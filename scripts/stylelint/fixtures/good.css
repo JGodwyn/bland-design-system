@@ -1,0 +1,90 @@
+/* Every value is a token or an allowed keyword. bland/use-tokens must report nothing. */
+.button {
+  display: inline-flex;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  margin: 0;
+  min-height: var(--control-sm);
+  width: 100%;
+  border: var(--stroke-sm) solid var(--border-subtle);
+  border-radius: var(--rad-md);
+  corner-shape: superellipse(2);
+  background: var(--button-brand-primary-rest);
+  color: var(--text-on-color);
+  font: var(--type-body-md-bold);
+  letter-spacing: var(--letter-spacing-normal);
+  box-shadow: var(--elevation-neutral-near);
+  z-index: 1;
+  line-height: 1;
+  transition:
+    background-color var(--duration-xs) var(--easing-ease),
+    transform var(--duration-sm) var(--easing-out);
+}
+
+.button:active {
+  transform: scale(0.97);
+}
+
+.button:disabled {
+  background: var(--button-brand-primary-disabled);
+}
+
+.button:focus-visible {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--stroke-lg);
+}
+
+.button svg {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+  stroke-width: var(--stroke-md);
+}
+
+.label {
+  font-family: inherit;
+  font-weight: var(--font-weight-medium);
+  margin-inline-start: calc(var(--space-xs) * -1);
+  max-width: 60ch;
+  text-overflow: ellipsis;
+}
+
+.popover {
+  opacity: 0;
+  transform: scale(0.96) rotate(0deg);
+  transform-origin: var(--trigger-origin);
+  animation: popover-in var(--duration-md) var(--easing-out) both;
+}
+
+.scroll {
+  overflow: auto;
+  mask-image: linear-gradient(to bottom, transparent, black var(--fade-md));
+}
+
+.ring {
+  box-shadow: 0 0 0 var(--stroke-lg) var(--border-focused);
+}
+
+@media (min-width: 768px) {
+  .button {
+    min-height: var(--control-md);
+  }
+}
+
+@media (width >= 1280px) {
+  .button {
+    min-height: var(--control-lg);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button:hover {
+    background: var(--button-brand-primary-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popover {
+    animation-name: popover-fade;
+  }
+}

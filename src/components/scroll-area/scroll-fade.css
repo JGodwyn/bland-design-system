@@ -1,0 +1,45 @@
+/*
+ * Overflow edge fade, shared by every scroll area (CLAUDE.md, "Overflow").
+ *
+ * A real mask on the scroll container: an edge goes transparent only while content is
+ * hidden past it. Script sets the edge attributes on scroll; the class does the rest.
+ *
+ *   <div class="bland-scroll-fade" data-fade-start data-fade-end>   vertical, fade/md
+ *   data-fade-axis="x"                                              horizontal
+ *   data-fade-size="sm"                                             fade/sm instead of fade/md
+ *
+ * Pair it with the visible scrollbar (Scrollbar/thumb, scrollbar/width).
+ */
+.bland-scroll-fade {
+  --bland-fade-length: var(--fade-md);
+  --bland-fade-start: 0px; /* a unit, because calc(100% - 0) is invalid */
+  --bland-fade-end: 0px;
+  --bland-fade-direction: to bottom;
+
+  overflow: auto;
+  /* A focused item scrolls clear of the fade. */
+  scroll-padding: var(--bland-fade-length);
+  mask-image: linear-gradient(
+    var(--bland-fade-direction),
+    transparent 0,
+    black var(--bland-fade-start),
+    black calc(100% - var(--bland-fade-end)),
+    transparent 100%
+  );
+}
+
+.bland-scroll-fade[data-fade-axis="x"] {
+  --bland-fade-direction: to right;
+}
+
+.bland-scroll-fade[data-fade-size="sm"] {
+  --bland-fade-length: var(--fade-sm);
+}
+
+.bland-scroll-fade[data-fade-start] {
+  --bland-fade-start: var(--bland-fade-length);
+}
+
+.bland-scroll-fade[data-fade-end] {
+  --bland-fade-end: var(--bland-fade-length);
+}

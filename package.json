@@ -1,0 +1,48 @@
+{
+  "name": "bland",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Bland design system: tokens and React components",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./tokens.css": "./dist/tokens.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "tokens": "tsx scripts/build-tokens.ts",
+    "tokens:checksum": "tsx scripts/figma/checksum.ts",
+    "build": "npm run tokens && vite build && cp src/tokens/tokens.css dist/tokens.css && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint:css": "stylelint \"src/components/**/*.css\" --allow-empty-input",
+    "test:lint": "node --test scripts/stylelint/*.test.js",
+    "audit": "npm audit --omit=dev"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "postcss-value-parser": "4.2.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "stylelint": "17.16.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
+  }
+}

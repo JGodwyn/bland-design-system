@@ -1,0 +1,73 @@
+/*
+ * Each line ending in an expect comment must be reported by bland/use-tokens, and its
+ * messages must contain every |-separated part. No other line may be reported.
+ */
+.bad {
+  padding: 12px; /* expect: var(--space-md) */
+  margin-top: -16px; /* expect: calc(var(--space-lg) * -1) */
+  gap: 10px; /* expect: no Spacing token is 10px | var(--space-sm) | var(--space-md) */
+  border-radius: 8px; /* expect: var(--rad-md) */
+  border: 1px solid #e2e5ea; /* expect: var(--stroke-sm) | var(--border-subtle) */
+  background-color: #0062ff; /* expect: var(--surface-brand) */
+  color: #15181d; /* expect: var(--icon-bold) */
+  width: 2.5rem; /* expect: 40px at a 16px root | var(--control-md) */
+  font-size: 14px; /* expect: var(--font-size-sm) */
+  font-weight: 500; /* expect: var(--font-weight-medium) */
+  font-family: "Inter", sans-serif; /* expect: var(--font-family-sans) */
+  font: 400 14px/20px Inter, sans-serif; /* expect: var(--type-body-md) */
+  box-shadow: 0 2px 4px -1px rgb(0 0 0 / 6%), 0 4px 8px -2px rgb(0 0 0 / 10%); /* expect: var(--elevation-neutral-mid) */
+  outline-color: white; /* expect: var(--border-inverse) */
+  fill: rgb(18 52 86); /* expect: no Theme token resolves to it */
+  height: var(--control-sm, 32px); /* expect: var(--control-sm) */
+  --local-gap: 24px; /* expect: var(--space-xl) */
+  background: color-mix(in srgb, var(--surface-brand) 50%, transparent); /* expect: hardcoded color */
+}
+
+.units {
+  padding-inline: 1em; /* expect: em is allowed only on width or height */
+  width: 30ch; /* expect: ch is allowed only on max-width */
+  margin: 2ch; /* expect: ch is allowed only on max-width */
+}
+
+.motion {
+  transition: opacity 200ms ease-out; /* expect: var(--duration-md) | var(--easing-out) */
+  transition-duration: 0.4s; /* expect: var(--duration-xl) */
+  transition-timing-function: ease-in; /* expect: Bland bans on UI | var(--easing-out) */
+  animation-timing-function: cubic-bezier(0.42, 0, 1, 1); /* expect: Bland bans on UI */
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1); /* expect: var(--easing-drawer) */
+  animation-timing-function: linear; /* expect: var(--easing-linear) */
+  animation-timing-function: ease; /* expect: var(--easing-ease) */
+  transition-delay: 300ms; /* expect: no Motion token is 300ms | var(--duration-lg) | var(--duration-xl) */
+  transition-property: all; /* expect: Name the exact properties */
+  --enter: 125ms; /* expect: var(--duration-xs) */
+}
+
+.mask {
+  mask-image: linear-gradient(to bottom, transparent, white); /* expect: only in mask-image | .bland-scroll-fade */
+  -webkit-mask: linear-gradient(black, transparent); /* expect: only in mask-image */
+  background: linear-gradient(black, transparent); /* expect: hardcoded color */
+}
+
+.button:disabled {
+  opacity: 0.5; /* expect: Bland has no disabled opacity | var(--button-brand-primary-disabled) */
+}
+
+.chip[aria-disabled="true"] .label {
+  opacity: 0.4; /* expect: Bland has no disabled opacity */
+}
+
+@media (min-width: 750px) { /* expect: not a Bland breakpoint | (min-width: 768px) */
+  .bad { gap: var(--space-md); }
+}
+
+@media (max-width: 768px) { /* expect: mobile-first min-width */
+  .bad { gap: var(--space-md); }
+}
+
+@media (min-width: 48em) { /* expect: not a Bland breakpoint */
+  .bad { gap: var(--space-md); }
+}
+
+@media (640px <= width < 1024px) { /* expect: not a Bland breakpoint */
+  .bad { gap: var(--space-md); }
+}
