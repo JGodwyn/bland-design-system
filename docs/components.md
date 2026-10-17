@@ -1,6 +1,6 @@
 # Building components
 
-How every Bland component is built, so components made in separate chats come out the same. Read `CLAUDE.md` first: its hard rule, decisions and component map apply here.
+How every Bland component is built, so components made in separate chats come out the same. Read `CLAUDE.md` and `INTERFACE.md` first: their rules, decisions and component map apply here. Skim `LEARNINGS.md` for the area you're touching.
 
 ## Before you start
 
@@ -83,6 +83,7 @@ Anything that can scroll uses `<ScrollArea>` (`src/components/scroll-area/Scroll
 - [ ] The story shows every state, and the screenshots were looked at.
 - [ ] The component map row in `CLAUDE.md` has the import and the prop mapping.
 - [ ] The tracker doc shows it done, with a log row.
+- [ ] `EXECUTIONS.md` has a section for the task; anything decided is in `INTERFACE.md` and anything surprising in `LEARNINGS.md`.
 
 ## Dependency waves
 

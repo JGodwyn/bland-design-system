@@ -30,6 +30,7 @@ scripts/stylelint/        bland/use-tokens lint rule, fixtures and test
 - `npm run typecheck`.
 - `npm run lint:css`: Stylelint on `src/components/**/*.css`; rejects any value that is not a `var(--…)` token (including durations, easings and `@media` widths) and names the token to use (`docs/lint.md`). `npm run test:lint` runs its fixtures.
 - `npm test`: Playwright in Chromium against the docs site: screenshots of every story in both themes, axe, behaviour specs, docs smoke tests. `npm run test:update` re-baselines screenshots after an intended visual change.
+- `npm run docs:stop`: frees port 5180 when an old dev server holds it ("Port 5180 is already in use").
 - `npm run docs`: the docs site at http://localhost:5180. It first runs `npm run props`, which reads each component's props from its TypeScript (via a TypeScript 5.9 alias, since TypeScript 7 has no JS API) into `playground/.generated/props.json`.
 
 **Building a component: follow `docs/components.md`.**
@@ -37,6 +38,16 @@ scripts/stylelint/        bland/use-tokens lint rule, fixtures and test
 - npm, not pnpm. Vite 8 library mode, TypeScript strict, React as a peer dependency.
 
 To sync tokens from Figma, follow `docs/tokens.md` step by step. Never hand-edit generated files.
+
+## Project logs — read and write these
+
+Three append-as-you-go files at the repo root, the working memory this file is too short to hold:
+
+- **`INTERFACE.md`**: every design and API decision settled in code (tokens, conventions, icons, overflow, motion, each component, the docs site). **Read it before building a component**; write to it the moment a decision is made.
+- **`LEARNINGS.md`**: symptom → cause → rule for everything this project has been bitten by (Figma MCP limits, fonts, TypeScript 7, CSS, ports, parallel sessions). Read the section matching what you're about to touch; add an entry the moment something surprises you.
+- **`EXECUTIONS.md`**: the steps taken, task by task, including dead ends. Append a section **during** the task, not reconstructed after. Side sessions append their own.
+
+They merge with git's `union` strategy (`.gitattributes`): append, never restructure another session's section.
 
 ## Hard rule
 
