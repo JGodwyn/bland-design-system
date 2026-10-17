@@ -169,7 +169,7 @@ Base Figma pages (Colors, Effects, Grid system, Icons, Spacing, Typography) docu
 
 In order; tokens come before components.
 
-- [ ] Repo + sync setup. Done: local git repo, `docs/` seeded, handoff archived. Left: GitHub remote (Godwin), connect it to the claude.ai project, merge and retire the project's `claude/bland-handoff*.md` files.
+- [ ] Repo + sync setup. Done: git repo on GitHub (private, [JGodwyn/bland-design-system](https://github.com/JGodwyn/bland-design-system)), `docs/` seeded, handoff archived. Left: connect it to the claude.ai project, merge and retire the project's `claude/bland-handoff*.md` files.
 - [ ] Drift check script. The checksum pair in `scripts/figma/` is the base; it still needs a per-variable diff report and an optional weekly schedule.
 - [x] Token export pipeline (Light/Dark CSS, resolved aliases and alphas, descriptions kept, `Fade/*-clear` skipped). First export 2026-10-16.
 - [x] Token lint (Stylelint) before any component code. Set up 2026-10-16, see `docs/lint.md`.
@@ -178,7 +178,6 @@ In order; tokens come before components.
 
 ## Open questions (ask Godwin, don't assume)
 
-- Where the repo lives (GitHub account/org and name).
 - Dark mode switch: root class/attribute, system preference, or both? The generated CSS currently supports both (`data-theme` wins over `prefers-color-scheme`).
 - Docs site stack and hosting.
 - Playwright scope.
