@@ -10,11 +10,15 @@ Bland is Godwin's personal design system: a Figma UI kit reused across client pr
 
 ```
 CLAUDE.md                 rules (this file)
-docs/                     long-form notes: tokens.md (pipeline), lint.md, motion.md
+docs/                     long-form notes: components.md (how to build one), tokens.md, lint.md, motion.md
 tokens/figma/raw/         raw Figma export, verified by checksum (generated)
 tokens/tokens.json        resolved tokens with descriptions (generated)
 src/tokens/tokens.css     CSS custom properties, shipped as bland/tokens.css (generated)
-src/components/           components (none yet)
+src/styles/               fonts.css (self-hosted Inter, Geist Mono) and base.css (reset, focus and smoothing helpers)
+src/components/           one folder per component: <Name>.tsx, <name>.css, <name>.stories.tsx
+src/icons/                Bland's own icons, exported from Figma
+playground/               Vite app showing every story in light and dark (npm run playground)
+tests/                    Playwright: screenshots, axe checks, behaviour specs
 scripts/build-tokens.ts   raw export -> tokens.json + tokens.css
 scripts/figma/            Plugin API scripts run through use_figma, plus the local checksum
 scripts/stylelint/        bland/use-tokens lint rule, fixtures and test
@@ -25,6 +29,10 @@ scripts/stylelint/        bland/use-tokens lint rule, fixtures and test
 - `npm run build`: tokens, Vite library build, `dist/tokens.css`, type declarations.
 - `npm run typecheck`.
 - `npm run lint:css`: Stylelint on `src/components/**/*.css`; rejects any value that is not a `var(--…)` token (including durations, easings and `@media` widths) and names the token to use (`docs/lint.md`). `npm run test:lint` runs its fixtures.
+- `npm test`: Playwright in Chromium against the playground: screenshots of every story in both themes, axe, behaviour specs. `npm run test:update` re-baselines screenshots after an intended visual change.
+- `npm run playground`: the playground at http://localhost:5180.
+
+**Building a component: follow `docs/components.md`.**
 - `npm run audit`: `npm audit --omit=dev`, the audit check. The full audit flags dev-only `braces` with no fix yet (`docs/lint.md`).
 - npm, not pnpm. Vite 8 library mode, TypeScript strict, React as a peer dependency.
 
@@ -90,7 +98,7 @@ Implemented in `scripts/build-tokens.ts`; CSS naming and the sync steps are in `
 - **Slots:** Figma `🧩` slots map to `children` or named slot props.
 - **Prop names:** strip Figma prefixes (`👀` boolean, `✏️` text, `🌟` instance swap, `🧩` slot).
 - **Corner smoothing:** `border-radius` plus `corner-shape: superellipse(n)` tuned to match. Safari/Firefox fall back to plain rounding; that is accepted.
-- **Icons:** Phosphor, stroke `stroke-md` (1.5), sized by `icon/*` (12, 16, 20, 24). Color via the `Icon/*` token matching the adjacent text.
+- **Icons (decided 2026-10-17):** Bland ships no icon pack. Every icon prop takes any SVG as a React node; Bland sizes it from `icon/*` (12, 16, 20, 24) and colors it through `currentColor` from the matching `Icon/*` token. Stroked icons (the Figma set, Lucide) get `stroke-md` (1.5) at every size; filled packs (Phosphor React, any weight) keep their own weight. The design source is the Phosphor-based Figma Icons page; the few icons Bland needs internally (spinner, caret, close, check) are exported from it into `src/icons/` as components need them. Details in `docs/components.md`.
 - **Overflow:** every overflowing scroll area shows **both** a visible scrollbar (thumb `Scrollbar/thumb`, width `scrollbar/width`) and an edge fade. The fade is a real `mask-image: linear-gradient(...)` on the scroll container, transparent only on edges with hidden content, length `fade/md` (32) by default or `fade/sm` (16), updated on scroll; a focused item scrolls clear of it. (Figma's surface-colored overlay is only a workaround.) In code every fade uses the shared `.bland-scroll-fade` class; don't write another mask. Scrolling in Figma today: Menu, Calendar month/year, Sidebar, Code snippet, Text Area. Table, Modal body, chat list and tab rows follow the same rule if they scroll in code.
 - **Disabled:** disabled states use the disabled color tokens (`Button/*-disabled`, `Toggle/*-disabled`, `Control/checked-disabled`). No opacity, and no opacity token; the lint rejects `opacity` on disabled selectors.
 - **Layout:** mobile-first. Base styles are mobile, `breakpoint/md` (768) is the tablet layout, `breakpoint/xl` (1280) the desktop layout; `sm`, `lg` and `2xl` are for component-level tweaks. Media queries use `min-width` on a breakpoint value only (`var()` does not work there; the lint holds the list). `--breakpoint-*` exist for JS (`matchMedia`, Floating UI).
@@ -111,7 +119,7 @@ Implemented in `scripts/build-tokens.ts`; CSS naming and the sync steps are in `
 
 ## Code stack
 
-Raw build: plain CSS (or CSS Modules) on token variables. **No Tailwind, no shadcn.**
+Raw build: plain CSS on token variables (decided 2026-10-17: plain classes, not CSS Modules). Classes are `bland-<component>`, variants are data attributes (`data-size`, `data-type`), parts are `bland-<component>__<part>`. **No Tailwind, no shadcn.**
 
 - **Raw HTML components:** Button, Badge, Indicator, Chip, Avatar, Alert, Banner, Toast, Progress, Breadcrumb, Table, Empty State, Accordion (`<details>`), Toggle, Checkbox, Radio (native inputs).
 - **React Aria for behaviour only** (keyboard, focus, screen reader); all styling is Bland CSS: Dropdown/Menu, Modal, Tooltip, Tabs, Slider, Date and Time pickers, Pagination input. Chosen over Radix and Base UI for focus handling and date components.
@@ -160,7 +168,8 @@ For each component: Figma set, code import, and Figma property → prop mapping.
 | Text-input | Text Input, Text Area, Numeric, Search | TBD | `Status` (replaces Type); leading/trailing add-on slots |
 | Toggle | Toggle | TBD | Knob white in both modes |
 | Tooltip | Tooltip | TBD | Floating UI placements; optional slot |
-| Scroll area | `_scrollbar`, `_fade` | `src/components/scroll-area/scroll-fade.css`, class `bland-scroll-fade` (internal) | Fade only so far: script sets `data-fade-start` / `data-fade-end` on scroll; `data-fade-axis="x"`, `data-fade-size="sm"`. Scrollbar TBD. See Overflow decision |
+| Scroll area | `_scrollbar`, `_fade` | `import { ScrollArea } from 'bland'` | `Axis` → `axis`: `y` (default) / `x`; `_fade` `Size` → `fadeSize`: `md` (default) / `sm`; fade edges and the thumb follow the scroll. Overlay thumb 4 in from the edge, always visible, draggable; native scrollbar hidden. `viewportProps` reach the scrolling element. Built on `.bland-scroll-fade` |
+| Icons page | Phosphor icons, `_Spinner` | `import { Icon, CheckIcon, … } from 'bland'` | `<Icon size label>` wraps any SVG: `size` xs/sm/md/lg (icon/*) or the parent's `--bland-icon-size`; stroked icons get `stroke-md`; `label` makes it non-decorative. Bland icons so far: Check, X, CaretDown, Plus, Spinner |
 | Brand elements | Logo | TBD | `Color`: default/on-color; optional `Mark` slot |
 
 Base Figma pages (Colors, Effects, Grid system, Icons, Spacing, Typography) document tokens. Annotations (Header, Footer, Notes, Typo card) is doc chrome, not kit. Landing page and site Navbar are pending a redesign.
@@ -185,14 +194,14 @@ In order; tokens come before components.
 - [ ] Drift check script. The checksum pair in `scripts/figma/` is the base; it still needs a per-variable diff report and an optional weekly schedule.
 - [x] Token export pipeline (Light/Dark CSS, resolved aliases and alphas, descriptions kept, `Fade/*-clear` skipped). First export 2026-10-16.
 - [x] Token lint (Stylelint) before any component code. Set up 2026-10-16, see `docs/lint.md`.
-- [ ] Playwright: scope to confirm (visual regression and/or interaction, both themes).
+- [x] Playwright (decided 2026-10-17): screenshots of every story in both themes, axe checks and behaviour specs, Chromium only, against the playground. Set up 2026-10-17.
+- [x] Base: fonts, reset, focus and smoothing helpers, icon slot, scroll area, conventions in `docs/components.md`. Done 2026-10-17. Grid system (17 Figma layout grids) is deferred until page layouts need it.
 - [ ] Docs site: lower priority; stack and hosting to decide.
 
 ## Open questions (ask Godwin, don't assume)
 
 - Dark mode switch: root class/attribute, system preference, or both? The generated CSS currently supports both (`data-theme` wins over `prefers-color-scheme`).
 - Docs site stack and hosting.
-- Playwright scope.
 - Brand swap per client: one package with a brand override file, or a build per client? Today the build resolves primitives to values, so a brand swap means editing `Brand/*` in Figma (or a client copy) and re-running the sync. A runtime override would need Theme tokens emitted as `var()` references to brand primitives instead.
 
 ## Pending context to merge into `docs/`

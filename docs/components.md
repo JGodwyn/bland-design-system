@@ -1,0 +1,91 @@
+# Building components
+
+How every Bland component is built, so components made in separate chats come out the same. Read `CLAUDE.md` first: its hard rule, decisions and component map apply here.
+
+## Before you start
+
+1. Find the component set in Figma (file `32J76yQH71a7sENjf60RqD`) and read its description and every property. Read the variable bindings of its variants with a read-only `use_figma` script: fills, strokes, padding, gap, radius, size and text style per variant. Build from those bindings, never from screenshots alone.
+2. Check the component map row in `CLAUDE.md` and the dependency waves below. If your component nests another one (a Badge's Indicator, a Toast's Icon Button), use the built one; if it isn't built yet, stop and say so.
+3. Set the task to in progress in the [Bland Build Tracker](https://claude.ai/code/artifact/6bcbb578-c0e8-411f-a75c-966e611e0134).
+
+## Files
+
+```
+src/components/<name>/
+  <Name>.tsx            the React component; imports its CSS
+  <name>.css            plain CSS, tokens only (npm run lint:css)
+  <name>.stories.tsx    every state, for the playground and the screenshots
+tests/<name>.spec.ts    behaviour: keyboard, focus, states (optional when there is none)
+```
+
+`<name>` is the Figma set name in kebab-case (`icon-button` lives inside `button/`, next to Button, because they share CSS). Export the component and its prop types from `src/index.ts`.
+
+## CSS
+
+- **Plain classes, not CSS Modules.** The root is `.bland-<name>`, parts are `.bland-<name>__<part>`, variants are data attributes: `data-size="md"`, `data-type="primary"`, `data-emotion="danger"`. Projects override with ordinary selectors.
+- **Tokens only.** The lint rejects any raw value and names the token to use. If no token fits, stop and ask Godwin; never add a value or a token.
+- **Component tokens first.** Use the component's own Theme tokens (`--button-brand-primary-hover`) where Figma binds them, then the semantic ones (`--text-bold`, `--border-subtle`).
+- **States:** hover is `:hover` inside `@media (hover: hover) and (pointer: fine)`, pressed is `:active`, disabled is `:disabled` or `[aria-disabled="true"]` with the disabled color tokens (never opacity). Selected and checked come from the element's real state (`:checked`, `aria-selected`, `aria-pressed`), not a class.
+- **Composite type and shadows:** `font: var(--type-body-md)`, `box-shadow: var(--elevation-neutral-mid)`.
+- **Motion:** follow `docs/motion.md`. Name each transitioned property, use the Motion tokens, and give every animation a `prefers-reduced-motion` fallback.
+
+## Shared helpers (`src/styles/base.css`)
+
+Add these classes in the markup instead of rewriting their CSS:
+
+| Class | What it does | Put it on |
+| --- | --- | --- |
+| `bland-focus-ring` | 2px `--border-focused` ring, 2px offset, on `:focus-visible` only | Every element that takes keyboard focus |
+| `bland-smooth` | `corner-shape: superellipse(2)` for Figma's 100% corner smoothing | Every element with a border radius |
+
+The smoothing exponent is a first guess. Tune it once in `base.css` against a Figma screenshot; every component follows.
+
+## Props
+
+- Figma property names become camelCase props; prefixes are dropped (`👀`, `✏️`, `🌟`, `🧩`). Variant values stay lowercase strings: `size="md"`, `type="secondary"`, `emotion="danger"`.
+- `👀 Focused` is never a prop; focus is `:focus-visible`. State (rest, hover, pressed) is never a prop; the browser drives it. Disabled is the native `disabled` prop.
+- Text properties become `children` when they are the main label, otherwise a named string prop.
+- `🧩` slots and `🌟` instance swaps become React nodes: `children`, or named props like `iconStart`, `iconEnd`, `leading`, `trailing`.
+- Spread the remaining native props onto the root element and accept `className`, so projects can add attributes and classes.
+- Default each variant to Figma's default.
+
+## Icons
+
+Bland ships no icon pack (CLAUDE.md, "Icons"). An icon prop takes any SVG node. Wrap it in `<Icon>` (`src/components/icon/Icon.tsx`). Set the size from the component's CSS with `--bland-icon-size: var(--icon-md)` on the slot's parent, not with a prop, so icons follow the component's size. Color comes from `currentColor`, so set `color` to the matching `Icon/*` or component content token. Icons next to a text label are decorative (no `label`). An icon-only control needs an accessible name (`aria-label`).
+
+Bland's own icons live in `src/icons/` and come from the Figma Icons page: export one with `node.exportAsync({format: 'SVG_STRING'})`, swap its colors to `currentColor`, and drop its `stroke-width` (the `.bland-icon` CSS sets it).
+
+## Overflow
+
+Anything that can scroll uses `<ScrollArea>` (`src/components/scroll-area/ScrollArea.tsx`). It handles the fade and the visible scrollbar together. Use `fadeSize="sm"` in compact areas (Menu). Truncated text is not overflow: give it `text-overflow: ellipsis`.
+
+## Behaviour
+
+- Simple components are native HTML (`<button>`, `<input type="checkbox">`, `<details>`): see "Code stack" in `CLAUDE.md` for the list.
+- Interactive components (Menu, Modal, Tooltip, Tabs, Slider, Date pickers) use React Aria hooks or components for keyboard, focus and screen reader behaviour, with Bland's CSS for every visual. Placement uses Floating UI.
+
+## Testing
+
+- `npm run playground` opens every story at `http://localhost:5180` (`#/<name>` both themes, `#/<name>?theme=dark` one theme).
+- `npm test` runs Playwright in Chromium: a screenshot of every story in light and dark (`tests/visual.spec.ts`), axe accessibility checks (`tests/a11y.spec.ts`), and each component's own spec.
+- A new story has no screenshot yet: run `npm run test:update` once, look at the PNGs in `tests/__screenshots__/`, and commit them with the component. Run it again only when a visual change is intended, and say so in the commit.
+- Baselines are taken on macOS. Another OS renders fonts differently; re-baseline there rather than loosening the threshold.
+
+## Done means
+
+- [ ] Every Figma variant and property is covered; differences from Figma are written down in the component map row.
+- [ ] `npm run lint:css`, `npm run typecheck` and `npm test` pass.
+- [ ] The story shows every state, and the screenshots were looked at.
+- [ ] The component map row in `CLAUDE.md` has the import and the prop mapping.
+- [ ] The tracker doc shows it done, with a log row.
+
+## Dependency waves
+
+Components that nest others come after them. Within a wave, components can be built in parallel chats.
+
+| Wave | Components | Needs |
+| --- | --- | --- |
+| 0 | Icon, Scroll area, Button and Icon Button | Base only. Button is the reference implementation: copy its patterns. |
+| 1 | Badge and Indicator, Toggle, Checkbox and Radio, Progress, Breadcrumb, Accordion, Empty State, Logo, Text Input family | Wave 0 |
+| 2 | Avatar, Chip and Pills, Alert, Banner, Toast, Notification, List item, Table, File Upload, Tooltip | Indicator, Button, Checkbox, Progress |
+| 3 | Dropdown and Menu, Modal, Tabs, Pagination, Slider, Date and Time, Code snippet, Sidebar, Messaging | Tooltip, Scroll area, Text Input, Badge |

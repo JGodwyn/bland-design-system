@@ -1,0 +1,40 @@
+/*
+ * Icon slot: sizes and colors any SVG from any icon pack (CLAUDE.md, "Icons").
+ *
+ *   <span class="bland-icon" data-size="md"><svg …/></span>
+ *
+ * Size comes from data-size, or from --bland-icon-size set by the component that holds the slot.
+ * Color is currentColor, so it follows the text color the parent sets (an Icon/* token).
+ * Stroked icons get stroke-md at every size; filled icons keep their own weight.
+ */
+.bland-icon {
+  --bland-icon-size: var(--icon-md);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--bland-icon-size);
+  height: var(--bland-icon-size);
+  color: inherit;
+}
+
+.bland-icon[data-size="xs"] { --bland-icon-size: var(--icon-xs); }
+.bland-icon[data-size="sm"] { --bland-icon-size: var(--icon-sm); }
+.bland-icon[data-size="md"] { --bland-icon-size: var(--icon-md); }
+.bland-icon[data-size="lg"] { --bland-icon-size: var(--icon-lg); }
+
+.bland-icon > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Stroked icons: one stroke weight at every size, whatever the SVG's viewBox. */
+.bland-icon > svg[stroke]:not([stroke="none"]),
+.bland-icon > svg [stroke]:not([stroke="none"]) {
+  stroke-width: var(--stroke-md);
+}
+.bland-icon > svg * {
+  vector-effect: non-scaling-stroke;
+}

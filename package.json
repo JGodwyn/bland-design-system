@@ -11,7 +11,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./tokens.css": "./dist/tokens.css"
+    "./tokens.css": "./dist/tokens.css",
+    "./fonts.css": "./dist/fonts.css",
+    "./base.css": "./dist/base.css",
+    "./styles.css": "./dist/index.css"
   },
   "files": [
     "dist"
@@ -22,17 +25,22 @@
   "scripts": {
     "tokens": "tsx scripts/build-tokens.ts",
     "tokens:checksum": "tsx scripts/figma/checksum.ts",
-    "build": "npm run tokens && vite build && cp src/tokens/tokens.css dist/tokens.css && tsc -p tsconfig.build.json",
+    "build": "npm run tokens && vite build && cp src/tokens/tokens.css src/styles/fonts.css src/styles/base.css dist/ && tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "lint:css": "stylelint \"src/components/**/*.css\" --allow-empty-input",
     "test:lint": "node --test scripts/stylelint/*.test.js",
-    "audit": "npm audit --omit=dev"
+    "audit": "npm audit --omit=dev",
+    "playground": "vite --config playground/vite.config.ts",
+    "test": "playwright test",
+    "test:update": "playwright test --update-snapshots"
   },
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.64.1",
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
@@ -44,5 +52,9 @@
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.4"
+  },
+  "dependencies": {
+    "@fontsource/geist-mono": "5.3.0",
+    "@fontsource/inter": "5.3.0"
   }
 }

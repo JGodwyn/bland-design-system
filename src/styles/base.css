@@ -1,0 +1,60 @@
+/*
+ * Bland base: a light reset, page defaults and the helpers every component shares.
+ * Shipped as bland/base.css. Load order in an app: tokens.css, fonts.css, base.css, then components.
+ */
+
+/* ---- Reset ---- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font: var(--type-body-md);
+  letter-spacing: var(--letter-spacing-normal);
+  color: var(--text-bold);
+  background: var(--surface-100);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Form controls take the page's type instead of the browser's. */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+/* ---- Helpers (see docs/components.md) ---- */
+
+/*
+ * Focus ring: CLAUDE.md, "Focus". Keyboard focus only, 2px Border/border-focused, offset 2px.
+ * Components put this class on every focusable element they render.
+ */
+.bland-focus-ring:focus-visible {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--space-2xs);
+}
+.bland-focus-ring:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/*
+ * Corner smoothing: CLAUDE.md, "Corner smoothing". Figma draws every rounded corner at 100%
+ * smoothing; corner-shape is the closest CSS (Chromium only; other browsers keep plain rounding).
+ * The exponent is a code constant, not a design token: tune it here against Figma screenshots.
+ */
+.bland-smooth {
+  corner-shape: superellipse(2);
+}

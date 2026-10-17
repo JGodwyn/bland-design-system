@@ -1,0 +1,69 @@
+/*
+ * Scroll area: the overflow rule in one component (CLAUDE.md, "Overflow").
+ * A masked viewport (.bland-scroll-fade) plus an always-visible overlay thumb, Figma's _scrollbar:
+ * Scrollbar/thumb, scrollbar/width, 4 in from the scrolling edge, outside the mask so the fade
+ * never hides it. The native scrollbar is hidden; wheel, touch and keyboard scrolling stay native.
+ * ScrollArea.tsx sets data-overflow, the fade edges and the thumb's size and position.
+ */
+.bland-scroll-area {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
+.bland-scroll-area__viewport {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  scrollbar-width: none;
+}
+.bland-scroll-area__viewport::-webkit-scrollbar {
+  display: none;
+}
+.bland-scroll-area[data-axis="y"] > .bland-scroll-area__viewport {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.bland-scroll-area[data-axis="x"] > .bland-scroll-area__viewport {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.bland-scroll-area__track {
+  position: absolute;
+  pointer-events: none;
+}
+.bland-scroll-area[data-axis="y"] > .bland-scroll-area__track {
+  top: var(--space-xs);
+  right: var(--space-xs);
+  bottom: var(--space-xs);
+  width: var(--scrollbar-width);
+}
+.bland-scroll-area[data-axis="x"] > .bland-scroll-area__track {
+  right: var(--space-xs);
+  bottom: var(--space-xs);
+  left: var(--space-xs);
+  height: var(--scrollbar-width);
+}
+.bland-scroll-area:not([data-overflow]) > .bland-scroll-area__track {
+  display: none;
+}
+
+.bland-scroll-area__thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: var(--rad-rd);
+  background: var(--scrollbar-thumb);
+  pointer-events: auto;
+  touch-action: none;
+}
+.bland-scroll-area[data-axis="y"] .bland-scroll-area__thumb {
+  width: 100%;
+  min-height: var(--control-xs);
+}
+.bland-scroll-area[data-axis="x"] .bland-scroll-area__thumb {
+  height: 100%;
+  min-width: var(--control-xs);
+}
