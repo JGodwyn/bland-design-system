@@ -1,0 +1,271 @@
+/*
+ * Button and Icon Button (Figma: Buttons page, sets "Button" and "Icon Button").
+ *
+ *   <button class="bland-button bland-focus-ring bland-smooth"
+ *           data-size="md" data-emotion="brand" data-type="primary">
+ *     <span class="bland-icon bland-button__icon">…</span>
+ *     <span class="bland-button__label">Save</span>
+ *   </button>
+ *
+ * Icon Button adds .bland-icon-button and holds one icon (or the spinner) instead of a label.
+ *
+ * How the colors work: each data-emotion block names that emotion's Button tokens (--_e-*),
+ * each data-type block picks from them (--_bg, --_text, …), and the state rules at the end read
+ * only those. One rule per emotion and per type instead of one per combination.
+ */
+
+.bland-button {
+  /* Set by data-type from the emotion's tokens. */
+  --_bg: transparent;
+  --_bg-hover: transparent;
+  --_bg-pressed: transparent;
+  --_bg-disabled: transparent;
+  --_text: var(--_e-text);
+  --_icon: var(--_e-icon);
+  --_text-disabled: var(--text-minimal);
+  --_icon-disabled: var(--icon-minimal);
+  --_border: transparent;
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  max-width: 100%;
+  height: var(--control-md);
+  margin: var(--space-none);
+  padding: var(--space-none) var(--space-lg);
+  border: none;
+  border-radius: var(--rad-md);
+  background-color: var(--_bg);
+  color: var(--_text);
+  font: var(--type-body-lg-bold);
+  letter-spacing: var(--letter-spacing-normal);
+  white-space: nowrap;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--duration-xs) var(--easing-ease),
+    color var(--duration-xs) var(--easing-ease),
+    box-shadow var(--duration-xs) var(--easing-ease),
+    transform var(--duration-sm) var(--easing-out);
+}
+
+/* ---- Size: height control/*, horizontal padding on the label, icon/* ---- */
+
+.bland-button[data-size="lg"] {
+  --bland-icon-size: var(--icon-lg);
+
+  height: var(--control-lg);
+  padding-inline: var(--space-2xl);
+}
+
+.bland-button[data-size="md"] {
+  --bland-icon-size: var(--icon-md);
+}
+
+.bland-button[data-size="sm"] {
+  --bland-icon-size: var(--icon-md);
+
+  height: var(--control-sm);
+  padding-inline: var(--space-md);
+}
+
+.bland-button[data-size="xs"] {
+  --bland-icon-size: var(--icon-xs);
+
+  height: var(--control-xs);
+  padding-inline: var(--space-sm);
+  border-radius: var(--rad-sm);
+  font: var(--type-body-md-bold);
+}
+
+/* Icon Button: a square, the icon centered. */
+.bland-icon-button {
+  width: var(--control-md);
+  padding: var(--space-none);
+}
+
+.bland-icon-button[data-size="lg"] { width: var(--control-lg); padding: var(--space-none); }
+.bland-icon-button[data-size="sm"] { width: var(--control-sm); padding: var(--space-none); }
+.bland-icon-button[data-size="xs"] { width: var(--control-xs); padding: var(--space-none); }
+
+/* ---- Emotion: the Button tokens for that intent ---- */
+
+.bland-button[data-emotion="brand"] {
+  --_e-primary-rest: var(--button-brand-primary-rest);
+  --_e-primary-hover: var(--button-brand-primary-hover);
+  --_e-primary-pressed: var(--button-brand-primary-pressed);
+  --_e-primary-disabled: var(--button-brand-primary-disabled);
+  --_e-secondary-rest: var(--button-brand-secondary-rest);
+  --_e-secondary-hover: var(--button-brand-secondary-hover);
+  --_e-secondary-pressed: var(--button-brand-secondary-pressed);
+  --_e-secondary-disabled: var(--button-brand-secondary-disabled);
+  --_e-ghost-hover: var(--button-brand-ghost-hover);
+  --_e-ghost-pressed: var(--button-brand-ghost-pressed);
+  --_e-stroke-hover: var(--button-brand-stroke-hover);
+  --_e-stroke-pressed: var(--button-brand-stroke-pressed);
+  --_e-border: var(--border-bold);
+  /* Brand content is neutral; the other emotions have a Button/<emotion>-content token. */
+  --_e-text: var(--text-bold);
+  --_e-icon: var(--icon-bold);
+}
+
+.bland-button[data-emotion="success"] {
+  --_e-primary-rest: var(--button-success-primary-rest);
+  --_e-primary-hover: var(--button-success-primary-hover);
+  --_e-primary-pressed: var(--button-success-primary-pressed);
+  --_e-primary-disabled: var(--button-success-primary-disabled);
+  --_e-secondary-rest: var(--button-success-secondary-rest);
+  --_e-secondary-hover: var(--button-success-secondary-hover);
+  --_e-secondary-pressed: var(--button-success-secondary-pressed);
+  --_e-secondary-disabled: var(--button-success-secondary-disabled);
+  --_e-ghost-hover: var(--button-success-ghost-hover);
+  --_e-ghost-pressed: var(--button-success-ghost-pressed);
+  --_e-stroke-hover: var(--button-success-stroke-hover);
+  --_e-stroke-pressed: var(--button-success-stroke-pressed);
+  --_e-border: var(--border-success);
+  --_e-text: var(--button-success-content);
+  --_e-icon: var(--button-success-content);
+}
+
+.bland-button[data-emotion="danger"] {
+  --_e-primary-rest: var(--button-danger-primary-rest);
+  --_e-primary-hover: var(--button-danger-primary-hover);
+  --_e-primary-pressed: var(--button-danger-primary-pressed);
+  --_e-primary-disabled: var(--button-danger-primary-disabled);
+  --_e-secondary-rest: var(--button-danger-secondary-rest);
+  --_e-secondary-hover: var(--button-danger-secondary-hover);
+  --_e-secondary-pressed: var(--button-danger-secondary-pressed);
+  --_e-secondary-disabled: var(--button-danger-secondary-disabled);
+  --_e-ghost-hover: var(--button-danger-ghost-hover);
+  --_e-ghost-pressed: var(--button-danger-ghost-pressed);
+  --_e-stroke-hover: var(--button-danger-stroke-hover);
+  --_e-stroke-pressed: var(--button-danger-stroke-pressed);
+  --_e-border: var(--border-danger);
+  --_e-text: var(--button-danger-content);
+  --_e-icon: var(--button-danger-content);
+}
+
+.bland-button[data-emotion="warning"] {
+  --_e-primary-rest: var(--button-warning-primary-rest);
+  --_e-primary-hover: var(--button-warning-primary-hover);
+  --_e-primary-pressed: var(--button-warning-primary-pressed);
+  --_e-primary-disabled: var(--button-warning-primary-disabled);
+  --_e-secondary-rest: var(--button-warning-secondary-rest);
+  --_e-secondary-hover: var(--button-warning-secondary-hover);
+  --_e-secondary-pressed: var(--button-warning-secondary-pressed);
+  --_e-secondary-disabled: var(--button-warning-secondary-disabled);
+  --_e-ghost-hover: var(--button-warning-ghost-hover);
+  --_e-ghost-pressed: var(--button-warning-ghost-pressed);
+  --_e-stroke-hover: var(--button-warning-stroke-hover);
+  --_e-stroke-pressed: var(--button-warning-stroke-pressed);
+  --_e-border: var(--border-warning);
+  --_e-text: var(--button-warning-content);
+  --_e-icon: var(--button-warning-content);
+}
+
+/* ---- Type: which of the emotion's tokens each state uses ---- */
+
+.bland-button[data-type="primary"] {
+  --_bg: var(--_e-primary-rest);
+  --_bg-hover: var(--_e-primary-hover);
+  --_bg-pressed: var(--_e-primary-pressed);
+  --_bg-disabled: var(--_e-primary-disabled);
+  --_text: var(--text-on-color);
+  --_icon: var(--icon-on-color);
+  --_text-disabled: var(--text-subtle);
+  --_icon-disabled: var(--icon-subtle);
+}
+
+.bland-button[data-type="secondary"] {
+  --_bg: var(--_e-secondary-rest);
+  --_bg-hover: var(--_e-secondary-hover);
+  --_bg-pressed: var(--_e-secondary-pressed);
+  --_bg-disabled: var(--_e-secondary-disabled);
+  --_text-disabled: var(--text-subtle);
+  --_icon-disabled: var(--icon-subtle);
+}
+
+.bland-button[data-type="ghost"] {
+  --_bg-hover: var(--_e-ghost-hover);
+  --_bg-pressed: var(--_e-ghost-pressed);
+}
+
+/* Stroke: a stroke-lg edge drawn inside the box (Figma's inside stroke), so it adds no size. */
+.bland-button[data-type="stroke"] {
+  --_bg-hover: var(--_e-stroke-hover);
+  --_bg-pressed: var(--_e-stroke-pressed);
+  --_border: var(--_e-border);
+
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-lg) var(--_border);
+}
+
+/* ---- Parts ---- */
+
+.bland-button__label {
+  min-width: var(--space-none);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bland-button__icon {
+  color: var(--_icon);
+}
+
+/* The spinner follows the label's color; in an Icon Button, the icon's. One turn per duration/spin. */
+.bland-button__spinner {
+  color: var(--_text);
+}
+
+.bland-button__spinner > svg {
+  animation: bland-button-spin var(--duration-spin) var(--easing-linear) infinite;
+}
+
+@keyframes bland-button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.bland-icon-button .bland-button__spinner {
+  color: var(--_icon);
+}
+
+/* ---- States: hover, pressed, disabled. Focus is .bland-focus-ring. ---- */
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-button:hover:not(:disabled, [aria-disabled="true"]) {
+    background-color: var(--_bg-hover);
+  }
+}
+
+.bland-button:active:not(:disabled, [aria-disabled="true"]) {
+  background-color: var(--_bg-pressed);
+  transform: scale(0.97);
+}
+
+.bland-button:is(:disabled, [aria-disabled="true"]) {
+  --_bg: var(--_bg-disabled);
+  --_text: var(--_text-disabled);
+  --_icon: var(--_icon-disabled);
+  --_border: var(--border-subtle);
+
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bland-button {
+    transition-property: background-color, color, box-shadow;
+  }
+
+  .bland-button:active:not(:disabled, [aria-disabled="true"]) {
+    transform: none;
+  }
+
+  /* No rotation; the spinner's shape and aria-busy still say it is loading. */
+  .bland-button__spinner > svg {
+    animation: none;
+  }
+}

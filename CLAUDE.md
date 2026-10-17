@@ -148,7 +148,7 @@ For each component: Figma set, code import, and Figma property → prop mapping.
 | Avatar | Avatar | TBD | `Type` → `type`: image/placeholder/initials. Nested Indicator |
 | Badges | Badge, Indicator | TBD | `Emotion` × `Type`. Badge tokens alias Indicator |
 | Breadcrumbs | Breadcrumb | TBD | Current page static; separator outside the link |
-| Buttons | Button, Icon Button | TBD | Loading uses `_Spinner` |
+| Buttons | Button, Icon Button | `import { Button, IconButton } from 'bland'` | `Size` → `size` lg/md/sm/xs, default **md** (Figma xs; its description says xs is below the touch target). `Emotion` → `emotion`, `Type` → `type`; native type is `htmlType` (default `button`). `✏️ Label` → `children` (`👀 Label` off → use IconButton). `🌟 Icon (L)/(R)` → `iconStart`/`iconEnd`. `👀 Loading (L)/(R)` → `loading`: `true`/`'start'`/`'end'`, spinner (rotates at `duration/spin`, static under reduced motion) replaces that side's icon, `aria-busy`, clicks ignored. Icon Button: `icon`, required `aria-label`, `loading` swaps the icon. State is CSS; `👀 Focused` dropped. Figma's inner Base frame is not rendered: padding sits on the `<button>`; stroke type is an inset `stroke-lg` shadow (Figma inside stroke) |
 | Checkbox / Radio Button | Control, Group | TBD | `Checked` → `checked`: false/true/mixed. 24 and 32 hit areas |
 | Chip / Pills | Chip, Pills | TBD | Count is a nested Indicator |
 | Code snippet | Code-snippet | TBD | `View`: collapsed/expanded/fullscreen. Resizable height; collapsed body capped at 384. Geist Mono + `Code/*` syntax tokens |

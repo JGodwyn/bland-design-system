@@ -7,9 +7,12 @@
  * Color is currentColor, so it follows the text color the parent sets (an Icon/* token).
  * Stroked icons get stroke-md at every size; filled icons keep their own weight.
  */
-.bland-icon {
+/* The default lives on :root so a component's --bland-icon-size reaches the icon by inheritance. */
+:root {
   --bland-icon-size: var(--icon-md);
+}
 
+.bland-icon {
   display: inline-flex;
   flex: none;
   align-items: center;

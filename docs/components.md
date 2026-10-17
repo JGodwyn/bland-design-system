@@ -26,6 +26,7 @@ tests/<name>.spec.ts    behaviour: keyboard, focus, states (optional when there 
 - **Tokens only.** The lint rejects any raw value and names the token to use. If no token fits, stop and ask Godwin; never add a value or a token.
 - **Component tokens first.** Use the component's own Theme tokens (`--button-brand-primary-hover`) where Figma binds them, then the semantic ones (`--text-bold`, `--border-subtle`).
 - **States:** hover is `:hover` inside `@media (hover: hover) and (pointer: fine)`, pressed is `:active`, disabled is `:disabled` or `[aria-disabled="true"]` with the disabled color tokens (never opacity). Selected and checked come from the element's real state (`:checked`, `aria-selected`, `aria-pressed`), not a class.
+- **Variant colors (copy `button.css`):** each `data-emotion` block names that emotion's component tokens in private `--_e-*` properties, each `data-type` block picks from them into `--_bg`, `--_text`, `--_icon`, `--_border` and their state twins, and the hover, pressed and disabled rules read only those. One rule per emotion and per type, not one per combination. Private properties start with `--_` and never leave the component.
 - **Composite type and shadows:** `font: var(--type-body-md)`, `box-shadow: var(--elevation-neutral-mid)`.
 - **Motion:** follow `docs/motion.md`. Name each transitioned property, use the Motion tokens, and give every animation a `prefers-reduced-motion` fallback.
 
@@ -47,11 +48,13 @@ The smoothing exponent is a first guess. Tune it once in `base.css` against a Fi
 - Text properties become `children` when they are the main label, otherwise a named string prop.
 - `🧩` slots and `🌟` instance swaps become React nodes: `children`, or named props like `iconStart`, `iconEnd`, `leading`, `trailing`.
 - Spread the remaining native props onto the root element and accept `className`, so projects can add attributes and classes.
-- Default each variant to Figma's default.
+- Default each variant to Figma's default, unless the set's description says that value is unsafe as a default; then pick the safe one and note why in the component map row (Button defaults to `size="md"` because xs is below the comfortable touch target).
+- A Figma property that collides with a native attribute keeps the Figma name, and the native one moves to `html<Name>`: Button's `type` is Figma's Type, `htmlType` is the native type (default `button`, so it never submits a form by accident).
+- Loading: set `aria-busy`, keep the accessible name and the rest colors, stay focusable (not `disabled`), and ignore clicks until loading ends. The spinner is `ButtonSpinner` from `button/Button.tsx` in the icon slot.
 
 ## Icons
 
-Bland ships no icon pack (CLAUDE.md, "Icons"). An icon prop takes any SVG node. Wrap it in `<Icon>` (`src/components/icon/Icon.tsx`). Set the size from the component's CSS with `--bland-icon-size: var(--icon-md)` on the slot's parent, not with a prop, so icons follow the component's size. Color comes from `currentColor`, so set `color` to the matching `Icon/*` or component content token. Icons next to a text label are decorative (no `label`). An icon-only control needs an accessible name (`aria-label`).
+Bland ships no icon pack (CLAUDE.md, "Icons"). An icon prop takes any SVG node. Wrap it in `<Icon>` (`src/components/icon/Icon.tsx`). Set the size from the component's CSS with `--bland-icon-size: var(--icon-md)` on the slot's parent, not with a prop, so icons follow the component's size (the default sits on `:root`, so the parent's value inherits). Color comes from `currentColor`, so set `color` to the matching `Icon/*` or component content token. Icons next to a text label are decorative (no `label`). An icon-only control needs an accessible name (`aria-label`).
 
 Bland's own icons live in `src/icons/` and come from the Figma Icons page: export one with `node.exportAsync({format: 'SVG_STRING'})`, swap its colors to `currentColor`, and drop its `stroke-width` (the `.bland-icon` CSS sets it).
 
