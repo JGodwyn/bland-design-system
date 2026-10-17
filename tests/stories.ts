@@ -11,7 +11,7 @@ export const themes = ['light', 'dark'] as const;
 
 /** Open one story in one theme and wait until fonts are in, so screenshots are stable. */
 export async function openStory(page: Page, id: string, theme: (typeof themes)[number]) {
-  await page.goto(`/#/${id}?theme=${theme}`);
+  await page.goto(`/#/raw/${id}?theme=${theme}`);
   await page.getByTestId(`frame-${theme}`).waitFor();
   await page.evaluate(() => document.fonts.ready);
 }

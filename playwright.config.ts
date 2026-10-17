@@ -11,7 +11,7 @@ export default defineConfig({
   use: { baseURL: 'http://localhost:5180', ...devices['Desktop Chrome'], viewport: { width: 1024, height: 768 } },
   projects: [{ name: 'chromium' }],
   webServer: {
-    command: 'npx vite --config playground/vite.config.ts',
+    command: 'npm run docs',
     url: 'http://localhost:5180',
     reuseExistingServer: true,
   },

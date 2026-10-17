@@ -30,9 +30,10 @@
     "lint:css": "stylelint \"src/components/**/*.css\" --allow-empty-input",
     "test:lint": "node --test scripts/stylelint/*.test.js",
     "audit": "npm audit --omit=dev",
-    "playground": "vite --config playground/vite.config.ts",
     "test": "playwright test",
-    "test:update": "playwright test --update-snapshots"
+    "test:update": "playwright test --update-snapshots",
+    "props": "tsx scripts/build-props.ts",
+    "docs": "npm run props && vite --config playground/vite.config.ts"
   },
   "peerDependencies": {
     "react": ">=18",
@@ -47,10 +48,12 @@
     "@vitejs/plugin-react": "^6.1.2",
     "postcss-value-parser": "4.2.0",
     "react": "^19.3.1",
+    "react-docgen-typescript": "2.4.0",
     "react-dom": "^19.3.1",
     "stylelint": "17.16.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
+    "typescript5": "npm:typescript@5.9.3",
     "vite": "^8.3.4"
   },
   "dependencies": {

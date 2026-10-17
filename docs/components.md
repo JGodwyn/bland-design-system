@@ -14,7 +14,7 @@ How every Bland component is built, so components made in separate chats come ou
 src/components/<name>/
   <Name>.tsx            the React component; imports its CSS
   <name>.css            plain CSS, tokens only (npm run lint:css)
-  <name>.stories.tsx    every state, for the playground and the screenshots
+  <name>.stories.tsx    the docs page and the screenshots: description, demo, every state
 tests/<name>.spec.ts    behaviour: keyboard, focus, states (optional when there is none)
 ```
 
@@ -69,7 +69,9 @@ Anything that can scroll uses `<ScrollArea>` (`src/components/scroll-area/Scroll
 
 ## Testing
 
-- `npm run playground` opens every story at `http://localhost:5180` (`#/<name>` both themes, `#/<name>?theme=dark` one theme).
+- `npm run docs` opens the docs site at `http://localhost:5180`. Each story becomes a page at `#/components/<name>`; `#/raw/<name>?theme=dark` shows the story alone, which is what the screenshots capture.
+- A story (`playground/story.ts`) has: `title`; `description` (the Figma set description, without em dashes); `components` (export names that get a props table); `demo` (the component whose props drive the controls, starting `args`, `controls` overrides such as a text field for `children` or `false` to hide one, and `render(args)`); and `render`, every state, shown under Variants and screenshotted. Name demo icon options after their exports (`PlusIcon`) so the code snippet reads like real usage.
+- Props tables are generated from the component's TypeScript and JSDoc, so write a JSDoc line on every prop: that line is the docs.
 - `npm test` runs Playwright in Chromium: a screenshot of every story in light and dark (`tests/visual.spec.ts`), axe accessibility checks (`tests/a11y.spec.ts`), and each component's own spec.
 - A new story has no screenshot yet: run `npm run test:update` once, look at the PNGs in `tests/__screenshots__/`, and commit them with the component. Run it again only when a visual change is intended, and say so in the commit.
 - Baselines are taken on macOS. Another OS renders fonts differently; re-baseline there rather than loosening the threshold.

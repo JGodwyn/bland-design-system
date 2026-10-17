@@ -11,8 +11,24 @@ const FilledDot = () => (
 
 const sizes = ['xs', 'sm', 'md', 'lg'] as const;
 
+// Option names match the icon exports, so the docs code snippet reads like real usage.
+const glyphs = { CheckIcon: <CheckIcon />, XIcon: <XIcon />, PlusIcon: <PlusIcon /> } as const;
+
 export default {
   title: 'Icon',
+  description:
+    'Sizes and colors one icon from any icon pack. Stroked icons get the 1.5 stroke at every size; filled icons keep their own weight. Color follows the text around it. Give it a label only when it carries meaning on its own.',
+  components: ['Icon'],
+  demo: {
+    component: 'Icon',
+    args: { children: 'CheckIcon', size: 'lg', label: '' },
+    controls: { children: { kind: 'select', options: Object.keys(glyphs) }, label: { kind: 'text' } },
+    render: ({ children, label, size }) => (
+      <Icon size={size} label={label || undefined}>
+        {glyphs[children as keyof typeof glyphs]}
+      </Icon>
+    ),
+  },
   render: () => (
     <>
       <div className="pg-stack">

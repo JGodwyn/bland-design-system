@@ -17,7 +17,7 @@ src/tokens/tokens.css     CSS custom properties, shipped as bland/tokens.css (ge
 src/styles/               fonts.css (self-hosted Inter, Geist Mono) and base.css (reset, focus and smoothing helpers)
 src/components/           one folder per component: <Name>.tsx, <name>.css, <name>.stories.tsx
 src/icons/                Bland's own icons, exported from Figma
-playground/               Vite app showing every story in light and dark (npm run playground)
+playground/               the docs site (npm run docs): style pages from tokens.json, component pages from stories and generated props; #/raw/<id> is what Playwright screenshots
 tests/                    Playwright: screenshots, axe checks, behaviour specs
 scripts/build-tokens.ts   raw export -> tokens.json + tokens.css
 scripts/figma/            Plugin API scripts run through use_figma, plus the local checksum
@@ -29,8 +29,8 @@ scripts/stylelint/        bland/use-tokens lint rule, fixtures and test
 - `npm run build`: tokens, Vite library build, `dist/tokens.css`, type declarations.
 - `npm run typecheck`.
 - `npm run lint:css`: Stylelint on `src/components/**/*.css`; rejects any value that is not a `var(--…)` token (including durations, easings and `@media` widths) and names the token to use (`docs/lint.md`). `npm run test:lint` runs its fixtures.
-- `npm test`: Playwright in Chromium against the playground: screenshots of every story in both themes, axe, behaviour specs. `npm run test:update` re-baselines screenshots after an intended visual change.
-- `npm run playground`: the playground at http://localhost:5180.
+- `npm test`: Playwright in Chromium against the docs site: screenshots of every story in both themes, axe, behaviour specs, docs smoke tests. `npm run test:update` re-baselines screenshots after an intended visual change.
+- `npm run docs`: the docs site at http://localhost:5180. It first runs `npm run props`, which reads each component's props from its TypeScript (via a TypeScript 5.9 alias, since TypeScript 7 has no JS API) into `playground/.generated/props.json`.
 
 **Building a component: follow `docs/components.md`.**
 - `npm run audit`: `npm audit --omit=dev`, the audit check. The full audit flags dev-only `braces` with no fix yet (`docs/lint.md`).
@@ -196,12 +196,13 @@ In order; tokens come before components.
 - [x] Token lint (Stylelint) before any component code. Set up 2026-10-16, see `docs/lint.md`.
 - [x] Playwright (decided 2026-10-17): screenshots of every story in both themes, axe checks and behaviour specs, Chromium only, against the playground. Set up 2026-10-17.
 - [x] Base: fonts, reset, focus and smoothing helpers, icon slot, scroll area, conventions in `docs/components.md`. Done 2026-10-17. Grid system (17 Figma layout grids) is deferred until page layouts need it.
-- [ ] Docs site: lower priority; stack and hosting to decide.
+- [x] Docs site, local (2026-10-17): sidebar of styles and components, live demo with controls, variants, props tables, theme switch. Runs with `npm run docs`.
+- [ ] Docs site hosting: not deployed anywhere yet.
 
 ## Open questions (ask Godwin, don't assume)
 
 - Dark mode switch: root class/attribute, system preference, or both? The generated CSS currently supports both (`data-theme` wins over `prefers-color-scheme`).
-- Docs site stack and hosting.
+- Docs site hosting: where, if anywhere, to deploy `npm run docs` as a static site.
 - Brand swap per client: one package with a brand override file, or a build per client? Today the build resolves primitives to values, so a brand swap means editing `Brand/*` in Figma (or a client copy) and re-running the sync. A runtime override would need Theme tokens emitted as `var()` references to brand primitives instead.
 
 ## Pending context to merge into `docs/`

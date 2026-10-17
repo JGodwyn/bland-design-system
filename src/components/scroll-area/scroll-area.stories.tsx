@@ -5,6 +5,23 @@ const rows = Array.from({ length: 24 }, (_, i) => `Row ${i + 1}`);
 
 export default {
   title: 'Scroll area',
+  description:
+    'Every scroll area that overflows shows a visible scrollbar and an edge fade, always both. The fade appears only on edges with hidden content. Use the sm fade in compact areas such as Menu. Truncated text is not overflow: it ends in an ellipsis.',
+  components: ['ScrollArea'],
+  demo: {
+    component: 'ScrollArea',
+    args: { axis: 'y', fadeSize: 'md' },
+    controls: { viewportProps: false },
+    render: ({ axis, fadeSize }) => (
+      <ScrollArea axis={axis} fadeSize={fadeSize} style={{ width: 'min(320px, 100%)', height: 200, border: 'var(--stroke-sm) solid var(--border-subtle)', borderRadius: 'var(--rad-md)' }}>
+        <div style={{ display: 'flex', flexDirection: axis === 'x' ? 'row' : 'column', gap: 'var(--space-sm)', padding: 'var(--space-lg)', width: axis === 'x' ? 'max-content' : undefined }}>
+          {rows.map((r) => (
+            <span key={r} style={{ padding: 'var(--space-xs) var(--space-sm)', background: 'var(--surface-200)', borderRadius: 'var(--rad-sm)' }}>{r}</span>
+          ))}
+        </div>
+      </ScrollArea>
+    ),
+  },
   render: () => (
     <>
       <div className="pg-stack">
