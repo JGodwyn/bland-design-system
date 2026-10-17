@@ -58,7 +58,7 @@ To sync tokens from Figma, follow `docs/tokens.md` step by step. Never hand-edit
 
 ## Token architecture
 
-Three layers. **Components bind only to Theme or scale tokens, never primitives.** 611 variables in 12 collections (as of 2026-10-17), plus 15 elevation styles and 23 text styles. Primitives are not emitted to CSS at all, so a component cannot reach them.
+Three layers. **Components bind only to Theme or scale tokens, never primitives.** 612 variables in 12 collections (as of 2026-10-17), plus 15 elevation styles and 23 text styles. Primitives are not emitted to CSS at all, so a component cannot reach them.
 
 | Collection | Layer | Modes | Holds |
 | --- | --- | --- | --- |
@@ -72,7 +72,7 @@ Three layers. **Components bind only to Theme or scale tokens, never primitives.
 | `Typography` | Scale | 1 | `family/`, `weight/`, `size/`, `line-height/`, `letter-spacing/normal` (0) |
 | `Effects` | Scale | 1 | `elevation/{near,mid,far}/{ambient,key}-{y,blur,spread}`, `elevation/x` |
 | `Sizing` | Scale | 1 | `control/*`, `icon/*`, `input/*`, `avatar/*`, `table/*`, `fade/*`, `scrollbar/width`, `logo/mark-*`, … |
-| `Motion` | Scale | 1 | `duration/xs` 125, `sm` 160, `md` 200, `lg` 250, `xl` 400 (Toast), `2xl` 500 (Sidebar, sheets); `easing/out`, `in-out`, `drawer`, `ease`, `linear` |
+| `Motion` | Scale | 1 | `duration/xs` 125, `sm` 160, `md` 200, `lg` 250, `xl` 400 (Toast), `2xl` 500 (Sidebar, sheets), `spin` 800 (one turn of a loading spinner); `easing/out`, `in-out`, `drawer`, `ease`, `linear` |
 | `Breakpoints` | Scale | 1 | `breakpoint/sm` 640, `md` 768, `lg` 1024, `xl` 1280, `2xl` 1536 (mobile-first `min-width`) |
 
 ### Export rules
@@ -104,7 +104,7 @@ Implemented in `scripts/build-tokens.ts`; CSS naming and the sync steps are in `
 - **Layout:** mobile-first. Base styles are mobile, `breakpoint/md` (768) is the tablet layout, `breakpoint/xl` (1280) the desktop layout; `sm`, `lg` and `2xl` are for component-level tweaks. Media queries use `min-width` on a breakpoint value only (`var()` does not work there; the lint holds the list). `--breakpoint-*` exist for JS (`matchMedia`, Floating UI).
 - **Motion:** details and reasons in `docs/motion.md`.
   - Durations and easings are Motion tokens only. Never `ease-in` on UI; entering and exiting use `easing/out`.
-  - UI motion stays at or under `duration/lg` (250). Only Toast (`xl`) and Sidebar/sheets (`2xl`, with `easing/drawer`) go above.
+  - UI motion stays at or under `duration/lg` (250). Only Toast (`xl`) and Sidebar/sheets (`2xl`, with `easing/drawer`) go above. Loading spinners rotate continuously at `duration/spin` with `easing/linear`.
   - Don't animate keyboard-initiated actions or anything used hundreds of times a day.
   - Never scale from 0: start at 0.95 to 0.97 with opacity 0. Popovers, dropdowns and tooltips scale from their trigger; modals stay centered.
   - Press feedback: `scale(0.97)` on `:active`, `duration/sm`, `easing/out`.

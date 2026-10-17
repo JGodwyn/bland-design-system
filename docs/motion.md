@@ -12,11 +12,12 @@ How Bland components move. The rules come from Emil Kowalski's animation skills 
 | `--duration-lg` | 250ms | Modals. The ceiling for UI motion |
 | `--duration-xl` | 400ms | Reserved for Toast |
 | `--duration-2xl` | 500ms | Reserved for Sidebar and sheet slides, with `--easing-drawer` |
+| `--duration-spin` | 800ms | One full turn of a loading spinner, repeated, with `--easing-linear`. Added 2026-10-17 for the Button's loading state |
 | `--easing-out` | `cubic-bezier(0.23, 1, 0.32, 1)` | Default. Anything entering or exiting |
 | `--easing-in-out` | `cubic-bezier(0.77, 0, 0.175, 1)` | Moving or morphing while on screen |
 | `--easing-drawer` | `cubic-bezier(0.32, 0.72, 0, 1)` | Sidebar and sheets |
 | `--easing-ease` | `cubic-bezier(0.25, 0.1, 0.25, 1)` | Hover and color changes |
-| `--easing-linear` | `linear` | Progress fills and hold-to-confirm only |
+| `--easing-linear` | `linear` | Progress fills, hold-to-confirm and spinner rotation only |
 
 The lint rejects raw `ms`/`s` values, easing keywords, `cubic-bezier()`, `steps()` and `linear()` in component CSS, and names the token to use. `ease-in` is rejected outright.
 
