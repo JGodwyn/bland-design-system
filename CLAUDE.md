@@ -165,6 +165,16 @@ For each component: Figma set, code import, and Figma property → prop mapping.
 
 Base Figma pages (Colors, Effects, Grid system, Icons, Spacing, Typography) document tokens. Annotations (Header, Footer, Notes, Typo card) is doc chrome, not kit. Landing page and site Navbar are pending a redesign.
 
+## Progress tracker
+
+Godwin follows progress in the [Bland Build Tracker](https://claude.ai/artifact/Fb9Mf2RUPVnrABBQfWN3SY), a claude.ai artifact with a shared database. **Keep it current as you work**, with the `ArtifactData` tool on that URL (read a doc first, then write with its `if_version`):
+
+- `tasks/<id>`: `{title, phase, owner, status, note, order, updatedAt, updatedBy}`. `phase` is one of Foundation, Tokens, Tooling, Components, Docs site. `owner` is Claude, Godwin or Both. `status` is todo, doing, blocked or done. Set `updatedBy: "Claude"` and an ISO `updatedAt`.
+- `questions/<id>`: `{question, context, status: open|decided, answer, decidedAt, decidedBy, order}`. Decisions waiting on Godwin.
+- `log/<id>`: `{text, at, by}`. One short note per meaningful step (a merge, a sync, a decision).
+
+When you start a task, set it to doing. When you finish, set it to done and add a log note. When Godwin answers a question there, apply the decision in the repo and record it here or in `docs/`. The tracker shows status; the roadmap below and the component map stay the source for scope.
+
 ## Roadmap
 
 In order; tokens come before components.
