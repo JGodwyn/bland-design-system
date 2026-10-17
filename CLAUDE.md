@@ -167,13 +167,15 @@ Base Figma pages (Colors, Effects, Grid system, Icons, Spacing, Typography) docu
 
 ## Progress tracker
 
-Godwin follows progress in the [Bland Build Tracker](https://claude.ai/artifact/Fb9Mf2RUPVnrABBQfWN3SY), a claude.ai artifact with a shared database. **Keep it current as you work**, with the `ArtifactData` tool on that URL (read a doc first, then write with its `if_version`):
+Godwin follows progress in the [Bland Build Tracker](https://claude.ai/code/artifact/6bcbb578-c0e8-411f-a75c-966e611e0134), a Claude Doc that both of you edit. **Keep it current as you work**, with the Claude Docs tools (read the doc first; Godwin's edits win):
 
-- `tasks/<id>`: `{title, phase, owner, status, note, order, updatedAt, updatedBy}`. `phase` is one of Foundation, Tokens, Tooling, Components, Docs site. `owner` is Claude, Godwin or Both. `status` is todo, doing, blocked or done. Set `updatedBy: "Claude"` and an ISO `updatedAt`.
-- `questions/<id>`: `{question, context, status: open|decided, answer, decidedAt, decidedBy, order}`. Decisions waiting on Godwin.
-- `log/<id>`: `{text, at, by}`. One short note per meaningful step (a merge, a sync, a decision).
+- **Where we are:** one short paragraph, rewritten when the state changes.
+- **Needs your call:** open decisions and Godwin's tasks as a checklist. When Godwin answers one, apply it in the repo, record it here or in `docs/`, and remove it from the list.
+- **Next up:** the next few tasks in order.
+- **Checklist:** every task by phase. Tick it when it's done.
+- **Log:** one row per meaningful step (a merge, a sync, a decision), newest first.
 
-When you start a task, set it to doing. When you finish, set it to done and add a log note. When Godwin answers a question there, apply the decision in the repo and record it here or in `docs/`. The tracker shows status; the roadmap below and the component map stay the source for scope.
+The doc shows status; the roadmap below and the component map stay the source for scope.
 
 ## Roadmap
 
