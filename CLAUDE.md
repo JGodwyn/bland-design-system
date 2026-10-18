@@ -105,7 +105,7 @@ Implemented in `scripts/build-tokens.ts`; CSS naming and the sync steps are in `
 
 ## Decisions code must follow
 
-- **Dark mode:** Neutral mirrors (0↔950, 50↔900, …); color tints (50–300) become deep tones; color solids (400+) move two steps lighter. Toggle knob is white in both modes. Danger primary Badge/Indicator label stays white in dark (3.7:1, deliberate).
+- **Dark mode:** Neutral mirrors (0↔950, 50↔900, …); color tints (50–300) become deep tones; color solids (400+) move two steps lighter. Toggle knob is white in both modes. Danger primary Badge/Indicator label stays white in dark (3.7:1, deliberate). Success primary Badge/Indicator label stays white in light (4.47:1, deliberate, decided 2026-10-18).
 - **Focus:** `:focus-visible` only, never a state or prop. 2px ring (`stroke-lg`) in `Border/border-focused`, offset 2px. Figma's `👀 Focused` boolean is dropped in code.
 - **States:** rest, hover, pressed (where relevant), disabled. Selected and checked are their own props.
 - **Slots:** Figma `🧩` slots map to `children` or named slot props.

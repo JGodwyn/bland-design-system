@@ -48,6 +48,12 @@ when), `docs/components.md` (how to build one).
   `corner-shape: superellipse(2)` would turn it into a squircle. Applies to
   Indicator, Badge, Avatar, Chip and every other pill or circle.
 
+### Deliberate contrast exceptions
+- White labels on primary colored fills stay white even where they fall under
+  4.5:1: danger primary in dark (3.7:1) and success primary in light (4.47:1,
+  Godwin kept it on 2026-10-18). Both are token values; `tests/a11y.spec.ts`
+  excludes exactly these. Any other contrast miss is a bug to raise.
+
 ### Disabled
 - Disabled states use the disabled color tokens. No opacity, ever; the lint
   rejects `opacity` on disabled selectors.

@@ -121,7 +121,7 @@ start"** on a server that is already running. → `npm run props` regenerates
 
 **axe catches contrast misses that live in the tokens, not the component.**
 White on `Indicator/success-primary` (#008b00) is 4.47:1 though the Figma
-description promises 4.5:1; danger primary in dark is 3.7:1 on purpose. →
+description promises 4.5:1 (kept on purpose, Godwin 2026-10-18); danger primary in dark is 3.7:1 on purpose. →
 Exclude only those selectors, per theme, in `tests/a11y.spec.ts` with the
 reason beside them, and raise anything unintended with Godwin.
 
