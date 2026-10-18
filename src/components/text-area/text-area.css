@@ -1,0 +1,154 @@
+/*
+ * Text Area (Figma: Text-input page, set "Text Area", handle "text-area-resizer").
+ *
+ *   <div class="bland-text-area" data-status="default" style="--_rows: 4">
+ *     <label class="bland-text-area__label">Label</label>
+ *     <div class="bland-text-area__field bland-focus-ring bland-smooth">              Figma field / user-input
+ *       <div class="bland-scroll-area bland-text-area__scroll">… <textarea class="bland-text-area__input"> …</div>
+ *       <span class="bland-text-area__resizer"><svg/></span>
+ *     </div>
+ *     <span class="bland-text-area__helper">Helper text</span>
+ *   </div>
+ *
+ * The textarea grows with its text (TextArea.tsx) inside a ScrollArea, which draws the fade and the visible
+ * thumb (Figma's 👀 Overflow); the field box has the height. Status picks private colors; disabled overrides.
+ */
+
+.bland-text-area {
+  --_border: var(--border-input);
+  --_helper: var(--text-subtle);
+  --_text: var(--text-bold);
+  --_placeholder: var(--text-subtle);
+  --_fill: var(--text-input-surface-rest);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: var(--space-none);
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+/* Figma binds the label to text-bold in every state, disabled included. */
+.bland-text-area__label {
+  color: var(--text-bold);
+  overflow-wrap: break-word;
+}
+
+.bland-text-area__field {
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* rows lines of body-lg plus the space-sm padding above and below; at least one line when resized. */
+  height: calc(var(--_rows) * var(--line-height-md) + var(--space-sm) * 2);
+  min-height: calc(var(--line-height-md) + var(--space-sm) * 2);
+  background-color: var(--_fill);
+  /* Figma's inside stroke, drawn inside the box so it adds no size. */
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--_border);
+  cursor: text;
+  transition: background-color var(--duration-xs) var(--easing-ease);
+}
+
+/* Same ring as .bland-focus-ring, on the box, while the textarea inside has focus. */
+.bland-text-area__field:has(.bland-text-area__input:focus-visible) {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--space-2xs);
+}
+
+.bland-text-area__scroll {
+  flex: 1;
+}
+
+/* Keep the thumb clear of the resize handle in the corner: handle (icon/sm) plus space-xs on each side. */
+.bland-text-area__field:has(.bland-text-area__resizer) .bland-scroll-area__track {
+  bottom: var(--space-xl);
+}
+
+.bland-text-area__input {
+  display: block;
+  width: 100%;
+  margin: var(--space-none);
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  background: none;
+  color: var(--_text);
+  font: inherit;
+  letter-spacing: inherit;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  resize: none;
+  outline: none;
+  cursor: inherit;
+}
+
+.bland-text-area__input::placeholder {
+  color: var(--_placeholder);
+  opacity: 1;
+}
+
+/* Figma text-area-resizer: 16 square, 4 in from the bottom right corner, two Border/border-bold strokes. */
+.bland-text-area__resizer {
+  position: absolute;
+  right: var(--space-xs);
+  bottom: var(--space-xs);
+  display: flex;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--border-bold);
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.bland-text-area__resizer > svg {
+  width: 100%;
+  height: 100%;
+  stroke-width: var(--stroke-sm);
+}
+
+.bland-text-area__helper {
+  color: var(--_helper);
+  font: var(--type-body-sm);
+  overflow-wrap: break-word;
+}
+
+/* ---- Status ---- */
+
+.bland-text-area[data-status="danger"] {
+  --_border: var(--border-danger);
+  --_helper: var(--text-danger);
+}
+
+.bland-text-area[data-status="success"] {
+  --_border: var(--border-success);
+  --_helper: var(--text-success);
+}
+
+.bland-text-area[data-status="warning"] {
+  --_border: var(--border-warning);
+  --_helper: var(--text-warning);
+}
+
+/* ---- States: hover, disabled. Focus is above. ---- */
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-text-area__field:hover:not(:has(:disabled)) {
+    --_fill: var(--text-input-surface-hover);
+  }
+}
+
+/* Figma keeps the status border on a disabled Text Area; only the default border turns subtle. */
+.bland-text-area:has(.bland-text-area__input:disabled) {
+  --_helper: var(--text-minimal);
+  --_text: var(--text-minimal);
+  --_placeholder: var(--text-minimal);
+}
+
+.bland-text-area[data-status="default"]:has(.bland-text-area__input:disabled) {
+  --_border: var(--border-subtle);
+}
+
+.bland-text-area:has(.bland-text-area__input:disabled) :is(.bland-text-area__field, .bland-text-area__resizer) {
+  cursor: not-allowed;
+}

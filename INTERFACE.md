@@ -88,7 +88,7 @@ when), `docs/components.md` (how to build one).
   the default lives on `:root` (see LEARNINGS).
 - Bland's own icons (`src/icons/`) are exported from the Figma Icons page as
   components need them: Check, X, CaretDown, Plus, Minus, User, Spinner,
-  MagnifyingGlass, XCircle, WarningOctagon, CheckCircle, WarningCircle so far.
+  MagnifyingGlass, XCircle, WarningOctagon, CheckCircle, WarningCircle, Info so far.
 
 ## 4. Overflow
 
@@ -351,6 +351,35 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   component) and stays `text-minimal`; `tests/a11y.spec.ts` excludes
   `.bland-text-input:has(:disabled)` for that reason.
 
+### Text Area (2026-10-18)
+- `import { TextArea } from 'bland'`, folder `text-area/`. Same contract as
+  Text Input: a native `<textarea>`, controlled or uncontrolled, native props
+  and `ref` on it, `className` on the wrapper; `label`, `helperText`,
+  `status` wired the same way (danger sets `aria-invalid`).
+- **Overflow:** the textarea never scrolls itself. It grows to its text
+  (and at least to the field, so a click anywhere lands in it) inside a
+  `ScrollArea`, which draws the fade and the always-visible thumb. That is
+  Figma's `👀 Overflow` and its description's code note; in code it is
+  automatic. Chromium keeps the caret in view by scrolling the viewport.
+  The thumb's track stops `space-xl` above the bottom so it clears the
+  handle.
+- **Height:** `rows` (default 4) lines of body-lg (`line-height/md`) plus
+  `space-sm` above and below; Figma's field is a fixed 124 with no token,
+  so rows is the code knob. At least one line when resized.
+- **Resize handle** (Figma `text-area-resizer`, inlined SVG): 16 square
+  (`icon/sm`), `space-xs` from the bottom right, `Border/border-bold`
+  strokes at `stroke-sm`. Dragging it sets the field's height (vertical
+  only; width follows the layout). `resizable={false}` hides it. It is
+  mouse and touch only and hidden from assistive tech; the text stays
+  reachable by scrolling.
+- From Figma: padding `space-sm` / `space-md`, radius `rad-md` with
+  `.bland-smooth`, inside stroke `stroke-sm`, fills `TextInput/surface-rest`
+  and `-hover`, borders and helper colors as Text Input. No status icon.
+- **Figma differs from Text Input in two places, and code follows Figma:**
+  the label is `text-bold` even when disabled (Text Input: `text-subtle`),
+  and a disabled danger, success or warning Text Area keeps its status
+  border (Text Input: `border-subtle`). Raised with Godwin in the tracker.
+
 ### Search Input (2026-10-18)
 - `import { SearchInput } from 'bland'`, folder `search-input/`. It is Text
   Input's field (`InputField`, same classes and CSS) with `type="search"`
@@ -369,6 +398,90 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   browser's own cancel button is hidden.
 - Figma's clear icon carries no color binding; it uses the field's icon
   color (`icon-subtle`, `icon-minimal` disabled).
+
+### Alert, Banner, Toast and Notification (2026-10-18)
+- `import { Alert, Banner, Toast, Toaster, useToaster, Notification } from 'bland'`.
+  Folders follow the Figma sets (`alert/`, `banner/`, `toast/` with the
+  Toaster, `notification/`).
+- **One status model, written once.** `status` info/danger/success/warning
+  (default info, Figma's) on all four. The internal `message/` folder holds
+  it: `message.css` maps each `data-status` to private `--_s-*` properties
+  (icon, text, light surface, strong surface, border, elevation) and each
+  component draws with the ones it needs; `Message.tsx` holds the status icon
+  and the icon, content, actions, close layout that Banner and Notification
+  share. Not exported, not a story.
+- **Status icons** (Figma's, exported to `src/icons/`): info Info, danger
+  WarningOctagon, success CheckCircle, warning WarningCircle, icon/md, colored
+  `Icon/icon-{brand,danger,success,warning}` (Toast: `icon-on-color`), with
+  Figma's `space-2xs` above so the icon centres on the first 24px line.
+  Decorative: the text carries the meaning.
+- **`icon` prop** (Figma `👀 Icon`): `true` (default) draws the status icon,
+  `false` hides it, any SVG node replaces it, following the icon policy that
+  every icon slot takes any pack.
+- **Who has what**, from the set descriptions and variants:
+  - Alert: icon and label only (`children`, body-lg in
+    `Text/text-{status}`; info is `text-bold`, as Figma binds it). No
+    surface, close or actions. `max-width: alert/max-width`; text wraps.
+  - Banner: surface-100, `border-bold` inside stroke for every status, no
+    elevation, rad-md, padding `space-sm` `space-md`. `title`, `children`
+    (description), `actions`, `onClose` (Figma `👀 Close`), `orientation`
+    horizontal (default) / vertical. Figma's `banner/width` (384) is only its
+    default frame: the description says to fill the container, so in code it
+    is a block spanning its container.
+  - Toast: strong fill `surface-{status}-strong`, white content
+    (`text-on-color` body-lg-bold, `icon-on-color`), `Elevation/{status}/mid`,
+    rad-md, padding `space-sm` `space-md`, `max-width: toast/max-width`. No
+    title, actions or close: the description sends those to Notification.
+  - Notification: `colored` (default true, Figma's) = `surface-{status}-light`,
+    `border-{status}`, `Elevation/{status}/mid`; uncolored = surface-100,
+    `border-bold`, `Elevation/neutral/mid`. Width `notification/width` (384,
+    capped at 100% of its container), padding `space-md`, or `space-lg` when
+    vertical. `title`, `children`, `timestamp` (body-sm text-subtle, beside
+    the title when vertical, after the text when horizontal), `actions`,
+    `onClose` (Figma `👀 Close btn`), `orientation`.
+- **Title on horizontal:** Figma's horizontal Banner and Notification have no
+  title. Code shows `title` in both orientations rather than drop it
+  silently; horizontal stacks it over the description on the same row as
+  the actions.
+- **Actions are a slot** (`actions`, Figma `👀 Btn` / `👀 Btn (2nd)`): pass
+  one or two Buttons, size xs on horizontal and md on vertical (Figma's), a
+  primary then a secondary. Kept a slot so apps choose labels, handlers and
+  loading states with the real Button API.
+- **Close** is an xs ghost Icon Button (control/xs, 24) holding the X at
+  icon/md in `icon-subtle`, as Figma draws it; `closeLabel` names it
+  (default "Dismiss"). The component never hides itself: `onClose` is the
+  app's job, or the Toaster's `dismiss`. Figma's close is a plain frame with
+  no hover; code gets the ghost button's hover and press.
+- **Roles** (decided 2026-10-18):
+  - Alert: `role="alert"` for danger (an error that appears after an action
+    is announced at once), `role="status"` for the others. Pass `role` to
+    change it, or `role={undefined}` for a message on the page from the start.
+    Link it to its field with `aria-describedby`.
+  - Banner and Notification: no role. A banner is usually on the page from
+    the start; pass `role="alert"` or `role="status"` when one is inserted
+    after an action. Notifications are announced by the Toaster.
+  - Toast: no role of its own; the Toaster announces it.
+- **Toaster** (built, minimal): `<Toaster>` wraps the app and `useToaster()`
+  returns `toast(message, { status, icon, duration, id })`,
+  `show(content | (dismiss) => content, { duration, id })` for a
+  Notification or anything else, and `dismiss(id)`.
+  - A `<section popover="manual">` named "Notifications" (`label`), shown on
+    mount: the top layer puts it above the page without a z-index token.
+    Inside, an `<ol aria-live="polite">` that exists before the first toast,
+    so each addition is announced. Danger toasts are polite too: urgent
+    errors belong in an Alert or Banner with `role="alert"`.
+  - Bottom of the screen, `space-lg` from the edges, full width on mobile and
+    bottom right from `breakpoint/md`; newest last, `space-sm` apart.
+  - Each toast dismisses itself after `duration`, **5000 ms by default**
+    (code constant, a timing rather than a visual value; on the tracker for
+    Godwin to confirm), `null` to keep it. Timers pause while the pointer is
+    over the stack, focus is inside it or the page is hidden, and resume with
+    the time that was left. A reused `id` replaces the toast in place.
+- **Toast motion:** enters with `@starting-style` and exits with
+  `data-state="closed"` along the same path: from `translateY(space-lg)
+  scale(0.97)` and opacity 0, over `duration/xl` with `easing/out`. The item
+  leaves the DOM once its transition time has passed (read from the computed
+  style, so no second constant). Reduced motion: opacity only.
 
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 

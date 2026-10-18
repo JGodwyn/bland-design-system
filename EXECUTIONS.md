@@ -373,3 +373,10 @@ baselines looked at in both themes.
   clear button (Escape clears, not a Tab stop); `tests/search-input.spec.ts`
   (5). Verified: lint:css, typecheck, `npm test` 158 passed, build;
   baselines looked at in both themes.
+- Text Area: a growing `<textarea>` inside ScrollArea (fade and thumb), rows
+  for the height, a drag handle from Figma's resizer;
+  `tests/text-area.spec.ts` (6), including caret-follow scrolling and the
+  drag. One `a11y` run of text-area (light) failed once under the full suite
+  and never again in 270 reruns; message not captured. Verified: lint:css,
+  my typecheck and tests (another session's alert/banner/toast work had type
+  errors and missing baselines at the time), build; baselines looked at.

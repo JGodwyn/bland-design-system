@@ -46,5 +46,6 @@ export {
   type TextInputSize,
   type TextInputStatus,
 } from './components/text-input/TextInput';
+export { TextArea, type TextAreaProps, type TextAreaStatus } from './components/text-area/TextArea';
 export { SearchInput, type SearchInputProps, type SearchInputSize } from './components/search-input/SearchInput';
 export * from './icons';

@@ -18,7 +18,10 @@ const knownContrast: Record<(typeof themes)[number], string[]> = {
  * Text in a disabled field (its helper text and add-on labels) is exempt from contrast (WCAG 1.4.3, inactive
  * components) and uses Text/text-minimal on purpose. axe only knows that for the input itself, so it skips these.
  */
-const disabledFieldText = ['.bland-text-input:has(.bland-text-input__input:disabled)'];
+const disabledFieldText = [
+  '.bland-text-input:has(.bland-text-input__input:disabled)',
+  '.bland-text-area:has(.bland-text-area__input:disabled)',
+];
 
 for (const id of storyIds) {
   for (const theme of themes) {
