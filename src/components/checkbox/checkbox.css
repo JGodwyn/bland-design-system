@@ -1,0 +1,168 @@
+/*
+ * Checkbox and Checkbox Group (Figma: Checkbox page, sets "Checkbox" and "Checkbox Group").
+ *
+ *   <label class="bland-checkbox" data-size="sm">
+ *     <span class="bland-checkbox__control">                         Figma hit-area, control/xs or control/sm
+ *       <input type="checkbox" class="bland-checkbox__input bland-focus-ring bland-smooth">   Figma box
+ *       <span class="bland-icon bland-checkbox__check">…</span>     Figma glyph (Check)
+ *       <span class="bland-icon bland-checkbox__mixed">…</span>     Figma glyph (Minus)
+ *     </span>
+ *     <span class="bland-checkbox__label">Label</span>
+ *   </label>
+ *
+ * The native input is the box itself (appearance: none), so keyboard, forms and the focus ring stay native and
+ * the ring sits 2px off the box, as Figma draws it. The label element is the whole hit area. Checked and mixed
+ * come from :checked and :indeterminate. Box colors live in private --_box / --_border on the input.
+ */
+
+.bland-checkbox {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  max-width: 100%;
+  color: var(--text-bold);
+  font: var(--type-body-md);
+  letter-spacing: var(--letter-spacing-normal);
+  vertical-align: top;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bland-checkbox__control {
+  --bland-icon-size: var(--icon-xs);
+
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-xs);
+  height: var(--control-xs);
+}
+
+.bland-checkbox__input {
+  --_box: var(--surface-200);
+  --_box-hover: var(--surface-300);
+  --_border: var(--border-input);
+
+  appearance: none;
+  flex: none;
+  width: var(--selection-box-sm);
+  height: var(--selection-box-sm);
+  margin: var(--space-none);
+  --bland-radius: var(--rad-sm); /* drawn by .bland-smooth */
+  background-color: var(--_box);
+  /* Figma's inside stroke: drawn inside the box, so it adds no size. */
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--_border);
+  cursor: inherit;
+  transition:
+    background-color var(--duration-xs) var(--easing-ease),
+    box-shadow var(--duration-xs) var(--easing-ease),
+    transform var(--duration-sm) var(--easing-out);
+}
+
+/* Figma glyph: icon/xs, white in both modes (the raw white in Figma is Icon/icon-on-color). */
+.bland-checkbox .bland-checkbox__check,
+.bland-checkbox .bland-checkbox__mixed {
+  position: absolute;
+  inset: var(--space-none);
+  display: none;
+  margin: auto;
+  color: var(--icon-on-color);
+  pointer-events: none;
+}
+
+.bland-checkbox__label {
+  min-width: var(--space-none);
+  padding-top: var(--space-2xs);
+  overflow-wrap: break-word;
+}
+
+/* ---- Size md: a 20 box in a 32 hit area, body-lg ---- */
+
+.bland-checkbox[data-size="md"] {
+  gap: var(--space-2xs);
+  font: var(--type-body-lg);
+}
+
+.bland-checkbox[data-size="md"] .bland-checkbox__control {
+  width: var(--control-sm);
+  height: var(--control-sm);
+}
+
+.bland-checkbox[data-size="md"] .bland-checkbox__input {
+  width: var(--selection-box-md);
+  height: var(--selection-box-md);
+}
+
+.bland-checkbox[data-size="md"] .bland-checkbox__label {
+  padding-top: var(--space-xs);
+}
+
+/* ---- Checked and mixed: Control/checked fills, no stroke, the glyph ---- */
+
+.bland-checkbox__input:is(:checked, :indeterminate) {
+  --_box: var(--control-checked-rest);
+  --_box-hover: var(--control-checked-hover);
+  --_border: transparent;
+}
+
+.bland-checkbox__input:checked:not(:indeterminate) ~ .bland-checkbox__check,
+.bland-checkbox__input:indeterminate ~ .bland-checkbox__mixed {
+  display: inline-flex;
+}
+
+/* ---- States: hover (anywhere on the label), pressed, disabled. Focus is .bland-focus-ring. ---- */
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-checkbox:hover .bland-checkbox__input:not(:disabled) {
+    background-color: var(--_box-hover);
+  }
+}
+
+.bland-checkbox:active .bland-checkbox__input:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.bland-checkbox__input:disabled {
+  --_border: var(--border-subtle);
+}
+
+.bland-checkbox__input:is(:checked, :indeterminate):disabled {
+  --_box: var(--control-checked-disabled);
+  --_border: transparent;
+}
+
+.bland-checkbox:has(.bland-checkbox__input:disabled) {
+  color: var(--text-minimal);
+  cursor: not-allowed;
+}
+
+/* ---- Group: vertical rows touch (the hit areas), horizontal items 16 apart ---- */
+
+.bland-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-none);
+  min-width: var(--space-none);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+}
+
+.bland-checkbox-group[data-orientation="horizontal"] {
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: var(--space-lg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bland-checkbox__input {
+    transition-property: background-color, box-shadow;
+  }
+
+  .bland-checkbox:active .bland-checkbox__input:not(:disabled) {
+    transform: none;
+  }
+}

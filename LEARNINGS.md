@@ -177,3 +177,7 @@ their edits.
 **Navigating to a URL that only changes the hash can screenshot the old page.**
 The screenshot fires before the hashchange render. → Click the sidebar link, or
 wait a second, before trusting the screenshot.
+
+**`form_input` on a React-controlled checkbox flips the DOM, not React's
+state.** The docs "focused" toggle looked on but did nothing; the next click
+turned it off. → Click React checkboxes with `computer` instead.

@@ -224,6 +224,48 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   (Figma's selected-disabled pill switches it back to neutral). Any other node
   is shown as is.
 
+### Checkbox and Radio (2026-10-18)
+- `import { Checkbox, CheckboxGroup, Radio, RadioGroup } from 'bland'`. Folders
+  follow the Figma sets: `checkbox/` and `radio-button/`, each with its group.
+  The code name is `Radio`, shorter than Figma's "Radio Button".
+- **The native input is the box.** `<input type="checkbox|radio">` with
+  `appearance: none` is drawn as Figma's box or circle (fill, `stroke-sm`
+  inside stroke as an inset shadow), so keyboard, forms, `:checked`,
+  `:indeterminate`, `:disabled` and the focus ring stay native, and
+  `.bland-focus-ring` lands 2px off the box exactly as Figma's focus-ring
+  frame. The glyph (Check / Minus, icon/xs) or radio dot (`selection/dot-*`)
+  is a sibling shown by `:checked` / `:indeterminate`, with no pointer events.
+- **The `<label>` is the hit area**: Figma's hit-area frame (control/xs 24 on
+  sm, control/sm 32 on md) plus the label text, so every pixel of it toggles.
+  Hover (`Surface/surface-300`, or `Control/checked-hover`) reacts anywhere on
+  the label. Label offsets come from Figma's label-wrap (top padding
+  `space-2xs` sm, `space-xs` md) so the first line centres on the box and
+  longer labels wrap beside it.
+- **Props split:** `className` goes on the root label; every other prop
+  (`name`, `value`, `onChange`, `aria-*`, `data-*`, `ref`) on the input,
+  because form code expects them there. This is the pattern for every
+  native form control in Bland.
+- **Mixed** is `checked="mixed"` (or `defaultChecked="mixed"`), set as the
+  input's `indeterminate` property, which screen readers announce as mixed.
+  A controlled mixed checkbox stays mixed after a click until the parent
+  changes `checked`; an uncontrolled one becomes checked, as natively.
+- Figma's `👀 Label` defaults off; in code the label is `children`, and a
+  checkbox without one needs `aria-label`. Default size sm (Figma's; 24 is
+  the minimum target).
+- **Groups are `<fieldset>`s** (`role="radiogroup"` on RadioGroup) so
+  `disabled` disables every control natively. Figma draws no legend, so the
+  group's name is a required `aria-label` or `aria-labelledby` (a TypeScript
+  union) instead of a visual legend Bland would have to invent. Vertical rows
+  touch (gap `space-none`; the hit areas give the 8 / 12 box spacing),
+  horizontal items sit `space-lg` apart and wrap. The group's `size` is
+  passed down through context; a child's own `size` wins.
+- RadioGroup gives every radio one `name` (generated with `useId` when left
+  out), so the browser keeps one selected and arrow keys move between them;
+  `value` / `defaultValue` / `onValueChange` control it from the group.
+- Disabled uses `Border/border-subtle` (unchecked) or
+  `Control/checked-disabled` and `Text/text-minimal` on the label; no opacity.
+- Press feedback `scale(0.97)` on the box, dropped under reduced motion.
+
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 
 - A sidebar of style pages (generated from `tokens.json`) and components

@@ -308,3 +308,19 @@ times.
   INTERFACE.md and the component map row instead).
 - Story row "Optical padding" at every size; `tests/badge.spec.ts` checks the
   computed padding. Badge screenshots re-baselined (intended change).
+
+## 2026-10-18 — Checkbox and Radio (Checkbox and Radio session)
+**Asked:** build Checkbox and Radio, each with its Group, from the Figma sets.
+
+- Read all four sets in one `use_figma` dump per page (split in two 19 KB
+  slices for the 20 KB limit): descriptions, properties, every variant's
+  bindings including hit-area, box, glyph/dot, focus-ring and label-wrap frames.
+- Built on native inputs drawn as the box (`appearance: none`) inside a
+  `<label>` hit area; groups are fieldsets with a required aria name. Details
+  in INTERFACE.md §Checkbox and Radio; map row in CLAUDE.md.
+- Stories with every state, a Focused row, groups and behaviour fixtures;
+  `tests/checkbox.spec.ts` (10) and `tests/radio-button.spec.ts` (7).
+- Restarted the docs server (it predated the new folders). Checked the docs
+  demo: mixed default and the focused preview both work.
+**Verified:** lint:css, typecheck, `npm test` 120 passed, build. New
+baselines looked at in both themes.
