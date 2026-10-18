@@ -1,0 +1,64 @@
+/*
+ * Search Input (Figma: Text-input page, set "Search Input"). The field is Text Input's
+ * (bland-text-input classes); this file adds the clear button and hides the browser's own.
+ *
+ *   <div class="bland-text-input bland-search-input" data-size="sm" data-filled>
+ *     … <input type="search" class="bland-text-input__input"> <button class="bland-search-input__clear">…</button> …
+ *   </div>
+ */
+
+.bland-search-input .bland-text-input__input::-webkit-search-cancel-button,
+.bland-search-input .bland-text-input__input::-webkit-search-decoration {
+  appearance: none;
+}
+
+/* Figma XCircle, icon/md, shown only while there is something to clear. */
+.bland-search-input__clear {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  background: none;
+  color: var(--_icon);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--duration-sm) var(--easing-out);
+}
+
+.bland-search-input:not([data-filled]) .bland-search-input__clear {
+  display: none;
+}
+
+/* The 20px icon is below the 24px target: the hit area is control/xs, centered. */
+.bland-search-input__clear::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--control-xs);
+  height: var(--control-xs);
+  transform: translate(-50%, -50%);
+}
+
+.bland-search-input__clear:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.bland-search-input__clear:disabled {
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bland-search-input__clear {
+    transition: none;
+  }
+
+  .bland-search-input__clear:active:not(:disabled) {
+    transform: none;
+  }
+}

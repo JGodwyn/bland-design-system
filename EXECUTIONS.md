@@ -369,3 +369,7 @@ baselines looked at in both themes.
   excluded as WCAG-exempt. All three in LEARNINGS.md.
 **Verified:** lint:css, typecheck, `npm test` 148 passed, build. New
 baselines looked at in both themes.
+- Search Input: Text Input's field with `type="search"`, the magnifier and a
+  clear button (Escape clears, not a Tab stop); `tests/search-input.spec.ts`
+  (5). Verified: lint:css, typecheck, `npm test` 158 passed, build;
+  baselines looked at in both themes.

@@ -351,6 +351,25 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   component) and stays `text-minimal`; `tests/a11y.spec.ts` excludes
   `.bland-text-input:has(:disabled)` for that reason.
 
+### Search Input (2026-10-18)
+- `import { SearchInput } from 'bland'`, folder `search-input/`. It is Text
+  Input's field (`InputField`, same classes and CSS) with `type="search"`
+  and the MagnifyingGlass icon at the start; Figma's Search set binds the
+  same tokens as Text Input's default status. No label, helper or status
+  (Figma has none); the input is named "Search" unless it gets `aria-label`
+  or `aria-labelledby`. Figma's `✏️ Label` ("Search here") is the
+  placeholder.
+- `👀 Clear` → `clearable`: an XCircle `<button>` (icon/md, hit area
+  `control/xs` via `::before`, press `scale(0.97)`) that shows only while the
+  field has a value. Clearing sets the value through the native setter and
+  fires an `input` event, so `onChange` runs with `''` for controlled and
+  uncontrolled fields alike; then `onClear`. Escape clears too.
+- **The clear button is not a Tab stop** (`tabIndex={-1}`): Escape is the
+  keyboard path, so Tab moves straight on, as in most search fields. The
+  browser's own cancel button is hidden.
+- Figma's clear icon carries no color binding; it uses the field's icon
+  color (`icon-subtle`, `icon-minimal` disabled).
+
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 
 - A sidebar of style pages (generated from `tokens.json`) and components
