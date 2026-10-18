@@ -30,8 +30,9 @@
   transition: transform var(--duration-sm) var(--easing-out);
 }
 
+/* Hidden, not removed, while empty: the button keeps its space, so the field's width never changes as you type. */
 .bland-search-input:not([data-filled]) .bland-search-input__clear {
-  display: none;
+  visibility: hidden;
 }
 
 /* The 20px icon is below the 24px target: the hit area is control/xs, centered. */

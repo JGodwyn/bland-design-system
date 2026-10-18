@@ -62,3 +62,18 @@ test('focus shows the 2px ring on the field box', async ({ page }) => {
   const ring = await field(input).evaluate((e) => [getComputedStyle(e).outlineWidth, getComputedStyle(e).outlineOffset]);
   expect(ring).toEqual(['2px', '2px']);
 });
+
+test('disabled matches Text Input: border-subtle whatever the status, label text-subtle', async ({ page }) => {
+  const color = (token: string) =>
+    page.evaluate((t) => {
+      const probe = document.createElement('div');
+      probe.style.color = `var(${t})`;
+      document.querySelector('[data-testid^="frame-"]')!.append(probe);
+      const c = getComputedStyle(probe).color;
+      probe.remove();
+      return c;
+    }, token);
+  const danger = page.locator('.bland-text-area[data-status="danger"]:has(textarea:disabled)').first();
+  expect(await danger.locator('.bland-text-area__field').evaluate((e) => getComputedStyle(e).boxShadow)).toContain(await color('--border-subtle'));
+  expect(await danger.locator('.bland-text-area__label').evaluate((e) => getComputedStyle(e).color)).toBe(await color('--text-subtle'));
+});

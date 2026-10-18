@@ -375,10 +375,12 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - From Figma: padding `space-sm` / `space-md`, radius `rad-md` with
   `.bland-smooth`, inside stroke `stroke-sm`, fills `TextInput/surface-rest`
   and `-hover`, borders and helper colors as Text Input. No status icon.
-- **Figma differs from Text Input in two places, and code follows Figma:**
-  the label is `text-bold` even when disabled (Text Input: `text-subtle`),
-  and a disabled danger, success or warning Text Area keeps its status
-  border (Text Input: `border-subtle`). Raised with Godwin in the tracker.
+- **Disabled matches Text Input** (Godwin, 2026-10-18): label `text-subtle`,
+  border `border-subtle` whatever the status, value, placeholder and helper
+  `text-minimal`. Figma first drew a disabled Text Area with a `text-bold`
+  label and its status border; its four disabled variants were rebound to
+  match. This is also the common standard (a disabled field shows no
+  validation state), so neither component needed more.
 
 ### Numeric Input Field (2026-10-18)
 - `import { NumericInputField } from 'bland'`, folder `numeric-input-field/`.
@@ -427,6 +429,10 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   field has a value. Clearing sets the value through the native setter and
   fires an `input` event, so `onChange` runs with `''` for controlled and
   uncontrolled fields alike; then `onClear`. Escape clears too.
+- **While the field is empty the clear button is `visibility: hidden`, not
+  removed** (2026-10-18): it keeps its 20px and the gap, so a field sized by
+  its content (the docs demo, an inline toolbar) does not widen by 28px on
+  the first keystroke.
 - **The clear button is not a Tab stop** (`tabIndex={-1}`): Escape is the
   keyboard path, so Tab moves straight on, as in most search fields. The
   browser's own cancel button is hidden.

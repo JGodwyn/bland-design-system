@@ -68,6 +68,10 @@ export default {
           <div style={column}>
             <SearchInput placeholder="Search here" clearable data-testid="uncontrolled" />
           </div>
+          {/* Sized by its content, like the docs demo: the width must not change as you type. */}
+          <div style={{ display: 'inline-block' }}>
+            <SearchInput placeholder="Search here" clearable aria-label="Shrink to fit" data-testid="shrink-to-fit" />
+          </div>
           <Controlled />
         </div>
       </div>

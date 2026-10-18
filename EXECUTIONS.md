@@ -414,3 +414,17 @@ toast (7); baselines looked at in both themes.
   instances (removed). Repo docs, JSDoc, story descriptions and a horizontal
   title example in both stories followed; banner and notification baselines
   re-taken.
+
+## 2026-10-18 — Text input fixes (Text Input family session)
+**Asked:** make Text Area match Text Input (in Figma too, and say if a better standard exists); Search Input grows as you type.
+
+- Search: reproduced in the docs demo, whose canvas sizes to its content:
+  233.5 → 261.5px when the clear button appeared. The button now stays in
+  the layout with `visibility: hidden` while empty. Story fixture and test
+  for a content-sized field.
+- Text Area disabled now uses Text Input's tokens (label `text-subtle`,
+  `border-subtle` for every status). In Figma, rebound the four disabled
+  Text Area variants (166:5125, 166:5254, 166:5534, 166:5814): Label fill
+  and user-input stroke; checked a screenshot. Test added.
+**Verified:** lint:css, typecheck, `npm test` 221 passed, build; changed
+baselines looked at.

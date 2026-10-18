@@ -52,3 +52,12 @@ test('the clear hit area is control/xs around the 20px icon', async ({ page }) =
   });
   expect(hit).toEqual(['24px', '24px', 20]);
 });
+
+test('typing does not change the field width, even where the width follows the content', async ({ page }) => {
+  const input = page.getByTestId('shrink-to-fit');
+  const root = input.locator('xpath=ancestor::div[contains(concat(" ", @class, " "), " bland-search-input ")][1]');
+  const before = (await root.boundingBox())!.width;
+  await input.fill('a much longer search than before');
+  await expect(clearButton(input)).toBeVisible();
+  expect((await root.boundingBox())!.width).toBe(before);
+});

@@ -20,6 +20,7 @@
   --_text: var(--text-bold);
   --_placeholder: var(--text-subtle);
   --_fill: var(--text-input-surface-rest);
+  --_label: var(--text-bold);
 
   display: flex;
   flex-direction: column;
@@ -29,9 +30,8 @@
   letter-spacing: var(--letter-spacing-normal);
 }
 
-/* Figma binds the label to text-bold in every state, disabled included. */
 .bland-text-area__label {
-  color: var(--text-bold);
+  color: var(--_label);
   overflow-wrap: break-word;
 }
 
@@ -138,15 +138,13 @@
   }
 }
 
-/* Figma keeps the status border on a disabled Text Area; only the default border turns subtle. */
+/* Disabled matches Text Input: the status no longer shows, the label dims. */
 .bland-text-area:has(.bland-text-area__input:disabled) {
+  --_border: var(--border-subtle);
   --_helper: var(--text-minimal);
+  --_label: var(--text-subtle);
   --_text: var(--text-minimal);
   --_placeholder: var(--text-minimal);
-}
-
-.bland-text-area[data-status="default"]:has(.bland-text-area__input:disabled) {
-  --_border: var(--border-subtle);
 }
 
 .bland-text-area:has(.bland-text-area__input:disabled) :is(.bland-text-area__field, .bland-text-area__resizer) {
