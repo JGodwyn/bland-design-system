@@ -266,6 +266,36 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   `Control/checked-disabled` and `Text/text-minimal` on the label; no opacity.
 - Press feedback `scale(0.97)` on the box, dropped under reduced motion.
 
+### Toggle (2026-10-18)
+- `import { Toggle } from 'bland'`, folder `toggle/`. Same pattern as
+  Checkbox: a native `<input type="checkbox" role="switch">` drawn as Figma's
+  track (`appearance: none`), so Space, forms, `:checked`, `:disabled` and
+  the focus ring stay native and screen readers announce on/off. The knob is
+  a sibling `<span>` laid over the track (an input has no children). The
+  `<label>` is the whole hit area; `className` on it, every other prop (and
+  `ref`) on the input.
+- Track `toggle/track-*` by `control/xs|sm`, padding `space-xs`, fill
+  `Toggle/surface-{checked,unchecked}` with `-hover` and `-disabled`; knob
+  `toggle/knob-*`, `Toggle/knob-rest` (white in both modes), `knob-disabled`.
+  Root gap `space-sm`; the label is body-lg at both sizes (Figma's), text-bold,
+  disabled text-minimal. Full radius, no `.bland-smooth`.
+- The knob's travel is track width minus track height (40 - 24 = 16 on sm,
+  56 - 32 = 24 on md), which equals track - knob - 2 x space-xs, so it needs
+  no new token.
+- The label starts at the track's top (`space-xs` padding on md) so a long
+  label wraps beside the track with its first line centred, as Checkbox does.
+  Figma centres the single-line label; for one line the result is the same.
+- Figma's `👀 Label` defaults off; in code the label is `children`, and a
+  toggle without one needs `aria-label`. Default size sm (Figma's).
+- **Motion:** the knob slides with `transform` over `duration/xs` and
+  `easing/out` (a small, frequent control, so the shortest step); the track
+  color changes over `duration/xs` with `easing/ease`. Under reduced motion
+  the knob jumps and the color change stays. No press scale: the slide is the
+  feedback, and a toggle is used constantly.
+- Figma binds a `stroke-lg` weight on the disabled tracks with no stroke
+  paint; nothing is drawn, so code draws no stroke.
+- Not handled yet: right-to-left. The knob translates on the physical x axis.
+
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 
 - A sidebar of style pages (generated from `tokens.json`) and components

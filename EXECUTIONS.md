@@ -324,3 +324,18 @@ times.
   demo: mixed default and the focused preview both work.
 **Verified:** lint:css, typecheck, `npm test` 120 passed, build. New
 baselines looked at in both themes.
+
+## 2026-10-18 — Toggle (Toggle session)
+**Asked:** build Toggle from the Figma set, following docs/components.md, on a native switch input.
+
+- One `use_figma` dump of all 12 variants (first try hit the 20 KB limit;
+  compacted to one line per node): description, properties, track, knob,
+  focus-ring and label bindings.
+- Built on `<input type="checkbox" role="switch">` as the track inside a
+  `<label>`, knob as a sibling. Travel = track width - track height, so no
+  new token. Details in INTERFACE.md §Toggle; map row in CLAUDE.md.
+- Story with every state, a Focused row, behaviour fixtures and a long label;
+  `tests/toggle.spec.ts` (8): switch role, Space, controlled, sizes and knob
+  travel, hit area, tokens per state, focus, reduced motion.
+**Verified:** lint:css, typecheck, `npm test` 133 passed, build. New
+baselines looked at in both themes.

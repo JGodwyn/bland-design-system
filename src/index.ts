@@ -39,4 +39,5 @@ export {
 export { CheckboxGroup, type CheckboxGroupProps, type CheckboxGroupOrientation } from './components/checkbox/CheckboxGroup';
 export { Radio, type RadioProps, type RadioSize } from './components/radio-button/Radio';
 export { RadioGroup, type RadioGroupProps, type RadioGroupOrientation } from './components/radio-button/RadioGroup';
+export { Toggle, type ToggleProps, type ToggleSize } from './components/toggle/Toggle';
 export * from './icons';

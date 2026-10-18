@@ -1,0 +1,126 @@
+/*
+ * Toggle (Figma: Toggle page, set "Toggle").
+ *
+ *   <label class="bland-toggle" data-size="sm">
+ *     <span class="bland-toggle__control">                                       holds the track and the knob
+ *       <input type="checkbox" role="switch" class="bland-toggle__track bland-focus-ring">   Figma track
+ *       <span class="bland-toggle__knob"></span>                                  Figma knob
+ *     </span>
+ *     <span class="bland-toggle__label">Label</span>
+ *   </label>
+ *
+ * The native input is the track itself (appearance: none), so Space, forms, :checked, :disabled and the focus ring
+ * stay native, and the ring sits 2px off the track as Figma's focus-ring frame does. The knob is a sibling laid over
+ * the track (an input has no children) and slides by track width minus track height, which is the knob's travel
+ * (track - knob - 2 x space-xs). The label element is the whole hit area. Track and knob are full-radius, so no
+ * .bland-smooth (Figma's smoothing has no straight edge to spread over).
+ */
+
+.bland-toggle {
+  --_track-w: var(--toggle-track-sm);
+  --_track-h: var(--control-xs);
+  --_knob: var(--toggle-knob-sm);
+
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  max-width: 100%;
+  color: var(--text-bold);
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+  vertical-align: top;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bland-toggle[data-size="md"] {
+  --_track-w: var(--toggle-track-md);
+  --_track-h: var(--control-sm);
+  --_knob: var(--toggle-knob-md);
+}
+
+.bland-toggle__control {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+.bland-toggle__track {
+  --_bg: var(--toggle-surface-unchecked);
+  --_bg-hover: var(--toggle-surface-unchecked-hover);
+
+  appearance: none;
+  flex: none;
+  width: var(--_track-w);
+  height: var(--_track-h);
+  margin: var(--space-none);
+  border-radius: var(--rad-rd);
+  background-color: var(--_bg);
+  cursor: inherit;
+  transition: background-color var(--duration-xs) var(--easing-ease);
+}
+
+.bland-toggle__knob {
+  position: absolute;
+  top: var(--space-xs);
+  left: var(--space-xs);
+  width: var(--_knob);
+  height: var(--_knob);
+  border-radius: var(--rad-rd);
+  background-color: var(--toggle-knob-rest);
+  pointer-events: none;
+  transition: transform var(--duration-xs) var(--easing-out);
+}
+
+/* The first line of the label centres on the track: body-lg is 24 high, so md's 32 track needs space-xs above. */
+.bland-toggle__label {
+  min-width: var(--space-none);
+  overflow-wrap: break-word;
+}
+
+.bland-toggle[data-size="md"] .bland-toggle__label {
+  padding-top: var(--space-xs);
+}
+
+/* ---- Checked: Toggle/surface-checked, the knob at the end ---- */
+
+.bland-toggle__track:checked {
+  --_bg: var(--toggle-surface-checked);
+  --_bg-hover: var(--toggle-surface-checked-hover);
+}
+
+.bland-toggle__track:checked ~ .bland-toggle__knob {
+  transform: translateX(calc(var(--_track-w) - var(--_track-h)));
+}
+
+/* ---- States: hover (anywhere on the label), disabled. Focus is .bland-focus-ring. ---- */
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-toggle:hover .bland-toggle__track:not(:disabled) {
+    background-color: var(--_bg-hover);
+  }
+}
+
+.bland-toggle__track:disabled {
+  --_bg: var(--toggle-surface-unchecked-disabled);
+}
+
+.bland-toggle__track:checked:disabled {
+  --_bg: var(--toggle-surface-checked-disabled);
+}
+
+.bland-toggle__track:disabled ~ .bland-toggle__knob {
+  background-color: var(--toggle-knob-disabled);
+}
+
+.bland-toggle:has(.bland-toggle__track:disabled) {
+  color: var(--text-minimal);
+  cursor: not-allowed;
+}
+
+/* Reduced motion: the knob jumps; the track's color change stays. */
+@media (prefers-reduced-motion: reduce) {
+  .bland-toggle__knob {
+    transition: none;
+  }
+}
