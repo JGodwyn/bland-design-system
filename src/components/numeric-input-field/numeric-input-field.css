@@ -16,6 +16,7 @@
   --_border: var(--border-input);
   --_helper: var(--text-subtle);
   --_box: var(--digit-sm);
+  --_label: var(--text-bold);
 
   display: inline-flex;
   flex-direction: column;
@@ -25,9 +26,8 @@
   letter-spacing: var(--letter-spacing-normal);
 }
 
-/* Figma binds the label to text-bold in every state. */
 .bland-numeric-input-field__label {
-  color: var(--text-bold);
+  color: var(--_label);
   overflow-wrap: break-word;
 }
 
@@ -104,9 +104,11 @@
   }
 }
 
+/* Disabled matches Text Input: the status no longer shows, the label dims. */
 .bland-numeric-input-field:has(.bland-numeric-input-field__box:disabled) {
   --_border: var(--border-subtle);
   --_helper: var(--text-minimal);
+  --_label: var(--text-subtle);
 }
 
 .bland-numeric-input-field__box:disabled {

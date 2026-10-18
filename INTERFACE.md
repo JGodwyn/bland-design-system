@@ -416,7 +416,9 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - `👀 6 digits` → `length` (4 or 6, default 4). Figma's description: on
   mobile use sm for 6 digits. Figma's field has no hover state; each box
   has its own (base set).
-- The label is `text-bold` in every state, as Figma binds it.
+- Disabled matches Text Input (Godwin, 2026-10-18): label `text-subtle`,
+  every box `border-subtle` whatever the status, helper `text-minimal`.
+  Figma's twelve disabled variants were rebound from a `text-bold` label.
 
 ### Search Input (2026-10-18)
 - `import { SearchInput } from 'bland'`, folder `search-input/`. It is Text

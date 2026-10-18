@@ -434,3 +434,7 @@ baselines looked at.
   synced it with the drift check and `--apply` (checksum 613 / 5e42e07e in
   both), and the Toaster's default duration now reads
   `--duration-toast-visible` (a test retunes it with CSS alone).
+- Numeric Input Field disabled label now `text-subtle` in code and in Figma
+  (12 disabled variants of 168:5383 rebound, checked on a temporary
+  instance that was then removed). Verified: lint:css, typecheck,
+  `npm test` 223 passed, build; Numeric baselines re-taken and looked at.

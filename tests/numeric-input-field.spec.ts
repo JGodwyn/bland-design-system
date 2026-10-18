@@ -70,3 +70,18 @@ test('boxes are digit/sm, md and lg squares', async ({ page }) => {
     expect([box.width, box.height]).toEqual([px, px]);
   }
 });
+
+test('disabled matches Text Input: border-subtle whatever the status, label text-subtle', async ({ page }) => {
+  const color = (token: string) =>
+    page.evaluate((t) => {
+      const probe = document.createElement('div');
+      probe.style.color = `var(${t})`;
+      document.querySelector('[data-testid^="frame-"]')!.append(probe);
+      const c = getComputedStyle(probe).color;
+      probe.remove();
+      return c;
+    }, token);
+  const field = page.locator('.bland-numeric-input-field[data-status="danger"]:has(input:disabled)').first();
+  expect(await field.locator('.bland-numeric-input-field__label').evaluate((e) => getComputedStyle(e).color)).toBe(await color('--text-subtle'));
+  expect(await field.locator('.bland-numeric-input-field__box').first().evaluate((e) => getComputedStyle(e).boxShadow)).toContain(await color('--border-subtle'));
+});
