@@ -327,7 +327,7 @@ function PropsTable({ name }: { name: string }) {
   return (
     <Section title={`${name} props`} note={<>Native {name === 'ScrollArea' ? 'div' : 'element'} attributes also pass through. Source: <code>{doc.file}</code></>}>
       <div className="docs-table-wrap">
-        <table className="docs-table">
+        <table className="docs-table docs-props-table">
           <thead>
             <tr>
               <th scope="col">Prop</th>

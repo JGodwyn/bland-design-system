@@ -267,6 +267,21 @@ code,
   color: var(--text-subtle);
   overflow-wrap: anywhere;
 }
+/*
+ * Props tables: a prop name and its default never wrap; a type wraps only between words
+ * ("sm" | "md" | "lg", a function's arguments), never inside one. The table scrolls sideways
+ * when a type is longer than the column can hold.
+ */
+.docs-props-table td:first-child,
+.docs-props-table td:nth-child(3) {
+  white-space: nowrap;
+}
+.docs-props-table .docs-value {
+  overflow-wrap: normal;
+}
+.docs-props-table td:nth-child(2) {
+  min-width: 140px;
+}
 .docs-values {
   display: flex;
   flex-direction: column;
@@ -466,22 +481,34 @@ code,
   }
 }
 .docs-controls {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
+  /*
+   * One grid for every control, so the label column fits the longest prop name on the page
+   * (up to half the panel, then it wraps) and all controls start on the same line after it.
+   */
+  display: grid;
+  grid-template-columns: fit-content(50%) minmax(0, 1fr);
+  align-content: start;
+  gap: var(--space-sm) var(--space-lg);
   padding: var(--space-lg);
   background: var(--surface-200);
   border-top: var(--stroke-sm) solid var(--border-subtle);
 }
 .docs-control {
   display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
   align-items: center;
-  gap: var(--space-sm);
 }
 .docs-control label {
   font: var(--type-code-body-sm);
   color: var(--text-subtle);
+  overflow-wrap: anywhere;
+}
+.docs-controls > :not(.docs-control) {
+  grid-column: 1 / -1;
+}
+.docs-controls > .docs-link-button {
+  justify-self: start;
 }
 /* Native select without its arrow (Chrome pins it to the edge); the CaretDown sits at the same inset as the text. Until Bland's Dropdown replaces it. */
 .docs-select {
@@ -529,7 +556,7 @@ code,
 }
 @media (min-width: 1024px) {
   .docs-demo {
-    grid-template-columns: minmax(0, 1fr) 280px;
+    grid-template-columns: minmax(0, 1fr) 320px;
   }
   .docs-controls {
     border-top: 0;
