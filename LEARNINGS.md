@@ -121,6 +121,15 @@ it** ("No story called avatar" at `#/raw/avatar`, even after a reload). Its
 session picks up another session's half-done work. → Stage explicit paths when
 another session is working here, and check `git show --stat` before pushing.
 
+**The git index is shared too.** The Chip and Pills session staged its files,
+and before it committed, the drift session ran `git commit`, which took
+everything staged: Chip and Pills shipped inside 9ab048c ("Add the drift
+check"), already pushed. → Never leave files staged between commands. Stage
+and commit in one command, or commit from a private index
+(`GIT_INDEX_FILE=<scratch> git read-tree HEAD`, `git add`, `git commit`, then
+`git reset -q -- <paths>` in the shared index). Before committing, check
+`git diff --cached --stat` lists only your files.
+
 **A side session can't make design decisions.** The Button session stopped on
 the spinner's rotation speed because no Motion token fit. → When a value has no
 token, the session asks; the answer is a new Figma variable synced through the

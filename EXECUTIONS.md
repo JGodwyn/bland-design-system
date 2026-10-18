@@ -254,3 +254,9 @@ times.
 
 **Verified:** 5 Chip and 8 Pill specs, chip and pills screenshots in light and dark, axe clean.
 **Logged:** INTERFACE.md §6 Chip and Pill · CLAUDE.md component map.
+- Commit race: while the Chip and Pills files sat staged, the drift session
+  committed and pushed everything in the index, so Chip and Pills shipped in
+  9ab048c under the drift check's message. Content checked complete (26 files,
+  `src/index.ts` with only the Chip and Pill exports). History left as is,
+  since it was already on origin; LEARNINGS.md §Working with parallel sessions
+  has the rule.
