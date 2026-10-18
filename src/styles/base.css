@@ -52,9 +52,26 @@ textarea {
 
 /*
  * Corner smoothing: CLAUDE.md, "Corner smoothing". Figma draws every rounded corner at 100%
- * smoothing; corner-shape is the closest CSS (Chromium only; other browsers keep plain rounding).
- * The exponent is a code constant, not a design token: tune it here against Figma screenshots.
+ * smoothing, which spreads the curve over twice the radius along each edge. CSS border-radius is
+ * the whole extent of the curve, so where corner-shape is drawn (Chromium) the radius doubles and
+ * superellipse(2) gives the smoothed profile; checked against an 8x Figma render of Button lg.
+ * Other browsers keep plain rounding at the Figma radius.
+ * Components set the Figma radius as --bland-radius (a Corner Radius token) and add this class;
+ * they do not set border-radius themselves. The 2 and the exponent are code constants, not tokens.
  */
+@property --bland-radius {
+  syntax: "<length-percentage>";
+  inherits: false; /* a nested rounded element never takes its parent's radius */
+  initial-value: 0px;
+}
+
 .bland-smooth {
-  corner-shape: superellipse(2);
+  border-radius: var(--bland-radius);
+}
+
+@supports (corner-shape: superellipse(2)) {
+  .bland-smooth {
+    border-radius: calc(var(--bland-radius) * 2);
+    corner-shape: superellipse(2);
+  }
 }

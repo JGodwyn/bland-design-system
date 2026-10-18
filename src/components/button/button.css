@@ -36,7 +36,7 @@
   margin: var(--space-none);
   padding: var(--space-none) var(--space-lg);
   border: none;
-  border-radius: var(--rad-md);
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
   background-color: var(--_bg);
   color: var(--_text);
   font: var(--type-body-lg-bold);
@@ -77,7 +77,7 @@
 
   height: var(--control-xs);
   padding-inline: var(--space-sm);
-  border-radius: var(--rad-sm);
+  --bland-radius: var(--rad-sm);
   font: var(--type-body-md-bold);
 }
 

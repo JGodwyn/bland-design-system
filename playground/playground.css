@@ -1,4 +1,6 @@
 /* Playground chrome only; not part of Bland. */
+/* Shows the keyboard focus ring without focus, for stories. Same values as .bland-focus-ring in base.css. */
+.pg-focus .bland-focus-ring { outline: var(--stroke-lg) solid var(--border-focused); outline-offset: var(--space-2xs); }
 body { margin: 0; }
 .pg-index { padding: var(--space-2xl); }
 .pg-index h1 { font: var(--type-title-lg); margin: 0 0 var(--space-lg); }

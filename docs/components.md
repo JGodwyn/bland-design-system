@@ -37,9 +37,9 @@ Add these classes in the markup instead of rewriting their CSS:
 | Class | What it does | Put it on |
 | --- | --- | --- |
 | `bland-focus-ring` | 2px `--border-focused` ring, 2px offset, on `:focus-visible` only | Every element that takes keyboard focus |
-| `bland-smooth` | `corner-shape: superellipse(2)` for Figma's 100% corner smoothing | Every element with a border radius |
+| `bland-smooth` | Figma's 100% corner smoothing: draws `border-radius` from `--bland-radius`, doubled with `corner-shape: superellipse(2)` where supported | Every rounded element. Set `--bland-radius: var(--rad-*)` (the Figma radius) instead of `border-radius` |
 
-The smoothing exponent is a first guess. Tune it once in `base.css` against a Figma screenshot; every component follows.
+The smoothing was tuned against an 8x Figma render of Button lg (2026-10-18): Figma's 100% smoothing spreads the curve over twice the radius, so the CSS radius doubles. If it ever needs retuning, change it once in `base.css`; every component follows.
 
 ## Props
 

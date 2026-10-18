@@ -288,7 +288,7 @@ code,
   display: block;
   width: var(--control-md);
   height: var(--control-md);
-  border-radius: var(--rad-md);
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
   border: var(--stroke-sm) solid var(--border-subtle);
 }
 .docs-bar {
@@ -328,7 +328,7 @@ code,
   align-items: flex-end;
   padding: var(--space-md);
   background: var(--surface-100);
-  border-radius: var(--rad-md);
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
 }
 
 .docs-type-list {
@@ -528,7 +528,7 @@ code,
   display: block;
   padding: var(--space-lg);
   border: var(--stroke-sm) solid var(--border-subtle);
-  border-radius: var(--rad-md);
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
   font: var(--type-body-md-bold);
   color: var(--text-bold);
   text-decoration: none;

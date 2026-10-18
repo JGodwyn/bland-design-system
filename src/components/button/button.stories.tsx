@@ -86,6 +86,20 @@ export default {
       </div>
 
       <div className="pg-stack">
+        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <div className="pg-row pg-focus">
+          {types.map((type) => (
+            <Button key={type} type={type} iconStart={<PlusIcon />}>
+              {type}
+            </Button>
+          ))}
+          <Button size="xs">xs</Button>
+          <IconButton icon={<PlusIcon />} aria-label="Add" />
+          <IconButton size="xs" type="stroke" icon={<PlusIcon />} aria-label="Add" />
+        </div>
+      </div>
+
+      <div className="pg-stack">
         <span className="pg-label">Loading: the spinner replaces the icon on that side</span>
         <div className="pg-row">
           <Button loading iconStart={<PlusIcon />}>
