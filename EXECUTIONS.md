@@ -202,6 +202,12 @@ times.
   those in `tests/a11y.spec.ts` and raised the success one with Godwin.
 - Full `npm test` had failures only in other sessions' uncommitted work
   (pills story, `scripts/tokens/drift.test.ts` typecheck).
+- Committed Indicator as 72628ba from a temporary staging of HEAD plus my
+  lines only: Avatar had its files staged in the shared index at the time.
+- Badge: icon only is a union-typed variant of Badge (`icon` + `aria-label`),
+  not a separate component. Outline border per emotion read from Figma
+  (neutral uses `border-bold`). The docs server needed `npm run props` to
+  show the new component's props table (props are generated at startup).
 
 ## 2026-10-18 — Chip and Pills (side session, wave 2)
 **Asked:** build Chip and Pills (pages 542:25321, 708:23768), nesting the Indicator from the Badge session for the count.

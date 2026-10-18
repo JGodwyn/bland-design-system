@@ -1,0 +1,141 @@
+/*
+ * Badge (Figma: Badges page, set "Badge").
+ *
+ *   <span class="bland-badge" data-size="md" data-emotion="success" data-type="secondary">
+ *     <span class="bland-icon bland-badge__icon">…</span>
+ *     <span class="bland-badge__label">Active</span>
+ *   </span>
+ *
+ * Icon only adds data-icon-only, role="img" and an aria-label, and holds one icon.
+ * Figma draws the fill on an inner frame; here it sits on the root. Height and min width are the
+ * same badge/* token. Full radius without .bland-smooth (see indicator.css).
+ *
+ * Colors: each data-emotion block names that emotion's Badge tokens (--_e-*), each data-type block
+ * picks from them. Badge/* aliases Indicator/*, so badges and indicators always match.
+ */
+
+.bland-badge {
+  --_size: var(--badge-sm);
+  --_border: transparent;
+  --bland-icon-size: var(--icon-xs);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  box-sizing: border-box;
+  max-width: 100%;
+  height: var(--_size);
+  min-width: var(--_size);
+  padding: var(--space-none) var(--space-sm);
+  border-radius: var(--rad-rd);
+  background-color: var(--_bg);
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--_border);
+  color: var(--_text);
+  font: var(--type-body-sm);
+  letter-spacing: var(--letter-spacing-normal);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* ---- Size: badge/* height, body type, icon/* ---- */
+
+.bland-badge[data-size="md"] {
+  --_size: var(--badge-md);
+
+  gap: var(--space-xs);
+  font: var(--type-body-md);
+}
+
+.bland-badge[data-size="lg"] {
+  --_size: var(--badge-lg);
+  --bland-icon-size: var(--icon-sm);
+
+  gap: var(--space-xs);
+  font: var(--type-body-lg);
+}
+
+.bland-badge[data-size="xl"] {
+  --_size: var(--badge-xl);
+  --bland-icon-size: var(--icon-md);
+
+  gap: var(--space-xs);
+  padding-inline: var(--space-lg);
+  font: var(--type-body-lg);
+}
+
+/* Icon only: a circle, the icon centered. */
+.bland-badge[data-icon-only] {
+  width: var(--_size);
+  padding: var(--space-none);
+}
+
+/* ---- Emotion: the Badge tokens for that color family ---- */
+
+.bland-badge[data-emotion="brand"] {
+  --_e-primary: var(--badge-brand-primary);
+  --_e-primary-content: var(--badge-brand-primary-content);
+  --_e-secondary: var(--badge-brand-secondary);
+  --_e-secondary-content: var(--badge-brand-secondary-content);
+  --_e-border: var(--border-brand);
+}
+
+.bland-badge[data-emotion="neutral"] {
+  --_e-primary: var(--badge-neutral-primary);
+  --_e-primary-content: var(--badge-neutral-primary-content);
+  --_e-secondary: var(--badge-neutral-secondary);
+  --_e-secondary-content: var(--badge-neutral-secondary-content);
+  --_e-border: var(--border-bold);
+}
+
+.bland-badge[data-emotion="success"] {
+  --_e-primary: var(--badge-success-primary);
+  --_e-primary-content: var(--badge-success-primary-content);
+  --_e-secondary: var(--badge-success-secondary);
+  --_e-secondary-content: var(--badge-success-secondary-content);
+  --_e-border: var(--border-success);
+}
+
+.bland-badge[data-emotion="danger"] {
+  --_e-primary: var(--badge-danger-primary);
+  --_e-primary-content: var(--badge-danger-primary-content);
+  --_e-secondary: var(--badge-danger-secondary);
+  --_e-secondary-content: var(--badge-danger-secondary-content);
+  --_e-border: var(--border-danger);
+}
+
+.bland-badge[data-emotion="warning"] {
+  --_e-primary: var(--badge-warning-primary);
+  --_e-primary-content: var(--badge-warning-primary-content);
+  --_e-secondary: var(--badge-warning-secondary);
+  --_e-secondary-content: var(--badge-warning-secondary-content);
+  --_e-border: var(--border-warning);
+}
+
+/* ---- Type: solid fill, soft tint, or border only ---- */
+
+.bland-badge[data-type="primary"] {
+  --_bg: var(--_e-primary);
+  --_text: var(--_e-primary-content);
+}
+
+.bland-badge[data-type="secondary"] {
+  --_bg: var(--_e-secondary);
+  --_text: var(--_e-secondary-content);
+}
+
+/* Outline: Figma's stroke-sm inside stroke, drawn as an inset shadow so it adds no size. */
+.bland-badge[data-type="outline"] {
+  --_bg: transparent;
+  --_text: var(--_e-secondary-content);
+  --_border: var(--_e-border);
+}
+
+/* ---- Parts ---- */
+
+.bland-badge__label {
+  min-width: var(--space-none);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

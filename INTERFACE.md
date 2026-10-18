@@ -129,6 +129,25 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   `data-ring`; label part `.bland-indicator__label`. Position it from the
   parent (Avatar's slot), not inside Indicator.
 
+### Badge (2026-10-18)
+- `import { Badge } from 'bland'`. Props: `size` sm/md/lg/xl (16, 20, 24, 32;
+  default sm, Figma's), `emotion` brand/neutral/success/danger/warning,
+  `type` primary/secondary/outline, `children` (label), `iconStart`,
+  `iconEnd` (Figma `🌟 Leading/Trailing icon`; the `👀` booleans are "pass an
+  icon or don't", same names as Button).
+- **Icon only** is the same component, not an IconBadge: pass `icon` (no
+  children) and a required `aria-label`; the badge becomes a circle with
+  `role="img"`. Its size type excludes sm and defaults to md, as the set
+  description asks. The props type is a union (`BadgeLabelProps |
+  BadgeIconOnlyProps`), so TypeScript rejects a label plus `icon`.
+- Sizes from Figma: padding `space-sm` (xl `space-lg`), gap `space-2xs` on sm
+  else `space-xs`, type body-sm/md/lg/lg, icons `icon/xs` (sm, md), `icon/sm`
+  (lg), `icon/md` (xl).
+- Outline: no fill, `stroke-sm` inside border as an inset shadow in
+  `Border/border-{brand,bold (neutral),success,danger,warning}`, content in
+  the `*-secondary-content` token.
+- Long labels truncate with an ellipsis. Static: no states, not focusable.
+
 ### Avatar (2026-10-18)
 - Props: `size` xs–3xl (default md; Figma's default xs is 16px), `type`
   image/placeholder/initials, `src`, `alt`, `initials`, `topSlot`,

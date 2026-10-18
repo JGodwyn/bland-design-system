@@ -115,6 +115,16 @@ it** ("No story called avatar" at `#/raw/avatar`, even after a reload). Its
 `import.meta.glob` and `props.json` are from when it started. → Restart it
 (`npm run docs:stop`, then `npm run docs`) after adding a component folder.
 
+**A new component's props table says "Props are generated when the docs
+start"** on a server that is already running. → `npm run props` regenerates
+`props.json` and a reload picks it up; no restart needed for props alone.
+
+**axe catches contrast misses that live in the tokens, not the component.**
+White on `Indicator/success-primary` (#008b00) is 4.47:1 though the Figma
+description promises 4.5:1; danger primary in dark is 3.7:1 on purpose. →
+Exclude only those selectors, per theme, in `tests/a11y.spec.ts` with the
+reason beside them, and raise anything unintended with Godwin.
+
 ## Working with parallel sessions
 
 **Two sessions share this folder and commit on `main`.** A `git add -A` from one
@@ -129,6 +139,12 @@ and commit in one command, or commit from a private index
 (`GIT_INDEX_FILE=<scratch> git read-tree HEAD`, `git add`, `git commit`, then
 `git reset -q -- <paths>` in the shared index). Before committing, check
 `git diff --cached --stat` lists only your files.
+
+**A shared file can hold another session's unfinished lines** (Chip's map row
+in `CLAUDE.md`, Chip's log in `EXECUTIONS.md`) next to yours, so even a
+pathspec commit would ship them. → Stage HEAD plus only your lines: write that
+version to a scratch file, `git hash-object -w` it, and
+`git update-index --cacheinfo 100644,<hash>,<path>` (Indicator, 72628ba).
 
 **A plain `git commit` takes everything staged, including another session's files.** The drift check commit (9ab048c) picked up the Chip session's Chip and Pills work: it was staged in the second between checking the index and committing. → Commit with a pathspec, `git commit -m "…" -- path1 path2`, which commits only those paths whatever else is staged. And make a staged-files check stop the commit, not just print.
 
