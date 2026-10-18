@@ -299,3 +299,12 @@ times.
   on desktop. Measured 100% vs 400% on Avatar, Button, Pills, Scroll area
   (desktop) and Avatar at 375px: same height, no sideways scroll.
 - Added a docs test: zooming to 400% leaves the view's box unchanged.
+
+## 2026-10-18 — Badge optical padding (Badge and Indicator session)
+**Asked:** "increases the padding on an area without an icon if there's an area with an icon … from 8 to 12 … just do this for sm, md, and lg."
+
+- Badge sets `data-icon` start/end/both; CSS widens the bare side to
+  `space-md` on sm, md, lg. xl untouched. No Figma change (noted in
+  INTERFACE.md and the component map row instead).
+- Story row "Optical padding" at every size; `tests/badge.spec.ts` checks the
+  computed padding. Badge screenshots re-baselined (intended change).

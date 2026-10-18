@@ -53,7 +53,8 @@ plugin connector returned "You've reached the Figma MCP tool call limit for your
 View seat", and Framelink answered 403 "Token expired". → Read a component in
 as few `use_figma` calls as possible (one script dumping the tree, bindings
 and text styles of every variant); the second Figma MCP connector in the
-session kept working when the first was limited.
+session kept working when the first was limited. Go straight to that second
+official connector; don't try Framelink (Godwin's call: official MCP only).
 
 ## Fonts
 

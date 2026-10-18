@@ -7,6 +7,7 @@
  *   </span>
  *
  * Icon only adds data-icon-only, role="img" and an aria-label, and holds one icon.
+ * data-icon="start" | "end" | "both" says which sides of a labelled badge hold an icon.
  * Figma draws the fill on an inner frame; here it sits on the root. Height and min width are the
  * same badge/* token. Full radius without .bland-smooth (see indicator.css).
  *
@@ -63,6 +64,19 @@
   gap: var(--space-xs);
   padding-inline: var(--space-lg);
   font: var(--type-body-lg);
+}
+
+/*
+ * Optical padding (code only; Figma can't express it): an icon on one side makes that side look
+ * roomier, so the bare side steps up from space-sm (8) to space-md (12). Not on xl: its padding is
+ * already space-lg (16) and the next step (24) is too large a jump.
+ */
+.bland-badge[data-icon="start"]:not([data-size="xl"]) {
+  padding-inline-end: var(--space-md);
+}
+
+.bland-badge[data-icon="end"]:not([data-size="xl"]) {
+  padding-inline-start: var(--space-md);
 }
 
 /* Icon only: a circle, the icon centered. */

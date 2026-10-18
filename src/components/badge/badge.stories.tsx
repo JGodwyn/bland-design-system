@@ -69,6 +69,26 @@ export default {
       </div>
 
       <div className="pg-stack">
+        <span className="pg-label">Optical padding: with one icon, the bare side steps up from 8 to 12 (sm, md, lg; xl keeps 16)</span>
+        {sizes.map((size) => (
+          <div key={size} className="pg-row">
+            <Badge size={size} type="secondary" data-testid={`plain-${size}`}>
+              No icon
+            </Badge>
+            <Badge size={size} type="secondary" iconStart={<CheckIcon />} data-testid={`start-${size}`}>
+              Leading
+            </Badge>
+            <Badge size={size} type="secondary" iconEnd={<XIcon />} data-testid={`end-${size}`}>
+              Trailing
+            </Badge>
+            <Badge size={size} type="secondary" iconStart={<CheckIcon />} iconEnd={<XIcon />} data-testid={`both-${size}`}>
+              Both
+            </Badge>
+          </div>
+        ))}
+      </div>
+
+      <div className="pg-stack">
         <span className="pg-label">A long label truncates with an ellipsis</span>
         <div className="pg-row" style={{ maxWidth: 160 }}>
           <Badge size="md" type="secondary" iconStart={<CheckIcon />}>

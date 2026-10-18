@@ -55,6 +55,8 @@ export function Badge({
   ...rest
 }: BadgeProps) {
   const iconOnly = icon != null;
+  // Which side holds an icon, so the CSS can widen the bare side (optical padding).
+  const iconSide = iconOnly ? undefined : iconStart && iconEnd ? 'both' : iconStart ? 'start' : iconEnd ? 'end' : undefined;
   const slot = (node: ReactNode) => (node ? <Icon className="bland-badge__icon">{node}</Icon> : null);
 
   return (
@@ -66,6 +68,7 @@ export function Badge({
       data-emotion={emotion}
       data-type={type}
       data-icon-only={iconOnly || undefined}
+      data-icon={iconSide}
     >
       {iconOnly ? (
         slot(icon)

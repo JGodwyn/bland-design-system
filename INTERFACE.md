@@ -153,6 +153,12 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   `Border/border-{brand,bold (neutral),success,danger,warning}`, content in
   the `*-secondary-content` token.
 - Long labels truncate with an ellipsis. Static: no states, not focusable.
+- **Optical padding (code only, 2026-10-18, Godwin):** an icon on one side
+  makes that side look roomier, so on sm, md and lg the side without an icon
+  steps up from `space-sm` (8) to `space-md` (12) when the other side has one
+  (`data-icon="start"|"end"`). Both icons or none keep 8. xl keeps
+  `space-lg` (16) on both sides, since the next step (24) is too big a jump.
+  Figma can't express this and doesn't show it.
 
 ### Avatar (2026-10-18)
 - Props: `size` xs–3xl (default md; Figma's default xs is 16px), `type`
