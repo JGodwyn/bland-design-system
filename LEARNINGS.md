@@ -46,6 +46,13 @@ an inner `Base` frame, and a stroke weight showed up on the hidden `focus-ring`
 frame. → Read the bindings of every child frame before writing CSS, not just
 the component root.
 
+**The Figma MCP has a per-seat call limit.** Mid-read, `use_figma` on the
+plugin connector returned "You've reached the Figma MCP tool call limit for your
+View seat", and Framelink answered 403 "Token expired". → Read a component in
+as few `use_figma` calls as possible (one script dumping the tree, bindings
+and text styles of every variant); the second Figma MCP connector in the
+session kept working when the first was limited.
+
 ## Fonts
 
 **Fontsource *variable* packages register a different family name**
@@ -100,6 +107,11 @@ change is broken.
 `playground/.generated/props.json`. → The docs import it through
 `import.meta.glob`, so a missing file is not a type error; `npm run docs` and the
 Playwright web server regenerate it first.
+
+**A docs server started before a new component folder existed may not list
+it** ("No story called avatar" at `#/raw/avatar`, even after a reload). Its
+`import.meta.glob` and `props.json` are from when it started. → Restart it
+(`npm run docs:stop`, then `npm run docs`) after adding a component folder.
 
 ## Working with parallel sessions
 

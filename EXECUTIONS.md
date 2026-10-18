@@ -153,3 +153,35 @@ times.
   `.gitattributes`.
 - Port: the old `vite --config playground/vite.config.ts` server (pid 6111)
   was still holding 5180. Added `npm run docs:stop`.
+
+## 2026-10-18 — Avatar (side session, wave 2)
+**Asked:** build Avatar from the Figma set (page 82:6937, set 132:2818), nesting the Indicator from the Badge session.
+
+- Read the set description, properties and bindings of every variant through
+  `use_figma`. Figma has **two** slots, `🧩 Top slot` (count badge) and
+  `🧩 Bottom slot` (status dot), not one: both centred on the circle edge at
+  45°, sized `avatar/slot-*`. Initials: `Surface/surface-brand` fill,
+  `Indicator/brand-primary-content` text; placeholder: `surface-300` fill,
+  User icon in `Icon/icon-subtle` at `avatar/icon-*`; image: `surface-500`
+  under the image.
+- The first Figma connector hit its View-seat call limit mid-read, and
+  Framelink's token had expired; the second Figma MCP connector finished the
+  read (text styles per size, slot positions, User icon SVG).
+- The Indicator was not in `src/components/` yet; built everything else first.
+- Exported User (6080:106234) into `src/icons/` as `UserIcon`. Built
+  `Avatar.tsx`, `avatar.css`, the story and `tests/avatar.spec.ts` (6 specs:
+  both fallbacks, alt as the name, xs initial, slot geometry, decorative).
+- Slot geometry measured in the browser: within 0.5px of Figma's x/y for every
+  size (Figma rounds to whole pixels).
+- The docs server on 5180 had been running since 2026-10-17 and did not list
+  the new story; restarted it with `docs:stop` + `npm run docs`.
+- The Indicator was still uncommitted when Avatar was done, so the slots take
+  any node and the story uses a stand-in dot; swap in `<Indicator ring>` once
+  it is on main.
+- Gates: lint:css clean; typecheck clean for Avatar (the only errors are in
+  another session's uncommitted `scripts/drift.ts` and `scripts/tokens/`);
+  Avatar visual, axe and behaviour tests pass; build passes. The Chip, Pills
+  and Indicator stories fail while their sessions finish them.
+
+**Verified:** 6 Avatar specs, avatar screenshots in light and dark looked at, axe clean.
+**Logged:** INTERFACE.md §3, §6 Avatar · LEARNINGS.md §Figma, §Tooling · CLAUDE.md component map.

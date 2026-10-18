@@ -76,7 +76,7 @@ when), `docs/components.md` (how to build one).
 - A component sets its icon size with `--bland-icon-size` on the slot's parent;
   the default lives on `:root` (see LEARNINGS).
 - Bland's own icons (`src/icons/`) are exported from the Figma Icons page as
-  components need them: Check, X, CaretDown, Plus, Spinner so far.
+  components need them: Check, X, CaretDown, Plus, Minus, User, Spinner so far.
 
 ## 4. Overflow
 
@@ -105,6 +105,28 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Icon Button requires `aria-label`; loading swaps its icon for the spinner.
 - CSS pattern every component copies: emotion and type blocks set private
   custom properties, and one rule per state reads them.
+
+### Avatar (2026-10-18)
+- Props: `size` xs–3xl (default md; Figma's default xs is 16px), `type`
+  image/placeholder/initials, `src`, `alt`, `initials`, `topSlot`,
+  `bottomSlot`, `imgProps`.
+- **`type` is optional:** omitted, it is image with a `src`, initials with
+  `initials`, else placeholder. A missing or failed image falls back to the
+  initials, then the placeholder; the failure is keyed to the `src`, so a new
+  `src` tries again. The image's `surface-500` fill shows while it loads.
+- **Accessible name is `alt`.** With it, the image (or the initials or
+  placeholder circle, as `role="img"`) is named; without it, the avatar is
+  decorative, for when the name is printed beside it.
+- **Initials:** xs shows the first character (Figma's description); other
+  sizes show up to two, so a name like "Ada Lovelace" passed as "AL" fits.
+- **Two slots, as in Figma:** `topSlot` for a count, `bottomSlot` for a status
+  dot. Both sit outside the clipped circle, centred on its edge at 45 degrees
+  (`50% ± 50% × cos(45deg)`), in a box of `avatar/slot-*` that fits the
+  matching Indicator size. They accept any node; the Indicator was not on main
+  when Avatar shipped.
+- **Circles skip `.bland-smooth`:** on a full circle Figma's smoothing has no
+  straight edge to act on, and `corner-shape` would make it a squircle.
+- Not interactive; wrap it in a button or link when it needs focus.
 
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 

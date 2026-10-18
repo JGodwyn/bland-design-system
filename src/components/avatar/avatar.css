@@ -1,0 +1,142 @@
+/*
+ * Avatar (Figma: Avatar page, set "Avatar").
+ *
+ *   <span class="bland-avatar" data-size="md" data-type="initials">
+ *     <span class="bland-avatar__inner" role="img" aria-label="Ada Lovelace">
+ *       <span class="bland-avatar__initials">AL</span>
+ *     </span>
+ *     <span class="bland-avatar__slot" data-slot="bottom">…an Indicator…</span>
+ *   </span>
+ *
+ * The inner circle clips the image; the slots sit outside it so an Indicator is never cut off.
+ * A full circle gets no .bland-smooth: Figma's smoothing has no straight edge to spread over on a
+ * circle, and corner-shape would turn it into a squircle.
+ *
+ * Slots: centred on the circle edge at 45 degrees on the right (Figma), so the slot's centre is
+ * 50% ± 50% × cos(45deg) of the avatar, and the slot box (avatar/slot-*) is centred on that point.
+ */
+
+.bland-avatar {
+  --_size: var(--avatar-md);
+  --_slot: var(--avatar-slot-md);
+  --bland-icon-size: var(--avatar-icon-md);
+
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  width: var(--_size);
+  height: var(--_size);
+  vertical-align: middle;
+}
+
+.bland-avatar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--rad-rd);
+  font: var(--type-body-md-bold);
+  letter-spacing: var(--letter-spacing-normal);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* ---- Type: the inner circle's fill and content color ---- */
+
+.bland-avatar[data-type="image"] .bland-avatar__inner {
+  background-color: var(--surface-500); /* shows while the image loads */
+}
+
+.bland-avatar[data-type="placeholder"] .bland-avatar__inner {
+  background-color: var(--surface-300);
+  color: var(--icon-subtle);
+}
+
+.bland-avatar[data-type="initials"] .bland-avatar__inner {
+  background-color: var(--surface-brand);
+  color: var(--indicator-brand-primary-content);
+}
+
+.bland-avatar__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---- Size: avatar/*, avatar/icon-* (half the avatar), avatar/slot-*, initials text style ---- */
+
+.bland-avatar[data-size="xs"] {
+  --_size: var(--avatar-xs);
+  --_slot: var(--avatar-slot-xs);
+  --bland-icon-size: var(--avatar-icon-xs);
+}
+
+.bland-avatar[data-size="sm"] {
+  --_size: var(--avatar-sm);
+  --_slot: var(--avatar-slot-sm);
+  --bland-icon-size: var(--avatar-icon-sm);
+}
+
+.bland-avatar[data-size="lg"] {
+  --_size: var(--avatar-lg);
+  --_slot: var(--avatar-slot-lg);
+  --bland-icon-size: var(--avatar-icon-lg);
+}
+
+.bland-avatar[data-size="xl"] {
+  --_size: var(--avatar-xl);
+  --_slot: var(--avatar-slot-xl);
+  --bland-icon-size: var(--avatar-icon-xl);
+}
+
+.bland-avatar[data-size="2xl"] {
+  --_size: var(--avatar-2xl);
+  --_slot: var(--avatar-slot-2xl);
+  --bland-icon-size: var(--avatar-icon-2xl);
+}
+
+.bland-avatar[data-size="3xl"] {
+  --_size: var(--avatar-3xl);
+  --_slot: var(--avatar-slot-3xl);
+  --bland-icon-size: var(--avatar-icon-3xl);
+}
+
+.bland-avatar:is([data-size="xs"], [data-size="sm"]) .bland-avatar__inner {
+  font: var(--type-body-sm-bold);
+}
+
+.bland-avatar:is([data-size="lg"], [data-size="xl"]) .bland-avatar__inner {
+  font: var(--type-body-lg-bold);
+}
+
+.bland-avatar[data-size="2xl"] .bland-avatar__inner {
+  font: var(--type-title-md);
+}
+
+.bland-avatar[data-size="3xl"] .bland-avatar__inner {
+  font: var(--type-title-lg);
+}
+
+/* ---- Slots ---- */
+
+.bland-avatar__slot {
+  position: absolute;
+  left: calc(50% + 50% * cos(45deg));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--_slot);
+  height: var(--_slot);
+  translate: -50% -50%;
+}
+
+.bland-avatar__slot[data-slot="top"] {
+  top: calc(50% - 50% * sin(45deg));
+}
+
+.bland-avatar__slot[data-slot="bottom"] {
+  top: calc(50% + 50% * sin(45deg));
+}
