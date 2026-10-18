@@ -309,6 +309,10 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - The playground's size never follows the demo, so zooming never resizes it
   (2026-10-18): the view is 320px tall, or the props panel's height beside it
   on desktop, and a demo bigger than that scrolls inside it.
+- Slot props get demo controls by building their content (2026-10-18):
+  Avatar's `topSlot` / `bottomSlot` pick none, a status dot or a count, with an
+  emotion and a count label, as a ringed Indicator sized for the slot. The
+  story's `code(args)` turns those controls into real JSX in the snippet.
 - Mobile first: below the tablet breakpoint the sidebar becomes a Menu.
 - **"focused" is offered only for components that take keyboard focus**
   (decided 2026-10-18). The demo shows the control only when what it renders

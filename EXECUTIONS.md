@@ -339,3 +339,14 @@ baselines looked at in both themes.
   travel, hit area, tokens per state, focus, reduced motion.
 **Verified:** lint:css, typecheck, `npm test` 133 passed, build. New
 baselines looked at in both themes.
+
+## 2026-10-18 — Avatar demo: slot controls
+**Asked:** "can we have an option to tweak the slot content?"
+
+- ReactNode props get no generated control, so the Avatar story adds its own:
+  `topSlot` / `bottomSlot` (none, dot, count), `topEmotion` / `bottomEmotion`,
+  `topCount` / `bottomCount`. The slot holds a ringed Indicator sized for the
+  avatar; a dot gets an `aria-label` from its emotion (Online, Busy, Away…).
+- The snippet printed every control as a prop, so `Story.demo` got an optional
+  `code(args)` and the snippet prints a string starting with `<` as JSX.
+- Checked in the browser; added a docs test for the slot controls.

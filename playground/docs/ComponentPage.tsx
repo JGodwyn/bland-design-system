@@ -111,7 +111,7 @@ function Demo({ demo }: { demo: NonNullable<Story['demo']> }) {
         </form>
       </div>
       <pre className="docs-code">
-        <code>{snippet(demo.component, args, doc?.props ?? [])}</code>
+        <code>{snippet(demo.component, demo.code ? demo.code(args) : args, doc?.props ?? [])}</code>
       </pre>
     </Section>
   );
@@ -308,6 +308,7 @@ function snippet(component: string, args: Args, props: PropDoc[]) {
     if (value === true) attrs.push(name);
     else if (value === false) attrs.push(`${name}={false}`);
     else if (typeof value === 'string' && /Icon$/.test(value)) attrs.push(`${name}={<${value} />}`);
+    else if (typeof value === 'string' && value.startsWith('<')) attrs.push(`${name}={${value}}`);
     else if (typeof value === 'string') attrs.push(`${name}="${value}"`);
     else attrs.push(`${name}={${JSON.stringify(value)}}`);
   }

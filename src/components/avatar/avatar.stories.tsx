@@ -1,5 +1,5 @@
 import type { Story } from '../../../playground/story';
-import { Indicator, type IndicatorSize } from '../indicator/Indicator';
+import { Indicator, type IndicatorEmotion, type IndicatorSize } from '../indicator/Indicator';
 import { Avatar, type AvatarSize } from './Avatar';
 // The photo on Figma's Avatar (Unsplash 3TLl_97HNJo), cropped to 160px and kept local,
 // so the docs and screenshots never wait on the network.
@@ -23,6 +23,45 @@ const slotIndicator: Record<AvatarSize, IndicatorSize> = {
   '3xl': '2xl',
 };
 
+// Demo slot content: a status dot (named for screen readers) or a count, as a ringed Indicator sized for the slot.
+const emotions: IndicatorEmotion[] = ['brand', 'neutral', 'success', 'danger', 'warning'];
+const statusNames: Record<IndicatorEmotion, string> = {
+  brand: 'Active',
+  neutral: 'Offline',
+  success: 'Online',
+  danger: 'Busy',
+  warning: 'Away',
+};
+type SlotArgs = { kind: string; emotion: IndicatorEmotion; count: string; size: AvatarSize };
+
+function slotNode({ kind, emotion, count, size }: SlotArgs) {
+  if (kind === 'dot') return <Indicator ring size={slotIndicator[size]} emotion={emotion} aria-label={statusNames[emotion]} />;
+  if (kind === 'count')
+    return (
+      <Indicator ring size={slotIndicator[size]} emotion={emotion}>
+        {count}
+      </Indicator>
+    );
+  return undefined;
+}
+
+function slotCode({ kind, emotion, count, size }: SlotArgs) {
+  const open = `<Indicator ring size="${slotIndicator[size]}" emotion="${emotion}"`;
+  if (kind === 'dot') return `${open} aria-label="${statusNames[emotion]}" />`;
+  if (kind === 'count') return `${open}>${count}</Indicator>`;
+  return undefined;
+}
+
+/** Splits the demo args into Avatar's props and the two slots' settings. */
+function demoSlots({ topSlot, topEmotion, topCount, bottomSlot, bottomEmotion, bottomCount, ...avatar }: Record<string, any>) {
+  const size = (avatar.size ?? 'md') as AvatarSize;
+  return {
+    avatar,
+    top: { kind: topSlot, emotion: topEmotion, count: topCount, size },
+    bottom: { kind: bottomSlot, emotion: bottomEmotion, count: bottomCount, size },
+  };
+}
+
 export default {
   title: 'Avatar',
   description:
@@ -30,14 +69,48 @@ export default {
   components: ['Avatar'],
   demo: {
     component: 'Avatar',
-    args: { size: 'xl', type: 'image', src: 'portrait', alt: 'Ada Lovelace', initials: 'AL' },
+    args: {
+      size: 'xl',
+      type: 'image',
+      src: 'portrait',
+      alt: 'Ada Lovelace',
+      initials: 'AL',
+      topSlot: 'count',
+      topEmotion: 'danger',
+      topCount: '3',
+      bottomSlot: 'dot',
+      bottomEmotion: 'success',
+      bottomCount: '1',
+    },
+    // Slot content is a node, so the controls build an Indicator: none, a status dot or a count.
+    // A count shows from avatar xl up; smaller slots hold Indicator sm or md, which are dots.
     controls: {
       src: { kind: 'select', options: Object.keys(images) },
       alt: { kind: 'text' },
       initials: { kind: 'text' },
       imgProps: false,
+      topSlot: { kind: 'select', options: ['none', 'dot', 'count'] },
+      topEmotion: { kind: 'select', options: emotions },
+      topCount: { kind: 'text' },
+      bottomSlot: { kind: 'select', options: ['none', 'dot', 'count'] },
+      bottomEmotion: { kind: 'select', options: emotions },
+      bottomCount: { kind: 'text' },
     },
-    render: ({ src, ...args }) => <Avatar {...(args as object)} src={images[src as keyof typeof images]} />,
+    render: (args) => {
+      const { avatar, top, bottom } = demoSlots(args);
+      return (
+        <Avatar
+          {...(avatar as object)}
+          src={images[avatar.src as keyof typeof images]}
+          topSlot={slotNode(top)}
+          bottomSlot={slotNode(bottom)}
+        />
+      );
+    },
+    code: (args) => {
+      const { avatar, top, bottom } = demoSlots(args);
+      return { ...avatar, topSlot: slotCode(top), bottomSlot: slotCode(bottom) };
+    },
   },
   render: () => (
     <>

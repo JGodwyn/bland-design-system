@@ -130,3 +130,16 @@ test('zooming never changes the size of the playground', async ({ page }) => {
   const after = (await view.boundingBox())!;
   expect([after.width, after.height]).toEqual([before.width, before.height]);
 });
+
+test('the Avatar demo builds its slot content from the controls', async ({ page }) => {
+  await page.goto('/#/components/avatar');
+  const stage = page.getByTestId('demo-stage');
+  const code = page.locator('.docs-code code').last();
+  await expect(stage.locator('[data-slot="top"]')).toHaveText('3');
+  await page.locator('#ctl-topCount').fill('12');
+  await expect(stage.locator('[data-slot="top"]')).toHaveText('12');
+  await page.locator('#ctl-bottomSlot').selectOption('none');
+  await expect(stage.locator('[data-slot="bottom"]')).toHaveCount(0);
+  await expect(code).toContainText('topSlot={<Indicator ring size="lg" emotion="danger">12</Indicator>}');
+  await expect(code).not.toContainText('bottomSlot');
+});
