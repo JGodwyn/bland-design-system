@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
 import type { Story } from '../../../playground/story';
+import { Indicator, type IndicatorSize } from '../indicator/Indicator';
 import { Avatar, type AvatarSize } from './Avatar';
 
 const sizes: AvatarSize[] = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl'];
@@ -15,31 +15,16 @@ const broken = 'data:image/png;base64,broken';
 
 const images = { portrait, broken, none: undefined } as const;
 
-/**
- * Stand-in for the slot content until the Indicator lands: any node fits a slot.
- * Sized by the slot (avatar/slot-*), ringed like Figma's Indicator Ring.
- */
-function Dot({ children }: { children?: ReactNode }) {
-  return (
-    <span
-      style={{
-        boxSizing: 'border-box',
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100%',
-        borderRadius: 'var(--rad-rd)',
-        background: children ? 'var(--surface-danger)' : 'var(--icon-success)',
-        boxShadow: '0 0 0 var(--stroke-lg) var(--surface-100)',
-        color: 'var(--text-on-color)',
-        font: 'var(--type-body-sm-bold)',
-      }}
-    >
-      {children}
-    </span>
-  );
-}
+// Indicator size that fills each avatar/slot-* (8, 8, 12, 12, 16, 20, 24).
+const slotIndicator: Record<AvatarSize, IndicatorSize> = {
+  xs: 'sm',
+  sm: 'sm',
+  md: 'md',
+  lg: 'md',
+  xl: 'lg',
+  '2xl': 'xl',
+  '3xl': '2xl',
+};
 
 export default {
   title: 'Avatar',
@@ -98,8 +83,15 @@ export default {
               size={size}
               src={portrait}
               alt={`Ada Lovelace (${size})`}
-              topSlot={size === 'xs' || size === 'sm' ? undefined : <Dot>3</Dot>}
-              bottomSlot={<Dot />}
+              topSlot={
+                // sm and md Indicators are dots and drop the count, so it reads from avatar xl up.
+                size === 'xs' || size === 'sm' ? undefined : (
+                  <Indicator ring size={slotIndicator[size]} emotion="danger">
+                    3
+                  </Indicator>
+                )
+              }
+              bottomSlot={<Indicator ring size={slotIndicator[size]} emotion="success" aria-label="Online" />}
             />
           ))}
         </div>

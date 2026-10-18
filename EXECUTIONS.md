@@ -266,3 +266,17 @@ times.
   `src/index.ts` with only the Chip and Pill exports). History left as is,
   since it was already on origin; LEARNINGS.md §Working with parallel sessions
   has the rule.
+
+## Avatar slots get the real Indicator (2026-10-18)
+
+- Indicator was on main (72628ba), so the Avatar story's hand-styled `Dot`
+  became `<Indicator ring>` at the slot's size: xs/sm sm, md/lg md, xl lg,
+  2xl xl, 3xl 2xl. Danger count on top, success dot with `aria-label="Online"`
+  at the bottom. sm and md Indicators drop their label, so the count reads
+  from avatar xl up; md and lg show a plain danger dot on top.
+- `npx playwright test -g avatar --update-snapshots` passed without touching
+  the PNGs: the change fit inside `maxDiffPixelRatio`. Re-ran with
+  `--update-snapshots=all` on `avatar looks` only and looked at both themes.
+
+**Verified:** lint:css and typecheck clean, `npm test` 87 passed, build passes.
+**Logged:** INTERFACE.md §Avatar · CLAUDE.md component map · LEARNINGS.md §Tooling.

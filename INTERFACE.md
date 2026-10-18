@@ -170,8 +170,11 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - **Two slots, as in Figma:** `topSlot` for a count, `bottomSlot` for a status
   dot. Both sit outside the clipped circle, centred on its edge at 45 degrees
   (`50% ± 50% × cos(45deg)`), in a box of `avatar/slot-*` that fits the
-  matching Indicator size. They accept any node; the Indicator was not on main
-  when Avatar shipped.
+  matching Indicator size. They accept any node; the story wires in
+  `<Indicator ring>` at the matching size (slot xs/sm 8 = Indicator sm,
+  md/lg 12 = md, xl 16 = lg, 2xl 20 = xl, 3xl 24 = 2xl), a danger count on
+  top and a success dot with `aria-label` at the bottom. Below avatar xl the
+  Indicator is a dot, so the count shows from xl up.
 - **Circles skip `.bland-smooth`:** on a full circle Figma's smoothing has no
   straight edge to act on, and `corner-shape` would make it a squircle.
 - Not interactive; wrap it in a button or link when it needs focus.

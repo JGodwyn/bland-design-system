@@ -105,6 +105,13 @@ silently tests against that old server. → `npm run docs:stop` frees the port.
 Check what is on it (`lsof -iTCP:5180 -sTCP:LISTEN`) before assuming your
 change is broken.
 
+**`--update-snapshots` alone keeps a baseline the change fits inside.** It
+defaults to "changed", and with `maxDiffPixelRatio: 0.002` a small story edit
+(Avatar's slot dots becoming Indicators, about 1,500 pixels) still passes, so
+the old picture stays. → To re-baseline one story on purpose, run
+`npx playwright test -g "<id> looks" --update-snapshots=all` and check
+`git status` shows the PNGs changed.
+
 **Generated files are not committed**, so a fresh clone has no
 `playground/.generated/props.json`. → The docs import it through
 `import.meta.glob`, so a missing file is not a type error; `npm run docs` and the
