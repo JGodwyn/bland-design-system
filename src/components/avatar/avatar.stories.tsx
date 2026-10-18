@@ -1,15 +1,12 @@
 import type { Story } from '../../../playground/story';
 import { Indicator, type IndicatorSize } from '../indicator/Indicator';
 import { Avatar, type AvatarSize } from './Avatar';
+// The photo on Figma's Avatar (Unsplash 3TLl_97HNJo), cropped to 160px and kept local,
+// so the docs and screenshots never wait on the network.
+import portrait from '../../../playground/assets/avatar-portrait.jpg';
 
 const sizes: AvatarSize[] = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl'];
 
-// A local portrait, so the docs and screenshots never wait on the network.
-const portrait =
-  'data:image/svg+xml;utf8,' +
-  encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><defs><linearGradient id="g" x2="0" y2="1"><stop offset="0" stop-color="#f6c28b"/><stop offset="1" stop-color="#e07a5f"/></linearGradient></defs><rect width="80" height="80" fill="url(#g)"/><circle cx="40" cy="32" r="14" fill="#3d405b"/><path d="M12 80c4-18 15-26 28-26s24 8 28 26z" fill="#3d405b"/></svg>',
-  );
 // Fails to decode without a network request, to show the fallback.
 const broken = 'data:image/png;base64,broken';
 

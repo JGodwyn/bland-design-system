@@ -280,3 +280,11 @@ times.
 
 **Verified:** lint:css and typecheck clean, `npm test` 87 passed, build passes.
 **Logged:** INTERFACE.md §Avatar · CLAUDE.md component map · LEARNINGS.md §Tooling.
+
+## 2026-10-18 — Avatar story photo
+**Asked:** use the Unsplash photo that Figma's Avatar uses (3TLl_97HNJo).
+
+- Fetched it through Unsplash's download redirect, cropped on the face to
+  160x160 (2x the 3xl avatar), 7.8 KB, into `playground/assets/avatar-portrait.jpg`;
+  the story imports it, so docs and screenshots stay offline.
+- Re-baselined only Avatar's screenshots and looked at them.
