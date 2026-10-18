@@ -130,6 +130,8 @@ and commit in one command, or commit from a private index
 `git reset -q -- <paths>` in the shared index). Before committing, check
 `git diff --cached --stat` lists only your files.
 
+**A plain `git commit` takes everything staged, including another session's files.** The drift check commit (9ab048c) picked up the Chip session's Chip and Pills work: it was staged in the second between checking the index and committing. → Commit with a pathspec, `git commit -m "…" -- path1 path2`, which commits only those paths whatever else is staged. And make a staged-files check stop the commit, not just print.
+
 **A side session can't make design decisions.** The Button session stopped on
 the spinner's rotation speed because no Motion token fit. → When a value has no
 token, the session asks; the answer is a new Figma variable synced through the
