@@ -14,12 +14,18 @@ const knownContrast: Record<(typeof themes)[number], string[]> = {
   dark: ['.bland-indicator[data-emotion="danger"][data-type="primary"]', '.bland-badge[data-emotion="danger"][data-type="primary"]'],
 };
 
+/**
+ * Text in a disabled field (its helper text and add-on labels) is exempt from contrast (WCAG 1.4.3, inactive
+ * components) and uses Text/text-minimal on purpose. axe only knows that for the input itself, so it skips these.
+ */
+const disabledFieldText = ['.bland-text-input:has(.bland-text-input__input:disabled)'];
+
 for (const id of storyIds) {
   for (const theme of themes) {
     test(`${id} has no axe violations (${theme})`, async ({ page }) => {
       await openStory(page, id, theme);
       const axe = new AxeBuilder({ page }).include(`[data-testid="frame-${theme}"]`);
-      for (const selector of knownContrast[theme]) axe.exclude(selector);
+      for (const selector of [...knownContrast[theme], ...disabledFieldText]) axe.exclude(selector);
       const results = await axe.analyze();
       expect(results.violations.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
     });

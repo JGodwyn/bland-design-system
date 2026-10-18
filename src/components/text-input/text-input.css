@@ -1,0 +1,210 @@
+/*
+ * Text Input (Figma: Text-input page, set "Text Input", add-ons "_leading-input" and "_trailing-input").
+ * Search Input reuses this field.
+ *
+ *   <div class="bland-text-input" data-size="sm" data-status="default" data-filled>
+ *     <label class="bland-text-input__label">Label</label>
+ *     <div class="bland-text-input__field bland-focus-ring bland-smooth">        Figma field / inner-border
+ *       <span class="bland-text-input__addon" data-side="start">…<span class="bland-text-input__divider"></span></span>
+ *       <span class="bland-text-input__main">                                     Figma main
+ *         icon, <input class="bland-text-input__input">, alt text, status icon, icon
+ *       </span>
+ *       <span class="bland-text-input__addon" data-side="end">…</span>
+ *     </div>
+ *     <span class="bland-text-input__helper">Helper text</span>
+ *   </div>
+ *
+ * The focus ring sits on the field box, not the input: it shows while the input matches :focus-visible
+ * (always, for a text field). Status picks private colors; disabled overrides them.
+ */
+
+.bland-text-input {
+  --_border: var(--border-input);
+  --_helper: var(--text-subtle);
+  --_status: var(--icon-subtle);
+  --_label: var(--text-bold);
+  --_text: var(--text-bold);
+  --_placeholder: var(--text-subtle);
+  --_addon: var(--text-subtle);
+  --_icon: var(--icon-subtle);
+  --_fill: var(--text-input-surface-rest);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: var(--space-none);
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.bland-text-input__label {
+  color: var(--_label);
+  overflow-wrap: break-word;
+}
+
+.bland-text-input__field {
+  --bland-icon-size: var(--icon-md);
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+
+  display: flex;
+  align-items: stretch;
+  height: var(--_height);
+  background-color: var(--_fill);
+  /* Figma's inside stroke, drawn inside the box so it adds no size. */
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--_border);
+  cursor: text;
+  transition: background-color var(--duration-xs) var(--easing-ease);
+}
+
+/* Same ring as .bland-focus-ring, on the box, while the input inside has keyboard or text focus. */
+.bland-text-input__field:has(.bland-text-input__input:focus-visible) {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--space-2xs);
+}
+
+.bland-text-input__main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: var(--space-none);
+  padding: var(--space-xs) var(--space-md);
+}
+
+.bland-text-input__input {
+  flex: 1;
+  min-width: var(--space-none);
+  height: 100%;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  background: none;
+  color: var(--_text);
+  font: inherit;
+  letter-spacing: inherit;
+  text-overflow: ellipsis;
+  outline: none;
+}
+
+.bland-text-input__input::placeholder {
+  color: var(--_placeholder);
+  opacity: 1;
+}
+
+.bland-text-input .bland-text-input__icon {
+  color: var(--_icon);
+}
+
+.bland-text-input .bland-text-input__status {
+  color: var(--_status);
+}
+
+/* Figma Alt: body-sm text-subtle, never wraps. */
+.bland-text-input__alt {
+  flex: none;
+  color: var(--_placeholder);
+  font: var(--type-body-sm);
+  white-space: nowrap;
+}
+
+/* ---- Add-ons: an inner box (padding 4 / 8, gap 4) and a 1px divider ---- */
+
+.bland-text-input__addon {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+.bland-text-input__addon-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  height: 100%;
+  padding: var(--space-xs) var(--space-sm);
+  color: var(--_addon);
+  white-space: nowrap;
+}
+
+.bland-text-input__divider {
+  flex: none;
+  width: var(--stroke-sm);
+  height: var(--_divider);
+  border-radius: var(--rad-rd);
+  background-color: var(--border-bold);
+}
+
+/* ---- Sizes: field height input/*, divider icon/md (sm, md) or icon/lg (lg) as in Figma ---- */
+
+.bland-text-input[data-size="sm"] {
+  --_height: var(--input-sm);
+  --_divider: var(--icon-md);
+}
+
+.bland-text-input[data-size="md"] {
+  --_height: var(--input-md);
+  --_divider: var(--icon-md);
+}
+
+.bland-text-input[data-size="lg"] {
+  --_height: var(--input-lg);
+  --_divider: var(--icon-lg);
+}
+
+/* ---- Status ---- */
+
+.bland-text-input[data-status="danger"] {
+  --_border: var(--border-danger);
+  --_helper: var(--text-danger);
+  --_status: var(--icon-danger);
+}
+
+.bland-text-input[data-status="success"] {
+  --_border: var(--border-success);
+  --_helper: var(--text-success);
+  --_status: var(--icon-success);
+}
+
+.bland-text-input[data-status="warning"] {
+  --_border: var(--border-warning);
+  --_helper: var(--text-warning);
+  --_status: var(--icon-warning);
+}
+
+.bland-text-input__helper {
+  color: var(--_helper);
+  font: var(--type-body-sm);
+  overflow-wrap: break-word;
+}
+
+/* ---- States: filled (add-on labels go bold), hover, disabled. Focus is above. ---- */
+
+.bland-text-input[data-filled] {
+  --_addon: var(--text-bold);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-text-input__field:hover:not(:has(:disabled)) {
+    --_fill: var(--text-input-surface-hover);
+    --_addon: var(--text-bold);
+  }
+}
+
+.bland-text-input:has(.bland-text-input__input:disabled) {
+  --_border: var(--border-subtle);
+  --_helper: var(--text-minimal);
+  --_status: var(--icon-minimal);
+  --_label: var(--text-subtle);
+  --_text: var(--text-minimal);
+  --_placeholder: var(--text-minimal);
+  --_addon: var(--text-minimal);
+  --_icon: var(--icon-minimal);
+}
+
+.bland-text-input:has(.bland-text-input__input:disabled) .bland-text-input__field {
+  cursor: not-allowed;
+}
+
+.bland-text-input__input:disabled {
+  cursor: not-allowed;
+}

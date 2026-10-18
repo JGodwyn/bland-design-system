@@ -350,3 +350,22 @@ baselines looked at in both themes.
 - The snippet printed every control as a prop, so `Story.demo` got an optional
   `code(args)` and the snippet prints a string starting with `<` as JSX.
 - Checked in the browser; added a docs test for the slot controls.
+
+## 2026-10-18 — Text Input (Text Input family session)
+**Asked:** build the text input family (Text Input, Text Area, Numeric Input Field, Search) from the Figma page "Text-input"; Text Input first, committed on its own.
+
+- Read all eight sets on the page with a `use_figma` dumper that walks every
+  variant and groups each binding by the variant property that changes it
+  (48 Text Input variants in one 9 KB answer), then targeted reads for the
+  field's child order, icon colors and the five icons' SVGs.
+- Built Text Input on a native `<input>` inside the Figma field box; add-ons,
+  icons, alt text, status icon. `InputField` (internal) carries an
+  `endAction` slot for Search's clear button. Details in INTERFACE.md
+  §Text Input; map row in CLAUDE.md.
+- Exported MagnifyingGlass, XCircle, WarningOctagon, CheckCircle,
+  WarningCircle into `src/icons/`.
+- Dead ends: two spec failures were test bugs (mouse coordinates below the
+  fold, a color read mid-transition); axe flagged disabled helper text,
+  excluded as WCAG-exempt. All three in LEARNINGS.md.
+**Verified:** lint:css, typecheck, `npm test` 148 passed, build. New
+baselines looked at in both themes.

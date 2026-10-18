@@ -135,6 +135,21 @@ description promises 4.5:1 (kept on purpose, Godwin 2026-10-18); danger primary 
 Exclude only those selectors, per theme, in `tests/a11y.spec.ts` with the
 reason beside them, and raise anything unintended with Godwin.
 
+**A computed color read right after `hover()` is the old one.** Text Input's
+fill eases over `duration/xs`, so `getComputedStyle` straight after the hover
+still returned the rest fill. → Read transitioned colors with
+`expect.poll(...)`, not a single `evaluate`.
+
+**`page.mouse.click(box.x, box.y)` misses an element below the fold.**
+`boundingBox()` gives page coordinates (y 3076) but the mouse clicks the
+viewport, so nothing was hit and the test failed as "not focused". → Call
+`scrollIntoViewIfNeeded()` before taking the box for raw mouse coordinates.
+
+**axe flags text around a disabled input** (helper text, add-on labels in
+`text-minimal`) though WCAG exempts inactive components; it only knows the
+input itself is disabled. → Exclude `.bland-text-input:has(:disabled)` in
+`tests/a11y.spec.ts`, with the reason beside it.
+
 ## Working with parallel sessions
 
 **Two sessions share this folder and commit on `main`.** A `git add -A` from one

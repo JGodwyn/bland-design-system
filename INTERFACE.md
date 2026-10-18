@@ -87,7 +87,8 @@ when), `docs/components.md` (how to build one).
 - A component sets its icon size with `--bland-icon-size` on the slot's parent;
   the default lives on `:root` (see LEARNINGS).
 - Bland's own icons (`src/icons/`) are exported from the Figma Icons page as
-  components need them: Check, X, CaretDown, Plus, Minus, User, Spinner so far.
+  components need them: Check, X, CaretDown, Plus, Minus, User, Spinner,
+  MagnifyingGlass, XCircle, WarningOctagon, CheckCircle, WarningCircle so far.
 
 ## 4. Overflow
 
@@ -295,6 +296,60 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Figma binds a `stroke-lg` weight on the disabled tracks with no stroke
   paint; nothing is drawn, so code draws no stroke.
 - Not handled yet: right-to-left. The knob translates on the physical x axis.
+
+### Text Input (2026-10-18)
+- `import { TextInput } from 'bland'`, folder `text-input/`. Figma set
+  "Text Input" plus its private add-ons `_leading-input` / `_trailing-input`.
+- **The contract other components build on (Dropdown's trigger, the Date
+  pickers):** Text Input is a plain native `<input>`. It works controlled
+  (`value` + `onChange`) or uncontrolled (`defaultValue`); every native input
+  prop (`type`, `name`, `placeholder`, `onKeyDown`, `aria-*`, `data-*`, …)
+  and `ref` reach the input; `className` goes on the wrapper, as with
+  Checkbox. `fieldRef` reaches the bordered field box, the element a popover
+  anchors to. A wrapper adds its own `iconEnd` (a caret) or `trailing` and
+  keeps the rest. Native `size` is not exposed (Figma `Size` owns the name).
+- Wiring: `label` is a `<label for>` (an `id` is generated with `useId` when
+  none is given); `helperText` gets an id and joins `aria-describedby` (a
+  passed `aria-describedby` is kept too); `status="danger"` sets
+  `aria-invalid`. The status icon is decorative: the message belongs in
+  `helperText`.
+- From Figma: field height `input/sm|md|lg` (32, 40, 48), default **sm**
+  (Figma's; its description does not call it unsafe). Text body-lg at every
+  size, label body-lg, helper body-sm. Root and field-to-helper gaps
+  `space-xs`. Main row padding `space-xs` / `space-md`, gap `space-sm`,
+  icons `icon/md`. Radius `rad-md` with `.bland-smooth`; the `stroke-sm`
+  border is an inset shadow (Figma's inside stroke). Fills
+  `TextInput/surface-rest`, `-hover` on hover.
+- Colors: border `Border/border-input`, or `border-danger|success|warning`
+  by status; helper `text-subtle` or `text-danger|success|warning`; status
+  icon `Icon/icon-danger|success|warning`. Placeholder `text-subtle` (Figma's
+  rest state shows the placeholder there), value `text-bold`. Disabled:
+  `border-subtle`, label `text-subtle`, value, placeholder and helper
+  `text-minimal`, icons `icon-minimal`, whatever the status.
+- Figma's start/end icon placeholders carry no color binding; code uses
+  `Icon/icon-subtle`, as Search Input's magnifier does.
+- Order inside the field, from Figma: start icon, input, alt text, status
+  icon, end icon. Alt text is body-sm `text-subtle`, never wraps.
+- Add-ons: padding `space-xs` / `space-sm`, gap `space-xs`, label body-lg
+  `text-subtle` at rest and `text-bold` when filled or hovered (Figma
+  `State=filled|hover`), a divider `stroke-sm` wide in `Border/border-bold`.
+  Its height is unbound in Figma (20 on sm and md, 24 on lg); code uses
+  `icon/md` and `icon/lg`, the same values.
+- **Filled** is tracked in React (`data-filled`): from `value` when
+  controlled, from change events otherwise, and read from the DOM on mount
+  for autofill. Only the add-ons use it.
+- **Focus ring on the box:** the input has no outline; the field box gets
+  the `.bland-focus-ring` values while the input matches `:focus-visible`
+  (always true for a text field, so mouse focus shows it too, as browsers
+  do for text fields). The box carries `.bland-focus-ring`, so the docs
+  "focused" preview and `.pg-focus` find it.
+- A mouse-down anywhere in the field (padding, icons, add-on labels) focuses
+  the input; buttons and other controls inside keep their own clicks.
+- Background color eases over `duration/xs` (`easing/ease`); no transform,
+  so nothing to drop under reduced motion.
+- Disabled field text is exempt from contrast (WCAG 1.4.3, inactive
+  component) and stays `text-minimal`; `tests/a11y.spec.ts` excludes
+  `.bland-text-input:has(:disabled)` for that reason.
 
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 

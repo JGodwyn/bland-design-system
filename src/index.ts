@@ -40,4 +40,10 @@ export { CheckboxGroup, type CheckboxGroupProps, type CheckboxGroupOrientation }
 export { Radio, type RadioProps, type RadioSize } from './components/radio-button/Radio';
 export { RadioGroup, type RadioGroupProps, type RadioGroupOrientation } from './components/radio-button/RadioGroup';
 export { Toggle, type ToggleProps, type ToggleSize } from './components/toggle/Toggle';
+export {
+  TextInput,
+  type TextInputProps,
+  type TextInputSize,
+  type TextInputStatus,
+} from './components/text-input/TextInput';
 export * from './icons';
