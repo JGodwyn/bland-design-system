@@ -34,7 +34,11 @@ export interface ToasterApi {
 export interface ToasterProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
   /** The app (or the part of it) that shows toasts with `useToaster()`. */
   children?: ReactNode;
-  /** Default time on screen in milliseconds. Paused while the pointer is over the stack or focus is inside it. */
+  /**
+   * Default time on screen in milliseconds; `null` keeps toasts until dismissed. Omitted, it is the
+   * `--duration-toast-visible` token (Figma `duration/toast-visible`, 5000ms), read where the Toaster sits.
+   * Paused while the pointer is over the stack, focus is inside it or the page is hidden.
+   */
   duration?: number | null;
   /** Accessible name of the region that holds the toasts. */
   label?: string;
@@ -49,6 +53,14 @@ interface Item {
 
 const ToasterContext = createContext<ToasterApi | null>(null);
 
+/** The `--duration-toast-visible` token in milliseconds, or `null` (keep until dismissed) when tokens.css is not loaded. */
+function tokenDuration(el: Element | null): number | null {
+  const raw = el ? getComputedStyle(el).getPropertyValue('--duration-toast-visible').trim() : '';
+  const n = parseFloat(raw);
+  if (!Number.isFinite(n)) return null;
+  return raw.endsWith('ms') ? n : n * 1000;
+}
+
 /** Shows toasts from anywhere inside a `<Toaster>`. */
 export function useToaster(): ToasterApi {
   const api = useContext(ToasterContext);
@@ -59,11 +71,12 @@ export function useToaster(): ToasterApi {
 /**
  * A fixed region that stacks toasts at the bottom of the screen (bottom right from the tablet
  * breakpoint), newest last. It is an aria-live="polite" region that exists before any toast, so
- * each one is announced when it appears. Each toast dismisses itself after `duration`, paused while
+ * each one is announced when it appears. Each toast dismisses itself after `duration` (by default the
+ * `--duration-toast-visible` token), paused while
  * the pointer is over the stack, focus is inside it or the page is hidden. It sits in the top layer
  * (a manual popover), so it shows above the page without a z-index.
  */
-export function Toaster({ children, duration = 5000, label = 'Notifications', className, ...rest }: ToasterProps) {
+export function Toaster({ children, duration, label = 'Notifications', className, ...rest }: ToasterProps) {
   const [items, setItems] = useState<Item[]>([]);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -94,7 +107,7 @@ export function Toaster({ children, duration = 5000, label = 'Notifications', cl
       const item: Item = {
         id,
         render: typeof content === 'function' ? content : () => content,
-        duration: options.duration === undefined ? duration : options.duration,
+        duration: options.duration !== undefined ? options.duration : duration !== undefined ? duration : tokenDuration(region.current),
         closing: false,
       };
       setItems((list) => (list.some((i) => i.id === id) ? list.map((i) => (i.id === id ? item : i)) : [...list, item]));

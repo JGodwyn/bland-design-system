@@ -428,3 +428,9 @@ toast (7); baselines looked at in both themes.
   and user-input stroke; checked a screenshot. Test added.
 **Verified:** lint:css, typecheck, `npm test` 221 passed, build; changed
 baselines looked at.
+- Follow-up (Godwin): the toast's time on screen is now a token. Created
+  `duration/toast-visible` (TIMING, 5s, ALL_SCOPES like `duration/spin`;
+  setting scopes on a TIMING variable throws) in Figma's Motion collection,
+  synced it with the drift check and `--apply` (checksum 613 / 5e42e07e in
+  both), and the Toaster's default duration now reads
+  `--duration-toast-visible` (a test retunes it with CSS alone).

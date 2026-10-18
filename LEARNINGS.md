@@ -37,6 +37,11 @@ hex turned 6% into 5.9%. → Carry the exact fraction through the build
 **Figma descriptions can hold HTML entities** (`&#39;` in the `Purple/*`
 descriptions). → The build decodes them; fix them at the source when convenient.
 
+**`variable.scopes` cannot be set on a TIMING variable.** Creating
+`duration/toast-visible` with `v.scopes = spin.scopes` threw "Cannot set
+scopes on this variable type" (the whole script rolled back). → Leave scopes
+alone on Motion variables; they stay `ALL_SCOPES` like the existing ones.
+
 **Motion variables are their own types.** Durations are `TIMING` in seconds
 (`0.8`), easings are `EASING` objects (`CUSTOM_CUBIC_BEZIER` or `LINEAR`). The
 file's existing ones use `ALL_SCOPES` and no code syntax. → Convert seconds to

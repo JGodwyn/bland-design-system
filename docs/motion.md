@@ -12,6 +12,7 @@ How Bland components move. The rules come from Emil Kowalski's animation skills 
 | `--duration-lg` | 250ms | Modals. The ceiling for UI motion |
 | `--duration-xl` | 400ms | Reserved for Toast |
 | `--duration-2xl` | 500ms | Reserved for Sidebar and sheet slides, with `--easing-drawer` |
+| `--duration-toast-visible` | 5000ms | Not an animation: how long a Toast stays on screen before it dismisses itself. The Toaster reads it. Added 2026-10-18 |
 | `--duration-spin` | 800ms | One full turn of a loading spinner, repeated, with `--easing-linear`. Added 2026-10-17 for the Button's loading state |
 | `--easing-out` | `cubic-bezier(0.23, 1, 0.32, 1)` | Default. Anything entering or exiting |
 | `--easing-in-out` | `cubic-bezier(0.77, 0, 0.175, 1)` | Moving or morphing while on screen |

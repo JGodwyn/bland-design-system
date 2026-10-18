@@ -96,6 +96,10 @@ This supports both an explicit switch and the system preference. Which one the p
 
 Twelve collections; the table in `CLAUDE.md` lists what each holds. Emitted: `Theme` (Light and Dark), `Spacing`, `Corner Radius`, `Stroke`, `Typography`, `Effects`, `Sizing`, `Motion`, `Breakpoints`, plus the elevation and text styles. Hidden and never emitted: `_Core Colors`, `_Functional Colors`, `_Units`.
 
+## Sync of 2026-10-18
+
+- Added `duration/toast-visible` (Motion, 5s) for the Toaster. Synced through the drift check (one added variable) and `--apply`; only `00.json` and `06.json` changed. Checksum: count 613, hash `5e42e07e`, equal in Figma and locally. 518 tokens emitted.
+
 ## Sync of 2026-10-17
 
 - Added `Motion` (11: six durations, five easings) and `Breakpoints` (5), and `letter-spacing/normal` in Typography. 611 variables, 516 tokens emitted.

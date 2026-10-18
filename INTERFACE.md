@@ -19,7 +19,7 @@ when), `docs/components.md` (how to build one).
 
 ### Tokens are the only source of values
 - Figma owns every value; `npm run tokens` generates `src/tokens/tokens.css`
-  from the verified export. 612 variables, 517 CSS tokens (2026-10-17).
+  from the verified export. 613 variables, 518 CSS tokens (2026-10-18).
 - Components read only Theme and scale tokens. Primitives are never emitted.
 - No value without a token. When none fits, stop and ask Godwin; the answer is a
   new Figma variable, synced (that is how `duration/spin` came about).
@@ -102,6 +102,8 @@ when), `docs/components.md` (how to build one).
 ## 5. Motion
 
 Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
+- **Time on screen is not motion, but it is a Motion token:** `duration/toast-visible`
+  (5000ms, 2026-10-18) is how long a Toast stays up, not how long it moves.
 - **Loading spinners** turn once per `duration/spin` (800ms, added 2026-10-17)
   with `easing/linear`, and stand still under `prefers-reduced-motion`.
 - **Press feedback:** `scale(0.97)` on `:active`, `duration/sm`, `easing/out`.
@@ -514,9 +516,13 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
     errors belong in an Alert or Banner with `role="alert"`.
   - Bottom of the screen, `space-lg` from the edges, full width on mobile and
     bottom right from `breakpoint/md`; newest last, `space-sm` apart.
-  - Each toast dismisses itself after `duration`, **5000 ms by default**
-    (code constant, a timing rather than a visual value; on the tracker for
-    Godwin to confirm), `null` to keep it. Timers pause while the pointer is
+  - Each toast dismisses itself after `duration`, by default the
+    **`duration/toast-visible` token** (5000ms, added in Figma 2026-10-18 at
+    Godwin's request, so the time on screen is a token like every other
+    value). The Toaster reads `--duration-toast-visible` from where it sits,
+    so a project retunes it with CSS alone; without tokens.css, toasts stay
+    until dismissed rather than fall back to an invented number. `null`
+    keeps one. Timers pause while the pointer is
     over the stack, focus is inside it or the page is hidden, and resume with
     the time that was left. A reused `id` replaces the toast in place.
 - **Toast motion:** enters with `@starting-style` and exits with

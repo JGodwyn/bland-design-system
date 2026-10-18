@@ -39,6 +39,17 @@ test('a toast dismisses itself after 5s, then leaves after its exit transition',
   await expect(item).toHaveCount(0);
 });
 
+test('the default time on screen is the --duration-toast-visible token', async ({ page }) => {
+  expect(await css(page.locator('.bland-toaster'), '--duration-toast-visible')).toBe('5000ms');
+  // A project can retune it with the token alone, here on the Toaster itself.
+  await page.locator('.bland-toaster').evaluate((e) => (e as HTMLElement).style.setProperty('--duration-toast-visible', '1000ms'));
+  await page.getByRole('button', { name: 'Show a toast' }).click();
+  const item = page.locator('.bland-toaster__item', { hasText: 'Changes saved' });
+  await page.mouse.move(0, 0);
+  await page.clock.runFor(1600);
+  await expect(item).toHaveAttribute('data-state', 'closed');
+});
+
 test('the timer pauses while the pointer is over the stack and resumes after', async ({ page }) => {
   await page.getByRole('button', { name: 'Show a toast' }).click();
   const item = page.locator('.bland-toaster__item', { hasText: 'Changes saved' });
