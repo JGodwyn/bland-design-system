@@ -567,7 +567,10 @@ code,
 .docs-variants {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3xl);
+  gap: var(--space-lg);
+}
+/* Each group a story renders (a label and its rows) gets its own bordered container. */
+.docs-variants > * {
   padding: var(--space-xl);
   border: var(--stroke-sm) solid var(--border-subtle);
   border-radius: var(--rad-lg);

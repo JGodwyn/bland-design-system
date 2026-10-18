@@ -507,5 +507,9 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   Icon Button and Pill always, Chip only with `onRemove` (its close button),
   never Icon, Badge, Indicator or Avatar. Stories likewise show a Focused row
   only for focusable components.
+- **Variants: one bordered container per group** (decided 2026-10-18). Each
+  top-level group a story's `render` returns (a `pg-stack`: its label and rows)
+  gets its own border on the component page, so a story's sections read as
+  separate cases. Screenshots (`#/raw/<id>`) are unaffected.
 - The docs chrome lives in `playground/`, outside the Bland package and the
   lint, but uses Bland's tokens and components wherever one fits.
