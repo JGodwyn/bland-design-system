@@ -229,5 +229,11 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   Variants (the story's `render`, also the screenshot fixture) and props
   tables generated from the TypeScript and JSDoc.
 - Mobile first: below the tablet breakpoint the sidebar becomes a Menu.
+- **"focused" is offered only for components that take keyboard focus**
+  (decided 2026-10-18). The demo shows the control only when what it renders
+  contains a `.bland-focus-ring` element, and it follows the props: Button,
+  Icon Button and Pill always, Chip only with `onRemove` (its close button),
+  never Icon, Badge, Indicator or Avatar. Stories likewise show a Focused row
+  only for focusable components.
 - The docs chrome lives in `playground/`, outside the Bland package and the
   lint, but uses Bland's tokens and components wherever one fits.

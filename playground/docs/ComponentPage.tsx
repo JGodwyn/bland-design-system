@@ -41,11 +41,24 @@ function Demo({ demo }: { demo: NonNullable<Story['demo']> }) {
   const controls = buildControls(demo, doc?.props ?? []);
   const set = (name: string, value: unknown) => setArgs((a) => ({ ...a, [name]: value }));
   const [focused, setFocused] = useState(false);
+  // "focused" is offered only when the demo renders something that takes keyboard focus
+  // (an element with .bland-focus-ring), and it follows the props: a Chip gets it only with onRemove.
+  const rendered = useRef<HTMLDivElement>(null);
+  const [focusable, setFocusable] = useState(false);
+  useLayoutEffect(() => {
+    const has = Boolean(rendered.current?.querySelector('.bland-focus-ring'));
+    setFocusable(has);
+    if (!has) setFocused(false);
+  }, [args]);
 
   return (
     <Section title="Playground">
       <div className="docs-demo">
-        <ZoomStage focused={focused}>{demo.render(args)}</ZoomStage>
+        <ZoomStage focused={focused}>
+          <div ref={rendered} className="docs-demo-render">
+            {demo.render(args)}
+          </div>
+        </ZoomStage>
         <form className="docs-controls" onSubmit={(e) => e.preventDefault()} aria-label="Props">
           {controls.map(({ name, control }) => {
             const id = `ctl-${name}`;
@@ -76,11 +89,15 @@ function Demo({ demo }: { demo: NonNullable<Story['demo']> }) {
               </div>
             );
           })}
-          <div className="docs-control">
-            <label htmlFor="ctl-focused">focused</label>
-            <input id="ctl-focused" type="checkbox" className="bland-focus-ring" checked={focused} onChange={(e) => setFocused(e.target.checked)} />
-          </div>
-          <p className="docs-control-note">focused previews the keyboard focus ring; in code it is :focus-visible, not a prop.</p>
+          {focusable && (
+            <>
+              <div className="docs-control">
+                <label htmlFor="ctl-focused">focused</label>
+                <input id="ctl-focused" type="checkbox" className="bland-focus-ring" checked={focused} onChange={(e) => setFocused(e.target.checked)} />
+              </div>
+              <p className="docs-control-note">focused previews the keyboard focus ring; in code it is :focus-visible, not a prop.</p>
+            </>
+          )}
           <button
             type="button"
             className="docs-link-button bland-focus-ring"

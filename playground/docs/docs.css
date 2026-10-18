@@ -586,3 +586,8 @@ code,
     background: var(--surface-200);
   }
 }
+
+/* Wraps the demo so the page can see what it renders; adds no box of its own. */
+.docs-demo-render {
+  display: contents;
+}

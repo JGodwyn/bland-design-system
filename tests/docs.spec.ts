@@ -98,3 +98,24 @@ test('a trackpad pinch over the playground zooms it, and nowhere else', async ({
   expect(await pinch(1, 1, -50)).toBe(false);
   await expect(level).toHaveText('50%');
 });
+
+test('focused is offered only for components that take keyboard focus', async ({ page }) => {
+  const focused = page.locator('#ctl-focused');
+  for (const id of ['button', 'pills']) {
+    await page.goto(`/#/components/${id}`);
+    await expect(focused, `${id} takes focus`).toBeVisible();
+  }
+  for (const id of ['icon', 'badge', 'indicator', 'avatar']) {
+    await page.goto(`/#/components/${id}`);
+    await expect(page.locator('.docs-demo-stage')).toBeVisible();
+    await expect(focused, `${id} never takes focus`).toHaveCount(0);
+  }
+  // A Chip only takes focus through its remove button.
+  await page.goto('/#/components/chip');
+  await expect(focused).toHaveCount(0);
+  await page.getByLabel('onRemove').check();
+  await expect(focused).toBeVisible();
+  await focused.check();
+  await page.getByLabel('onRemove').uncheck();
+  await expect(focused).toHaveCount(0);
+});
