@@ -119,3 +119,14 @@ test('focused is offered only for components that take keyboard focus', async ({
   await page.getByLabel('onRemove').uncheck();
   await expect(focused).toHaveCount(0);
 });
+
+test('zooming never changes the size of the playground', async ({ page }) => {
+  await page.goto('/#/components/avatar');
+  const view = page.locator('.docs-demo-view');
+  const before = (await view.boundingBox())!;
+  const zoomIn = page.getByRole('button', { name: 'Zoom in' });
+  while (await zoomIn.isEnabled()) await zoomIn.click();
+  await expect(page.locator('.docs-zoom-level')).toHaveText('400%');
+  const after = (await view.boundingBox())!;
+  expect([after.width, after.height]).toEqual([before.width, before.height]);
+});

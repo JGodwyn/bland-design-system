@@ -228,6 +228,9 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   line, a live demo with controls, the code snippet for the current props,
   Variants (the story's `render`, also the screenshot fixture) and props
   tables generated from the TypeScript and JSDoc.
+- The playground's size never follows the demo, so zooming never resizes it
+  (2026-10-18): the view is 320px tall, or the props panel's height beside it
+  on desktop, and a demo bigger than that scrolls inside it.
 - Mobile first: below the tablet breakpoint the sidebar becomes a Menu.
 - **"focused" is offered only for components that take keyboard focus**
   (decided 2026-10-18). The demo shows the control only when what it renders

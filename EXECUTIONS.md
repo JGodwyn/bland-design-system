@@ -288,3 +288,14 @@ times.
   160x160 (2x the 3xl avatar), 7.8 KB, into `playground/assets/avatar-portrait.jpg`;
   the story imports it, so docs and screenshots stay offline.
 - Re-baselined only Avatar's screenshots and looked at them.
+
+## 2026-10-18 — Playground keeps its size when zoomed
+**Asked:** "the playground increases vertically when i zoom to 400%. i don't want the playground changing sizes."
+
+- Cause: `.docs-demo-stage` sized to its content between 240 and 480px, and
+  CSS `zoom` grows the content's layout box (Avatar xl at 400%: 248 → ~290).
+- Fix: the stage fills `.docs-demo-view` out of flow (`position: absolute;
+  inset: 0`); the view is `min-height: 320px` and stretches to the props panel
+  on desktop. Measured 100% vs 400% on Avatar, Button, Pills, Scroll area
+  (desktop) and Avatar at 375px: same height, no sideways scroll.
+- Added a docs test: zooming to 400% leaves the view's box unchanged.

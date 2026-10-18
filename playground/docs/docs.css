@@ -417,16 +417,21 @@ code,
   corner-shape: superellipse(2);
   overflow: hidden;
 }
+/*
+ * The view's size never follows the demo, so zooming never resizes the playground: it is a fixed
+ * height (taller on desktop if the props panel beside it is), and the stage fills it out of flow.
+ * A demo bigger than the view scrolls inside it.
+ */
 .docs-demo-view {
   position: relative;
   min-width: 0;
+  min-height: 320px;
 }
 /* The canvas uses margin: auto (not justify-content) so a zoomed-in demo can scroll to every edge. */
 .docs-demo-stage {
+  position: absolute;
+  inset: 0;
   display: flex;
-  height: 100%;
-  min-height: 240px;
-  max-height: 480px;
   padding: var(--space-lg) var(--space-lg) var(--space-4xl);
   overflow: auto;
   background: var(--surface-100);
