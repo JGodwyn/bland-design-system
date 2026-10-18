@@ -42,6 +42,11 @@ when), `docs/components.md` (how to build one).
   `src/styles/base.css`.
 - Every focusable element gets `bland-focus-ring`: `:focus-visible` only, 2px
   `--border-focused`, 2px offset.
+- **Full radius (`rad-rd`) skips `bland-smooth`** (2026-10-18, Indicator): set
+  `border-radius: var(--rad-rd)` directly. On a circle or pill Figma's 100%
+  smoothing has no room to spread and the shape stays round, while
+  `corner-shape: superellipse(2)` would turn it into a squircle. Applies to
+  Indicator, Badge, Avatar, Chip and every other pill or circle.
 
 ### Disabled
 - Disabled states use the disabled color tokens. No opacity, ever; the lint
@@ -105,6 +110,24 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Icon Button requires `aria-label`; loading swaps its icon for the spinner.
 - CSS pattern every component copies: emotion and type blocks set private
   custom properties, and one rule per state reads them.
+
+### Indicator (2026-10-18)
+- `import { Indicator } from 'bland'`. Props: `size` sm/md/lg/xl/2xl (default
+  sm, Figma's), `emotion` brand/neutral/success/danger/warning (default brand),
+  `type` primary/secondary (default primary), `children` (the label, usually a
+  count), `ring` (default **false**), plus native span props and `className`.
+- sm (8) and md (12) are dots and ignore `children`; lg (16), xl (20) and 2xl
+  (24) show it and grow into a pill (height = min width = `indicator/*`).
+  No `children` at lg+ = an empty circle (Figma `👀 Label` off).
+- `ring` = Figma `👀 Ring`, a `stroke-lg` `surface-100` outside outline as a
+  box-shadow (adds no size). Figma defaults it on, code defaults it off: the
+  set description says to turn it on only over an Avatar or image. Nesting
+  components pass `ring` themselves.
+- A dot with meaning gets `aria-label`; the Indicator then sets `role="img"`.
+  A labelled one is read as its text. Static, never focusable.
+- Root is `.bland-indicator` with `data-size`, `data-emotion`, `data-type`,
+  `data-ring`; label part `.bland-indicator__label`. Position it from the
+  parent (Avatar's slot), not inside Indicator.
 
 ### Avatar (2026-10-18)
 - Props: `size` xs–3xl (default md; Figma's default xs is 16px), `type`

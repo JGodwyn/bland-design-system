@@ -185,3 +185,20 @@ times.
 
 **Verified:** 6 Avatar specs, avatar screenshots in light and dark looked at, axe clean.
 **Logged:** INTERFACE.md §3, §6 Avatar · LEARNINGS.md §Figma, §Tooling · CLAUDE.md component map.
+
+## 2026-10-18 — Badge and Indicator (side session, wave 1)
+**Asked:** build Badge and Indicator; Indicator first, since Avatar and Chip nest it.
+
+- Read both set descriptions, properties and variant bindings (inner frames
+  included). The first Figma connector hit its View-seat limit and
+  Framelink's token had expired; the second Figma MCP connector worked.
+- Indicator: fill and size sit on an inner frame, ring is a hidden-by-prop
+  frame with a 2px outside `surface-100` stroke. Labels: lg and xl
+  `Body/body-sm`, 2xl `Body/body-lg`; padding lg `space-2xs`, xl/2xl `space-xs`.
+- Decided: `rad-rd` shapes skip `.bland-smooth` (corner-shape would make a
+  squircle; Figma keeps a circle). `ring` defaults off (Figma on).
+- axe: danger primary labels in dark (3.7:1, deliberate) and success primary
+  in light (4.47:1, token just under 4.5) fail contrast. Excluded exactly
+  those in `tests/a11y.spec.ts` and raised the success one with Godwin.
+- Full `npm test` had failures only in other sessions' uncommitted work
+  (pills story, `scripts/tokens/drift.test.ts` typecheck).

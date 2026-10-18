@@ -11,5 +11,12 @@ export {
 export { IconButton, type IconButtonProps } from './components/button/IconButton';
 export { Icon, type IconProps, type IconSize } from './components/icon/Icon';
 export { ScrollArea, type ScrollAreaProps } from './components/scroll-area/ScrollArea';
+export {
+  Indicator,
+  type IndicatorProps,
+  type IndicatorSize,
+  type IndicatorEmotion,
+  type IndicatorType,
+} from './components/indicator/Indicator';
 export { Avatar, type AvatarProps, type AvatarSize, type AvatarType } from './components/avatar/Avatar';
 export * from './icons';

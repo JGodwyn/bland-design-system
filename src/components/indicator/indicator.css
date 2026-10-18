@@ -1,0 +1,125 @@
+/*
+ * Indicator (Figma: Badges page, set "Indicator").
+ *
+ *   <span class="bland-indicator" data-size="lg" data-emotion="danger" data-type="primary" data-ring>
+ *     <span class="bland-indicator__label">3</span>
+ *   </span>
+ *
+ * Figma draws the fill on an inner frame; here it sits on the root. Height and min width are the
+ * same indicator/* token, so one character stays a circle and longer labels grow into a pill.
+ * The radius is rad-rd without .bland-smooth: on a full radius Figma's smoothing has no room to
+ * spread, so the shape stays a circle, while corner-shape would turn it into a squircle.
+ *
+ * Colors: each data-emotion block names that emotion's Indicator tokens (--_e-*), each data-type
+ * block picks from them. Badge aliases these tokens, so the two always match.
+ */
+
+.bland-indicator {
+  --_size: var(--indicator-sm);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--_size);
+  height: var(--_size);
+  min-width: var(--_size);
+  padding: var(--space-none);
+  border-radius: var(--rad-rd);
+  background-color: var(--_bg);
+  color: var(--_text);
+  font: var(--type-body-sm);
+  letter-spacing: var(--letter-spacing-normal);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* ---- Size: indicator/* for height and min width; lg and up hug their label ---- */
+
+.bland-indicator[data-size="md"] {
+  --_size: var(--indicator-md);
+}
+
+.bland-indicator[data-size="lg"] {
+  --_size: var(--indicator-lg);
+
+  width: auto;
+  padding-inline: var(--space-2xs);
+}
+
+.bland-indicator[data-size="xl"] {
+  --_size: var(--indicator-xl);
+
+  width: auto;
+  padding-inline: var(--space-xs);
+}
+
+.bland-indicator[data-size="2xl"] {
+  --_size: var(--indicator-2xl);
+
+  width: auto;
+  padding-inline: var(--space-xs);
+  font: var(--type-body-lg);
+}
+
+/* ---- Emotion: the Indicator tokens for that color family ---- */
+
+.bland-indicator[data-emotion="brand"] {
+  --_e-primary: var(--indicator-brand-primary);
+  --_e-primary-content: var(--indicator-brand-primary-content);
+  --_e-secondary: var(--indicator-brand-secondary);
+  --_e-secondary-content: var(--indicator-brand-secondary-content);
+}
+
+.bland-indicator[data-emotion="neutral"] {
+  --_e-primary: var(--indicator-neutral-primary);
+  --_e-primary-content: var(--indicator-neutral-primary-content);
+  --_e-secondary: var(--indicator-neutral-secondary);
+  --_e-secondary-content: var(--indicator-neutral-secondary-content);
+}
+
+.bland-indicator[data-emotion="success"] {
+  --_e-primary: var(--indicator-success-primary);
+  --_e-primary-content: var(--indicator-success-primary-content);
+  --_e-secondary: var(--indicator-success-secondary);
+  --_e-secondary-content: var(--indicator-success-secondary-content);
+}
+
+.bland-indicator[data-emotion="danger"] {
+  --_e-primary: var(--indicator-danger-primary);
+  --_e-primary-content: var(--indicator-danger-primary-content);
+  --_e-secondary: var(--indicator-danger-secondary);
+  --_e-secondary-content: var(--indicator-danger-secondary-content);
+}
+
+.bland-indicator[data-emotion="warning"] {
+  --_e-primary: var(--indicator-warning-primary);
+  --_e-primary-content: var(--indicator-warning-primary-content);
+  --_e-secondary: var(--indicator-warning-secondary);
+  --_e-secondary-content: var(--indicator-warning-secondary-content);
+}
+
+/* ---- Type: solid fill or soft tint ---- */
+
+.bland-indicator[data-type="primary"] {
+  --_bg: var(--_e-primary);
+  --_text: var(--_e-primary-content);
+}
+
+.bland-indicator[data-type="secondary"] {
+  --_bg: var(--_e-secondary);
+  --_text: var(--_e-secondary-content);
+}
+
+/* ---- Ring: Figma's 2px outside stroke in surface-100, so it adds no size ---- */
+
+.bland-indicator[data-ring] {
+  box-shadow: var(--space-none) var(--space-none) var(--space-none) var(--stroke-lg) var(--surface-100);
+}
+
+/* ---- Parts ---- */
+
+.bland-indicator__label {
+  text-align: center;
+}
