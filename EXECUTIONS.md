@@ -380,6 +380,13 @@ baselines looked at in both themes.
   and never again in 270 reruns; message not captured. Verified: lint:css,
   my typecheck and tests (another session's alert/banner/toast work had type
   errors and missing baselines at the time), build; baselines looked at.
+- Numeric Input Field: one native input per box in a labelled group; type,
+  Backspace, arrows, paste and one-time-code autofill handled in React;
+  `tests/numeric-input-field.spec.ts` (6). Verified: lint:css, typecheck,
+  `npm test` 219 passed, build; baselines looked at in both themes.
+- Slip: 0b4c4c6 shipped the Feedback session's uncommitted CLAUDE.md and
+  INTERFACE.md lines (my edit script read the working copy). Told that
+  session; nothing to undo. LEARNINGS.md §Working with parallel sessions.
 
 ## 2026-10-18 — Alert, Banner, Toast and Notification (feedback session)
 **Asked:** build the four feedback components from their Figma pages, sharing one status model, with a minimal Toaster.

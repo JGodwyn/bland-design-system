@@ -380,6 +380,40 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   and a disabled danger, success or warning Text Area keeps its status
   border (Text Input: `border-subtle`). Raised with Godwin in the tracker.
 
+### Numeric Input Field (2026-10-18)
+- `import { NumericInputField } from 'bland'`, folder `numeric-input-field/`.
+  Figma "Numeric Input Field" (the row) and "_Numeric Input Field Base"
+  (one box, private).
+- **One native input per box** (`type="text"`, `inputMode="numeric"`,
+  `pattern="[0-9]*"`), drawn as Figma's square: `digit/sm|md|lg` (40, 56,
+  72), radius `rad-sm` with `.bland-smooth`, inside stroke `stroke-sm`,
+  fills `TextInput/surface-rest` / `-hover`, digit body-md on sm and
+  title-lg on md and lg (Figma), placeholder `text-subtle`, digit
+  `text-bold`, disabled `text-minimal` with `border-subtle`. Boxes and
+  rows sit `space-xs` apart. Each box has its own `.bland-focus-ring`
+  (Figma focuses one box), so the ring touches the next box, as in Figma.
+- **Accessibility:** the row is `role="group"` named by `label` (a span
+  referenced by `aria-labelledby`) or the group's own `aria-label`; each
+  box is "Digit n of 4" and is described by the helper; danger sets
+  `aria-invalid` on every box. The first box has
+  `autocomplete="one-time-code"`, so phones offer the code from a message.
+- **Keyboard and input:** focusing a box selects its digit, so typing
+  replaces it and moves to the next box (typing the same digit moves on
+  too); a letter is ignored; Backspace on an empty box clears the one
+  before and moves there, on a filled box clears it; Delete clears in
+  place; ArrowLeft/Right, Home and End move. Paste (any text; non-digits
+  dropped) or an autofilled code fills from the focused box, or from the
+  first when it is a whole code, and focus lands after the last digit.
+- **Value:** a string of digits. Boxes keep their positions internally, so
+  clearing a middle box leaves a gap; `onValueChange` gets the digits in
+  order, `onComplete` fires when every box gets a digit. A controlled
+  `value` resyncs the boxes only when it differs from them. `name` adds a
+  hidden input for forms; `ref` reaches the first box.
+- `👀 6 digits` → `length` (4 or 6, default 4). Figma's description: on
+  mobile use sm for 6 digits. Figma's field has no hover state; each box
+  has its own (base set).
+- The label is `text-bold` in every state, as Figma binds it.
+
 ### Search Input (2026-10-18)
 - `import { SearchInput } from 'bland'`, folder `search-input/`. It is Text
   Input's field (`InputField`, same classes and CSS) with `type="search"`

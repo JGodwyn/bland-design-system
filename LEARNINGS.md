@@ -184,6 +184,14 @@ the spinner's rotation speed because no Motion token fit. → When a value has n
 token, the session asks; the answer is a new Figma variable synced through the
 pipeline, never a value in CSS.
 
+**Editing a shared doc in the working tree, then staging it, ships the other
+session's uncommitted lines in it.** The Text Area commit (0b4c4c6) carried
+the Feedback session's CLAUDE.md row and INTERFACE.md section, because the
+edit script read the working copy. A pathspec does not help: the file is
+yours and theirs. → Apply your edits twice: to the working copy, and to
+`git show HEAD:<file>`; commit the HEAD-based copy with `git hash-object -w`
++ `update-index --cacheinfo` from a private index.
+
 ## Claude Docs (the tracker)
 
 **A table row is not a block.** Inserting a log row with `"as":"markdown"`

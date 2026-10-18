@@ -47,6 +47,12 @@ export {
   type TextInputStatus,
 } from './components/text-input/TextInput';
 export { TextArea, type TextAreaProps, type TextAreaStatus } from './components/text-area/TextArea';
+export {
+  NumericInputField,
+  type NumericInputFieldProps,
+  type NumericInputFieldSize,
+  type NumericInputFieldStatus,
+} from './components/numeric-input-field/NumericInputField';
 export { SearchInput, type SearchInputProps, type SearchInputSize } from './components/search-input/SearchInput';
 export * from './icons';
 export { Alert, type AlertProps, type AlertStatus } from './components/alert/Alert';

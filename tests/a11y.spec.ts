@@ -21,6 +21,7 @@ const knownContrast: Record<(typeof themes)[number], string[]> = {
 const disabledFieldText = [
   '.bland-text-input:has(.bland-text-input__input:disabled)',
   '.bland-text-area:has(.bland-text-area__input:disabled)',
+  '.bland-numeric-input-field:has(.bland-numeric-input-field__box:disabled)',
 ];
 
 for (const id of storyIds) {

@@ -1,0 +1,119 @@
+/*
+ * Numeric Input Field (Figma: Text-input page, sets "Numeric Input Field" and "_Numeric Input Field Base").
+ *
+ *   <div class="bland-numeric-input-field" role="group" data-size="sm" data-status="default">
+ *     <span class="bland-numeric-input-field__label">Label</span>
+ *     <div class="bland-numeric-input-field__boxes">
+ *       <input class="bland-numeric-input-field__box bland-focus-ring bland-smooth"> × 4 or 6     Figma base / inner
+ *     </div>
+ *     <span class="bland-numeric-input-field__helper">Helper text</span>
+ *   </div>
+ *
+ * Each box is a native input drawn as Figma's square digit box, so the focus ring is the box's own.
+ */
+
+.bland-numeric-input-field {
+  --_border: var(--border-input);
+  --_helper: var(--text-subtle);
+  --_box: var(--digit-sm);
+
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  max-width: 100%;
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+/* Figma binds the label to text-bold in every state. */
+.bland-numeric-input-field__label {
+  color: var(--text-bold);
+  overflow-wrap: break-word;
+}
+
+.bland-numeric-input-field__boxes {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.bland-numeric-input-field__box {
+  --bland-radius: var(--rad-sm); /* drawn by .bland-smooth */
+
+  flex: none;
+  width: var(--_box);
+  height: var(--_box);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  background-color: var(--text-input-surface-rest);
+  /* Figma's inside stroke, drawn inside the box so it adds no size. */
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--_border);
+  color: var(--text-bold);
+  font: var(--type-body-md);
+  text-align: center;
+  transition: background-color var(--duration-xs) var(--easing-ease);
+}
+
+.bland-numeric-input-field__box::placeholder {
+  color: var(--text-subtle);
+  opacity: 1;
+}
+
+.bland-numeric-input-field__helper {
+  color: var(--_helper);
+  font: var(--type-body-sm);
+  overflow-wrap: break-word;
+}
+
+/* ---- Sizes: sm body-md, md and lg title-lg (Figma) ---- */
+
+.bland-numeric-input-field[data-size="md"] {
+  --_box: var(--digit-md);
+}
+
+.bland-numeric-input-field[data-size="lg"] {
+  --_box: var(--digit-lg);
+}
+
+.bland-numeric-input-field:is([data-size="md"], [data-size="lg"]) .bland-numeric-input-field__box {
+  font: var(--type-title-lg);
+}
+
+/* ---- Status ---- */
+
+.bland-numeric-input-field[data-status="danger"] {
+  --_border: var(--border-danger);
+  --_helper: var(--text-danger);
+}
+
+.bland-numeric-input-field[data-status="success"] {
+  --_border: var(--border-success);
+  --_helper: var(--text-success);
+}
+
+.bland-numeric-input-field[data-status="warning"] {
+  --_border: var(--border-warning);
+  --_helper: var(--text-warning);
+}
+
+/* ---- States: hover, disabled. Focus is .bland-focus-ring on each box. ---- */
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-numeric-input-field__box:hover:not(:disabled) {
+    background-color: var(--text-input-surface-hover);
+  }
+}
+
+.bland-numeric-input-field:has(.bland-numeric-input-field__box:disabled) {
+  --_border: var(--border-subtle);
+  --_helper: var(--text-minimal);
+}
+
+.bland-numeric-input-field__box:disabled {
+  color: var(--text-minimal);
+  cursor: not-allowed;
+}
+
+.bland-numeric-input-field__box:disabled::placeholder {
+  color: var(--text-minimal);
+}
