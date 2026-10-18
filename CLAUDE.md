@@ -180,7 +180,7 @@ For each component: Figma set, code import, and Figma property → prop mapping.
 | Toggle | Toggle | TBD | Knob white in both modes |
 | Tooltip | Tooltip | TBD | Floating UI placements; optional slot |
 | Scroll area | `_scrollbar`, `_fade` | `import { ScrollArea } from 'bland'` | `Axis` → `axis`: `y` (default) / `x`; `_fade` `Size` → `fadeSize`: `md` (default) / `sm`; fade edges and the thumb follow the scroll. Overlay thumb 4 in from the edge, always visible, draggable; native scrollbar hidden. `viewportProps` reach the scrolling element. Built on `.bland-scroll-fade` |
-| Icons page | Phosphor icons, `_Spinner` | `import { Icon, CheckIcon, … } from 'bland'` | `<Icon size label>` wraps any SVG: `size` xs/sm/md/lg (icon/*) or the parent's `--bland-icon-size`; stroked icons get `stroke-md`; `label` makes it non-decorative. Bland icons so far: Check, X, CaretDown, Plus, Spinner |
+| Icons page | Phosphor icons, `_Spinner` | `import { Icon, CheckIcon, … } from 'bland'` | `<Icon size label>` wraps any SVG: `size` xs/sm/md/lg (icon/*) or the parent's `--bland-icon-size`; stroked icons get `stroke-md`; `label` makes it non-decorative. Bland icons so far: Check, X, CaretDown, Plus, Minus, Spinner |
 | Brand elements | Logo | TBD | `Color`: default/on-color; optional `Mark` slot |
 
 Base Figma pages (Colors, Effects, Grid system, Icons, Spacing, Typography) document tokens. Annotations (Header, Footer, Notes, Typo card) is doc chrome, not kit. Landing page and site Navbar are pending a redesign.

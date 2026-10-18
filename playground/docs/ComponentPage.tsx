@@ -1,5 +1,8 @@
 // A component's docs page: live demo with controls, every variant (the story), and props tables.
-import { useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react';
+import { Button } from '../../src/components/button/Button';
+import { IconButton } from '../../src/components/button/IconButton';
+import { MinusIcon, PlusIcon } from '../../src/icons';
 import type { Control, Story } from '../story';
 import { componentDocs, type PropDoc } from './data';
 import { PageHeader, Section } from './parts';
@@ -36,11 +39,12 @@ function Demo({ demo }: { demo: NonNullable<Story['demo']> }) {
   const doc = componentDocs[demo.component];
   const controls = buildControls(demo, doc?.props ?? []);
   const set = (name: string, value: unknown) => setArgs((a) => ({ ...a, [name]: value }));
+  const [focused, setFocused] = useState(false);
 
   return (
     <Section title="Playground">
       <div className="docs-demo">
-        <div className="docs-demo-stage">{demo.render(args)}</div>
+        <ZoomStage focused={focused}>{demo.render(args)}</ZoomStage>
         <form className="docs-controls" onSubmit={(e) => e.preventDefault()} aria-label="Props">
           {controls.map(({ name, control }) => {
             const id = `ctl-${name}`;
@@ -66,7 +70,19 @@ function Demo({ demo }: { demo: NonNullable<Story['demo']> }) {
               </div>
             );
           })}
-          <button type="button" className="docs-link-button bland-focus-ring" onClick={() => setArgs(demo.args)}>
+          <div className="docs-control">
+            <label htmlFor="ctl-focused">focused</label>
+            <input id="ctl-focused" type="checkbox" className="bland-focus-ring" checked={focused} onChange={(e) => setFocused(e.target.checked)} />
+          </div>
+          <p className="docs-control-note">focused previews the keyboard focus ring; in code it is :focus-visible, not a prop.</p>
+          <button
+            type="button"
+            className="docs-link-button bland-focus-ring"
+            onClick={() => {
+              setArgs(demo.args);
+              setFocused(false);
+            }}
+          >
             Reset
           </button>
         </form>
@@ -75,6 +91,93 @@ function Demo({ demo }: { demo: NonNullable<Story['demo']> }) {
         <code>{snippet(demo.component, args, doc?.props ?? [])}</code>
       </pre>
     </Section>
+  );
+}
+
+const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4];
+
+/**
+ * The demo's canvas. Zoom with the buttons at the bottom right, or with + and - while the pointer is
+ * over it; 0 resets the zoom and the position. Drag the background to pan when zoomed in.
+ */
+function ZoomStage({ children, focused }: { children: ReactNode; focused: boolean }) {
+  const [zoom, setZoom] = useState(1);
+  const stage = useRef<HTMLDivElement>(null);
+  const hovering = useRef(false);
+  const step = (dir: 1 | -1) =>
+    setZoom((z) => ZOOM_STEPS[Math.min(ZOOM_STEPS.length - 1, Math.max(0, ZOOM_STEPS.indexOf(z) + dir))] ?? z);
+  // Reset bumps `recenter` too, so it moves the view back even when the zoom is already 100%.
+  const [recenter, setRecenter] = useState(0);
+  const reset = () => {
+    setZoom(1);
+    setRecenter((n) => n + 1);
+  };
+
+  // Keep the content centered whenever the zoom changes or the view is reset.
+  useLayoutEffect(() => {
+    const el = stage.current;
+    if (!el) return;
+    el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
+    el.scrollTop = (el.scrollHeight - el.clientHeight) / 2;
+  }, [zoom, recenter]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!hovering.current || e.metaKey || e.ctrlKey || e.altKey) return;
+      // Leave typing alone: text fields and selects keep their keys; checkboxes and buttons don't need them.
+      if ((e.target as HTMLElement).closest('input:not([type=checkbox], [type=radio]), select, textarea')) return;
+      if (e.key === '+' || e.key === '=') step(1);
+      else if (e.key === '-' || e.key === '_') step(-1);
+      else if (e.key === '0') reset();
+      else return;
+      e.preventDefault();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // Drag on the background (not on the component) to pan.
+  const pan = (e: PointerEvent<HTMLDivElement>) => {
+    const el = stage.current;
+    if (!el || e.button !== 0 || (e.target as HTMLElement).closest('button, a, input, select, textarea, [tabindex]')) return;
+    if (el.scrollWidth <= el.clientWidth && el.scrollHeight <= el.clientHeight) return;
+    const start = { x: e.clientX, y: e.clientY, left: el.scrollLeft, top: el.scrollTop };
+    el.setPointerCapture(e.pointerId);
+    el.dataset.panning = '';
+    const move = (m: globalThis.PointerEvent) => {
+      el.scrollLeft = start.left - (m.clientX - start.x);
+      el.scrollTop = start.top - (m.clientY - start.y);
+    };
+    const up = () => {
+      delete el.dataset.panning;
+      el.removeEventListener('pointermove', move);
+      el.removeEventListener('pointerup', up);
+      el.removeEventListener('pointercancel', up);
+    };
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', up);
+    el.addEventListener('pointercancel', up);
+  };
+
+  return (
+    <div
+      className="docs-demo-view"
+      onPointerEnter={() => (hovering.current = true)}
+      onPointerLeave={() => (hovering.current = false)}
+    >
+      <div ref={stage} className="docs-demo-stage" onPointerDown={pan} data-testid="demo-stage">
+        <div className={`docs-demo-canvas${focused ? ' pg-focus' : ''}`} style={{ zoom }}>
+          {children}
+        </div>
+      </div>
+      <div className="docs-zoom" role="group" aria-label="Zoom">
+        <IconButton size="sm" type="secondary" icon={<MinusIcon />} aria-label="Zoom out" title="Zoom out (-)" onClick={() => step(-1)} disabled={zoom === ZOOM_STEPS[0]} />
+        <Button size="sm" type="ghost" aria-label="Reset zoom" title="Reset zoom and position (0)" onClick={reset} className="docs-zoom-level">
+          {Math.round(zoom * 100)}%
+        </Button>
+        <IconButton size="sm" type="secondary" icon={<PlusIcon />} aria-label="Zoom in" title="Zoom in (+)" onClick={() => step(1)} disabled={zoom === ZOOM_STEPS.at(-1)} />
+      </div>
+    </div>
   );
 }
 

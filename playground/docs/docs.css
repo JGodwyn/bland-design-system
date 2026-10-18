@@ -416,18 +416,47 @@ code,
   corner-shape: superellipse(2);
   overflow: hidden;
 }
+.docs-demo-view {
+  position: relative;
+  min-width: 0;
+}
+/* The canvas uses margin: auto (not justify-content) so a zoomed-in demo can scroll to every edge. */
 .docs-demo-stage {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 100%;
   min-height: 240px;
-  padding: var(--space-lg);
-  overflow-x: auto;
+  max-height: 480px;
+  padding: var(--space-lg) var(--space-lg) var(--space-4xl);
+  overflow: auto;
   background: var(--surface-100);
+}
+.docs-demo-stage[data-panning] {
+  cursor: grabbing;
+  user-select: none;
+}
+.docs-demo-canvas {
+  margin: auto;
+}
+.docs-zoom {
+  position: absolute;
+  right: var(--space-md);
+  bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+.docs-zoom-level {
+  min-width: var(--space-4xl);
+  font-variant-numeric: tabular-nums;
+}
+.docs-control-note {
+  margin: 0;
+  font: var(--type-body-sm);
+  color: var(--text-subtle);
 }
 @media (min-width: 768px) {
   .docs-demo-stage {
-    padding: var(--space-2xl);
+    padding: var(--space-2xl) var(--space-2xl) var(--space-4xl);
   }
 }
 .docs-controls {
@@ -487,7 +516,7 @@ code,
 .docs-variants {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
+  gap: var(--space-3xl);
   padding: var(--space-xl);
   border: var(--stroke-sm) solid var(--border-subtle);
   border-radius: var(--rad-lg);

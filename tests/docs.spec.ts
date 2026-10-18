@@ -49,3 +49,31 @@ test('every component page shows a props table with rows', async ({ page }) => {
     await expect(page.locator('.docs-table tbody tr').first()).toBeVisible();
   }
 });
+
+test('the playground previews focus and zooms with its buttons and the +, - and 0 keys', async ({ page }) => {
+  await page.goto('/#/components/button');
+  const demo = page.locator('.docs-demo-stage .bland-button');
+  const outline = () => demo.evaluate((e) => getComputedStyle(e).outlineStyle);
+  expect(await outline()).toBe('none');
+  await page.getByLabel('focused').check();
+  expect(await outline()).toBe('solid');
+
+  const level = page.locator('.docs-zoom-level');
+  await page.getByRole('button', { name: 'Zoom in' }).click();
+  await expect(level).toHaveText('125%');
+  await page.getByTestId('demo-stage').hover({ position: { x: 10, y: 10 } });
+  await page.keyboard.press('+');
+  await expect(level).toHaveText('150%');
+  await page.keyboard.press('-');
+  await page.keyboard.press('-');
+  await expect(level).toHaveText('100%');
+  await page.keyboard.press('-');
+  await expect(level).toHaveText('75%');
+  await page.keyboard.press('0');
+  await expect(level).toHaveText('100%');
+
+  // Keys only zoom while the pointer is over the playground.
+  await page.mouse.move(1, 1);
+  await page.keyboard.press('+');
+  await expect(level).toHaveText('100%');
+});

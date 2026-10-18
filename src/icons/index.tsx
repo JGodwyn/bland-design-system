@@ -36,6 +36,13 @@ export const PlusIcon = (p: P) => (
   </svg>
 );
 
+/** Figma: Minus (6080:106048) */
+export const MinusIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M5 16H27" />
+  </svg>
+);
+
 /** Figma: _Spinner (6065:1682). A filled three-quarter ring; the component that uses it rotates it. */
 export const SpinnerIcon = (p: P) => (
   <svg viewBox="0 0 20 20" fill="currentColor" {...p}>
