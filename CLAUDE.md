@@ -20,12 +20,14 @@ src/icons/                Bland's own icons, exported from Figma
 playground/               the docs site (npm run docs): style pages from tokens.json, component pages from stories and generated props; #/raw/<id> is what Playwright screenshots
 tests/                    Playwright: screenshots, axe checks, behaviour specs
 scripts/build-tokens.ts   raw export -> tokens.json + tokens.css
+scripts/tokens/           token build core (core.ts) and drift check logic (drift.ts)
 scripts/figma/            Plugin API scripts run through use_figma, plus the local checksum
 scripts/stylelint/        bland/use-tokens lint rule, fixtures and test
 ```
 
 - `npm run tokens`: regenerate `tokens.json` and `tokens.css` from the raw export.
 - `npm run tokens:checksum`: hash of the raw export; must equal `scripts/figma/checksum.js` run in Figma.
+- `npm run tokens:drift`: drift check against Figma, variable by variable, with the CSS tokens each change reaches; `-- --apply` takes the Figma version. Two steps around one `use_figma` call (`docs/tokens.md`, "Drift check"). `npm run test:drift` runs its tests.
 - `npm run build`: tokens, Vite library build, `dist/tokens.css`, type declarations.
 - `npm run typecheck`.
 - `npm run lint:css`: Stylelint on `src/components/**/*.css`; rejects any value that is not a `var(--…)` token (including durations, easings and `@media` widths) and names the token to use (`docs/lint.md`). `npm run test:lint` runs its fixtures.
@@ -161,7 +163,7 @@ For each component: Figma set, code import, and Figma property → prop mapping.
 | Breadcrumbs | Breadcrumb | TBD | Current page static; separator outside the link |
 | Buttons | Button, Icon Button | `import { Button, IconButton } from 'bland'` | `Size` → `size` lg/md/sm/xs, default **md** (Figma xs; its description says xs is below the touch target). `Emotion` → `emotion`, `Type` → `type`; native type is `htmlType` (default `button`). `✏️ Label` → `children` (`👀 Label` off → use IconButton). `🌟 Icon (L)/(R)` → `iconStart`/`iconEnd`. `👀 Loading (L)/(R)` → `loading`: `true`/`'start'`/`'end'`, spinner (rotates at `duration/spin`, static under reduced motion) replaces that side's icon, `aria-busy`, clicks ignored. Icon Button: `icon`, required `aria-label`, `loading` swaps the icon. State is CSS; `👀 Focused` dropped. Figma's inner Base frame is not rendered: padding sits on the `<button>`; stroke type is an inset `stroke-lg` shadow (Figma inside stroke) |
 | Checkbox / Radio Button | Control, Group | TBD | `Checked` → `checked`: false/true/mixed. 24 and 32 hit areas |
-| Chip / Pills | Chip, Pills | TBD | Count is a nested Indicator |
+| Chip / Pills | Chip, Pills | `import { Chip, Pill } from 'bland'` | Chip (static `<span>`): `Size` → `size` sm/md/lg, default **sm** (Figma's). `✏️ Label` → `children`. `Type` is not a prop: `count` (Figma countable + `✏️ Count`, the chip's own `surface-200` box, not an Indicator) and `onRemove` (cancellable: a close `<button>`, `aria-label` "Remove <label>" or `removeLabel`, 24px hit area). `🧩 Slot` → `leading`. Pill (toggle `<button aria-pressed>`, folder `pills/`): `Size` → `size` sm/md/lg, default **sm**. `Selected` → `selected` / `defaultSelected` + `onSelectedChange`. `State` is CSS (hover) or `disabled`. `🌟 Icon` → `icon`; `👀 Number` → `count` (a number or string becomes an Indicator xl secondary: brand when selected, neutral otherwise or disabled; any other node as is); `👀 Label` off → no `children`, add `aria-label`. Full radius without `.bland-smooth` |
 | Code snippet | Code-snippet | TBD | `View`: collapsed/expanded/fullscreen. Resizable height; collapsed body capped at 384. Geist Mono + `Code/*` syntax tokens |
 | Date & Time | Calendar, pickers | TBD | Pickers wrap an exposed Text Input. React Aria |
 | Dropdown | Dropdown, Menu | TBD | Exposed trigger + menu. Menu uses `Elevation/neutral/mid`. React Aria + Floating UI |
@@ -202,7 +204,8 @@ The doc shows status; the roadmap below and the component map stay the source fo
 In order; tokens come before components.
 
 - [ ] Repo + sync setup. Done: git repo on GitHub (private, [JGodwyn/bland-design-system](https://github.com/JGodwyn/bland-design-system)), `docs/` seeded, handoff archived. Left: connect it to the claude.ai project, merge and retire the project's `claude/bland-handoff*.md` files.
-- [ ] Drift check script. The checksum pair in `scripts/figma/` is the base; it still needs a per-variable diff report and an optional weekly schedule.
+- [x] Drift check with a per-variable diff report (2026-10-18): `npm run tokens:drift`, see `docs/tokens.md`.
+- [ ] Weekly drift check on a schedule (optional): it needs the Figma MCP, so it would be a scheduled Claude task.
 - [x] Token export pipeline (Light/Dark CSS, resolved aliases and alphas, descriptions kept, `Fade/*-clear` skipped). First export 2026-10-16.
 - [x] Token lint (Stylelint) before any component code. Set up 2026-10-16, see `docs/lint.md`.
 - [x] Playwright (decided 2026-10-17): screenshots of every story in both themes, axe checks and behaviour specs, Chromium only, against the playground. Set up 2026-10-17.

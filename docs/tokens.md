@@ -11,7 +11,9 @@ Figma owns every token value. The repo holds a verified copy of the Figma variab
 | `src/tokens/tokens.css` | CSS custom properties, shipped as `bland/tokens.css` | `npm run tokens` |
 | `scripts/figma/dump-tokens.js` | Plugin API script that produces the raw chunks | By hand |
 | `scripts/figma/checksum.js`, `checksum.ts` | Same hash computed in Figma and locally | By hand |
-| `scripts/build-tokens.ts` | Raw chunks to `tokens.json` and `tokens.css` | By hand |
+| `scripts/build-tokens.ts`, `scripts/tokens/core.ts` | Raw chunks to `tokens.json` and `tokens.css` (the logic lives in `core.ts`) | By hand |
+| `scripts/drift.ts`, `scripts/tokens/drift.ts`, `scripts/figma/drift-check.js` | The drift check (below) | By hand |
+| `tokens/figma/drift/` | The drift check's working files: `check.js`, `result-N.json`, `report.md`. Not committed | `npm run tokens:drift` |
 
 ## Syncing from Figma
 
@@ -25,6 +27,23 @@ The variables are local and unpublished, and the REST variables endpoint needs a
 6. Commit the raw chunks, `tokens/tokens.json` and `src/tokens/tokens.css` together. The `tokens.json` diff is the readable record of what changed.
 
 Why chunks: `use_figma` caps a return value at 20 KB, the full export is about 200 KB, and the plugin sandbox has no `fetch`, so it cannot write anywhere else.
+
+## Drift check
+
+Answers "does the repo still match Figma?", variable by variable, and shows which CSS tokens a Figma change would move. Use it before a sync to see what changed, or on its own to confirm nothing has.
+
+The work is split so almost nothing has to be copied out of Figma: the repo sends its hashes in, and Figma sends back only what differs.
+
+1. `npm run tokens:drift`. With no Figma result saved, it writes `tokens/figma/drift/check.js`: `scripts/figma/drift-check.js` with a hash of every variable in `tokens/figma/raw` filled in (about 17 KB, under `use_figma`'s 50 KB code limit). Exit code 2.
+2. Run `check.js` through `use_figma` (read-only). Figma hashes its own variables the same way and returns only the records that differ, the ids that are gone, and the collections and styles if those changed. Save the result as `tokens/figma/drift/result-0.json`. If it reports `of` above 1, run it again with `CHUNK = 1`, … and save `result-1.json`, ….
+3. `npm run tokens:drift` again.
+   - **No drift:** "No drift: all 612 variables, the collections and the styles match Figma." Exit code 0.
+   - **Drift:** a report in the terminal and in `tokens/figma/drift/report.md`, exit code 1. It has two tables. **Variables** lists each added, removed or changed variable with the field that changed (name, collection, type, description, or the value per mode, with aliases shown by name). **CSS tokens affected** lists every generated token whose value or description would change, including the ones that change only through an alias: recoloring `Brand/Brand600` lists `--button-brand-primary-rest` in both modes, `--surface-brand` in light only, and the brand shadows. If the Figma version would not build (a deleted variable that others alias), the report says so first.
+4. To take the Figma version: `npm run tokens:drift -- --apply` writes it into `tokens/figma/raw` (re-chunked) without a full export. Then run `npm run tokens`, and confirm `npm run tokens:checksum` equals `scripts/figma/checksum.js` in Figma before committing, as in a normal sync.
+
+A result saved against an older `tokens/figma/raw` is ignored and a fresh `check.js` is written, so a stale check can't report the wrong thing. `npm run test:drift` simulates drift on a copy of the real export (a recolor, a reworded description, an added and a removed variable, a broken alias) and checks the report.
+
+Not set up yet: running the check on a schedule. It needs the Figma MCP, so it would run as a scheduled Claude task rather than a plain cron job.
 
 ## What the build does
 

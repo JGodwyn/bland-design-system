@@ -1,0 +1,130 @@
+/*
+ * Pill (Figma: Pills page, set "Pills").
+ *
+ *   <button class="bland-pill bland-focus-ring" data-size="sm" aria-pressed="false">
+ *     <span class="bland-icon bland-pill__icon">…</span>
+ *     <span class="bland-pill__label">Design</span>
+ *     <span class="bland-pill__count">…Indicator…</span>
+ *   </button>
+ *
+ * Selected comes from aria-pressed, not a class. Figma's outer frame has no padding; its inner
+ * frame's padding, fill and stroke sit on the button. Every size uses body-lg and icon/md.
+ * The radius is rad-rd without .bland-smooth: on a full radius Figma's smoothing has no straight
+ * edge to spread over, and superellipse() would square the ends off.
+ */
+
+.bland-pill {
+  --_bg: var(--surface-100);
+  --_bg-hover: var(--surface-200);
+  --_bg-disabled: var(--surface-200);
+  --_text: var(--text-bold);
+  --_icon: var(--icon-bold);
+  --_text-disabled: var(--text-minimal);
+  --_icon-disabled: var(--icon-minimal);
+  --_border: var(--border-subtle);
+  --bland-icon-size: var(--icon-md);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  max-width: 100%;
+  min-width: var(--pill-sm);
+  height: var(--pill-sm);
+  margin: var(--space-none);
+  padding: var(--space-none) var(--space-md);
+  border: none;
+  border-radius: var(--rad-rd);
+  background-color: var(--_bg);
+  color: var(--_text);
+  /* Figma's inside stroke: drawn inside the box, so it adds no size. */
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--_border);
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--duration-xs) var(--easing-ease),
+    color var(--duration-xs) var(--easing-ease),
+    box-shadow var(--duration-xs) var(--easing-ease),
+    transform var(--duration-sm) var(--easing-out);
+}
+
+/* ---- Size: height and min width pill/*, side padding ---- */
+
+.bland-pill[data-size="md"] {
+  min-width: var(--pill-md);
+  height: var(--pill-md);
+  padding-inline: var(--space-lg);
+}
+
+.bland-pill[data-size="lg"] {
+  min-width: var(--pill-lg);
+  height: var(--pill-lg);
+  padding-inline: var(--space-xl);
+}
+
+/* ---- Selected: Control/checked fills, white content in both modes, no stroke ---- */
+
+.bland-pill[aria-pressed="true"] {
+  --_bg: var(--control-checked-rest);
+  --_bg-hover: var(--control-checked-hover);
+  --_bg-disabled: var(--control-checked-disabled);
+  --_text: var(--text-on-color);
+  --_icon: var(--icon-on-color);
+  --_text-disabled: var(--text-on-color);
+  --_icon-disabled: var(--icon-on-color);
+  --_border: transparent;
+}
+
+/* ---- Parts ---- */
+
+.bland-pill__icon {
+  color: var(--_icon);
+}
+
+.bland-pill__label {
+  min-width: var(--space-none);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bland-pill__count {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+}
+
+/* ---- States: hover, pressed, disabled. Focus is .bland-focus-ring. ---- */
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-pill:hover:not(:disabled, [aria-disabled="true"]) {
+    background-color: var(--_bg-hover);
+  }
+}
+
+.bland-pill:active:not(:disabled, [aria-disabled="true"]) {
+  transform: scale(0.97);
+}
+
+.bland-pill:is(:disabled, [aria-disabled="true"]) {
+  --_bg: var(--_bg-disabled);
+  --_text: var(--_text-disabled);
+  --_icon: var(--_icon-disabled);
+
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bland-pill {
+    transition-property: background-color, color, box-shadow;
+  }
+
+  .bland-pill:active:not(:disabled, [aria-disabled="true"]) {
+    transform: none;
+  }
+}

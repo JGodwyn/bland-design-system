@@ -7,3 +7,4 @@ coverage/
 test-results/
 playwright-report/
 playground/.generated/
+tokens/figma/drift/

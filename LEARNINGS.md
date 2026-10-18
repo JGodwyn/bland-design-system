@@ -23,6 +23,8 @@ each to `tokens/figma/raw/NN.json`, and prove the copy is exact with the
 checksum pair (`scripts/figma/checksum.js` in Figma = `npm run tokens:checksum`
 locally). Never trust a hand-copied chunk without the matching hash.
 
+**Copying data out of Figma is the expensive direction.** A `use_figma` result only reaches the repo by being copied into a file, so a check that returns a hash per variable (about 15 KB) costs that copy every run. → Send the repo's side into the script instead (the code input takes 50 KB) and have Figma return only the differences. That is how `npm run tokens:drift` works; a clean check returns about 150 bytes.
+
 **The REST variables endpoint needs an Enterprise plan, and Bland's variables
 are local and unpublished.** → Read variables only through the Figma MCP
 (`use_figma` read-only scripts or `get_variable_defs`).

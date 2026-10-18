@@ -151,6 +151,45 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   straight edge to act on, and `corner-shape` would make it a squircle.
 - Not interactive; wrap it in a button or link when it needs focus.
 
+### Chip and Pill (2026-10-18)
+- **Chip is not interactive; Pill is a toggle.** From the set descriptions:
+  Chip is a "compact label for a value, filter or attribute" with no selected
+  state, so the chip is a `<span>` and only its close button is a `<button>`.
+  Pills is "selectable … a toggle button with aria-pressed", so a Pill is a
+  native `<button aria-pressed>`. Neither is both.
+- **Chip** (`import { Chip } from 'bland'`): `size` sm/md/lg (default sm, as
+  in Figma; 20, 24, 32), `children` (label), `leading` (Figma `🧩 Slot`, one
+  Avatar or Indicator; named for its place because a Figma slot called just
+  "Slot" says nothing), `count` (Figma `Type=countable` + `✏️ Count`), and
+  `onRemove` (Figma `Type=cancellable`). Figma's `Type` is not a prop: it
+  follows from `count` / `onRemove`, and `data-type` reflects it. Both at
+  once is allowed in code (count, then close), though Figma has no such
+  variant.
+- Chip's count is **its own box, not an Indicator**: Figma draws a
+  `chip/trail-*` frame filled `surface-200` with `text-subtle` body-sm-bold
+  (body-md-bold on lg). It grows past square for wide numbers.
+- Chip close button: `aria-label` defaults to "Remove <label>" when the label
+  is a string (`removeLabel` overrides). The box is `chip/trail-*` (16, 20,
+  24) but the hit area is a centred `control/xs` (24) `::before`, as the set
+  description asks. No hover or disabled look: Figma has none. Press feedback
+  `scale(0.97)`. Removing is the app's job (`onRemove`), the chip never hides
+  itself.
+- **Pill** (`import { Pill } from 'bland'`, folder `pills/` after the Figma
+  set): `size` sm/md/lg (default sm, as in Figma; 32, 40, 48, `min-width`
+  the same), `selected` (controlled) or `defaultSelected`, `onSelectedChange`,
+  `icon` (Figma `🌟 Icon`, icon/md at every size), `count` (Figma
+  `👀 Number`), `htmlType` (default `button`), `disabled`. `👀 Label` off =
+  no `children`; give it an `aria-label`. Its width then follows the padding
+  (44 on sm), as in Figma.
+- Pill colours: rest `surface-100` with a `stroke-sm` `border-subtle` inside
+  stroke (inset shadow), hover and disabled `surface-200`, disabled text
+  `text-minimal`. Selected: `Control/checked-{rest,hover,disabled}`, white
+  content in both modes, no stroke. Full radius without `.bland-smooth`.
+- Pill `count` is Figma's nested Indicator: a number or string becomes an
+  Indicator xl secondary, brand when selected and enabled, neutral otherwise
+  (Figma's selected-disabled pill switches it back to neutral). Any other node
+  is shown as is.
+
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 
 - A sidebar of style pages (generated from `tokens.json`) and components

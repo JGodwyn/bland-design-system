@@ -1,0 +1,147 @@
+/*
+ * Chip (Figma: Chip page, set "Chip").
+ *
+ *   <span class="bland-chip bland-smooth" data-size="sm" data-type="cancellable">
+ *     <span class="bland-chip__leading">…Avatar or Indicator…</span>
+ *     <span class="bland-chip__label">Design</span>
+ *     <span class="bland-chip__count bland-smooth">3</span>                  (countable)
+ *     <button class="bland-chip__close bland-focus-ring bland-smooth" aria-label="Remove Design">…</button>  (cancellable)
+ *   </span>
+ *
+ * A chip is not interactive itself; only its close button is. The count box and the close box
+ * share a size (chip/trail-*), the same as the indicator/lg, xl and 2xl count badges.
+ */
+
+.bland-chip {
+  --_trail: var(--chip-trail-sm);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-sm);
+  max-width: 100%;
+  height: var(--chip-sm);
+  padding: var(--space-none) var(--space-sm);
+  border: var(--stroke-sm) solid var(--border-subtle);
+  --bland-radius: var(--rad-sm); /* drawn by .bland-smooth */
+  background-color: var(--surface-100);
+  color: var(--text-bold);
+  font: var(--type-body-sm);
+  letter-spacing: var(--letter-spacing-normal);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* ---- Size: height chip/*, label type, trailing box chip/trail-* ---- */
+
+.bland-chip[data-size="md"] {
+  --_trail: var(--chip-trail-md);
+
+  height: var(--chip-md);
+  font: var(--type-body-md);
+}
+
+.bland-chip[data-size="lg"] {
+  --_trail: var(--chip-trail-lg);
+  --bland-icon-size: var(--icon-sm);
+
+  height: var(--chip-lg);
+  padding-inline-end: var(--space-md);
+  font: var(--type-body-lg);
+}
+
+/* A count or close box sits close to the edge: space-2xs on sm and md, space-xs on lg. */
+.bland-chip:is([data-type="cancellable"], [data-type="countable"]) {
+  padding-inline-end: var(--space-2xs);
+}
+
+.bland-chip[data-size="lg"]:is([data-type="cancellable"], [data-type="countable"]) {
+  padding-inline-end: var(--space-xs);
+}
+
+/* ---- Parts ---- */
+
+.bland-chip__leading {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+}
+
+.bland-chip__label {
+  min-width: var(--space-none);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Count box: at least as wide as it is high, grows with the number. */
+.bland-chip__count {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--_trail);
+  height: var(--_trail);
+  padding: var(--space-none) var(--space-2xs);
+  --bland-radius: var(--rad-xs);
+  background-color: var(--surface-200);
+  color: var(--text-subtle);
+  font: var(--type-body-sm-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.bland-chip[data-size="lg"] .bland-chip__count {
+  padding-inline: var(--space-xs);
+  font: var(--type-body-md-bold);
+}
+
+/* Close button: the same box as the count, with icon/xs (icon/sm on lg). */
+.bland-chip__close {
+  --bland-icon-size: var(--icon-xs);
+
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--_trail);
+  height: var(--_trail);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  --bland-radius: var(--rad-xs);
+  background-color: var(--surface-200);
+  color: var(--icon-subtle);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--duration-sm) var(--easing-out);
+}
+
+.bland-chip[data-size="lg"] .bland-chip__close {
+  --bland-icon-size: var(--icon-sm);
+}
+
+/* The sm and md boxes (16, 20) are below the 24px target: the hit area is control/xs, centered. */
+.bland-chip__close::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--control-xs);
+  height: var(--control-xs);
+  transform: translate(-50%, -50%);
+}
+
+.bland-chip__close:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bland-chip__close {
+    transition: none;
+  }
+
+  .bland-chip__close:active {
+    transform: none;
+  }
+}

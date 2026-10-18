@@ -202,3 +202,55 @@ times.
   those in `tests/a11y.spec.ts` and raised the success one with Godwin.
 - Full `npm test` had failures only in other sessions' uncommitted work
   (pills story, `scripts/tokens/drift.test.ts` typecheck).
+
+## 2026-10-18 — Chip and Pills (side session, wave 2)
+**Asked:** build Chip and Pills (pages 542:25321, 708:23768), nesting the Indicator from the Badge session for the count.
+
+- The first Figma connector hit its View-seat limit on the first call; the
+  second Figma MCP connector read both sets (descriptions, properties, every
+  variant's bindings, inner frames).
+- Chip (542:25533): no selected state, so a static `<span>`; `Type` is
+  default/cancellable/countable. Its count is **not** an Indicator: a
+  `chip/trail-*` frame, `surface-200`, `text-subtle` body-sm-bold
+  (body-md-bold on lg). Padding end `space-2xs` (lg `space-xs`) with a trailing
+  box, `space-sm` (lg `space-md`) without. Close icon X at icon/xs (lg icon/sm),
+  `icon-subtle`. The description asks for a bigger hit area on sm and md:
+  centred `control/xs` `::before`.
+- Pills (708:23772): description says toggle button with `aria-pressed`. Outer
+  frame zero padding, inner frame carries height/min width `pill/*`, padding
+  `space-md/lg/xl`, gap `space-xs`, body-lg and icon/md at every size. Count is
+  an Indicator xl secondary: brand when selected, neutral otherwise.
+- First render of the pills had squircle ends: `rad-rd` with `.bland-smooth`.
+  Dropped the class, as Indicator and Avatar had already decided.
+- The docs server on 5180 did not pick up the new `pills/` folder's story
+  until `playground/docs/data.ts` was touched (Vite's glob watcher missed the
+  new directory).
+- A spec expected an icon-only sm pill to be 32 wide; it is 44 (12 + 20 + 12),
+  the same as Figma's padding gives. The spec was wrong, not the pill.
+
+## 2026-10-18 — Drift check with a per-variable diff report
+**Asked:** "Drift check with a per-variable diff report (do in this chat)", alongside Badge, Avatar and Chip in three parallel sessions.
+
+- Started the Badge, Avatar and Chip sessions first, telling Avatar and Chip to wire the Indicator only once the Badge session had committed it.
+- Split `scripts/build-tokens.ts` into `scripts/tokens/core.ts` (load and build) and the writer, so the drift check can build two exports and compare the CSS. Output checked byte-identical before and after.
+- First design: a Figma script returning a fingerprint per variable, then a second script fetching the changed ones. Wrote it and its tests, then dropped it: every check meant copying about 15 KB of hashes out of a `use_figma` result by hand.
+- Flipped the direction: `npm run tokens:drift` bakes the repo's hashes into `tokens/figma/drift/check.js`; Figma compares and returns only the records that differ. A clean check returns about 150 bytes.
+- `scripts/tokens/drift.ts` turns the result into a report: per-variable field changes (aliases shown by name) and every CSS token whose value or description moves, found by building both exports. `--apply` writes the Figma version back into `tokens/figma/raw`.
+- One test failed on a wrong expectation: Brand primary uses Brand600 in both modes, so both change. Fixed the test, not the code.
+
+**Verified:** `npm run test:drift` 5/5 (recolor, reworded description, add, remove, broken alias, apply round trip); live run against Figma: "No drift: all 612 variables, the collections and the styles match Figma"; a simulated Brand600 recolor through the real CLI listed 14 affected tokens and `--apply` produced `--button-brand-primary-rest: #1a4fe0`, then the committed files were restored.
+**Logged:** LEARNINGS.md §Figma · docs/tokens.md "Drift check".
+- The Indicator landed on main (72628ba) as the rest was finishing, so Pill
+  wraps a numeric `count` in it, and the Chip story shows the leading slot
+  with an Avatar and an Indicator.
+- Seen in the dark screenshot: a selected, disabled pill's neutral count
+  (`indicator-neutral-secondary`, #576275) is the same colour as
+  `control-checked-disabled`, so the badge disappears. That is Figma's binding;
+  kept and raised with Godwin.
+- Gates: lint:css clean, typecheck clean for `src/` and `tests/` (the
+  remaining errors are another session's uncommitted `scripts/drift.ts` and
+  `scripts/tokens/`), `npm test` 82 passed, build passes. Re-baselined only
+  `chip-*` and `pills-*` screenshots and looked at them.
+
+**Verified:** 5 Chip and 8 Pill specs, chip and pills screenshots in light and dark, axe clean.
+**Logged:** INTERFACE.md §6 Chip and Pill · CLAUDE.md component map.

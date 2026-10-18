@@ -19,4 +19,6 @@ export {
   type IndicatorType,
 } from './components/indicator/Indicator';
 export { Avatar, type AvatarProps, type AvatarSize, type AvatarType } from './components/avatar/Avatar';
+export { Chip, type ChipProps, type ChipSize } from './components/chip/Chip';
+export { Pill, type PillProps, type PillSize } from './components/pills/Pill';
 export * from './icons';
