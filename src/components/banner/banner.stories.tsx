@@ -37,7 +37,7 @@ function Dismissible() {
 export default {
   title: 'Banner',
   description:
-    'Persistent message that sits in the page layout, usually full width under a header, and stays until the user dismisses it or the condition clears. No elevation, so it reads as part of the page. Status sets the icon and its color: info, danger, success, warning. Set the instance to Fill container in layouts. For floating messages use Notification; for transient ones use Toast.',
+    'Persistent message that sits in the page layout, usually full width under a header, and stays until the user dismisses it or the condition clears. No elevation, so it reads as part of the page. Status sets the icon and its color: info, danger, success, warning. Title shows on vertical; on horizontal it is optional (👀 Title, off by default) and sits above the description. Set the instance to Fill container in layouts. For floating messages use Notification; for transient ones use Toast.',
   components: ['Banner'],
   demo: {
     component: 'Banner',
@@ -86,6 +86,9 @@ export default {
         <span className="pg-label">Actions (xs inline when horizontal, md below when vertical) and close</span>
         <Banner status="info" actions={actionsFor('horizontal', 2)} onClose={() => {}}>
           A new version is available
+        </Banner>
+        <Banner status="info" title="Version 2.4" actions={actionsFor('horizontal', 1)} onClose={() => {}}>
+          Horizontal, with a title
         </Banner>
         <Banner status="danger" orientation="vertical" title="Payment failed" actions={actionsFor('vertical', 2)} onClose={() => {}}>
           We could not charge your card. Update your payment details to keep your plan.

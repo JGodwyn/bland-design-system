@@ -10,7 +10,7 @@ export interface BannerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title
   status?: BannerStatus;
   /** Figma `Orientation`: horizontal is one row with inline actions; vertical puts a title over the text and actions under it. */
   orientation?: BannerOrientation;
-  /** Figma `✏️ Title`. Shown above the description; Figma draws it on vertical banners only. */
+  /** Figma `✏️ Title` (on horizontal, `👀 Title`): shown above the description. */
   title?: ReactNode;
   /** Figma `✏️ Description` (`👀 Description` off = no children). */
   children?: ReactNode;

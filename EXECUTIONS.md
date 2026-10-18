@@ -407,3 +407,10 @@ baselines looked at in both themes.
   clock still runs in real time between `runFor` calls (LEARNINGS.md).
 **Verified:** see the commit; specs alert (5), banner (4), notification (3),
 toast (7); baselines looked at in both themes.
+- Follow-up (Godwin): Figma now has the horizontal title. Added a `👀 Title`
+  boolean (off by default) to the Banner and Notification sets, bound to
+  `✏️ Title` in a new `text` frame (space-xs) above the description in all
+  12 horizontal variants; set descriptions updated, checked with temporary
+  instances (removed). Repo docs, JSDoc, story descriptions and a horizontal
+  title example in both stories followed; banner and notification baselines
+  re-taken.

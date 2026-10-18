@@ -473,10 +473,12 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
     vertical. `title`, `children`, `timestamp` (body-sm text-subtle, beside
     the title when vertical, after the text when horizontal), `actions`,
     `onClose` (Figma `👀 Close btn`), `orientation`.
-- **Title on horizontal:** Figma's horizontal Banner and Notification have no
-  title. Code shows `title` in both orientations rather than drop it
-  silently; horizontal stacks it over the description on the same row as
-  the actions.
+- **Title on horizontal** (2026-10-18, Godwin): code shows `title` in both
+  orientations; horizontal stacks it over the description on the same row as
+  the actions. Figma now matches: the horizontal Banner and Notification
+  variants have a `👀 Title` boolean (off by default, so the one-line look
+  stays the default) bound to `✏️ Title`, in a `text` frame (`space-xs` gap)
+  above the description. Vertical always shows its title.
 - **Actions are a slot** (`actions`, Figma `👀 Btn` / `👀 Btn (2nd)`): pass
   one or two Buttons, size xs on horizontal and md on vertical (Figma's), a
   primary then a secondary. Kept a slot so apps choose labels, handlers and

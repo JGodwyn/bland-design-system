@@ -12,7 +12,7 @@ export interface NotificationProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   orientation?: NotificationOrientation;
   /** Figma `Colored`: the tinted status surface and border. `false` is surface-100 with border-bold and a neutral shadow. */
   colored?: boolean;
-  /** Figma `✏️ Title`. Shown above the description; Figma draws it on vertical notifications only. */
+  /** Figma `✏️ Title` (on horizontal, `👀 Title`): shown above the description. */
   title?: ReactNode;
   /** Figma `✏️ Description` (`👀 Description` off = no children). */
   children?: ReactNode;

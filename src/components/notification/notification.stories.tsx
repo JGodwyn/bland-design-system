@@ -24,7 +24,7 @@ const stamp = <time dateTime="2026-10-18T09:41">9:41 AM</time>;
 export default {
   title: 'Notification',
   description:
-    'Toast that reports the result of an action or a system event. Status sets the icon, colors and shadow: info, success, warning, danger. Colored uses the tinted status surface and border; uncolored uses surface-100 with border-bold. Horizontal is a single line with optional inline actions; vertical adds a title, timestamp and up to two actions. Width comes from notification/width (384) and text wraps inside it. Close and icon are optional.',
+    'Toast that reports the result of an action or a system event. Status sets the icon, colors and shadow: info, success, warning, danger. Colored uses the tinted status surface and border; uncolored uses surface-100 with border-bold. Horizontal is a single line with optional inline actions and an optional title above the description (👀 Title, off by default); vertical adds a title, timestamp and up to two actions. Width comes from notification/width (384) and text wraps inside it. Close and icon are optional.',
   components: ['Notification'],
   demo: {
     component: 'Notification',
@@ -80,11 +80,16 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">Actions (xs inline when horizontal, md below when vertical), timestamp, no close, no icon</span>
+        <span className="pg-label">Actions (xs inline when horizontal, md below when vertical), timestamp, a horizontal title, no close, no icon</span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
-          <Notification status="success" actions={actionsFor('horizontal', 1)} timestamp={stamp}>
-            File deleted
-          </Notification>
+          <div className="pg-stack">
+            <Notification status="success" actions={actionsFor('horizontal', 1)} timestamp={stamp}>
+              File deleted
+            </Notification>
+            <Notification status="success" title="File deleted" actions={actionsFor('horizontal', 1)} timestamp={stamp} onClose={() => {}}>
+              Horizontal, with a title
+            </Notification>
+          </div>
           <Notification status="danger" orientation="vertical" title="Upload failed" timestamp={stamp} actions={actionsFor('vertical', 2)} onClose={() => {}}>
             report-final.pdf is larger than 20 MB. Compress it or split it into smaller files, then try again.
           </Notification>
