@@ -44,6 +44,9 @@ export function ScrollArea({ children, axis = 'y', fadeSize = 'md', viewportProp
 
     const trackSize = y ? track.clientHeight : track.clientWidth;
     // Proportional thumb; its CSS min size (control/xs) wins when content is very long.
+    // Clear the other axis's length: after an axis switch it would otherwise stay inline and win
+    // over the CSS (a 4px track drawing a thumb as tall as the old vertical one).
+    thumb.style[y ? 'width' : 'height'] = '';
     thumb.style[y ? 'height' : 'width'] = `${(size / total) * trackSize}px`;
     const thumbSize = y ? thumb.offsetHeight : thumb.offsetWidth;
     const offset = max ? (pos / max) * (trackSize - thumbSize) : 0;

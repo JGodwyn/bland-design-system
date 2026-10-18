@@ -87,6 +87,8 @@ value.** `.bland-icon { --bland-icon-size: var(--icon-md) }` meant a Button's
 Defaults for a variable a parent is meant to set go on `:root`, so inheritance
 can override them.
 
+**An inline style set for one variant outlives the switch to another.** ScrollArea set the thumb's `height` inline while vertical; switched to `axis="x"`, that height stayed and beat the CSS, so the 4px horizontal track drew a thumb tens of pixels tall, hanging below the area. → When script sets a variant-specific inline style, clear the other variant's property on every update (`thumb.style.width = ''` when vertical, `height` when horizontal). `tests/scroll-area.spec.ts` switches the axis to hold it.
+
 **Native scrollbars can't meet the overflow rule.** macOS overlay scrollbars hide
 when idle, and the standard `scrollbar-width` has no 4px option. → The
 `ScrollArea` component hides the native bar and draws its own always-visible

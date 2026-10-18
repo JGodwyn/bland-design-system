@@ -46,3 +46,20 @@ test('dragging the thumb scrolls the content', async ({ page }) => {
   const top = await area.locator('.bland-scroll-area__viewport').evaluate((el) => el.scrollTop);
   expect(top).toBeGreaterThan(0);
 });
+
+test('switching the axis keeps the thumb the scrollbar width', async ({ page }) => {
+  await page.goto('/#/components/scroll-area');
+  const thumb = page.locator('.docs-demo-stage .bland-scroll-area__thumb');
+  const width = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--scrollbar-width')));
+  await expect.poll(async () => Math.round((await thumb.boundingBox())!.width)).toBe(width);
+
+  await page.getByLabel('axis').selectOption('x');
+  await expect.poll(async () => Math.round((await thumb.boundingBox())!.height)).toBe(width);
+  // And it stays inside the area, on its bottom edge.
+  const area = (await page.locator('.docs-demo-stage .bland-scroll-area').boundingBox())!;
+  const box = (await thumb.boundingBox())!;
+  expect(box.y + box.height).toBeLessThanOrEqual(area.y + area.height);
+
+  await page.getByLabel('axis').selectOption('y');
+  await expect.poll(async () => Math.round((await thumb.boundingBox())!.width)).toBe(width);
+});
