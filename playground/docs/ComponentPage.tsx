@@ -2,7 +2,8 @@
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react';
 import { Button } from '../../src/components/button/Button';
 import { IconButton } from '../../src/components/button/IconButton';
-import { MinusIcon, PlusIcon } from '../../src/icons';
+import { Icon } from '../../src/components/icon/Icon';
+import { CaretDownIcon, MinusIcon, PlusIcon } from '../../src/icons';
 import type { Control, Story } from '../story';
 import { componentDocs, type PropDoc } from './data';
 import { PageHeader, Section } from './parts';
@@ -53,13 +54,18 @@ function Demo({ demo }: { demo: NonNullable<Story['demo']> }) {
               <div key={name} className="docs-control">
                 <label htmlFor={id}>{name}</label>
                 {control.kind === 'select' && (
-                  <select id={id} className="bland-focus-ring" value={String(value)} onChange={(e) => set(name, parseOption(e.target.value, control.options))}>
-                    {control.options.map((o) => (
-                      <option key={String(o)} value={String(o)}>
-                        {String(o)}
-                      </option>
-                    ))}
-                  </select>
+                  <span className="docs-select">
+                    <select id={id} className="bland-focus-ring" value={String(value)} onChange={(e) => set(name, parseOption(e.target.value, control.options))}>
+                      {control.options.map((o) => (
+                        <option key={String(o)} value={String(o)}>
+                          {String(o)}
+                        </option>
+                      ))}
+                    </select>
+                    <Icon size="sm">
+                      <CaretDownIcon />
+                    </Icon>
+                  </span>
                 )}
                 {control.kind === 'boolean' && (
                   <input id={id} type="checkbox" className="bland-focus-ring" checked={Boolean(value)} onChange={(e) => set(name, e.target.checked)} />

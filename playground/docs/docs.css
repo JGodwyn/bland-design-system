@@ -173,6 +173,7 @@
 .docs-note {
   margin: 0;
   max-width: 65ch;
+  font: var(--type-body-lg);
   color: var(--text-subtle);
 }
 .docs-footnote {
@@ -476,6 +477,24 @@ code,
 .docs-control label {
   font: var(--type-code-body-sm);
   color: var(--text-subtle);
+}
+/* Native select without its arrow (Chrome pins it to the edge); the CaretDown sits at the same inset as the text. Until Bland's Dropdown replaces it. */
+.docs-select {
+  position: relative;
+  display: grid;
+  min-width: 0;
+}
+.docs-control .docs-select select {
+  appearance: none;
+  padding-right: calc(var(--space-sm) + var(--icon-sm) + var(--space-sm));
+}
+.docs-select .bland-icon {
+  position: absolute;
+  top: 50%;
+  right: var(--space-sm);
+  transform: translateY(-50%);
+  color: var(--icon-subtle);
+  pointer-events: none;
 }
 .docs-control select,
 .docs-control input[type="text"] {
