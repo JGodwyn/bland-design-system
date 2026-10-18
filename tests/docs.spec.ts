@@ -77,3 +77,24 @@ test('the playground previews focus and zooms with its buttons and the +, - and 
   await page.keyboard.press('+');
   await expect(level).toHaveText('100%');
 });
+
+test('a trackpad pinch over the playground zooms it, and nowhere else', async ({ page }) => {
+  await page.goto('/#/components/button');
+  const level = page.locator('.docs-zoom-level');
+  const box = (await page.getByTestId('demo-stage').boundingBox())!;
+  // Chrome and Firefox report a pinch as a wheel event with ctrlKey; deltaY < 0 spreads the fingers.
+  const pinch = (x: number, y: number, deltaY: number) =>
+    page.evaluate(({ x, y, deltaY }) => {
+      const event = new WheelEvent('wheel', { deltaY, ctrlKey: true, clientX: x, clientY: y, bubbles: true, cancelable: true });
+      document.elementFromPoint(x, y)!.dispatchEvent(event);
+      return event.defaultPrevented;
+    }, { x, y, deltaY });
+
+  expect(await pinch(box.x + 20, box.y + 20, -50)).toBe(true); // the page itself does not zoom
+  await expect(level).not.toHaveText('100%');
+  await pinch(box.x + 20, box.y + 20, 1000);
+  await expect(level).toHaveText('50%');
+
+  expect(await pinch(1, 1, -50)).toBe(false);
+  await expect(level).toHaveText('50%');
+});

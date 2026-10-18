@@ -95,17 +95,25 @@ function Demo({ demo }: { demo: NonNullable<Story['demo']> }) {
 }
 
 const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4];
+const ZOOM_MIN = ZOOM_STEPS[0]!;
+const ZOOM_MAX = ZOOM_STEPS.at(-1)!;
+const clampZoom = (z: number) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
 
 /**
- * The demo's canvas. Zoom with the buttons at the bottom right, or with + and - while the pointer is
- * over it; 0 resets the zoom and the position. Drag the background to pan when zoomed in.
+ * The demo's canvas. Zoom with the buttons at the bottom right, with + and - while the pointer is
+ * over it, or by pinching on a trackpad; 0 resets the zoom and the position. Drag the background
+ * to pan when zoomed in.
  */
 function ZoomStage({ children, focused }: { children: ReactNode; focused: boolean }) {
   const [zoom, setZoom] = useState(1);
+  const view = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const hovering = useRef(false);
+  // Buttons and keys move to the next step; a pinch can leave the zoom between steps.
   const step = (dir: 1 | -1) =>
-    setZoom((z) => ZOOM_STEPS[Math.min(ZOOM_STEPS.length - 1, Math.max(0, ZOOM_STEPS.indexOf(z) + dir))] ?? z);
+    setZoom((z) =>
+      dir > 0 ? (ZOOM_STEPS.find((s) => s > z + 0.001) ?? ZOOM_MAX) : ([...ZOOM_STEPS].reverse().find((s) => s < z - 0.001) ?? ZOOM_MIN),
+    );
   // Reset bumps `recenter` too, so it moves the view back even when the zoom is already 100%.
   const [recenter, setRecenter] = useState(0);
   const reset = () => {
@@ -113,10 +121,24 @@ function ZoomStage({ children, focused }: { children: ReactNode; focused: boolea
     setRecenter((n) => n + 1);
   };
 
-  // Keep the content centered whenever the zoom changes or the view is reset.
+  // A pinch zooms around the pointer: it records where the pointer was and the scroll and zoom it
+  // started from, and the layout effect keeps that point under the pointer.
+  const zoomRef = useRef(1);
+  const anchor = useRef<{ x: number; y: number; left: number; top: number; from: number } | null>(null);
+
+  // Keep the content centered whenever the zoom changes from a button, a key or a reset.
   useLayoutEffect(() => {
+    zoomRef.current = zoom;
     const el = stage.current;
     if (!el) return;
+    const a = anchor.current;
+    anchor.current = null;
+    if (a) {
+      const f = zoom / a.from;
+      el.scrollLeft = (a.left + a.x) * f - a.x;
+      el.scrollTop = (a.top + a.y) * f - a.y;
+      return;
+    }
     el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
     el.scrollTop = (el.scrollHeight - el.clientHeight) / 2;
   }, [zoom, recenter]);
@@ -134,6 +156,46 @@ function ZoomStage({ children, focused }: { children: ReactNode; focused: boolea
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // Trackpad pinch, only over the playground: Chrome and Firefox send it as a wheel event with
+  // ctrlKey, Safari as gesture events. preventDefault stops the browser zooming the whole page.
+  useEffect(() => {
+    const el = view.current;
+    if (!el) return;
+    const zoomTo = (next: number, clientX: number, clientY: number) => {
+      const st = stage.current;
+      if (!st) return;
+      const r = st.getBoundingClientRect();
+      const from = anchor.current?.from ?? zoomRef.current;
+      anchor.current = { x: clientX - r.left, y: clientY - r.top, left: anchor.current?.left ?? st.scrollLeft, top: anchor.current?.top ?? st.scrollTop, from };
+      zoomRef.current = clampZoom(next);
+      setZoom(zoomRef.current);
+    };
+    const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey) return; // a plain two-finger scroll keeps scrolling
+      e.preventDefault();
+      zoomTo(zoomRef.current * Math.exp(-e.deltaY * 0.01), e.clientX, e.clientY);
+    };
+    type GestureEvent = UIEvent & { scale: number; clientX: number; clientY: number };
+    let base = 1;
+    const onGestureStart = (e: Event) => {
+      e.preventDefault();
+      base = zoomRef.current;
+    };
+    const onGestureChange = (e: Event) => {
+      e.preventDefault();
+      const g = e as GestureEvent;
+      zoomTo(base * g.scale, g.clientX, g.clientY);
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    el.addEventListener('gesturestart', onGestureStart);
+    el.addEventListener('gesturechange', onGestureChange);
+    return () => {
+      el.removeEventListener('wheel', onWheel);
+      el.removeEventListener('gesturestart', onGestureStart);
+      el.removeEventListener('gesturechange', onGestureChange);
+    };
   }, []);
 
   // Drag on the background (not on the component) to pan.
@@ -161,6 +223,7 @@ function ZoomStage({ children, focused }: { children: ReactNode; focused: boolea
 
   return (
     <div
+      ref={view}
       className="docs-demo-view"
       onPointerEnter={() => (hovering.current = true)}
       onPointerLeave={() => (hovering.current = false)}
@@ -171,11 +234,11 @@ function ZoomStage({ children, focused }: { children: ReactNode; focused: boolea
         </div>
       </div>
       <div className="docs-zoom" role="group" aria-label="Zoom">
-        <IconButton size="sm" type="secondary" icon={<MinusIcon />} aria-label="Zoom out" title="Zoom out (-)" onClick={() => step(-1)} disabled={zoom === ZOOM_STEPS[0]} />
+        <IconButton size="sm" type="secondary" icon={<MinusIcon />} aria-label="Zoom out" title="Zoom out (-)" onClick={() => step(-1)} disabled={zoom <= ZOOM_MIN} />
         <Button size="sm" type="ghost" aria-label="Reset zoom" title="Reset zoom and position (0)" onClick={reset} className="docs-zoom-level">
           {Math.round(zoom * 100)}%
         </Button>
-        <IconButton size="sm" type="secondary" icon={<PlusIcon />} aria-label="Zoom in" title="Zoom in (+)" onClick={() => step(1)} disabled={zoom === ZOOM_STEPS.at(-1)} />
+        <IconButton size="sm" type="secondary" icon={<PlusIcon />} aria-label="Zoom in" title="Zoom in (+)" onClick={() => step(1)} disabled={zoom >= ZOOM_MAX} />
       </div>
     </div>
   );
