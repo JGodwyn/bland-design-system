@@ -115,6 +115,12 @@ the old picture stays. → To re-baseline one story on purpose, run
 `npx playwright test -g "<id> looks" --update-snapshots=all` and check
 `git status` shows the PNGs changed.
 
+**`page.clock.install()` does not stop time.** A Toaster test that hovered at
+2000 ms of fake time found 2959 ms elapsed: the installed clock keeps
+running in real time between `runFor` calls, and Playwright's actions take
+real time. → Leave a margin of about a second either side of a timer's
+deadline, or use `page.clock.pauseAt()` when a test needs exact times.
+
 **Generated files are not committed**, so a fresh clone has no
 `playground/.generated/props.json`. → The docs import it through
 `import.meta.glob`, so a missing file is not a type error; `npm run docs` and the

@@ -380,3 +380,23 @@ baselines looked at in both themes.
   and never again in 270 reruns; message not captured. Verified: lint:css,
   my typecheck and tests (another session's alert/banner/toast work had type
   errors and missing baselines at the time), build; baselines looked at.
+
+## 2026-10-18 — Alert, Banner, Toast and Notification (feedback session)
+**Asked:** build the four feedback components from their Figma pages, sharing one status model, with a minimal Toaster.
+
+- Read all 32 variants (Alert 4, Banner 8, Toast 4, Notification 16) with a
+  `use_figma` tree dumper (bindings, text styles, effect styles, instance
+  mains) per page, in parallel calls; Banner's first dump went over the
+  20 KB limit and was split by orientation. Then one read for the icon and
+  close-icon colors inside the instances, and the four status icons' SVGs.
+- Text Input had already exported WarningOctagon, CheckCircle and
+  WarningCircle (uncommitted at the time); reused them and added Info, which
+  rode into Text Input's commit b27faca.
+- Built the internal `message/` (status tokens per `data-status`, status
+  icon, shared Banner/Notification layout), then Alert, Banner, Toast with
+  the Toaster, Notification. Decisions in INTERFACE.md §Alert, Banner, Toast
+  and Notification; map row in CLAUDE.md.
+- Dead end: the Toaster pause test failed because Playwright's installed
+  clock still runs in real time between `runFor` calls (LEARNINGS.md).
+**Verified:** see the commit; specs alert (5), banner (4), notification (3),
+toast (7); baselines looked at in both themes.

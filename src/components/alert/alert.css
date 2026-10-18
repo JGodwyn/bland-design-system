@@ -1,0 +1,19 @@
+/*
+ * Alert (Figma: Alert page, set "Alert"). Status colors and the icon come from message.css.
+ *
+ *   <div class="bland-alert bland-message" data-status="danger" role="alert">
+ *     <span class="bland-icon bland-message__icon">…</span>
+ *     <span class="bland-alert__label">Enter a valid email address</span>
+ *   </div>
+ */
+
+.bland-alert {
+  max-width: var(--alert-max-width);
+}
+
+.bland-alert__label {
+  flex: 1 1 var(--space-none);
+  min-width: var(--space-none);
+  color: var(--_s-text);
+  font: var(--type-body-lg);
+}

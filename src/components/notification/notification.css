@@ -1,0 +1,35 @@
+/*
+ * Notification (Figma: Notification page, set "Notification"). Layout and status tokens come from message.css.
+ *
+ *   <div class="bland-notification bland-message bland-smooth"
+ *        data-status="success" data-orientation="vertical" data-colored="true">…</div>
+ *
+ * Colored: the status's light surface, border and tinted mid elevation. Uncolored: surface-100,
+ * border-bold and the neutral mid elevation. Width notification/width (384), never wider than its container.
+ */
+
+.bland-notification {
+  --_bg: var(--surface-100);
+  --_border: var(--border-bold);
+  --_elevation: var(--elevation-neutral-mid);
+
+  width: var(--notification-width);
+  max-width: 100%;
+  padding: var(--space-md);
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+  background-color: var(--_bg);
+  /* Figma's inside stroke (adds no size), then the elevation. */
+  box-shadow:
+    inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--_border),
+    var(--_elevation);
+}
+
+.bland-notification[data-colored="true"] {
+  --_bg: var(--_s-surface-light);
+  --_border: var(--_s-border);
+  --_elevation: var(--_s-elevation);
+}
+
+.bland-notification[data-orientation="vertical"] {
+  padding: var(--space-lg);
+}

@@ -1,0 +1,111 @@
+/*
+ * Toast and Toaster (Figma: Toast page, set "Toast"). Status tokens and the icon come from message.css.
+ *
+ *   <div class="bland-toast bland-message bland-smooth" data-status="success">
+ *     <span class="bland-icon bland-message__icon">…</span>
+ *     <span class="bland-toast__label">Changes saved</span>
+ *   </div>
+ *
+ *   <section class="bland-toaster" popover="manual" aria-label="Notifications">
+ *     <ol class="bland-toaster__list" aria-live="polite">
+ *       <li class="bland-toaster__item" data-state="open">…</li>
+ *     </ol>
+ *   </section>
+ */
+
+.bland-toast {
+  width: fit-content;
+  max-width: min(100%, var(--toast-max-width));
+  padding: var(--space-sm) var(--space-md);
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+  background-color: var(--_s-surface-strong);
+  box-shadow: var(--_s-elevation);
+}
+
+/* White content in both modes: the strong surfaces keep the same step in light and dark. */
+.bland-toast .bland-message__icon {
+  color: var(--icon-on-color);
+}
+
+.bland-toast__label {
+  flex: 1 1 auto;
+  min-width: var(--space-none);
+  color: var(--text-on-color);
+  font: var(--type-body-lg-bold);
+}
+
+/* ---- Toaster: a fixed stack at the bottom, full width on mobile, bottom right from tablet up ---- */
+
+.bland-toaster {
+  /* Reset the popover's UA box; the toaster draws nothing itself. */
+  position: fixed;
+  inset: auto var(--space-lg) var(--space-lg);
+  width: auto;
+  height: auto;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  background: transparent;
+  color: inherit;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.bland-toaster__list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .bland-toaster {
+    inset-inline-start: auto;
+  }
+
+  .bland-toaster__list {
+    align-items: flex-end;
+  }
+}
+
+/* Enter and exit along the same path: up from space-lg below, from 0.97, at duration/xl with easing/out. */
+.bland-toaster__item {
+  max-width: 100%;
+  pointer-events: auto;
+  transition:
+    opacity var(--duration-xl) var(--easing-out),
+    transform var(--duration-xl) var(--easing-out);
+}
+
+@starting-style {
+  .bland-toaster__item {
+    opacity: 0;
+    transform: translateY(var(--space-lg)) scale(0.97);
+  }
+}
+
+.bland-toaster__item[data-state="closed"] {
+  opacity: 0;
+  transform: translateY(var(--space-lg)) scale(0.97);
+  pointer-events: none;
+}
+
+/* Reduced motion: a fade only. */
+@media (prefers-reduced-motion: reduce) {
+  .bland-toaster__item {
+    transition-property: opacity;
+  }
+
+  @starting-style {
+    .bland-toaster__item {
+      transform: none;
+    }
+  }
+
+  .bland-toaster__item[data-state="closed"] {
+    transform: none;
+  }
+}

@@ -1,0 +1,16 @@
+/*
+ * Banner (Figma: Banner page, set "Banner"). Layout and status icon come from message.css.
+ *
+ *   <div class="bland-banner bland-message bland-smooth" data-status="warning" data-orientation="horizontal">…</div>
+ *
+ * Figma's banner/width (384) is only its default frame width: the description says to fill the
+ * container in layouts, so in code the banner is a block that spans its container.
+ */
+
+.bland-banner {
+  padding: var(--space-sm) var(--space-md);
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+  background-color: var(--surface-100);
+  /* Figma's inside stroke: drawn inside the box, so it adds no size. */
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-bold);
+}

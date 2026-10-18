@@ -1,0 +1,136 @@
+/*
+ * Shared by Alert, Banner, Toast and Notification (internal; see Message.tsx).
+ *
+ *   <div class="bland-banner bland-message" data-status="info" data-orientation="vertical">
+ *     <span class="bland-icon bland-message__icon">…</span>
+ *     <div class="bland-message__content">
+ *       <div class="bland-message__text">
+ *         <div class="bland-message__header"><div class="bland-message__title">…</div><span class="bland-message__timestamp">…</span></div>
+ *         <div class="bland-message__description">…</div>
+ *       </div>
+ *       <div class="bland-message__actions">…</div>
+ *     </div>
+ *     <button class="bland-button bland-icon-button bland-message__close">…</button>
+ *   </div>
+ *
+ * The status model: each data-status block names that status's tokens in private --_s-*
+ * properties, and each component picks the ones it draws with. One rule per status, not per component.
+ */
+
+.bland-message {
+  --bland-icon-size: var(--icon-md);
+
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  min-width: var(--space-none);
+  letter-spacing: var(--letter-spacing-normal);
+  overflow-wrap: break-word;
+}
+
+/* ---- Status: the tokens for that status ---- */
+
+.bland-message[data-status="info"] {
+  --_s-icon: var(--icon-brand);
+  --_s-text: var(--text-bold); /* Figma's info Alert text is text-bold, not brand */
+  --_s-surface-light: var(--surface-brand-light);
+  --_s-surface-strong: var(--surface-brand-strong);
+  --_s-border: var(--border-brand);
+  --_s-elevation: var(--elevation-brand-mid);
+}
+
+.bland-message[data-status="danger"] {
+  --_s-icon: var(--icon-danger);
+  --_s-text: var(--text-danger);
+  --_s-surface-light: var(--surface-danger-light);
+  --_s-surface-strong: var(--surface-danger-strong);
+  --_s-border: var(--border-danger);
+  --_s-elevation: var(--elevation-danger-mid);
+}
+
+.bland-message[data-status="success"] {
+  --_s-icon: var(--icon-success);
+  --_s-text: var(--text-success);
+  --_s-surface-light: var(--surface-success-light);
+  --_s-surface-strong: var(--surface-success-strong);
+  --_s-border: var(--border-success);
+  --_s-elevation: var(--elevation-success-mid);
+}
+
+.bland-message[data-status="warning"] {
+  --_s-icon: var(--icon-warning);
+  --_s-text: var(--text-warning);
+  --_s-surface-light: var(--surface-warning-light);
+  --_s-surface-strong: var(--surface-warning-strong);
+  --_s-border: var(--border-warning);
+  --_s-elevation: var(--elevation-warning-mid);
+}
+
+/* ---- Parts ---- */
+
+/* Figma's icon-wrap: space-2xs above the 20px icon centres it on the first 24px line of text. */
+.bland-message__icon {
+  margin-block-start: var(--space-2xs);
+  color: var(--_s-icon);
+}
+
+.bland-message__content {
+  display: flex;
+  flex: 1 1 var(--space-none);
+  align-items: flex-start;
+  gap: var(--space-sm);
+  min-width: var(--space-none);
+}
+
+.bland-message[data-orientation="vertical"] .bland-message__content {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-lg);
+}
+
+.bland-message__text {
+  display: flex;
+  flex: 1 1 var(--space-none);
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: var(--space-none);
+}
+
+.bland-message__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.bland-message__title {
+  flex: 1 1 var(--space-none);
+  min-width: var(--space-none);
+  color: var(--text-bold);
+  font: var(--type-body-lg-bold);
+}
+
+.bland-message__description {
+  color: var(--text-bold);
+  font: var(--type-body-lg);
+}
+
+.bland-message__timestamp {
+  flex: none;
+  color: var(--text-subtle);
+  font: var(--type-body-sm);
+  white-space: nowrap;
+}
+
+.bland-message__actions {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* Figma's close is a control/xs box holding an icon/md X in icon-subtle: an xs ghost Icon Button. */
+.bland-message .bland-button.bland-message__close {
+  --bland-icon-size: var(--icon-md);
+  --_icon: var(--icon-subtle);
+}
