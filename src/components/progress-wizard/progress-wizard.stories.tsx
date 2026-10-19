@@ -19,6 +19,10 @@ const fiveSteps: ProgressWizardStep[] = [
 
 const stepsOf = (count: number) => fiveSteps.slice(0, count);
 
+/** The demo's steps, with or without their descriptions. */
+const demoSteps = (count: number, description: boolean) =>
+  stepsOf(count).map((step) => (description ? step : { title: step.title }));
+
 export default {
   title: 'Progress-wizard',
   description:
@@ -26,19 +30,26 @@ export default {
   components: ['ProgressWizard'],
   demo: {
     component: 'ProgressWizard',
-    args: { steps: 4, current: 1, layout: 'inline', style: 'bar', disabled: false },
+    args: { steps: 4, current: 1, description: true, layout: 'inline', style: 'bar', disabled: false },
     controls: {
       steps: { kind: 'select', options: ['2', '3', '4', '5'] },
       current: { kind: 'select', options: ['0', '1', '2', '3', '4', '5'] },
+      // Figma's 👀 Description: in code, a step with or without its `description`.
+      description: { kind: 'boolean' },
       progressLabels: false,
     },
-    render: ({ steps, current, ...args }) => (
-      <ProgressWizard {...args} steps={stepsOf(Number(steps))} current={Number(current)} aria-label="Sign-up progress" />
+    render: ({ steps, current, description, ...args }) => (
+      <ProgressWizard
+        {...args}
+        steps={demoSteps(Number(steps), description)}
+        current={Number(current)}
+        aria-label="Sign-up progress"
+      />
     ),
-    code: ({ steps, current, ...args }) => ({
+    code: ({ steps, current, description, ...args }) => ({
       ...args,
       current: Number(current),
-      steps: `{${JSON.stringify(stepsOf(Number(steps)).map(({ title }) => ({ title })))}}`,
+      steps: demoSteps(Number(steps), description),
     }),
   },
   render: () => (
