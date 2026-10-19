@@ -27,8 +27,7 @@
   border: none;
   background: transparent;
   color: var(--tooltip-text);
-  overflow: visible;
-  pointer-events: none;
+  overflow: visible; /* Takes the pointer (no pointer-events: none), so it stays open while hovered (WCAG 1.4.13). */
 
   /* Scale from the pointer's tip, wherever Floating UI put it. */
   --_tip: calc(var(--_origin, 50%) + var(--tooltip-pointer-width) / 2);

@@ -19,7 +19,7 @@ when), `docs/components.md` (how to build one).
 
 ### Tokens are the only source of values
 - Figma owns every value; `npm run tokens` generates `src/tokens/tokens.css`
-  from the verified export. 613 variables, 518 CSS tokens (2026-10-18).
+  from the verified export. 616 variables, 521 CSS tokens (2026-10-19).
 - Components read only Theme and scale tokens. Primitives are never emitted.
 - No value without a token. When none fits, stop and ask Godwin; the answer is a
   new Figma variable, synced (that is how `duration/spin` came about).
@@ -895,32 +895,43 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   so `extra` must stay non-interactive (a shortcut, not a button), whatever
   Figma's "small action" says. `Placement` → `placement`, Floating UI's
   twelve names, default **top-start** (Figma's); it flips and shifts at the
-  screen edge. `delay` / `closeDelay` pass to React Aria, whose defaults
-  (1500 / 500 ms) apply: Bland has no tooltip delay token (open question
-  for Godwin). `trigger="focus"` opens on keyboard focus only. Escape
+  screen edge. **Delays are Motion tokens** (Godwin, 2026-10-19): it opens
+  after `duration/tooltip-delay` (500ms) of hover and closes
+  `duration/tooltip-close-delay` (100ms) after the pointer leaves, read
+  from `:root` once per tooltip; `delay` / `closeDelay` override them, and
+  without tokens.css React Aria's defaults (1500 / 500) apply. Like
+  `duration/toast-visible`, they are time, not motion. `trigger="focus"` opens on keyboard focus only. Escape
   closes it, a press on the trigger closes it, one tooltip at a time.
-  `aria-describedby` points at it only while open.
+  `aria-describedby` points at it only while open. The tooltip takes the
+  pointer (no `pointer-events: none`), so moving onto it keeps it open
+  (WCAG 1.4.13, hoverable); the close delay covers the gap.
 - Visuals: content padding space-sm / space-md, gap space-xs, `rad-md` with
   `.bland-smooth`, `Tooltip/surface`, body-md `Tooltip/text`, width hugs up
-  to `tooltip/max-width` (256; the Figma description says 264, the variable
-  is 256 and wins) and wraps beyond it. `Elevation/neutral/near` sits on the
+  to `tooltip/max-width` (256; the Figma description said 264 and now says
+  256, Godwin 2026-10-19) and wraps beyond it. `Elevation/neutral/near` sits on the
   content box; Figma puts it on the whole frame (content plus pointer), so
   in code the pointer has no shadow.
 - Pointer: Figma's `_Tooltip-pointers` Direction=down exported as SVG
   (16 x 12, its rad-xs corners baked in) and turned per side by CSS, sized
   `tooltip/pointer-width` x `tooltip/pointer-depth`, filled
   `Tooltip/surface`. Floating UI aims it at the trigger's centre, kept
-  space-md from the corners (Figma's start and end inset). Offset is
-  `tooltip/pointer-depth`, so the tip touches the trigger (Figma draws no
-  gap); `shift` keeps space-sm from the screen edge; `hide` hides it while
-  the trigger is scrolled out of an inner scroll area.
+  space-md from the corners (Figma's start and end inset). The distance
+  from the trigger is `tooltip/pointer-depth` + `tooltip/offset` (4, the
+  gap between the tip and the trigger; added to Figma 2026-10-19). `shift`
+  keeps space-sm from the screen edge with `limitShift()`, so it slides
+  along the trigger but never off it: without the limiter a left or right
+  tooltip stayed pinned to the top of the screen after its trigger
+  scrolled away. `hide()` (default boundary) hides it once the trigger is
+  out of view.
 - Motion: `duration/xs`, `easing/out`, opacity 0 and `scale(0.96)` to full,
   from the tip; opacity only under reduced motion.
 - A disabled `<button>` gets no pointer events, so its hover tooltip never
   opens; give a disabled control's reason another way.
-- Docs: the demo is held open (`open` control), so the playground and the
-  screenshots show it; "focused" follows the trigger (the Button), never the
-  tooltip.
+- Docs: the demo is held open (`open` control), so the playground shows it;
+  the Variants stay closed until hovered or focused (Godwin, 2026-10-19), so
+  the story screenshot shows triggers only and `tests/tooltip.spec.ts`
+  screenshots four tooltips opened by focus, in both themes. "focused"
+  follows the trigger (the Button), never the tooltip.
 
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 

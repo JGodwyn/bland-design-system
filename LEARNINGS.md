@@ -241,9 +241,14 @@ moment.
 
 **Floating UI's `hide()` and `flip()` measure against the viewport.** In a
 full-page screenshot, open tooltips below the first viewport were hidden
-and bottom placements flipped up. → `hide({ rootBoundary: 'document' })`
-(the page carries trigger and tooltip together; only inner scroll areas
-should hide it), and keep held-open story examples where they have room.
+and bottom placements flipped up. → Don't hold overlays open in a story's
+`render`; screenshot them opened by focus in the component's spec, clipped
+to the trigger and the overlay (`tests/tooltip.spec.ts`).
+
+**`shift()` alone pins a side placement to the screen edge.** For left and
+right placements its main axis is vertical, so once the trigger scrolled
+above the viewport the tooltip stayed at the top, detached from it. → Always
+pass `limiter: limitShift()`: it slides along the trigger, never off it.
 
 **Vite library mode bundles every dependency not listed as external.**
 Adding react-aria grew `dist/index.js` from 62 to 117 KB. → List each

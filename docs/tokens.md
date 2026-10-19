@@ -96,6 +96,11 @@ This supports both an explicit switch and the system preference. Which one the p
 
 Twelve collections; the table in `CLAUDE.md` lists what each holds. Emitted: `Theme` (Light and Dark), `Spacing`, `Corner Radius`, `Stroke`, `Typography`, `Effects`, `Sizing`, `Motion`, `Breakpoints`, plus the elevation and text styles. Hidden and never emitted: `_Core Colors`, `_Functional Colors`, `_Units`.
 
+## Sync of 2026-10-19 (Tooltip)
+
+- Added `duration/tooltip-delay` (500ms) and `duration/tooltip-close-delay` (100ms) in Motion and `tooltip/offset` (Sizing, alias of `unit/4`) for the Tooltip. Synced through the drift check (three added variables) and `--apply`; only `00.json` and `06.json` changed. Checksum: count 616, hash `e8f5443`, equal in Figma and locally. 521 tokens emitted.
+- Not synced: the same check reported Figma's `Typography` collection renamed to `_Typography` and hidden. The build skips hidden collections, so taking it would drop every `--font-*`, `--line-height-*` and `--letter-spacing-normal` token. Left for Godwin; the repo keeps `Typography` (the checksum covers variables only, so it still matches).
+
 ## Sync of 2026-10-18
 
 - Added `duration/toast-visible` (Motion, 5s) for the Toaster. Synced through the drift check (one added variable) and `--apply`; only `00.json` and `06.json` changed. Checksum: count 613, hash `5e42e07e`, equal in Figma and locally. 518 tokens emitted.

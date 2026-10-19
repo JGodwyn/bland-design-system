@@ -625,3 +625,30 @@ overlays that follow.
   re-baselined the Table screenshots on purpose and looked at them.
 - Follow-up (Godwin): the story's lists now space rows `space-xs` apart, since
   filled rows ran together in dark mode; list baselines re-taken.
+
+## 2026-10-19 — Tooltip fixes from Godwin's review (tooltip session)
+**Asked:** variants closed until hover; tooltips stuck to the top after
+scrolling; too slow to open; a Motion variable for the delay and an offset
+variable if standard; use 256 and fix the Figma description.
+
+- Figma (one write): `duration/tooltip-delay` 0.5s and
+  `duration/tooltip-close-delay` 0.1s in Motion (descriptions in the
+  `toast-visible` style: time, not motion), `tooltip/offset` in Sizing
+  (alias `unit/4`, scope GAP), and the Tooltip set description now says 256
+  plus a "Code:" pointer.
+- Sync: drift check (three added), `--apply`, `npm run tokens`, checksum
+  616 / `e8f5443` equal in Figma and locally. The check also reported
+  `Typography` renamed to `_Typography` and hidden in Figma; not taken
+  (it would drop the font tokens), asked Godwin. Saved the result without
+  the collection change, since the checksum covers variables only.
+- Sticking: `shift()` keeps a tooltip on screen along its alignment axis,
+  which for left and right placements is vertical, so after scrolling it sat
+  pinned at the top. Fixed with `limitShift()`; `hide()` back to its default
+  boundary (the screenshot reason for `rootBoundary: 'document'` is gone now
+  that variants are closed). New spec scrolls a right tooltip's trigger away.
+- Slow: delays now 500 / 100 from the tokens (React Aria's 1500 / 500 were
+  the defaults). The tooltip now takes the pointer, so it stays open while
+  hovered (WCAG 1.4.13).
+- Story: every variant closed; the demo stays held open. Visual coverage
+  moved to `tests/tooltip.spec.ts`: four tooltips opened by focus,
+  screenshotted in both themes. 12 tooltip specs.

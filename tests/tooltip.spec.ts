@@ -20,10 +20,12 @@ test.beforeEach(async ({ page }) => {
 test('hover opens it after the delay and describes the trigger', async ({ page }) => {
   const trigger = page.getByTestId('first');
   const tooltip = tooltipFor(page, 'First hint');
+  const delay = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--duration-tooltip-delay')));
+  expect(delay).toBe(500);
   await hover(page, 'first');
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(delay / 2);
   await expect(tooltip).toBeHidden();
-  await expect(tooltip).toBeVisible({ timeout: 3000 });
+  await expect(tooltip).toBeVisible({ timeout: delay * 2 });
   const id = await tooltip.getAttribute('id');
   await expect(trigger).toHaveAttribute('aria-describedby', id!);
   // Opened cold by hover: it animates in.
@@ -82,11 +84,28 @@ test('trigger="focus" ignores hover; disabled never opens', async ({ page }) => 
   await expect(tooltipFor(page, 'Never shown')).toBeHidden();
 });
 
-test('the pointer aims at the trigger and the tooltip keeps its placement', async ({ page }) => {
+test('variants stay closed until their trigger is hovered or focused', async ({ page }) => {
+  await expect(page.getByRole('tooltip')).toHaveCount(0);
+});
+
+test('it stays open while the pointer moves onto it', async ({ page }) => {
+  await hover(page, 'first');
+  const tooltip = tooltipFor(page, 'First hint');
+  await expect(tooltip).toBeVisible({ timeout: 3000 });
+  await tooltip.hover();
+  await page.waitForTimeout(500);
+  await expect(tooltip).toBeVisible();
+});
+
+test('the pointer aims at the trigger, tooltip/offset away, and the tooltip keeps its placement', async ({ page }) => {
+  const gapToken = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tooltip-offset')));
+  expect(gapToken).toBe(4);
   for (const placement of ['top-start', 'bottom', 'left-end', 'right']) {
-    const tooltip = tooltipFor(page, placement);
-    await expect(tooltip).toHaveAttribute('data-placement', placement);
     const trigger = page.getByRole('button', { name: placement, exact: true });
+    await trigger.focus();
+    const tooltip = tooltipFor(page, placement);
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveAttribute('data-placement', placement);
     const t = (await trigger.boundingBox())!;
     const p = (await tooltip.locator('.bland-tooltip__pointer').boundingBox())!;
     if (placement.startsWith('top') || placement.startsWith('bottom')) {
@@ -94,11 +113,48 @@ test('the pointer aims at the trigger and the tooltip keeps its placement', asyn
     } else {
       expect(Math.abs(p.y + p.height / 2 - (t.y + t.height / 2))).toBeLessThan(1);
     }
-    // The tip touches the trigger edge.
+    // The tip sits tooltip/offset from the trigger edge.
     const gap = placement.startsWith('top') ? t.y - (p.y + p.height) : placement.startsWith('bottom') ? p.y - (t.y + t.height) : placement.startsWith('left') ? t.x - (p.x + p.width) : p.x - (t.x + t.width);
-    expect(Math.abs(gap)).toBeLessThan(1);
+    expect(Math.abs(gap - gapToken)).toBeLessThan(1);
   }
 });
+
+test('a left or right tooltip leaves with its trigger instead of sticking to the screen edge', async ({ page }) => {
+  await page.evaluate(() => (document.body.style.paddingBottom = '2000px'));
+  const trigger = page.getByRole('button', { name: 'right', exact: true });
+  await trigger.focus();
+  await expect(tooltipFor(page, 'right')).toBeVisible();
+  // Hidden tooltips leave the accessibility tree, so follow it by id from here.
+  const tooltip = page.locator(`[id="${await tooltipFor(page, 'right').getAttribute('id')}"]`);
+  // Scroll the trigger above the viewport: the tooltip must not stay pinned at the top.
+  const box = (await trigger.boundingBox())!;
+  await page.evaluate((y) => window.scrollBy(0, y), box.y + box.height + 200);
+  await expect(tooltip).toHaveCSS('visibility', 'hidden');
+  const t = (await trigger.boundingBox())!;
+  const tip = (await tooltip.boundingBox())!;
+  // limitShift: it may slide along the trigger, never off it (before the fix it stayed pinned at the viewport top).
+  expect(tip.y).toBeLessThanOrEqual(t.y + t.height);
+  expect(tip.y + tip.height).toBeGreaterThanOrEqual(t.y);
+});
+
+for (const theme of ['light', 'dark'] as const) {
+  test(`open tooltips look the same (${theme})`, async ({ page }) => {
+    await openStory(page, 'tooltip', theme);
+    for (const name of ['top-start', 'left', 'bottom-end', 'Copy']) {
+      const trigger = page.getByRole('button', { name, exact: true });
+      await trigger.focus();
+      const tooltip = page.getByRole('tooltip');
+      await expect(tooltip).toBeVisible();
+      const t = (await trigger.boundingBox())!;
+      const b = (await tooltip.boundingBox())!;
+      const pad = 16;
+      const x = Math.min(t.x, b.x) - pad;
+      const y = Math.min(t.y, b.y) - pad;
+      const clip = { x, y, width: Math.max(t.x + t.width, b.x + b.width) + pad - x, height: Math.max(t.y + t.height, b.y + b.height) + pad - y };
+      await expect(page).toHaveScreenshot(`tooltip-open-${name.toLowerCase()}-${theme}.png`, { clip });
+    }
+  });
+}
 
 test('reduced motion drops the scale', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });

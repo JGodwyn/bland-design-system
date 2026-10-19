@@ -54,10 +54,10 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">placement: all twelve, held open (the pointer aims at the trigger)</span>
+        <span className="pg-label">placement: all twelve; hover or Tab to a trigger to open its tooltip (the pointer aims at the trigger)</span>
         <div style={grid}>
           {placementRows.flat().map((placement) => (
-            <Tooltip key={placement} text={placement} placement={placement} open>
+            <Tooltip key={placement} text={placement} placement={placement}>
               <Button type="secondary" size="sm">
                 {placement}
               </Button>
@@ -67,16 +67,15 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Long text wraps at tooltip/max-width; extra holds a slot under the text</span>
-        <div style={{ ...grid, gridTemplateColumns: 'repeat(2, 360px)', gridAutoRows: 128, alignItems: 'end' }}>
+        <span className="pg-label">Long text wraps at tooltip/max-width; extra holds a slot under the text (hover to open)</span>
+        <div style={{ ...grid, gridTemplateColumns: 'repeat(2, 360px)', gridAutoRows: 152, alignItems: 'end' }}>
           <Tooltip
             text="Saves a copy of this file to your device, with every comment and version kept"
             placement="top-start"
-            open
           >
             <IconButton type="stroke" icon={<CaretDownIcon />} aria-label="Download" />
           </Tooltip>
-          <Tooltip text="Copy link" extra={<span>Shortcut: Ctrl + C</span>} placement="top" open>
+          <Tooltip text="Copy link" extra={<span>Shortcut: Ctrl + C</span>} placement="top">
             <IconButton type="stroke" icon={<PlusIcon />} aria-label="Copy" />
           </Tooltip>
         </div>
@@ -84,8 +83,8 @@ export default {
 
       <div className="pg-stack">
         <span className="pg-label">Focused: the trigger takes focus and shows the ring; the tooltip never does</span>
-        <div className="pg-row pg-focus" style={{ paddingTop: 56 }}>
-          <Tooltip text="Add a member" open>
+        <div className="pg-row pg-focus">
+          <Tooltip text="Add a member">
             <IconButton icon={<PlusIcon />} aria-label="Add" />
           </Tooltip>
         </div>

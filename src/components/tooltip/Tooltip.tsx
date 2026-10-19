@@ -11,7 +11,7 @@ import {
 } from 'react';
 import { mergeProps, mergeRefs, useTooltip, useTooltipTrigger } from 'react-aria';
 import { useTooltipTriggerState } from 'react-stately';
-import { arrow, autoUpdate, flip, hide, offset, shift, useFloating, type Placement } from '@floating-ui/react-dom';
+import { arrow, autoUpdate, flip, hide, limitShift, offset, shift, useFloating, type Placement } from '@floating-ui/react-dom';
 import './tooltip.css';
 
 /** Floating UI's placement names: the side of the trigger, then start, center (no suffix) or end alignment. */
@@ -38,9 +38,9 @@ export interface TooltipProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
   defaultOpen?: boolean;
   /** Called with the new open state: hover, focus, blur, Escape, a press on the trigger. */
   onOpenChange?: (open: boolean) => void;
-  /** Hover time in ms before it opens. Default: React Aria's 1500. Keyboard focus opens it at once. */
+  /** Hover time in ms before it opens. Default: the `duration/tooltip-delay` token (500ms). Keyboard focus opens it at once. */
   delay?: number;
-  /** Time in ms before it closes after the pointer leaves. Default: React Aria's 500. */
+  /** Time in ms it stays after the pointer leaves the trigger or the tooltip. Default: the `duration/tooltip-close-delay` token (100ms). */
   closeDelay?: number;
   /** `focus` opens it on keyboard focus only, never on hover. */
   trigger?: 'focus';
@@ -53,6 +53,15 @@ export interface TooltipProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
 /** A length token in px, read where the tooltip sits (0 if tokens.css is not loaded). */
 function tokenPx(el: Element, token: string) {
   return parseFloat(getComputedStyle(el).getPropertyValue(token)) || 0;
+}
+
+/** A Motion token in ms, read from the root where tokens.css defines it (undefined if it is not loaded). */
+function tokenMs(token: string) {
+  if (typeof document === 'undefined') return undefined;
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(token).trim();
+  const value = parseFloat(raw);
+  if (Number.isNaN(value)) return undefined;
+  return raw.endsWith('ms') ? value : value * 1000;
 }
 
 const sideOf = (placement: Placement) => placement.split('-')[0] as 'top' | 'right' | 'bottom' | 'left';
@@ -80,7 +89,17 @@ export function Tooltip({
   ref,
   ...rest
 }: TooltipProps) {
-  const triggerOptions = { isOpen: open, defaultOpen, onOpenChange, delay, closeDelay, trigger, isDisabled: disabled };
+  // Delays come from the Motion tokens, read once per tooltip; without tokens.css, React Aria's defaults apply.
+  const [tokenDelays] = useState(() => ({ delay: tokenMs('--duration-tooltip-delay'), closeDelay: tokenMs('--duration-tooltip-close-delay') }));
+  const triggerOptions = {
+    isOpen: open,
+    defaultOpen,
+    onOpenChange,
+    delay: delay ?? tokenDelays.delay,
+    closeDelay: closeDelay ?? tokenDelays.closeDelay,
+    trigger,
+    isDisabled: disabled,
+  };
   const state = useTooltipTriggerState(triggerOptions);
   const triggerRef = useRef<HTMLElement>(null);
   const { triggerProps, tooltipProps: triggerTooltipProps } = useTooltipTrigger(triggerOptions, state, triggerRef);
@@ -102,14 +121,15 @@ export function Tooltip({
     strategy: 'fixed',
     transform: false,
     middleware: [
-      // The pointer's tip touches the trigger.
-      offset(({ elements }) => tokenPx(elements.floating, '--tooltip-pointer-depth')),
+      // The pointer's tip sits tooltip/offset from the trigger.
+      offset(({ elements }) => tokenPx(elements.floating, '--tooltip-pointer-depth') + tokenPx(elements.floating, '--tooltip-offset')),
       flip(),
-      shift(({ elements }) => ({ padding: tokenPx(elements.floating, '--space-sm') })),
+      // Slides along the edge to stay on screen, but never past the trigger (limitShift), so it stays attached.
+      shift(({ elements }) => ({ padding: tokenPx(elements.floating, '--space-sm'), limiter: limitShift() })),
       // The pointer aims at the trigger, kept space-md from the corners (Figma's start and end inset).
       arrow(({ elements }) => ({ element: pointerRef.current!, padding: tokenPx(elements.floating, '--space-md') })),
-      // Hidden while the trigger is scrolled out of an inner scroll area (the page itself carries both along).
-      hide({ rootBoundary: 'document' }),
+      // Hidden while the trigger is scrolled out of view (the page or an inner scroll area).
+      hide(),
     ],
   });
 
