@@ -863,10 +863,20 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   - Floating UI (`@floating-ui/react-dom`) places it: `useFloating` with
     `strategy: 'fixed'` and `transform: false` (it sets `left` / `top`, so
     `transform` stays free for motion), middleware `offset`, `flip`,
-    `shift`, `arrow`, `hide`. Distances are tokens read at run time with
-    `getComputedStyle` inside derivable middleware options
+    `shift`, a small `aimPointer` middleware in place of `arrow`, `hide`.
+    Distances are tokens read at run time with `getComputedStyle` inside
+    derivable middleware options
     (`offset(({ elements }) => tokenPx(elements.floating, '--…'))`), never
     numbers in code. `autoUpdate` runs only while open.
+  - **CSS `zoom` aware** (2026-10-19, Godwin saw the tooltip drift with the
+    docs zoom): under a zoomed ancestor the trigger's rect is in screen px
+    but the overlay's size is in its own unzoomed px, and the `left` / `top`
+    written to it are drawn zoomed again. So: a `platform` whose
+    `getDimensions` multiplies by the element's `currentCSSZoom`, token
+    distances multiplied by it too, and every position divided by it when
+    rendered. `arrow()` reads the overlay's unzoomed `clientWidth` directly,
+    so it can't be fixed that way; the pointer is placed by Bland's own
+    middleware from the rects. Every overlay copies this.
   - The floating element is a **manual popover rendered right after the
     trigger** in the DOM, not a portal: the top layer means no overflow clips
     it and no z-index is needed, and staying in place means it inherits the
@@ -914,8 +924,11 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Pointer: Figma's `_Tooltip-pointers` Direction=down exported as SVG
   (16 x 12, its rad-xs corners baked in) and turned per side by CSS, sized
   `tooltip/pointer-width` x `tooltip/pointer-depth`, filled
-  `Tooltip/surface`. Floating UI aims it at the trigger's centre, kept
-  space-md from the corners (Figma's start and end inset). The distance
+  `Tooltip/surface`. `aimPointer` aims it at the trigger's centre, kept
+  space-md from the corners (Figma's start and end inset); on a tooltip too
+  short for that (a one-line side tooltip, 36 against a 32 trigger) the
+  inset shrinks as in Floating UI's `arrow()`, so an end placement's pointer
+  can sit up to 1px off the trigger's centre. The distance
   from the trigger is `tooltip/pointer-depth` + `tooltip/offset` (4, the
   gap between the tip and the trigger; added to Figma 2026-10-19). `shift`
   keeps space-sm from the screen edge with `limitShift()`, so it slides
@@ -927,9 +940,11 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   from the tip; opacity only under reduced motion.
 - A disabled `<button>` gets no pointer events, so its hover tooltip never
   opens; give a disabled control's reason another way.
-- Docs: the demo is held open (`open` control), so the playground shows it;
-  the Variants stay closed until hovered or focused (Godwin, 2026-10-19), so
-  the story screenshot shows triggers only and `tests/tooltip.spec.ts`
+- Docs: the demo and the Variants are closed until hovered or focused
+  (Godwin, 2026-10-19); the demo's `open` box holds it open (unticked, the
+  prop is left out, not `false`, or it would be controlled shut). Variants
+  sit tight in rows (open tooltips may cover their neighbours), so the story
+  screenshot shows triggers only and `tests/tooltip.spec.ts`
   screenshots four tooltips opened by focus, in both themes. "focused"
   follows the trigger (the Button), never the tooltip.
 

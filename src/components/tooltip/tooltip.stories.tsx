@@ -5,7 +5,7 @@ import { Button } from '../button/Button';
 import { IconButton } from '../button/IconButton';
 import { Tooltip, type TooltipPlacement } from './Tooltip';
 
-// Rows of placements; each cell is roomy enough for its tooltip to stay on its side.
+// One row per side. Open tooltips may cover neighbouring triggers; only one opens at a time.
 const placementRows: TooltipPlacement[][] = [
   ['top-start', 'top', 'top-end'],
   ['bottom-start', 'bottom', 'bottom-end'],
@@ -13,7 +13,6 @@ const placementRows: TooltipPlacement[][] = [
   ['right-start', 'right', 'right-end'],
 ];
 
-const grid: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(3, 248px)', gridAutoRows: 136, alignItems: 'center', justifyItems: 'center' };
 const stage: CSSProperties = { display: 'grid', placeItems: 'center', minHeight: 200, minWidth: 280 };
 
 // Options for the demo's `extra` control; the code snippet prints the same JSX.
@@ -30,7 +29,7 @@ export default {
   components: ['Tooltip'],
   demo: {
     component: 'Tooltip',
-    args: { text: 'Copy link', placement: 'top-start', open: true, extra: 'none', disabled: false },
+    args: { text: 'Copy link', placement: 'top-start', open: false, extra: 'none', disabled: false },
     controls: {
       text: { kind: 'text' },
       open: { kind: 'boolean' },
@@ -40,35 +39,38 @@ export default {
       closeDelay: false,
       trigger: false,
     },
-    render: ({ extra, ...args }) => (
+    // Unticked, `open` is left out (not false), so hover and focus open it; ticked, it is held open.
+    render: ({ extra, open, ...args }) => (
       <div style={stage}>
-        <Tooltip {...(args as { text: string })} extra={extras[extra as keyof typeof extras]}>
+        <Tooltip {...(args as { text: string })} open={open ? true : undefined} extra={extras[extra as keyof typeof extras]}>
           <Button type="stroke" iconStart={<PlusIcon />}>
             Hover or focus me
           </Button>
         </Tooltip>
       </div>
     ),
-    code: ({ extra, ...args }) => ({ ...args, extra: extraCode[extra as keyof typeof extraCode] }),
+    code: ({ extra, open, ...args }) => ({ ...args, open: open || undefined, extra: extraCode[extra as keyof typeof extraCode] }),
   },
   render: () => (
     <>
       <div className="pg-stack">
         <span className="pg-label">placement: all twelve; hover or Tab to a trigger to open its tooltip (the pointer aims at the trigger)</span>
-        <div style={grid}>
-          {placementRows.flat().map((placement) => (
-            <Tooltip key={placement} text={placement} placement={placement}>
-              <Button type="secondary" size="sm">
-                {placement}
-              </Button>
-            </Tooltip>
-          ))}
-        </div>
+        {placementRows.map((row) => (
+          <div key={row[0]} className="pg-row">
+            {row.map((placement) => (
+              <Tooltip key={placement} text={placement} placement={placement}>
+                <Button type="secondary" size="sm">
+                  {placement}
+                </Button>
+              </Tooltip>
+            ))}
+          </div>
+        ))}
       </div>
 
       <div className="pg-stack">
         <span className="pg-label">Long text wraps at tooltip/max-width; extra holds a slot under the text (hover to open)</span>
-        <div style={{ ...grid, gridTemplateColumns: 'repeat(2, 360px)', gridAutoRows: 152, alignItems: 'end' }}>
+        <div className="pg-row">
           <Tooltip
             text="Saves a copy of this file to your device, with every comment and version kept"
             placement="top-start"
@@ -92,7 +94,7 @@ export default {
 
       <div className="pg-stack">
         <span className="pg-label">Closed until hover or keyboard focus (used by the behaviour tests)</span>
-        <div className="pg-row" style={{ paddingTop: 56 }}>
+        <div className="pg-row">
           <Tooltip text="First hint" placement="top">
             <Button type="secondary" data-testid="first">
               First

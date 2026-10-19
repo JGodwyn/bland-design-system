@@ -111,7 +111,9 @@ test('the pointer aims at the trigger, tooltip/offset away, and the tooltip keep
     if (placement.startsWith('top') || placement.startsWith('bottom')) {
       expect(Math.abs(p.x + p.width / 2 - (t.x + t.width / 2))).toBeLessThan(1);
     } else {
-      expect(Math.abs(p.y + p.height / 2 - (t.y + t.height / 2))).toBeLessThan(1);
+      // A one-line side tooltip (36) is barely taller than its trigger (32), so an end placement leaves the
+      // pointer up to 1px short of the trigger's centre: the inset keeps it off the rounded corner.
+      expect(Math.abs(p.y + p.height / 2 - (t.y + t.height / 2))).toBeLessThanOrEqual(1);
     }
     // The tip sits tooltip/offset from the trigger edge.
     const gap = placement.startsWith('top') ? t.y - (p.y + p.height) : placement.startsWith('bottom') ? p.y - (t.y + t.height) : placement.startsWith('left') ? t.x - (p.x + p.width) : p.x - (t.x + t.width);
@@ -135,6 +137,26 @@ test('a left or right tooltip leaves with its trigger instead of sticking to the
   // limitShift: it may slide along the trigger, never off it (before the fix it stayed pinned at the viewport top).
   expect(tip.y).toBeLessThanOrEqual(t.y + t.height);
   expect(tip.y + tip.height).toBeGreaterThanOrEqual(t.y);
+});
+
+test('under CSS zoom the tooltip stays on its trigger, the gap zoomed with it', async ({ page }) => {
+  // The docs zoom control (and any app) sets CSS zoom on an ancestor; the tooltip inherits it.
+  await page.getByTestId('frame-light').evaluate((e) => ((e as HTMLElement).style.zoom = '1.5'));
+  for (const placement of ['top', 'right-end']) {
+    const trigger = page.getByRole('button', { name: placement, exact: true });
+    await trigger.focus();
+    const tooltip = tooltipFor(page, placement);
+    await expect(tooltip).toBeVisible();
+    const t = (await trigger.boundingBox())!;
+    const p = (await tooltip.locator('.bland-tooltip__pointer').boundingBox())!;
+    if (placement === 'top') {
+      expect(Math.abs(p.x + p.width / 2 - (t.x + t.width / 2))).toBeLessThan(1);
+      expect(Math.abs(t.y - (p.y + p.height) - 4 * 1.5)).toBeLessThan(1);
+    } else {
+      expect(Math.abs(p.y + p.height / 2 - (t.y + t.height / 2))).toBeLessThanOrEqual(1 * 1.5); // the 1px above, zoomed
+      expect(Math.abs(p.x - (t.x + t.width) - 4 * 1.5)).toBeLessThan(1);
+    }
+  }
 });
 
 for (const theme of ['light', 'dark'] as const) {

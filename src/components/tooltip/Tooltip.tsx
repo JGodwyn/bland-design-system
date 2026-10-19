@@ -11,7 +11,19 @@ import {
 } from 'react';
 import { mergeProps, mergeRefs, useTooltip, useTooltipTrigger } from 'react-aria';
 import { useTooltipTriggerState } from 'react-stately';
-import { arrow, autoUpdate, flip, hide, limitShift, offset, shift, useFloating, type Placement } from '@floating-ui/react-dom';
+import {
+  autoUpdate,
+  flip,
+  hide,
+  limitShift,
+  offset,
+  platform,
+  shift,
+  useFloating,
+  type Middleware,
+  type Placement,
+  type Platform,
+} from '@floating-ui/react-dom';
 import './tooltip.css';
 
 /** Floating UI's placement names: the side of the trigger, then start, center (no suffix) or end alignment. */
@@ -50,10 +62,30 @@ export interface TooltipProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
   ref?: Ref<HTMLDivElement>;
 }
 
-/** A length token in px, read where the tooltip sits (0 if tokens.css is not loaded). */
+/** The CSS `zoom` an element renders at, its own and its ancestors' (1 where the browser has no currentCSSZoom). */
+const zoomOf = (el: Element) => (el as Element & { currentCSSZoom?: number }).currentCSSZoom ?? 1;
+
+/**
+ * A length token in screen px, read where the tooltip sits (0 if tokens.css is not loaded). Under a CSS `zoom`
+ * (the docs' zoom control, or an app's) a token's 4px draws as 4 x zoom, and Floating UI works in screen px.
+ */
 function tokenPx(el: Element, token: string) {
-  return parseFloat(getComputedStyle(el).getPropertyValue(token)) || 0;
+  return (parseFloat(getComputedStyle(el).getPropertyValue(token)) || 0) * zoomOf(el);
 }
+
+/**
+ * Floating UI under CSS `zoom`: the trigger's rect comes back in screen px, but the tooltip's and the pointer's
+ * sizes in their own unzoomed px. Scale those to screen px; the render divides the results back by the zoom,
+ * because `left` and `top` are drawn zoomed again.
+ */
+const zoomAwarePlatform: Platform = {
+  ...platform,
+  getDimensions: async (el) => {
+    const size = await platform.getDimensions(el);
+    const zoom = zoomOf(el);
+    return { width: size.width * zoom, height: size.height * zoom };
+  },
+};
 
 /** A Motion token in ms, read from the root where tokens.css defines it (undefined if it is not loaded). */
 function tokenMs(token: string) {
@@ -65,6 +97,27 @@ function tokenMs(token: string) {
 }
 
 const sideOf = (placement: Placement) => placement.split('-')[0] as 'top' | 'right' | 'bottom' | 'left';
+
+/**
+ * Aims the pointer at the trigger's centre, kept space-md from the tooltip's corners (Figma's start and end
+ * inset; less on a tooltip too short for it). Floating UI's own arrow() reads the
+ * tooltip's unzoomed clientWidth, so it drifts under CSS `zoom`; this works only from the rects (screen px).
+ */
+const aimPointer: Middleware = {
+  name: 'pointer',
+  fn({ x, y, placement, rects, elements }) {
+    const alongX = sideOf(placement) === 'top' || sideOf(placement) === 'bottom';
+    const size = tokenPx(elements.floating, '--tooltip-pointer-width');
+    const inset = tokenPx(elements.floating, '--space-md');
+    const length = alongX ? rects.floating.width : rects.floating.height;
+    const target = alongX ? rects.reference.x + rects.reference.width / 2 - x : rects.reference.y + rects.reference.height / 2 - y;
+    // As Floating UI's arrow(): the inset shrinks on a tooltip too short for it (a one-line left or right one),
+    // keeping 1px (zoomed) of the edge clear.
+    const pad = Math.max(0, Math.min(inset, length / 2 - size / 2 - zoomOf(elements.floating)));
+    const offset = Math.min(Math.max(target - size / 2, pad), length - size - pad);
+    return { data: { offset } };
+  },
+};
 
 /**
  * A short, non-interactive hint shown on hover or keyboard focus of its trigger. React Aria runs the behaviour
@@ -115,19 +168,18 @@ export function Tooltip({
     setInstant(state.isOpen ? state.shouldSkipAnimation || !!triggerRef.current?.matches(':focus-visible') : instant || state.shouldSkipAnimation);
   }
 
-  const pointerRef = useRef<HTMLSpanElement>(null);
   const { refs, elements, update, x, y, placement: placed, middlewareData } = useFloating<HTMLElement>({
     placement,
     strategy: 'fixed',
     transform: false,
+    platform: zoomAwarePlatform,
     middleware: [
       // The pointer's tip sits tooltip/offset from the trigger.
       offset(({ elements }) => tokenPx(elements.floating, '--tooltip-pointer-depth') + tokenPx(elements.floating, '--tooltip-offset')),
       flip(),
       // Slides along the edge to stay on screen, but never past the trigger (limitShift), so it stays attached.
       shift(({ elements }) => ({ padding: tokenPx(elements.floating, '--space-sm'), limiter: limitShift() })),
-      // The pointer aims at the trigger, kept space-md from the corners (Figma's start and end inset).
-      arrow(({ elements }) => ({ element: pointerRef.current!, padding: tokenPx(elements.floating, '--space-md') })),
+      aimPointer,
       // Hidden while the trigger is scrolled out of view (the page or an inner scroll area).
       hide(),
     ],
@@ -148,8 +200,10 @@ export function Tooltip({
   }, [state.isOpen, elements.floating, elements.reference, update]);
 
   const side = sideOf(placed);
-  const pointer = middlewareData.arrow;
-  const origin = side === 'top' || side === 'bottom' ? pointer?.x : pointer?.y;
+  // Floating UI answers in screen px; the tooltip's own styles are drawn at its CSS zoom, so divide by it.
+  const zoom = elements.floating ? zoomOf(elements.floating) : 1;
+  const unzoom = (n: number | null | undefined) => (n == null ? undefined : n / zoom);
+  const pointer = unzoom((middlewareData.pointer as { offset?: number } | undefined)?.offset);
 
   const child = children as ReactElement<{ ref?: Ref<HTMLElement> } & Record<string, unknown>>;
   const childRef = child.props.ref;
@@ -171,11 +225,11 @@ export function Tooltip({
         style={
           {
             ...style,
-            left: x,
-            top: y,
+            left: unzoom(x),
+            top: unzoom(y),
             visibility: middlewareData.hide?.referenceHidden ? 'hidden' : undefined,
             // Where the pointer starts along its edge; the CSS adds half its width to scale from the tip.
-            '--_origin': origin != null ? `${origin}px` : undefined,
+            '--_origin': pointer != null ? `${pointer}px` : undefined,
           } as CSSProperties
         }
       >
@@ -184,10 +238,9 @@ export function Tooltip({
           {extra != null && extra !== false && <div className="bland-tooltip__slot">{extra}</div>}
         </div>
         <span
-          ref={pointerRef}
           className="bland-tooltip__pointer"
           aria-hidden="true"
-          style={side === 'top' || side === 'bottom' ? { left: pointer?.x } : { top: pointer?.y }}
+          style={side === 'top' || side === 'bottom' ? { left: pointer } : { top: pointer }}
         >
           {/* Figma _Tooltip-pointers, Direction=down, exported with its rad-xs corners; CSS turns it to the side. */}
           <svg viewBox="0 0 16 12" focusable="false">

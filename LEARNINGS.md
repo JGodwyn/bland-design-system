@@ -250,6 +250,16 @@ right placements its main axis is vertical, so once the trigger scrolled
 above the viewport the tooltip stayed at the top, detached from it. → Always
 pass `limiter: limitShift()`: it slides along the trigger, never off it.
 
+**Floating UI drifts under CSS `zoom`.** With the docs zoom at 125% the
+tooltip sat below and right of its trigger and grew. Under a zoomed ancestor
+`getBoundingClientRect` (the trigger) is in screen px, but `offsetWidth` and
+computed sizes (the tooltip) are unzoomed, and the `left` / `top` Floating UI
+writes are drawn zoomed again; `arrow()` also reads `clientWidth`. →
+`platform.getDimensions` times `el.currentCSSZoom`, token distances times
+it, positions divided by it, and pointers placed by your own middleware
+(`src/components/tooltip/Tooltip.tsx`). `tests/tooltip.spec.ts` sets
+`zoom: 1.5` on the frame to hold it.
+
 **Vite library mode bundles every dependency not listed as external.**
 Adding react-aria grew `dist/index.js` from 62 to 117 KB. → List each
 runtime dependency in `rollupOptions.external`, with a regex for its

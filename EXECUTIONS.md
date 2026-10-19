@@ -652,3 +652,21 @@ variable if standard; use 256 and fix the Figma description.
 - Story: every variant closed; the demo stays held open. Visual coverage
   moved to `tests/tooltip.spec.ts`: four tooltips opened by focus,
   screenshotted in both themes. 12 tooltip specs.
+
+## 2026-10-19 — Tooltip: zoom, closed demo, tight variants (tooltip session)
+**Asked:** the docs zoom moves the tooltip off its trigger; the demo says
+"hover or focus me" but is always open; too much space in Variants.
+
+- Probed the docs page in Playwright at 150%: trigger rect 301 wide (screen
+  px), tooltip `offsetWidth` 85 (unzoomed), `left` 329 drawn at 494. Fixed
+  with a zoom-aware `platform`, zoomed token distances and unzoomed
+  render positions. Position and gap then matched, but the pointer did not:
+  `arrow()` reads `clientWidth`. Replaced it with `aimPointer`, a middleware
+  working from the rects; then matched Floating UI's shrinking inset (and
+  its 1px edge, zoomed) for short side tooltips. Checked at 100, 150, 300%.
+- Demo: `open` unticked by default and left out (not `false`) when
+  unticked, so hover and focus open it. Variants: one `pg-row` per side, no
+  fixed cells; open tooltips may cover neighbours (Godwin is fine with it).
+- New spec: frame at `zoom: 1.5`, top and right-end tooltips on their
+  triggers with the gap zoomed. 13 tooltip specs; tooltip screenshots
+  re-baselined.
