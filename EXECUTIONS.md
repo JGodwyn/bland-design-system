@@ -544,3 +544,6 @@ props`), build; baselines looked at in both themes.
   following `actions`). Decisions in INTERFACE.md §Empty State, map row in
   CLAUDE.md.
 - Slip caught by the test: assumed title-lg was 20px; `size/xl` is 22.
+- Figma (one `use_figma` write, after merge): a "Code:" line in the
+  `Empty-state` and `_empty-illustration` descriptions saying Bland ships no
+  default illustration, pointing to the component map.
