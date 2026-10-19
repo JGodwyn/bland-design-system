@@ -479,3 +479,20 @@ props`), build; baselines looked at in both themes.
 - axe flagged the disabled wizard steps' `text-minimal` text (12 nodes);
   excluded like disabled field text, with the reason in `tests/a11y.spec.ts`.
 
+## 2026-10-18/19 — Accordion (accordion session)
+**Asked:** build Accordion from the Figma Accordion page (1458:27759) on native `<details>`.
+
+- Read the set (1460:28041) with four read-only `use_figma` scripts: the first
+  full dump passed the 20 KB limit, then the description and properties, then
+  compact per-line binding trees for the 12 default and 12 flush variants plus
+  the caret's inner stroke per variant.
+- Usage limit hit after the Figma read; findings and the plan went to
+  `accordion.md` in the side-session notes, and the build resumed from it the
+  next day.
+- Built `src/components/accordion/` (component, CSS, story), the export and
+  `tests/accordion.spec.ts` (11). Checked in the browser that the height
+  animates both ways (136px open at md, as in Figma). Decisions in
+  INTERFACE.md §Accordion, map row in CLAUDE.md.
+- Dead ends: `getByRole('button')` found no summary (LEARNINGS, Tooling);
+  switched to CDP. axe flagged the disabled open content (`text-minimal`);
+  excluded like disabled field text in `tests/a11y.spec.ts`.

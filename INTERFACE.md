@@ -629,6 +629,46 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Not interactive: nothing takes focus, so no Focused row. Circles skip
   `.bland-smooth`.
 
+### Accordion (2026-10-19)
+- `import { Accordion } from 'bland'`, folder `accordion/`. A native
+  `<details>` whose `<summary>` is Figma's header, so it opens without scripts
+  and keeps the browser's keyboard (Enter, Space) and screen reader behaviour:
+  Chromium exposes the summary as a disclosure button with an expanded state,
+  which is what Figma's "button with aria-expanded and aria-controls" note asks
+  for. No ARIA is added.
+- **React owns the open state.** The summary's click (also fired by Enter and
+  Space) is cancelled and `open` / `defaultOpen` decide; `onToggle` follows
+  changes the browser makes itself (find in page, a `name` group closing the
+  item) and reports them through `onOpenChange`. `defaultOpen` renders the
+  native `open` attribute, so server-rendered pages start right.
+- **Groups:** Figma has no group set and describes none, so there is no
+  `AccordionGroup`. Items that share the native `name` attribute form a group
+  where only one is open at a time; the browser closes the others.
+- **Disabled:** `<details>` has no native disabled. `disabled` sets
+  `aria-disabled` and `tabIndex=-1` on the summary (out of the Tab order, like
+  a disabled button) and ignores clicks; an open item stays open. Header and
+  content text `text-minimal`, caret `icon-minimal`, header fill unchanged
+  (Figma). axe excludes the disabled content text, like disabled field text.
+- Figma bindings: header `surface-200` (hover `surface-300`), padding
+  `space-xs` (sm) / `space-sm` (md) by `space-md`, gap `space-sm`, `rad-md`
+  with `.bland-smooth`; title body-lg, body-lg-bold while open; caret `icon/md`
+  `icon-bold`, nudged `space-2xs` so it sits on the title's first line (long
+  titles wrap); content padding `space-md`, gap `space-lg`, body-lg
+  `text-bold`. Root and content have no fill.
+- **Flush:** no header fill, no side padding; content padded `space-xs` above
+  and below only; on hover the title underlines with the
+  `body-lg(-bold)-underline` styles. Non-flush hover does not underline.
+- **Width:** fills its container. `accordion/width` (256) is Figma's frame
+  default; its description says "Use Fill container in layouts" (as Banner).
+- **Motion:** the caret turns 180° (Figma swaps CaretDown for CaretUp; code
+  rotates the one `CaretDownIcon`) and the content's height animates with
+  `::details-content`, `interpolate-size: allow-keywords` and
+  `content-visibility ... allow-discrete`, both over `duration/md` with
+  `easing/out`, opening and closing along the same path. Browsers without
+  `::details-content` open at once. Under reduced motion both happen at once.
+  No press scale: Figma has no pressed state.
+- Figma's `🌟 Slot` property is defined on the set but no layer uses it; ignored.
+
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 
 - A sidebar of style pages (generated from `tokens.json`) and components

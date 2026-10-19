@@ -60,6 +60,7 @@ export {
   type BreadcrumbItem,
   type BreadcrumbLinkProps,
 } from './components/breadcrumb/Breadcrumb';
+export { Accordion, type AccordionProps, type AccordionSize } from './components/accordion/Accordion';
 export * from './icons';
 export { Alert, type AlertProps, type AlertStatus } from './components/alert/Alert';
 export { Banner, type BannerProps, type BannerStatus, type BannerOrientation } from './components/banner/Banner';

@@ -172,6 +172,13 @@ input itself is disabled. → Exclude `.bland-text-input:has(:disabled)` in
 
 **A reused docs server has stale props.** `npm test` reuses a dev server on 5180 started before your component existed, so `playground/.generated/props.json` lacks it and `docs.spec.ts` ("every component page shows a props table") fails. → Run `npm run props` (the server picks it up) and re-run.
 
+**Playwright's `getByRole('button')` does not find a `<summary>`.** Chromium
+exposes it as `DisclosureTriangle` (`DisclosureTriangleGrouped` inside a
+`name` group), which platform screen readers get as a button, but
+Playwright's role engine and aria snapshot see only text. → Check a summary's
+role and expanded state through CDP (`Accessibility.getFullAXTree`), as
+`tests/accordion.spec.ts` does, and locate it by CSS.
+
 ## Working with parallel sessions
 
 **Two sessions share this folder and commit on `main`.** A `git add -A` from one

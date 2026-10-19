@@ -1,0 +1,95 @@
+import { useState, type DetailsHTMLAttributes, type MouseEvent, type ReactNode, type Ref, type SyntheticEvent } from 'react';
+import { CaretDownIcon } from '../../icons';
+import { Icon } from '../icon/Icon';
+import './accordion.css';
+
+export type AccordionSize = 'sm' | 'md';
+
+export interface AccordionProps extends Omit<DetailsHTMLAttributes<HTMLDetailsElement>, 'title' | 'open' | 'children'> {
+  /** Figma `✏️ Title`: the header label. Bold while open. Wraps onto more lines when it is long. */
+  title: ReactNode;
+  /** Figma `✏️ Description` and `🧩 Slot`: the content shown while open. Text or any nodes, stacked space-lg apart. */
+  children?: ReactNode;
+  /** Figma `Size`. sm: a 32px header (default, as in Figma). md: a 40px header. */
+  size?: AccordionSize;
+  /** Figma `Flush`: no header fill and no side padding, so the item lines up with surrounding content; the title underlines on hover. */
+  flush?: boolean;
+  /** Figma `Expanded`, controlled. Pair it with `onOpenChange`. */
+  open?: boolean;
+  /** Starting state when `open` is left out. Rendered as the native `open` attribute, so it works before scripts load. */
+  defaultOpen?: boolean;
+  /** Called with the new open state, from a click, Enter or Space, or the browser (find in page, another item in the same `name` group opening). */
+  onOpenChange?: (open: boolean) => void;
+  /** Figma `State=disabled`: the header stops responding and leaves the Tab order; an open item stays open. */
+  disabled?: boolean;
+  /** Native `name`: items sharing one name form a group where only one is open at a time (the browser closes the others). */
+  name?: string;
+  /** Reaches the native `<details>`. */
+  ref?: Ref<HTMLDetailsElement>;
+}
+
+/**
+ * Shows or hides a content region under a header. A native `<details>` with a `<summary>` header, so it opens
+ * without scripts and keeps the browser's keyboard and screen reader behaviour (a button with an expanded state).
+ * Figma: Accordion page, set "Accordion".
+ */
+export function Accordion({
+  title,
+  children,
+  size = 'sm',
+  flush = false,
+  open,
+  defaultOpen = false,
+  onOpenChange,
+  disabled = false,
+  className,
+  onToggle,
+  ...rest
+}: AccordionProps) {
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
+  const controlled = open !== undefined;
+  const isOpen = controlled ? open : uncontrolledOpen;
+
+  const change = (next: boolean) => {
+    if (!controlled) setUncontrolledOpen(next);
+    onOpenChange?.(next);
+  };
+
+  // React owns the open state: the click (also Enter and Space) is cancelled and the state decides.
+  const handleClick = (event: MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    if (!disabled) change(!isOpen);
+  };
+
+  // The browser can still open or close it (find in page, a `name` group); follow it.
+  const handleToggle = (event: SyntheticEvent<HTMLDetailsElement>) => {
+    onToggle?.(event as Parameters<NonNullable<typeof onToggle>>[0]);
+    const now = event.currentTarget.open;
+    if (now !== isOpen) change(now);
+  };
+
+  return (
+    <details
+      {...rest}
+      className={`bland-accordion${className ? ` ${className}` : ''}`}
+      data-size={size}
+      data-flush={flush || undefined}
+      data-disabled={disabled || undefined}
+      open={isOpen}
+      onToggle={handleToggle}
+    >
+      <summary
+        className="bland-accordion__header bland-focus-ring bland-smooth"
+        aria-disabled={disabled || undefined}
+        tabIndex={disabled ? -1 : undefined}
+        onClick={handleClick}
+      >
+        <span className="bland-accordion__title">{title}</span>
+        <Icon className="bland-accordion__caret">
+          <CaretDownIcon />
+        </Icon>
+      </summary>
+      <div className="bland-accordion__content">{children}</div>
+    </details>
+  );
+}

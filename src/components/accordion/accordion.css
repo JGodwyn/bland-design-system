@@ -1,0 +1,152 @@
+/*
+ * Accordion (Figma: Accordion page, set "Accordion").
+ *
+ *   <details class="bland-accordion" data-size="sm" [data-flush] [data-disabled] [open]>
+ *     <summary class="bland-accordion__header bland-focus-ring bland-smooth">
+ *       <span class="bland-accordion__title">Title</span>
+ *       <span class="bland-icon bland-accordion__caret">…CaretDown…</span>
+ *     </summary>
+ *     <div class="bland-accordion__content">…</div>
+ *   </details>
+ *
+ * Figma's root and content have no fill; only the header has one (none when flush). The item fills
+ * its container: accordion/width (256) is Figma's frame default ("Use Fill container in layouts").
+ * The caret rotates and the content's height animates over duration/md with easing/out
+ * (::details-content and interpolate-size, Chromium); elsewhere it opens at once.
+ */
+
+.bland-accordion {
+  display: block;
+  width: 100%;
+  margin: var(--space-none);
+  interpolate-size: allow-keywords;
+}
+
+/* ---- Header: the summary. Padding by size; sm 4 + 24 + 4 = 32, md 8 + 24 + 8 = 40 ---- */
+
+.bland-accordion__header {
+  --bland-icon-size: var(--icon-md);
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-md);
+  background-color: var(--surface-200);
+  color: var(--text-bold);
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--duration-xs) var(--easing-ease);
+}
+
+.bland-accordion__header::-webkit-details-marker {
+  display: none;
+}
+
+.bland-accordion[data-size="md"] > .bland-accordion__header {
+  padding-block: var(--space-sm);
+}
+
+.bland-accordion[open] > .bland-accordion__header {
+  font: var(--type-body-lg-bold);
+}
+
+.bland-accordion__title {
+  flex: 1 1 auto;
+  min-width: var(--space-none);
+  overflow-wrap: anywhere;
+}
+
+/* Figma's icon-wrap pads the caret by space-2xs, centring the 20px icon on the title's first 24px line. */
+.bland-accordion__caret {
+  margin-top: var(--space-2xs);
+  color: var(--icon-bold);
+  transition: transform var(--duration-md) var(--easing-out);
+}
+
+/* Figma swaps CaretDown for CaretUp; code turns the one caret. */
+.bland-accordion[open] > .bland-accordion__header .bland-accordion__caret {
+  transform: rotate(180deg);
+}
+
+/* ---- Content: Figma's description and slot, stacked space-lg apart ---- */
+
+.bland-accordion::details-content {
+  block-size: var(--space-none);
+  overflow: clip;
+  transition:
+    block-size var(--duration-md) var(--easing-out),
+    content-visibility var(--duration-md) var(--easing-out) allow-discrete;
+}
+
+.bland-accordion[open]::details-content {
+  block-size: auto;
+}
+
+.bland-accordion__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-md);
+  color: var(--text-bold);
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+/* ---- Flush: no fill, no side padding; content padded space-xs above and below ---- */
+
+.bland-accordion[data-flush] > .bland-accordion__header {
+  padding-inline: var(--space-none);
+  background-color: transparent;
+}
+
+.bland-accordion[data-flush] .bland-accordion__content {
+  padding: var(--space-xs) var(--space-none);
+}
+
+/* ---- States: hover, disabled. Focus is .bland-focus-ring. No press state in Figma. ---- */
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-accordion:not([data-flush], [data-disabled]) > .bland-accordion__header:hover {
+    background-color: var(--surface-300);
+  }
+
+  .bland-accordion[data-flush]:not([data-disabled]) > .bland-accordion__header:hover {
+    font: var(--type-body-lg-underline);
+    text-decoration-line: underline;
+  }
+
+  .bland-accordion[data-flush][open]:not([data-disabled]) > .bland-accordion__header:hover {
+    font: var(--type-body-lg-bold-underline);
+  }
+}
+
+.bland-accordion[data-disabled] > .bland-accordion__header {
+  color: var(--text-minimal);
+  cursor: not-allowed;
+}
+
+.bland-accordion[data-disabled] .bland-accordion__caret {
+  color: var(--icon-minimal);
+}
+
+.bland-accordion[data-disabled] .bland-accordion__content {
+  color: var(--text-minimal);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bland-accordion__header {
+    transition-property: background-color;
+  }
+
+  /* The caret flips and the content opens at once. */
+  .bland-accordion__caret,
+  .bland-accordion::details-content {
+    transition: none;
+  }
+}
