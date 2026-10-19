@@ -11,7 +11,8 @@ export default defineConfig({
       fileName: 'index',
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      // Peer and runtime dependencies stay imports, so apps share one copy (React Aria keeps global tooltip state).
+      external: ['react', 'react-dom', 'react/jsx-runtime', /^react-aria(\/|$)/, /^react-stately(\/|$)/, /^@floating-ui\//],
     },
     cssCodeSplit: false,
   },

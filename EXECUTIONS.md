@@ -571,3 +571,35 @@ native `<table>`, with selection, sorting and horizontal overflow.
 - Dead end: a static test page under the scratchpad could not be scripted
   in the browser pane (local file); tested in the docs server instead.
 
+
+## 2026-10-19 — Tooltip (tooltip session)
+**Asked:** build Tooltip from the Figma Tooltip page (180:6572), the first
+component on React Aria and Floating UI, and write the pattern down for the
+overlays that follow.
+
+- Read CLAUDE.md, INTERFACE.md, docs/components.md, docs/motion.md,
+  LEARNINGS (Figma, CSS, tooling, parallel sessions) and Button's files.
+- Figma, four read-only `use_figma` calls: the first full dump of both sets
+  exceeded 20 KB, so: sets, properties and descriptions; the top and
+  bottom variants plus the four pointers with bindings; the left and right
+  variants' layout plus the pointer's vector; the pointer exported as SVG.
+  Found: content padding space-sm / space-md, gap space-xs, rad-md, fill
+  Tooltip/surface, body-md Tooltip/text, max width bound to
+  tooltip/max-width (256; the set description says 264), Elevation/neutral/near
+  on the whole frame, pointer inset space-md, pointer a 16 x 14 triangle
+  clipped to 16 x 12 with rad-xs corners.
+- Dependencies: react-aria 3.52.1, react-stately 3.50.0 (its pair) and
+  @floating-ui/react-dom 2.1.9, exact; 3.53 and 3.51 were under two weeks
+  old. `npm run audit` clean. First build bundled React Aria (117 KB);
+  made them external in vite.config.ts (62 KB).
+- Built `src/components/tooltip/` (Tooltip.tsx, tooltip.css, story),
+  `tests/tooltip.spec.ts` (7), the export and baselines. Pattern written in
+  docs/components.md ("Behaviour") and INTERFACE.md §Tooltip.
+- Fixed along the way: open tooltips below the first viewport were hidden
+  in the full-page screenshot (`hide()` measured against the viewport; now
+  `rootBoundary: 'document'`), and the story's bottom placements flipped
+  for the same reason (moved to top). Hover-opened tooltips were marked
+  instant because `useFocusVisible` had not seen the pointer move; now
+  "from the keyboard" is the trigger matching `:focus-visible`. Playwright's
+  one-step hover was ignored by React Aria; the spec moves the mouse first.
+- Gates: lint:css, test:lint, typecheck, npm test (325), audit, build.

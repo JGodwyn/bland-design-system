@@ -125,3 +125,4 @@ export {
   type TableSelectionMode,
   type TableSort,
 } from './components/table/Table';
+export { Tooltip, type TooltipProps, type TooltipPlacement } from './components/tooltip/Tooltip';

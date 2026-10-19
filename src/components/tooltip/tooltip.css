@@ -1,0 +1,146 @@
+/*
+ * Tooltip (Figma: Tooltip page, sets "Tooltip" and "_Tooltip-pointers").
+ *
+ *   <button aria-describedby="…">…</button>          the trigger, the caller's element
+ *   <div class="bland-tooltip" popover="manual" role="tooltip" data-side="top" data-placement="top-start">
+ *     <div class="bland-tooltip__content bland-smooth">
+ *       <span class="bland-tooltip__text">Copy link</span>
+ *       <div class="bland-tooltip__slot">…</div>        Figma 🧩 Slot, only with `extra`
+ *     </div>
+ *     <span class="bland-tooltip__pointer"><svg>…</svg></span>
+ *   </div>
+ *
+ * The root is a manual popover in the top layer: Floating UI sets `left` and `top` (fixed strategy) and the
+ * pointer's offset along its edge; data-side says which side of the trigger it ended up on after a flip.
+ * It sits right after the trigger in the DOM, so it inherits the trigger's theme.
+ */
+
+.bland-tooltip {
+  /* Reset the popover's UA box: Floating UI places it, the content draws it. */
+  position: fixed;
+  inset: auto;
+  width: max-content;
+  max-width: var(--tooltip-max-width);
+  height: auto;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  background: transparent;
+  color: var(--tooltip-text);
+  overflow: visible;
+  pointer-events: none;
+
+  /* Scale from the pointer's tip, wherever Floating UI put it. */
+  --_tip: calc(var(--_origin, 50%) + var(--tooltip-pointer-width) / 2);
+
+  /* Shows and leaves along the same path: opacity and a small scale from the trigger side. */
+  opacity: 0;
+  transform: scale(0.96);
+  transition:
+    opacity var(--duration-xs) var(--easing-out),
+    transform var(--duration-xs) var(--easing-out),
+    display var(--duration-xs) allow-discrete,
+    overlay var(--duration-xs) allow-discrete;
+}
+
+.bland-tooltip:popover-open {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .bland-tooltip:popover-open {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* Opened from the keyboard, warm (another tooltip was just open) or open from the start: no motion. */
+.bland-tooltip[data-instant] {
+  transition: none;
+}
+
+.bland-tooltip[data-side="top"] { transform-origin: var(--_tip) calc(100% + var(--tooltip-pointer-depth)); }
+.bland-tooltip[data-side="bottom"] { transform-origin: var(--_tip) calc(var(--tooltip-pointer-depth) * -1); }
+.bland-tooltip[data-side="left"] { transform-origin: calc(100% + var(--tooltip-pointer-depth)) var(--_tip); }
+.bland-tooltip[data-side="right"] { transform-origin: calc(var(--tooltip-pointer-depth) * -1) var(--_tip); }
+
+/* ---- Content: Figma's Content frame ---- */
+
+.bland-tooltip__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+  background-color: var(--tooltip-surface);
+  box-shadow: var(--elevation-neutral-near);
+}
+
+.bland-tooltip__text {
+  color: var(--tooltip-text);
+  font: var(--type-body-md);
+  letter-spacing: var(--letter-spacing-normal);
+  overflow-wrap: break-word;
+}
+
+/* Figma 🧩 Slot: fills the content width, its items stacked space-sm apart, in the tooltip's text color. */
+.bland-tooltip__slot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  color: var(--tooltip-text);
+  font: var(--type-body-md);
+}
+
+/* ---- Pointer: Figma _Tooltip-pointers, on the edge facing the trigger ---- */
+
+.bland-tooltip__pointer {
+  position: absolute;
+  display: block;
+}
+
+.bland-tooltip__pointer > svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--tooltip-pointer-width);
+  height: var(--tooltip-pointer-depth);
+  fill: var(--tooltip-surface);
+  translate: -50% -50%;
+}
+
+.bland-tooltip[data-side="top"] .bland-tooltip__pointer,
+.bland-tooltip[data-side="bottom"] .bland-tooltip__pointer {
+  width: var(--tooltip-pointer-width);
+  height: var(--tooltip-pointer-depth);
+}
+
+.bland-tooltip[data-side="left"] .bland-tooltip__pointer,
+.bland-tooltip[data-side="right"] .bland-tooltip__pointer {
+  width: var(--tooltip-pointer-depth);
+  height: var(--tooltip-pointer-width);
+}
+
+.bland-tooltip[data-side="top"] .bland-tooltip__pointer { top: 100%; }
+.bland-tooltip[data-side="bottom"] .bland-tooltip__pointer { bottom: 100%; }
+.bland-tooltip[data-side="left"] .bland-tooltip__pointer { left: 100%; }
+.bland-tooltip[data-side="right"] .bland-tooltip__pointer { right: 100%; }
+
+.bland-tooltip[data-side="bottom"] .bland-tooltip__pointer > svg { rotate: 180deg; }
+.bland-tooltip[data-side="left"] .bland-tooltip__pointer > svg { rotate: -90deg; }
+.bland-tooltip[data-side="right"] .bland-tooltip__pointer > svg { rotate: 90deg; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Opacity only: no scale. */
+  .bland-tooltip {
+    transform: none;
+    transition-property: opacity, display, overlay;
+  }
+
+  @starting-style {
+    .bland-tooltip:popover-open {
+      transform: none;
+    }
+  }
+}

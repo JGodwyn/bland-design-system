@@ -65,7 +65,14 @@ Anything that can scroll uses `<ScrollArea>` (`src/components/scroll-area/Scroll
 ## Behaviour
 
 - Simple components are native HTML (`<button>`, `<input type="checkbox">`, `<details>`): see "Code stack" in `CLAUDE.md` for the list.
-- Interactive components (Menu, Modal, Tooltip, Tabs, Slider, Date pickers) use React Aria hooks or components for keyboard, focus and screen reader behaviour, with Bland's CSS for every visual. Placement uses Floating UI.
+- Interactive components (Menu, Modal, Tooltip, Tabs, Slider, Date pickers) use React Aria hooks for keyboard, focus and screen reader behaviour, with Bland's CSS for every visual. Placement uses Floating UI. Tooltip (`src/components/tooltip/Tooltip.tsx`) is the reference; copy it:
+  - **Hooks, not components.** State from `react-stately` (`use…State`), behaviour from `react-aria` (`use…`). Bland renders every element, so classes, data attributes and tokens work as everywhere else.
+  - **Bland prop names.** `open` / `defaultOpen` / `onOpenChange` / `disabled`, mapped to React Aria's `isOpen` / `isDisabled` inside the component.
+  - **Floating UI with tokens.** `useFloating` from `@floating-ui/react-dom` with `strategy: 'fixed'` and `transform: false` (it sets `left` / `top`; `transform` stays free for motion). Every distance (offset, shift padding, arrow padding) is a token read with `getComputedStyle` inside a derivable middleware option, never a number. Run `autoUpdate` only while open.
+  - **A manual popover after the trigger, not a portal.** `popover="manual"` puts it in the top layer (no clipping, no z-index) while it keeps inheriting the theme from where it sits; the open state calls `showPopover()` / `hidePopover()` in a layout effect. Reset the popover's UA box in CSS (`inset: auto`, no margin, border, padding or background, `overflow: visible`).
+  - **Motion in CSS.** `@starting-style` plus `display` and `overlay` transitions with `allow-discrete`, so the exit reverses the entrance. Set `data-side` from Floating UI's final placement and `transform-origin` from it, so it scales from the trigger. Add `data-instant` (no transition) when it opens from the keyboard (the trigger matches `:focus-visible`), opens warm (React Aria's `shouldSkipAnimation`), or renders open.
+  - **The trigger is the caller's element.** Clone it with the trigger props from React Aria and a `mergeRefs` ref; it must forward `ref` and DOM props (every Bland control does).
+  - **Dependencies stay external** in `vite.config.ts`, like React, so apps share one copy.
 
 ## Testing
 

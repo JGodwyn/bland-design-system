@@ -68,6 +68,11 @@ and text styles of every variant); the second Figma MCP connector in the
 session kept working when the first was limited. Go straight to that second
 official connector; don't try Framelink (Godwin's call: official MCP only).
 
+**A Figma description can disagree with its own variable.** Tooltip's set
+description says the content wraps at 264; `tooltip/max-width` is 256. →
+The variable wins (it is what the frame is bound to); report the stale
+description.
+
 ## Fonts
 
 **Fontsource *variable* packages register a different family name**
@@ -212,6 +217,30 @@ cannot take focus. → Test focusability by calling `focus()` and checking
 **`getByRole(…, { name })` matches a substring.** `getByRole('table', { name: 'People sm' })` also found
 "Expandable people sm" (6 column headers instead of 4). → Pass `exact: true` when one accessible name
 contains another.
+
+**React Aria ignores a hover that arrives before any pointer move.**
+`useTooltipTrigger` counts a hover only when the interaction modality is
+"pointer", which a `pointermove` on the document sets; Playwright's
+`hover()` jumps onto the element in one move, so the enter fires first and
+the tooltip never opened. → In specs, `page.mouse.move(1, 1)` before
+hovering a React Aria trigger (`tests/tooltip.spec.ts`).
+
+**`useFocusVisible()` lags behind the pointer.** Its `isFocusVisible`
+re-renders only on pointerdown and keys, not pointer moves, so after a page
+load a hover-opened tooltip still read as "keyboard". → To know whether
+focus opened something, check `trigger.matches(':focus-visible')` at that
+moment.
+
+**Floating UI's `hide()` and `flip()` measure against the viewport.** In a
+full-page screenshot, open tooltips below the first viewport were hidden
+and bottom placements flipped up. → `hide({ rootBoundary: 'document' })`
+(the page carries trigger and tooltip together; only inner scroll areas
+should hide it), and keep held-open story examples where they have room.
+
+**Vite library mode bundles every dependency not listed as external.**
+Adding react-aria grew `dist/index.js` from 62 to 117 KB. → List each
+runtime dependency in `rollupOptions.external`, with a regex for its
+subpaths (`/^react-aria(\/|$)/`), and check `dist/index.js` imports them.
 
 ## Working with parallel sessions
 

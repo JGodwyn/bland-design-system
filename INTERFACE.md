@@ -843,6 +843,82 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   the scrolling element becomes a Tab stop while it overflows so keyboard
   users can scroll a table with no controls in it.
 
+### Tooltip (2026-10-19, the React Aria and Floating UI pattern)
+- `import { Tooltip } from 'bland'`, folder `tooltip/`. Figma: set `Tooltip`
+  (244:2806, 12 Placement variants) and the private `_Tooltip-pointers`
+  (244:2778, 4 directions); every variant's bindings read, inner frames
+  included.
+- **The pattern every overlay copies** (decided 2026-10-19; Dropdown, Menu,
+  Modal, Slider and the pickers follow it):
+  - React Aria hooks run the behaviour (`useTooltipTriggerState` from
+    `react-stately`, `useTooltipTrigger` and `useTooltip` from `react-aria`);
+    Bland renders every element and draws it with its own CSS. No React Aria
+    components, no React Aria styles.
+  - Bland's own prop names wrap React Aria's: `open` / `defaultOpen` /
+    `onOpenChange` / `disabled` (as Accordion), mapped to `isOpen`,
+    `isDisabled` and so on inside the component.
+  - Floating UI (`@floating-ui/react-dom`) places it: `useFloating` with
+    `strategy: 'fixed'` and `transform: false` (it sets `left` / `top`, so
+    `transform` stays free for motion), middleware `offset`, `flip`,
+    `shift`, `arrow`, `hide`. Distances are tokens read at run time with
+    `getComputedStyle` inside derivable middleware options
+    (`offset(({ elements }) => tokenPx(elements.floating, '--…'))`), never
+    numbers in code. `autoUpdate` runs only while open.
+  - The floating element is a **manual popover rendered right after the
+    trigger** in the DOM, not a portal: the top layer means no overflow clips
+    it and no z-index is needed, and staying in place means it inherits the
+    trigger's theme (`data-theme` on any ancestor). The open state drives
+    `showPopover()` / `hidePopover()` in a layout effect.
+  - Entry and exit are CSS: `@starting-style` plus `display` and `overlay`
+    transitions with `allow-discrete`, so the exit plays the entrance in
+    reverse without keeping React state alive. `data-side` (after a flip) and
+    `data-placement` describe where it landed; `transform-origin` is set per
+    side from the pointer's offset (`--_origin`), so it scales from the tip.
+  - `data-instant` turns motion off: opened from the keyboard (the trigger
+    matches `:focus-visible`; React Aria only opens on visible focus), opened
+    warm (React Aria's `shouldSkipAnimation`: another tooltip was just open,
+    so the next shows without the delay or the animation), or open from the
+    first render. It closes the way it opened.
+  - The trigger is the caller's element (`children`), cloned with React
+    Aria's trigger props and a merged `ref` (`mergeRefs`; React 19 passes
+    `ref` as a prop, as Checkbox and Text Input already rely on). It must be
+    focusable and forward `ref` and DOM props: Button, Icon Button, a link.
+  - `react-aria`, `react-stately` and `@floating-ui/react-dom` are exact
+    runtime dependencies, external in the library build like React, so an
+    app keeps one copy (React Aria's one-tooltip-at-a-time state is global).
+- Props: `✏️ Text` → `text`; `🧩 Slot` with `👀 Slot` → `extra` (named for
+  its role, as Chip's slot is `leading`; any node under the text, stacked
+  space-sm apart, space-xs below the text). The tooltip never takes focus,
+  so `extra` must stay non-interactive (a shortcut, not a button), whatever
+  Figma's "small action" says. `Placement` → `placement`, Floating UI's
+  twelve names, default **top-start** (Figma's); it flips and shifts at the
+  screen edge. `delay` / `closeDelay` pass to React Aria, whose defaults
+  (1500 / 500 ms) apply: Bland has no tooltip delay token (open question
+  for Godwin). `trigger="focus"` opens on keyboard focus only. Escape
+  closes it, a press on the trigger closes it, one tooltip at a time.
+  `aria-describedby` points at it only while open.
+- Visuals: content padding space-sm / space-md, gap space-xs, `rad-md` with
+  `.bland-smooth`, `Tooltip/surface`, body-md `Tooltip/text`, width hugs up
+  to `tooltip/max-width` (256; the Figma description says 264, the variable
+  is 256 and wins) and wraps beyond it. `Elevation/neutral/near` sits on the
+  content box; Figma puts it on the whole frame (content plus pointer), so
+  in code the pointer has no shadow.
+- Pointer: Figma's `_Tooltip-pointers` Direction=down exported as SVG
+  (16 x 12, its rad-xs corners baked in) and turned per side by CSS, sized
+  `tooltip/pointer-width` x `tooltip/pointer-depth`, filled
+  `Tooltip/surface`. Floating UI aims it at the trigger's centre, kept
+  space-md from the corners (Figma's start and end inset). Offset is
+  `tooltip/pointer-depth`, so the tip touches the trigger (Figma draws no
+  gap); `shift` keeps space-sm from the screen edge; `hide` hides it while
+  the trigger is scrolled out of an inner scroll area.
+- Motion: `duration/xs`, `easing/out`, opacity 0 and `scale(0.96)` to full,
+  from the tip; opacity only under reduced motion.
+- A disabled `<button>` gets no pointer events, so its hover tooltip never
+  opens; give a disabled control's reason another way.
+- Docs: the demo is held open (`open` control), so the playground and the
+  screenshots show it; "focused" follows the trigger (the Button), never the
+  tooltip.
+
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 
 - A sidebar of style pages (generated from `tokens.json`) and components
