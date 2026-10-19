@@ -1,0 +1,108 @@
+/*
+ * Breadcrumb (Figma: Breadcrumbs page, sets "Breadcrumb" and "_Breadcrumb Base").
+ *
+ *   <nav class="bland-breadcrumb" aria-label="Breadcrumb">
+ *     <ol class="bland-breadcrumb__list">
+ *       <li class="bland-breadcrumb__item">
+ *         <a class="bland-breadcrumb__crumb bland-breadcrumb__link bland-focus-ring bland-smooth" href="/">…</a>
+ *         <span class="bland-icon bland-breadcrumb__separator">CaretRight</span>
+ *       </li>
+ *       <li class="bland-breadcrumb__item">
+ *         <button class="bland-breadcrumb__crumb bland-breadcrumb__overflow …">…</button> + separator
+ *       </li>
+ *       <li class="bland-breadcrumb__item">
+ *         <span class="bland-breadcrumb__crumb bland-breadcrumb__current" aria-current="page">…</span>
+ *       </li>
+ *     </ol>
+ *   </nav>
+ *
+ * The separator sits outside the link, in the item, and is decorative (Icon is aria-hidden).
+ */
+
+.bland-breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap; /* Figma does not wrap; in code a long trail wraps rather than overflow the page */
+  align-items: center;
+  gap: var(--space-sm);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  list-style: none;
+}
+
+/* One _Breadcrumb Base: the crumb, then the separator, space-sm apart, control/xs high. */
+.bland-breadcrumb__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  height: var(--control-xs);
+}
+
+.bland-breadcrumb__crumb {
+  --bland-icon-size: var(--icon-md);
+  --bland-radius: var(--rad-sm); /* drawn by .bland-smooth */
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  height: var(--control-xs);
+  margin: var(--space-none);
+  padding: var(--space-none) var(--space-2xs);
+  border: none;
+  background-color: transparent;
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+  white-space: nowrap;
+}
+
+/* ---- Link: an ancestor page ---- */
+
+.bland-breadcrumb__link {
+  color: var(--text-link);
+  text-decoration: none;
+}
+
+.bland-breadcrumb__link .bland-breadcrumb__icon {
+  color: var(--icon-link);
+}
+
+/* Hover underlines the label only (body-lg-underline keeps its size). */
+@media (hover: hover) and (pointer: fine) {
+  .bland-breadcrumb__link:hover .bland-breadcrumb__label {
+    font: var(--type-body-lg-underline);
+    text-decoration: underline;
+  }
+}
+
+/* ---- Current page: static text, not focusable ---- */
+
+.bland-breadcrumb__current {
+  color: var(--text-bold);
+  font: var(--type-body-lg-bold);
+}
+
+.bland-breadcrumb__current .bland-breadcrumb__icon {
+  color: var(--icon-bold);
+}
+
+/* ---- Overflow: stands in for the collapsed middle ---- */
+
+.bland-breadcrumb__overflow {
+  padding-inline: var(--space-xs);
+  color: var(--text-link);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-breadcrumb__overflow:hover {
+    background-color: var(--breadcrumb-surface-hover);
+  }
+}
+
+/* ---- Separator: CaretRight, icon/xs, decorative ---- */
+
+.bland-breadcrumb__separator {
+  --bland-icon-size: var(--icon-xs);
+
+  color: var(--icon-subtle);
+}

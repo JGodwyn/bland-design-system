@@ -87,7 +87,7 @@ when), `docs/components.md` (how to build one).
 - A component sets its icon size with `--bland-icon-size` on the slot's parent;
   the default lives on `:root` (see LEARNINGS).
 - Bland's own icons (`src/icons/`) are exported from the Figma Icons page as
-  components need them: Check, X, CaretDown, Plus, Minus, User, Spinner,
+  components need them: Check, X, CaretDown, CaretRight, Plus, Minus, User, Spinner,
   MagnifyingGlass, XCircle, WarningOctagon, CheckCircle, WarningCircle, Info so far.
 
 ## 4. Overflow
@@ -532,6 +532,38 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   scale(0.97)` and opacity 0, over `duration/xl` with `easing/out`. The item
   leaves the DOM once its transition time has passed (read from the computed
   style, so no second constant). Reduced motion: opacity only.
+
+### Breadcrumb (2026-10-19)
+- Built from both Figma sets: `Breadcrumb` (Crumbs 2 to 7) and `_Breadcrumb
+  Base` (link, current page, overflow; rest and hover). Every binding read,
+  inner frames included.
+- **Items array, not children** (decided 2026-10-19): `items` of
+  `{ label, href, icon, hideLabel }`. The component needs the count and the
+  order to collapse the middle and to know which item is the current page,
+  so an array is simpler than child components. `label` is a string so it
+  can name an icon-only crumb and the overflow count.
+- **Any router through `renderLink(props, item)`** (decided 2026-10-19): it
+  gets `{ href, className, children }` and the item, and returns the link.
+  Default `<a>`. A render function rather than an `as` component because
+  routers disagree on the prop (`href` in Next, `to` in React Router). The
+  link must keep `className`: it carries the look, the focus ring, and is
+  how the overflow finds the first revealed crumb to focus.
+- **The current page is never a link**: a `<span aria-current="page">`,
+  not focusable, no separator, even if its item has an `href`.
+- **Separator** is Figma's CaretRight (exported to `src/icons/`), outside
+  the link inside the `<li>`, aria-hidden via `<Icon>`.
+- **Overflow** (decided 2026-10-19): `maxItems` collapses a trail longer
+  than it (and longer than three) to the first item, an overflow crumb and
+  the last two, the rule in the Figma description. Figma's overflow is the
+  text "…", not a DotsThree icon. Its description says it opens a menu of
+  the hidden items; Dropdown is not built yet, so for now pressing it
+  reveals them in place for good and moves focus to the first one. When
+  Dropdown exists, switch to a menu and keep the API.
+- **Wraps in code**: the list wraps onto more lines rather than overflowing
+  the page. Figma does not wrap; collapsing is still the intended fix.
+- Hover: link label underlined (`body-lg-underline`, same size); overflow
+  gets `Breadcrumb/surface-hover`. No pressed state or motion (Figma has
+  none; links are used constantly).
 
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 

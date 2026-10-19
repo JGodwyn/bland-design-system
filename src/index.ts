@@ -54,6 +54,12 @@ export {
   type NumericInputFieldStatus,
 } from './components/numeric-input-field/NumericInputField';
 export { SearchInput, type SearchInputProps, type SearchInputSize } from './components/search-input/SearchInput';
+export {
+  Breadcrumb,
+  type BreadcrumbProps,
+  type BreadcrumbItem,
+  type BreadcrumbLinkProps,
+} from './components/breadcrumb/Breadcrumb';
 export * from './icons';
 export { Alert, type AlertProps, type AlertStatus } from './components/alert/Alert';
 export { Banner, type BannerProps, type BannerStatus, type BannerOrientation } from './components/banner/Banner';

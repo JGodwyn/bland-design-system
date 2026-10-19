@@ -438,3 +438,23 @@ baselines looked at.
   (12 disabled variants of 168:5383 rebound, checked on a temporary
   instance that was then removed). Verified: lint:css, typecheck,
   `npm test` 223 passed, build; Numeric baselines re-taken and looked at.
+
+## 2026-10-19 — Breadcrumb (breadcrumb session)
+**Asked:** build Breadcrumb from the Figma Breadcrumbs page, router-agnostic links, decide the overflow behaviour.
+
+- Read both sets with three `use_figma` scripts: descriptions and
+  properties, the five `_Breadcrumb Base` variants (every child's bindings
+  and text styles), the six `Breadcrumb` variants (instance properties,
+  separators) plus the CaretRight SVG. Overflow is a "…" text, so no
+  DotsThree export.
+- Built `src/components/breadcrumb/` (component, CSS, story), CaretRightIcon,
+  exports; `tests/breadcrumb.spec.ts` (5). Decisions in INTERFACE.md
+  §Breadcrumb, map row in CLAUDE.md.
+- Session hit the usage limit mid-build (handover note in the side-session
+  notes folder) and resumed the next day.
+- Dead ends: the story's icon example first used CaretRight, which read as
+  a separator; swapped to a house and a user icon, but `--update-snapshots`
+  kept the old PNG (under the diff threshold). The docs props test failed on
+  a reused server's stale props. Both in LEARNINGS.md §Tooling.
+**Verified:** lint:css, typecheck, `npm test` 233 passed (after `npm run
+props`), build; baselines looked at in both themes.

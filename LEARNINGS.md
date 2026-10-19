@@ -161,6 +161,10 @@ viewport, so nothing was hit and the test failed as "not focused". → Call
 input itself is disabled. → Exclude `.bland-text-input:has(:disabled)` in
 `tests/a11y.spec.ts`, with the reason beside it.
 
+**`--update-snapshots` keeps a baseline that differs by less than the threshold.** After a story change (two small icons swapped), `npx playwright test -g breadcrumb --update-snapshots` passed and left the old PNG, because the change was under `maxDiffPixelRatio` (0.002) and Playwright only rewrites "changed" snapshots. → For a small intended change, delete your own PNGs first and re-run, then look at them.
+
+**A reused docs server has stale props.** `npm test` reuses a dev server on 5180 started before your component existed, so `playground/.generated/props.json` lacks it and `docs.spec.ts` ("every component page shows a props table") fails. → Run `npm run props` (the server picks it up) and re-run.
+
 ## Working with parallel sessions
 
 **Two sessions share this folder and commit on `main`.** A `git add -A` from one

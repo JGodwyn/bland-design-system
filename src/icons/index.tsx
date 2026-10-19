@@ -28,6 +28,13 @@ export const CaretDownIcon = (p: P) => (
   </svg>
 );
 
+/** Figma: CaretRight (6080:106193). Breadcrumb's separator. */
+export const CaretRightIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M12 6L22 16L12 26" />
+  </svg>
+);
+
 /** Figma: Plus (6080:106833) */
 export const PlusIcon = (p: P) => (
   <svg {...stroked} {...p}>
