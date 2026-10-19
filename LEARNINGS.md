@@ -101,6 +101,11 @@ content: a shrinkable item contributes its content's size, not its basis. →
 Give the item a `width` (and `flex: 0 1 auto` to keep shrinking) when a
 fixed size must survive an auto-sized parent.
 
+**A focus ring on a stacked row is cut off by the next row.** The outline's
+2px offset on a List row sat under the following `<li>`'s fill, which paints
+later. → Give the focused element `position: relative` (no z-index needed:
+positioned boxes paint after in-flow siblings).
+
 **Native scrollbars can't meet the overflow rule.** macOS overlay scrollbars hide
 when idle, and the standard `scrollbar-width` has no 4px option. → The
 `ScrollArea` component hides the native bar and draws its own always-visible
@@ -178,6 +183,10 @@ exposes it as `DisclosureTriangle` (`DisclosureTriangleGrouped` inside a
 Playwright's role engine and aria snapshot see only text. → Check a summary's
 role and expanded state through CDP (`Accessibility.getFullAXTree`), as
 `tests/accordion.spec.ts` does, and locate it by CSS.
+
+**An `<a>` without `href` reports `tabIndex` 0 in Chromium** though it
+cannot take focus. → Test focusability by calling `focus()` and checking
+`document.activeElement`, not `tabIndex`.
 
 ## Working with parallel sessions
 

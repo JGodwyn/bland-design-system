@@ -496,3 +496,20 @@ props`), build; baselines looked at in both themes.
 - Dead ends: `getByRole('button')` found no summary (LEARNINGS, Tooling);
   switched to CDP. axe flagged the disabled open content (`text-minimal`);
   excluded like disabled field text in `tests/a11y.spec.ts`.
+
+## 2026-10-19 — List item (list session)
+**Asked:** build List item from the Figma Lists page (82:6945).
+
+- Read the one set, `List` (375:6454), with five read-only `use_figma`
+  scripts: description and properties, then binding trees grouped by node
+  path for the 12 default and 12 flush variants (the first dump of all 24
+  passed the 20 KB limit), then the fixed heights and a screenshot.
+- Found Figma fixes 1 and 2 line rows at 40 and 64 with no variable; chose
+  `space-sm` padding (40 and 62) and raised the 2px with Godwin on the tracker.
+- Built `src/components/list/` (ListItem, CSS, story), the export and
+  `tests/list.spec.ts` (10). Decisions in INTERFACE.md §List item, map row in
+  CLAUDE.md.
+- Fixed in the browser: a focused row's ring was cut off by the next row's
+  fill; the focused row is now `position: relative`.
+- Dead end: tested a disabled link row with `tabIndex === -1`; Chromium
+  reports 0 for an `<a>` without href though it cannot take focus (LEARNINGS).

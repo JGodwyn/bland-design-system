@@ -26,6 +26,8 @@ const disabledFieldText = [
   '.bland-accordion[data-disabled] .bland-accordion__content',
   // A disabled Progress-wizard step is drawn in Text/text-minimal by Figma's State=disabled, like disabled fields.
   '.bland-progress-wizard__step[data-disabled]',
+  // A disabled List row is drawn in Text/text-minimal by Figma's State=disabled; plain and link rows have no native disabled.
+  '.bland-list-item[data-disabled]',
 ];
 
 for (const id of storyIds) {

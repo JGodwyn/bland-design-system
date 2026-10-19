@@ -669,6 +669,56 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   No press scale: Figma has no pressed state.
 - Figma's `🌟 Slot` property is defined on the set but no layer uses it; ignored.
 
+### List item (2026-10-19)
+- `import { ListItem } from 'bland'`, folder `list/`. Figma has one set,
+  `List` (375:6454, 24 variants: Flush x Lines x State); every variant's
+  bindings read, inner frames included. There is **no List wrapper** in
+  Figma, so none in code: a row is an `<li>` (Figma: "li inside ul") and the
+  project supplies the `<ul>` / `<ol>`. Figma draws no dividers and no gap
+  between rows; neither does code.
+- **Which rows are interactive** (decided 2026-10-19): a row with `href` or
+  `onClick` is one link or one button (the `<a>` / `<button>` inside the
+  `<li>`), takes focus and gets Figma's hover and pressed fills
+  (`List/surface-hover`, `-pressed`). Without them it is a plain row (a
+  `<div>`): no hover, no focus. Use the plain row whenever the trailing slot
+  holds its own control (Toggle, Checkbox, a Button), so a control is never
+  nested inside a button or link; on a button or link row the trailing slot
+  holds only non-interactive content (a value, a Badge, a caret). Links go
+  through `renderLink(props)` for routers, as Breadcrumb.
+- Figma's "role=option inside a listbox when rows are selectable" is left to
+  Dropdown/Menu, which will use React Aria's listbox; ListItem has no
+  selected state.
+- **Lines** (decided 2026-10-19): a row without `description` is Figma's
+  `Lines=1`; with one, `lines` picks `2` (default; the description is one
+  line ending in an ellipsis) or `3+` (it wraps). The title is always one
+  line with an ellipsis; `altText` never truncates, the title gives way.
+- **Heights:** Figma fixes 1 and 2 line rows at 40 and 64 (unbound) and
+  centres the content, so its `space-md` padding never shows there. Code pads
+  them `space-sm` above and below: 8 + 24 + 8 = 40, and 8 + 46 + 8 = **62**,
+  2px under Figma's 64 (raised with Godwin on the tracker). 3+ line rows hug,
+  `space-md` (flush `space-sm`) above and below, as in Figma, with slots and
+  text at the top; 1 and 2 line rows centre them.
+- From Figma: fill `List/surface-rest` (flush: none), `rad-md` with
+  `.bland-smooth` (flush `rad-null`; its focus ring `rad-xs`, so the flush
+  row takes `rad-xs` only while focused); padding `space-md` (1 line) or
+  `space-lg` at the sides, flush `space-2xs`; gap `space-sm`; text column gap
+  `space-2xs`, header gap `space-sm`. Title body-lg `text-bold`, alt text
+  body-lg `text-subtle`, description body-md `text-subtle`. Disabled: all
+  text `text-minimal`, fill unchanged.
+- **Slots:** leading is `list/slot-sm` (24) on 1 line rows, `list/slot-lg`
+  (40) otherwise, content centred; an `<Icon>` in it is `icon/lg` in
+  `icon-bold` (`icon-minimal` disabled), an Avatar should be `sm` (24) or
+  `lg` (40). Trailing hugs its content, text `text-subtle`, an `<Icon>`
+  `icon/md` in `icon-subtle`. Figma leaves both slots empty, so these icon
+  sizes and colors are code decisions.
+- **Width:** fills its container. `list/width` (384) is Figma's frame
+  default ("Use Fill container in layouts").
+- A focused row is `position: relative` so the next row's fill does not
+  cover its ring's offset. No press scale (Figma has only the pressed fill;
+  rows are used constantly); the fill eases over `duration/xs`.
+- Long lists: Figma does not scroll a List, so ListItem has no ScrollArea;
+  a project that scrolls rows wraps the `<ul>` in `ScrollArea`.
+
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 
 - A sidebar of style pages (generated from `tokens.json`) and components

@@ -1,0 +1,187 @@
+/*
+ * List item (Figma: Lists page, set "List").
+ *
+ *   <li class="bland-list-item" data-lines="1|2|3+" [data-flush] [data-disabled]>
+ *     <button|a|div class="bland-list-item__row bland-smooth [bland-focus-ring]">
+ *       <span class="bland-list-item__leading">…</span>
+ *       <span class="bland-list-item__text">                     (2 and 3+ lines)
+ *         <span class="bland-list-item__header">
+ *           <span class="bland-list-item__title">Title</span>
+ *           <span class="bland-list-item__alt">Alt</span>
+ *         </span>
+ *         <span class="bland-list-item__description">…</span>
+ *       </span>
+ *       <span class="bland-list-item__trailing">…</span>
+ *     </…>
+ *   </li>
+ *
+ * Figma's root and inner frames are one element here, the row. Only a button or link row has
+ * hover and pressed fills. The row fills its container: list/width (384) is Figma's frame
+ * default ("Use Fill container in layouts").
+ *
+ * Heights: Figma fixes 1 line rows at 40 and 2 line rows at 64 (unbound) and centres the
+ * content, so its space-md padding never shows there. Code pads 1 and 2 line rows space-sm
+ * above and below: 8 + 24 + 8 = 40, 8 + 46 + 8 = 62. 3+ line rows hug, as in Figma.
+ */
+
+.bland-list-item {
+  display: block;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  list-style: none;
+}
+
+.bland-list-item__row {
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+  --bland-icon-size: var(--icon-lg);
+  --_bg: var(--list-surface-rest);
+  --_title: var(--text-bold);
+  --_subtle: var(--text-subtle);
+  --_icon: var(--icon-bold);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  box-sizing: border-box;
+  width: 100%;
+  margin: var(--space-none);
+  padding: var(--space-sm) var(--space-lg);
+  border: none;
+  background-color: var(--_bg);
+  color: var(--_title);
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+  text-align: start;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--duration-xs) var(--easing-ease);
+}
+
+/* ---- Lines: padding, alignment and the leading slot's size ---- */
+
+.bland-list-item[data-lines="1"] > .bland-list-item__row {
+  padding-inline: var(--space-md);
+}
+
+/* 3+ lines: content and slots sit at the top, and the row hugs its text. */
+.bland-list-item[data-lines="3+"] > .bland-list-item__row {
+  align-items: flex-start;
+  padding-block: var(--space-md);
+}
+
+/* Flush: no resting fill, no radius, space-sm above and below, space-2xs at the sides. */
+.bland-list-item[data-flush] > .bland-list-item__row {
+  --bland-radius: var(--rad-null);
+  --_bg: transparent;
+
+  padding: var(--space-sm) var(--space-2xs);
+}
+
+/* A focused row paints above its neighbours, so the next row's fill never covers the ring's offset. */
+.bland-list-item__row:focus-visible {
+  position: relative;
+}
+
+/* Figma's flush focus ring has a rad-xs corner. */
+.bland-list-item[data-flush] > .bland-list-item__row:focus-visible {
+  --bland-radius: var(--rad-xs);
+}
+
+/* ---- Parts ---- */
+
+.bland-list-item__leading {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--list-slot-lg);
+  height: var(--list-slot-lg);
+  color: var(--_icon);
+}
+
+.bland-list-item[data-lines="1"] .bland-list-item__leading {
+  width: var(--list-slot-sm);
+  height: var(--list-slot-sm);
+}
+
+.bland-list-item__text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  min-width: var(--space-none);
+}
+
+.bland-list-item__header {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: var(--space-none);
+}
+
+.bland-list-item__title {
+  flex: 1 1 auto;
+  min-width: var(--space-none);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bland-list-item__alt {
+  flex: none;
+  color: var(--_subtle);
+  white-space: nowrap;
+}
+
+.bland-list-item__description {
+  min-width: var(--space-none);
+  color: var(--_subtle);
+  font: var(--type-body-md);
+  overflow-wrap: anywhere;
+}
+
+/* 2 lines: the description is one line ending in an ellipsis. 3+ lets it wrap. */
+.bland-list-item[data-lines="2"] .bland-list-item__description {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bland-list-item__trailing {
+  --bland-icon-size: var(--icon-md);
+
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--_subtle);
+}
+
+.bland-list-item__trailing > .bland-icon {
+  color: var(--icon-subtle);
+}
+
+/* ---- States: hover and pressed on button and link rows only, disabled. Focus is .bland-focus-ring. ---- */
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-list-item__row:is(button:enabled, a[href]):hover {
+    --_bg: var(--list-surface-hover);
+
+    cursor: pointer;
+  }
+}
+
+.bland-list-item__row:is(button:enabled, a[href]):active {
+  --_bg: var(--list-surface-pressed);
+}
+
+.bland-list-item[data-disabled] > .bland-list-item__row {
+  --_title: var(--text-minimal);
+  --_subtle: var(--text-minimal);
+  --_icon: var(--icon-minimal);
+}
+
+.bland-list-item[data-disabled] > .bland-list-item__row:is(button, a) {
+  cursor: not-allowed;
+}
