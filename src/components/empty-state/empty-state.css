@@ -1,0 +1,82 @@
+/*
+ * Empty State (Figma: Empty State page, set "Empty-state").
+ *
+ *   <div class="bland-empty-state" data-size="sm">
+ *     <div class="bland-empty-state__illustration">…the project's illustration…</div>
+ *     <div class="bland-empty-state__text">
+ *       <h2 class="bland-empty-state__title">This part is empty.</h2>
+ *       <div class="bland-empty-state__description">…</div>
+ *     </div>
+ *     <div class="bland-empty-state__actions"><button class="bland-button">…</button></div>
+ *   </div>
+ *
+ * Fills its container: empty-state/width-sm and -lg are Figma's frame widths ("use Fill container
+ * in layouts"). Not focusable; only the action Buttons take focus. Bland ships no illustration:
+ * Figma's _empty-illustration is a placeholder (Godwin, 2026-10-19), so the slot is empty unless
+ * the project fills it.
+ */
+
+.bland-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--space-md);
+  text-align: center;
+}
+
+.bland-empty-state[data-size="lg"] {
+  gap: var(--space-xl);
+}
+
+/* ---- Illustration: the project's node (icon, image, SVG), centered and drawn as is ---- */
+
+.bland-empty-state__illustration {
+  display: flex;
+  justify-content: center;
+  max-width: 100%;
+}
+
+/* ---- Text: title and description, centered, wrapping ---- */
+
+.bland-empty-state__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+.bland-empty-state__title {
+  margin: var(--space-none);
+  color: var(--text-bold);
+  font: var(--type-body-lg-bold);
+  letter-spacing: var(--letter-spacing-normal);
+  overflow-wrap: anywhere;
+}
+
+.bland-empty-state[data-size="lg"] .bland-empty-state__title {
+  font: var(--type-title-lg);
+}
+
+.bland-empty-state__description {
+  color: var(--text-subtle);
+  font: var(--type-body-md);
+  letter-spacing: var(--letter-spacing-normal);
+  overflow-wrap: anywhere;
+}
+
+.bland-empty-state[data-size="lg"] .bland-empty-state__description {
+  font: var(--type-body-lg);
+}
+
+/* ---- Actions: up to two Buttons, stacked, each the full width ---- */
+
+.bland-empty-state__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-sm);
+  width: 100%;
+}

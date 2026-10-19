@@ -99,3 +99,9 @@ export {
   type ListItemLines,
   type ListItemLinkProps,
 } from './components/list/ListItem';
+export {
+  EmptyState,
+  type EmptyStateProps,
+  type EmptyStateSize,
+  type EmptyStateTitleAs,
+} from './components/empty-state/EmptyState';

@@ -528,3 +528,19 @@ props`), build; baselines looked at in both themes.
 - Slip caught by the test: the stories said the line's minimum was 32px;
   `space-xl` is 24.
 
+## 2026-10-19 — Empty State (empty-state session)
+**Asked:** build Empty State from the Figma Empty State page (82:6947).
+
+- One read-only `use_figma` dump of both sets on the page, `Empty-state`
+  and `_empty-illustration`: description, properties and binding trees of
+  every variant, hidden actions included; a second call exported the
+  Package icon SVG.
+- Found the placeholder icon bound to primitives `unit/40` / `unit/64`, with
+  no CSS token to reach. Built everything else, asked; Godwin chose no
+  default illustration. Removed the drafted disc CSS and the PackageIcon
+  export; the story draws the placeholder as project code.
+- Built `src/components/empty-state/` (EmptyState, CSS, story), the export
+  and `tests/empty-state.spec.ts` (6, including the docs "focused" control
+  following `actions`). Decisions in INTERFACE.md §Empty State, map row in
+  CLAUDE.md.
+- Slip caught by the test: assumed title-lg was 20px; `size/xl` is 22.

@@ -730,6 +730,39 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Long lists: Figma does not scroll a List, so ListItem has no ScrollArea;
   a project that scrolls rows wraps the `<ul>` in `ScrollArea`.
 
+### Empty State (2026-10-19)
+- `import { EmptyState } from 'bland'`, folder `empty-state/`. Figma: set
+  `Empty-state` (864:4114, Size sm/lg) and the private `_empty-illustration`
+  (6184:558); every variant's bindings read, inner frames and the hidden
+  actions included. A plain `<div>`: no role, no live region, no focus. Only
+  the action Buttons take focus, so the docs' "focused" control shows only
+  while actions render.
+- **No default illustration** (Godwin, 2026-10-19). Figma's slot defaults
+  to `_empty-illustration`, a Package icon on a `surface-200` disc whose icon
+  is bound straight to the primitives `unit/40` and `unit/64` ("placeholder
+  only, so no component tokens"). Primitives never reach CSS, so there was no
+  token to size it; rather than add Sizing variables or reuse spacing tokens,
+  Bland ships no illustration. `illustration` takes any node (an image, an
+  SVG, an `<Icon>`), centered and drawn as is: the project sizes and colors
+  it. Omitted, the slot does not render. The story draws Figma's placeholder
+  as a project would (its own sizes, outside the package).
+- **The title's heading level is the project's choice** (decided
+  2026-10-19): `titleAs` is `h1` to `h6` or `p`, default `h2`. An empty
+  state usually sits under the page's `h1` or inside a section, so `h2`
+  is the common case; use `h3` inside a panel under an `h2`, or `p` when
+  the view already names itself. The look never changes with the level.
+- From Figma: padding `space-md`, gap `space-lg` (sm) / `space-xl` (lg),
+  text column gap `space-sm`. Title body-lg-bold (sm) / title-lg (lg) in
+  `text-bold`, description body-md / body-lg in `text-subtle`, all
+  centered; long words break (`overflow-wrap: anywhere`).
+- **Actions:** the `actions` slot takes up to two Buttons (Figma: md brand
+  primary, then secondary), stacked `space-sm` apart, each stretched to the
+  content width (Figma's first button fills; the actions frame is the full
+  width). Size md is the Button default, so nothing is set.
+- **Width:** fills its container. `empty-state/width-sm` (256) and
+  `-lg` (384) are Figma's frame widths; its description says "use Fill
+  container in layouts" (as Banner, Accordion, List item).
+
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 
 - A sidebar of style pages (generated from `tokens.json`) and components

@@ -53,6 +53,13 @@ an inner `Base` frame, and a stroke weight showed up on the hidden `focus-ring`
 frame. → Read the bindings of every child frame before writing CSS, not just
 the component root.
 
+**A Figma placeholder can be bound to primitives on purpose.** Empty
+State's `_empty-illustration` binds its icon to `unit/40` and `unit/64`
+("placeholder only, so no component tokens"), and primitives are never
+emitted to CSS, so code had no token for its size. → Check whether a
+binding is a primitive before planning CSS for it; if it is, it is a
+question for Godwin (Empty State: ship no default illustration).
+
 **The Figma MCP has a per-seat call limit.** Mid-read, `use_figma` on the
 plugin connector returned "You've reached the Figma MCP tool call limit for your
 View seat", and Framelink answered 403 "Token expired". → Read a component in
@@ -230,6 +237,11 @@ yours and theirs. → Apply your edits twice: to the working copy, and to
 before a row id is refused with `shape_mismatch` (needs `tableRow`). → Insert
 rows with `"as":"blocks"` and a `row` → `cell` → `paragraph` structure, `side`
 `"before"` the newest row.
+
+**A read prints short block ids; a write needs the full one.** Replacing
+`.4658` was refused with `relative_id`. → A short `.N` belongs to the
+session of the nearest full id printed above it (`mwfmcdf7qq7.4646` makes
+`.4658` into `mwfmcdf7qq7.4658`); send that.
 
 **Read the doc before writing.** Godwin and other sessions edit it between
 turns. → Start with `read( …, {"kind":"view","sinceRev":<last rev>} )` and keep
