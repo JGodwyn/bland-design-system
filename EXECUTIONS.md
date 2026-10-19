@@ -603,3 +603,24 @@ overlays that follow.
   "from the keyboard" is the trigger matching `:focus-visible`. Playwright's
   one-step hover was ignored by React Aria; the spec moves the mouse first.
 - Gates: lint:css, test:lint, typecheck, npm test (325), audit, build.
+
+## 2026-10-19 — Table colors from Figma (table session)
+**Asked:** Godwin changed the six `Table/*` surface colors in Figma; use them.
+
+- Drift check (`npm run tokens:drift`, one read-only `use_figma`): the six
+  Table variables changed (dark: cells Neutral900 / hover 800, header 800 /
+  hover 700, selected Brand900; light: cell selected Brand100), and the
+  collections changed too: Typography is now `_Typography`, hidden, which
+  the build would treat as primitives and drop 28 CSS tokens
+  (`--font-*`, `--line-height-*`, `--letter-spacing-normal`, used directly
+  by 21 component files).
+- Asked Godwin: Table colors only for now; the Typography rename stays an
+  open question on the tracker.
+- Applied only the six records: set `metaChanged` false in the saved
+  result so `--apply` kept the repo's collection metadata, then
+  `npm run tokens` (518 tokens, only the six Table values moved). The
+  checksum will not match Figma's until the Typography question is
+  settled, because Figma's collection metadata differs.
+- Confirmed the Table sets still bind the same six variables;
+  re-baselined the Table screenshots on purpose and looked at them.
+

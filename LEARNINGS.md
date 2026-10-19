@@ -60,6 +60,14 @@ emitted to CSS, so code had no token for its size. → Check whether a
 binding is a primitive before planning CSS for it; if it is, it is a
 question for Godwin (Empty State: ship no default illustration).
 
+**A drift check can carry an unrelated Figma change.** Syncing six Table
+colors, the check also reported Typography renamed to `_Typography` and
+hidden, which `--apply` would have turned into 28 removed CSS tokens. →
+Read the report's "CSS tokens affected" before applying. To take only the
+variable records, set `metaChanged` to false (and drop `meta`) in the saved
+result: `--apply` then keeps the repo's collections and styles. Say in the
+commit that the checksum will differ until the rest is settled.
+
 **The Figma MCP has a per-seat call limit.** Mid-read, `use_figma` on the
 plugin connector returned "You've reached the Figma MCP tool call limit for your
 View seat", and Framelink answered 403 "Token expired". → Read a component in
