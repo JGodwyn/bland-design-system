@@ -513,3 +513,18 @@ props`), build; baselines looked at in both themes.
   fill; the focused row is now `position: relative`.
 - Dead end: tested a disabled link row with `tabIndex === -1`; Chromium
   reports 0 for an `<a>` without href though it cannot take focus (LEARNINGS).
+
+## 2026-10-19 — Progress-wizard: fill and long titles (progress session)
+**Asked:** steps of fixed width or filling the container, and whether a label squeezing the inline connector is normal; then build both, in Figma where needed.
+
+- Answer: yes, the line takes what the title leaves (Figma, Ant, MUI), but a
+  title past the line's minimum overflowed into the next step.
+- Code: `fill` prop (equal steps across the container) and ellipsis
+  truncation for inline connector titles; story rows, two specs, wizard
+  baselines re-taken on purpose and looked at.
+- Figma (one `use_figma` write): ending truncation and one line on the six
+  inline connector titles (no visual change while they hug), and code
+  pointers in the Progress-wizard and `_progress-wizard-item` descriptions.
+- Slip caught by the test: the stories said the line's minimum was 32px;
+  `space-xl` is 24.
+

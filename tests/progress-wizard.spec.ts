@@ -57,3 +57,24 @@ test('nothing in a wizard takes focus', async ({ page }) => {
     .evaluateAll((els) => els.flatMap((e) => [...e.querySelectorAll('a, button, input, [tabindex]')]).length);
   expect(focusable).toBe(0);
 });
+
+test('fill stretches the wizard and shares its width equally between the steps', async ({ page }) => {
+  for (const name of ['Fill bar', 'Fill connector']) {
+    const wizard = page.getByRole('list', { name });
+    const total = (await wizard.boundingBox())!.width;
+    const widths = await wizard.getByRole('listitem').evaluateAll((els) => els.map((e) => e.getBoundingClientRect().width));
+    for (const w of widths) expect(Math.abs(w - total / widths.length)).toBeLessThan(1);
+    expect(widths[0]).toBeGreaterThan(152);
+  }
+});
+
+test('a long inline connector title truncates with an ellipsis and leaves the line space-xl', async ({ page }) => {
+  const step = page.getByRole('list', { name: 'Long title' }).getByRole('listitem').first();
+  const title = step.locator('.bland-progress-wizard__title');
+  const [scroll, client, overflow] = await title.evaluate((e) => [e.scrollWidth, e.clientWidth, getComputedStyle(e).textOverflow]);
+  expect(scroll).toBeGreaterThan(client as number);
+  expect(overflow).toBe('ellipsis');
+  const line = (await step.locator('.bland-progress-wizard__connector').boundingBox())!;
+  expect(line.width).toBeGreaterThanOrEqual(24);
+  expect(line.x + line.width).toBeLessThanOrEqual((await step.boundingBox())!.x + 152 + 0.5);
+});

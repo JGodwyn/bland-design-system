@@ -32,6 +32,11 @@ export interface ProgressWizardProps extends Omit<OlHTMLAttributes<HTMLOListElem
   htmlStyle?: CSSProperties;
   /** Figma `State=disabled` for every step. */
   disabled?: boolean;
+  /**
+   * Stretch the wizard across its container, the steps sharing the width equally (Figma: wizard and steps set to
+   * Fill container). Off, each step is progress/step-width wide and the wizard hugs them.
+   */
+  fill?: boolean;
   /** What a screen reader hears for each step's marker. Defaults to "Completed", "Current" and "Not started". */
   progressLabels?: Record<ProgressWizardProgress, string>;
 }
@@ -54,6 +59,7 @@ export function ProgressWizard({
   style = 'bar',
   htmlStyle,
   disabled = false,
+  fill = false,
   progressLabels = defaultLabels,
   className,
   ...rest
@@ -67,6 +73,7 @@ export function ProgressWizard({
       className={`bland-progress-wizard${className ? ` ${className}` : ''}`}
       data-layout={layout}
       data-style={style}
+      data-fill={fill || undefined}
     >
       {steps.map((step, index) => {
         const progress = progressOf(index, current);

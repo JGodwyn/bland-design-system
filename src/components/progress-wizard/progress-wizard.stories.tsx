@@ -26,7 +26,7 @@ const demoSteps = (count: number, description: boolean) =>
 export default {
   title: 'Progress-wizard',
   description:
-    'Multi-step progress (stepper). Layout: inline, centered or stacked steps; Style: bar (top bar per step) or connector (line between markers). Steps before current are done, the current step is bold with aria-current="step", the rest are next. Each step is progress/step-width wide, so the wizard hugs its steps, and shrinks to share a narrower row. Not interactive.',
+    'Multi-step progress (stepper). Layout: inline, centered or stacked steps; Style: bar (top bar per step) or connector (line between markers). Steps before current are done, the current step is bold with aria-current="step", the rest are next. Each step is progress/step-width wide, so the wizard hugs its steps, and shrinks to share a narrower row; fill stretches the wizard across its container with equal steps. In an inline connector step a long title truncates with an ellipsis, so the line keeps at least space-xl. Not interactive.',
   components: ['ProgressWizard'],
   demo: {
     component: 'ProgressWizard',
@@ -90,6 +90,25 @@ export default {
             aria-label={`Disabled ${style}`}
           />
         ))}
+      </div>
+
+      <div className="pg-stack">
+        <span className="pg-label">fill: the steps share the container's width (here 960)</span>
+        {styles.map((style) => (
+          <div key={style} style={{ width: 960, maxWidth: '100%' }}>
+            <ProgressWizard fill style={style} steps={stepsOf(3)} current={1} aria-label={`Fill ${style}`} />
+          </div>
+        ))}
+      </div>
+
+      <div className="pg-stack">
+        <span className="pg-label">A title too long for an inline connector step truncates; the line keeps its space-xl (24) minimum</span>
+        <ProgressWizard
+          style="connector"
+          steps={[{ title: 'Billing and shipping address' }, { title: 'Payment' }, { title: 'Review' }]}
+          current={0}
+          aria-label="Long title"
+        />
       </div>
 
       <div className="pg-stack">

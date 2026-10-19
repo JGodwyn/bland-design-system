@@ -611,6 +611,17 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - `layout` inline (default) / centered / stacked, `disabled` for all steps
   or per step. Steps are `width: progress/step-width` and may shrink to share
   a narrower row (a width, not a flex-basis: see LEARNINGS, CSS).
+- **`fill`** (2026-10-19, Godwin): the wizard stretches across its container
+  and the steps share it equally (`flex: 1 1 0`), the common stepper default
+  and Figma's "set the wizard and each step to Fill container". Off by
+  default, so the wizard hugs 152px steps as in Figma.
+- **Long titles in an inline connector step truncate** (2026-10-19, Godwin):
+  the title hugs its text and the line fills what is left, as in Figma and
+  Ant Design, so a longer title means a shorter line; past the line's
+  `space-xl` (24) minimum the title ends in an ellipsis instead of pushing
+  into the next step. Other layouts wrap their titles. Figma's six inline
+  connector titles now have ending truncation (one line), which shows only
+  once a title is not set to Hug, and the item description says so.
 - From Figma: bar style pads `space-sm` all round with a `stroke-lg` top
   inside stroke (inset shadow), `Progress/fill-brand` on done and current,
   `Progress/track` on next. Connector style drops the inline padding; lines

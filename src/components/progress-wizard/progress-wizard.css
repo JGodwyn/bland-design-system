@@ -45,6 +45,12 @@
   padding: var(--space-sm);
 }
 
+/* fill: the steps share the container's width equally. */
+.bland-progress-wizard[data-fill] .bland-progress-wizard__step {
+  flex: 1 1 var(--space-none);
+  width: auto;
+}
+
 .bland-progress-wizard__step[data-disabled] {
   --_reached: var(--control-checked-disabled);
   --_marker-border: var(--border-subtle);
@@ -183,6 +189,14 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
+}
+
+/* Inline connector: a title too long for the row truncates, leaving the line its space-xl minimum. */
+.bland-progress-wizard__title-row .bland-progress-wizard__title {
+  min-width: var(--space-none);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .bland-progress-wizard__connector {
