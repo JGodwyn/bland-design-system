@@ -113,6 +113,19 @@ fixed size must survive an auto-sized parent.
 later. → Give the focused element `position: relative` (no z-index needed:
 positioned boxes paint after in-flow siblings).
 
+**A border on a table cell adds to the row height.** Table rows with
+`height: var(--table-sm)` on the cells came out 32.5 (body, 0.5 divider) and
+33 (header, 1px): Figma's dividers are inside strokes, CSS borders are not.
+→ Draw a Figma inside stroke on a table cell as an inset shadow
+(`box-shadow: inset 0 calc(var(--stroke-xs) * -1) 0 …`).
+
+**Table columns grow to fit one-line labels, so nothing truncates.** With
+`white-space: nowrap` a cell's min-content is its whole label, and the table
+widens instead of showing an ellipsis. → `max-width: 0` on the cell (plus a
+`min-width` token) makes the columns share the table's width; the label
+inside ends in an ellipsis and the table scrolls only when the minimums do
+not fit.
+
 **Native scrollbars can't meet the overflow rule.** macOS overlay scrollbars hide
 when idle, and the standard `scrollbar-width` has no 4px option. → The
 `ScrollArea` component hides the native bar and draws its own always-visible
@@ -194,6 +207,11 @@ role and expanded state through CDP (`Accessibility.getFullAXTree`), as
 **An `<a>` without `href` reports `tabIndex` 0 in Chromium** though it
 cannot take focus. → Test focusability by calling `focus()` and checking
 `document.activeElement`, not `tabIndex`.
+
+
+**`getByRole(…, { name })` matches a substring.** `getByRole('table', { name: 'People sm' })` also found
+"Expandable people sm" (6 column headers instead of 4). → Pass `exact: true` when one accessible name
+contains another.
 
 ## Working with parallel sessions
 

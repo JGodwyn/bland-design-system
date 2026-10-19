@@ -547,3 +547,27 @@ props`), build; baselines looked at in both themes.
 - Figma (one `use_figma` write, after merge): a "Code:" line in the
   `Empty-state` and `_empty-illustration` descriptions saying Bland ships no
   default illustration, pointing to the component map.
+
+## 2026-10-19 — Table (table session)
+**Asked:** build Table from the Figma Table page (53:10005), composable on a
+native `<table>`, with selection, sorting and horizontal overflow.
+
+- Three read-only `use_figma` dumps: `_table-cell` (60 variants),
+  `_table-header` (45) and `Table-row` (12), descriptions, properties and
+  deduped binding trees of every variant, inner frames and hidden
+  slots/focus rings included. The first Table-row dump exceeded 20 KB;
+  re-ran it compact (top-level children only). One more call exported
+  ArrowUp, ArrowDown, ArrowsDownUp and DotsThree.
+- Found: dividers are inside strokes (cells stroke-xs, header stroke-sm);
+  control columns are table/sm-lg squares; expand and option hold ghost Icon
+  Buttons (sm, md in lg); the sort icon's fill is unbound; the header's
+  selected variant pairs with a checked select all.
+- Built `src/components/table/` (eight parts, CSS, story), the four icons,
+  the exports and `tests/table.spec.ts` (11). Decisions in INTERFACE.md
+  §Table, map row in CLAUDE.md, axe exclusion for disabled cells.
+- Fixed in the browser: rows measured 32.5 / 33 with border dividers;
+  switched to inset shadows (LEARNINGS). Verified `max-width: 0` gives
+  ellipsis plus sideways scroll at 128px minimum columns.
+- Dead end: a static test page under the scratchpad could not be scripted
+  in the browser pane (local file); tested in the docs server instead.
+

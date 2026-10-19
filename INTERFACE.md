@@ -88,7 +88,8 @@ when), `docs/components.md` (how to build one).
   the default lives on `:root` (see LEARNINGS).
 - Bland's own icons (`src/icons/`) are exported from the Figma Icons page as
   components need them: Check, X, CaretDown, CaretRight, Plus, Minus, User, Spinner,
-  MagnifyingGlass, XCircle, WarningOctagon, CheckCircle, WarningCircle, Info so far.
+  MagnifyingGlass, XCircle, WarningOctagon, CheckCircle, WarningCircle, Info,
+  ArrowUp, ArrowDown, ArrowsDownUp, DotsThree (filled) so far.
 
 ## 4. Overflow
 
@@ -762,6 +763,85 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - **Width:** fills its container. `empty-state/width-sm` (256) and
   `-lg` (384) are Figma's frame widths; its description says "use Fill
   container in layouts" (as Banner, Accordion, List item).
+
+### Table (2026-10-19)
+- `import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell,
+  TableExpandCell, TableOptionCell } from 'bland'`, folder `table/`. Figma:
+  sets `Table-row` (849:6722, 12 variants), `_table-header` (711:72592, 45)
+  and `_table-cell` (53:9651, 60); every variant's bindings read, inner
+  frames and hidden slots and focus rings included.
+- **A native `<table>`, composed, not a data grid** (decided 2026-10-19):
+  `Table` > `TableHead` / `TableBody` > `TableRow` > cells, so screen
+  readers get rows, columns and headers for free, and projects map their
+  own data. Name it with `aria-label` or `aria-labelledby` (Figma has no
+  caption). Headers are `<th scope="col">`. No grid keyboard navigation:
+  only the interactive parts take focus (sort buttons, selection controls,
+  expand and option buttons, links in cells), so Figma's `👀 Focused` inset
+  ring is drawn on the sort button only, and the docs "focused" preview
+  appears only while one of those renders. A grid (`role="grid"`, arrow
+  keys between cells) waits for a project that needs it, with React Aria.
+- **Selection** (decided 2026-10-19): Figma's Table-row `👀 Checkbox` /
+  `👀 Radio` are `selectionMode` `multiple` / `single` on `Table`, with
+  `selectedKeys` / `defaultSelectedKeys` / `onSelectionChange` (an array of
+  `rowKey`s). Each body `TableRow` with a `rowKey` gets the control column
+  first: a Checkbox sm (`selectLabel`, default "Select row"; give each a
+  real name such as "Select Ada Lovelace") or a Radio sm sharing one
+  generated `name`. The head gets a select all Checkbox in a `th` (mixed
+  while some rows are selected, `selectAllLabel`) or, for single, Figma's
+  blank `empty` header as a `<td>` (an empty `th` is an empty column
+  header). Select all touches only rows that are not disabled. Selected
+  rows set `aria-selected` and take `Table/surface-cell-selected`. Rows are
+  selected only through their control, never by clicking the row, so
+  nothing interactive nests.
+- **Header selected fill** (decided 2026-10-19): Figma's
+  `_table-header State=selected` pairs with its checked select all Checkbox,
+  so the head row takes `Table/surface-header-selected` while every row is
+  selected. Figma's Table-row header is otherwise rest only.
+- **Sorting**: `TableHeaderCell` with `onSort` is Figma's
+  `Structure=sortable`: a button filling the th (label, then the sort icon
+  at the end), `aria-sort` on the th while `sort` is `ascending` or
+  `descending`. The project sorts and passes the next `sort`. Icons:
+  ArrowUp ascending, ArrowDown descending (Figma's default), ArrowsDownUp
+  while unsorted so the column reads as sortable; icon/sm, `icon-bold`
+  when sorted, `icon-subtle` otherwise (Figma's sort icon fill is unbound
+  white, so the colors are a code decision). `sortIcon` replaces it
+  (Figma `🌟 Sort icon`). Hover fill `Table/surface-header-hover` only on
+  sortable headers; the focus ring is inset (`outline-offset` minus
+  `stroke-lg`), as Figma's, because cells touch.
+- **Row hover**: every body row takes `Table/surface-cell-hover` (Figma's
+  Table-row `State=hover`), except selected and disabled rows. No
+  transition: rows are scanned constantly (motion rules).
+- **Expand and option** (`Structure=expand` / `option`, Table-row
+  `👀 Option`): `TableExpandCell` (ghost Icon Button, CaretDown turning 180°
+  over `duration/md` `easing/out`, `aria-expanded`, `controls` for
+  `aria-controls`; the project renders the details row, usually one
+  `TableCell` with `colSpan`) and `TableOptionCell` (ghost DotsThree Icon
+  Button, or `children` for a Dropdown trigger later). The Icon Button is
+  sm in sm and md tables, md in lg, as in Figma. In the head,
+  TableExpandCell is Figma's blank `empty` header and TableOptionCell keeps
+  its button (Figma draws one there).
+- **Disabled**: `disabled` on a `TableRow` (all its cells, its controls) or
+  one `TableCell`: text `text-minimal`, slot icons `icon-minimal`, fill
+  unchanged, as Figma's `State=disabled`.
+- **Sizes and layout** (from Figma): rows and headers `table/sm`, `md`,
+  `lg` (32, 40, 48; default sm, Figma's); padding `space-md` at the sides,
+  gap `space-sm`; slots at least `table/slot-sm`, `md`, `lg` (20, 24, 32)
+  square, content centred, an `<Icon>` icon/md in sm and icon/lg in md and
+  lg (leading `icon-bold`, trailing `icon-subtle`, as List item); an Avatar
+  fits as xs, sm, md. Slots grow for wider content (code only; Figma's are
+  fixed squares). Control cells are squares of the row height. Header
+  body-lg-bold, cells body-lg, both `text-bold`.
+- **Dividers** are Figma's inside strokes, drawn as an inset bottom
+  shadow so rows keep their exact height: cells `stroke-xs` (0.5),
+  headers `stroke-sm` (1), both `border-subtle`.
+- **Width and overflow** (decided 2026-10-19): the table fills its
+  container (`table/width` 640 is Figma's frame). Basic columns are at least
+  `table/cell-width` (128) and share the rest; labels never widen a column,
+  they end in an ellipsis (one line, Figma's ending truncation). When the
+  minimum widths exceed the container, the table scrolls sideways in a
+  `ScrollArea axis="x"` (fade plus visible thumb, the overflow rule), and
+  the scrolling element becomes a Tab stop while it overflows so keyboard
+  users can scroll a table with no controls in it.
 
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 

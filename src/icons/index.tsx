@@ -116,3 +116,38 @@ export const InfoIcon = (p: P) => (
     <path d="M15.5 12C16.3284 12 17 11.3284 17 10.5C17 9.67157 16.3284 9 15.5 9C14.6716 9 14 9.67157 14 10.5C14 11.3284 14.6716 12 15.5 12Z" fill="currentColor" stroke="none" />
   </svg>
 );
+
+/** Figma: ArrowUp (6080:105903). A Table header sorted ascending. */
+export const ArrowUpIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M16 27V5" />
+    <path d="M7 14L16 5L25 14" />
+  </svg>
+);
+
+/** Figma: ArrowDown (6080:105456). A Table header sorted descending (Figma's default sort icon). */
+export const ArrowDownIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M16 5V27" />
+    <path d="M7 18L16 27L25 18" />
+  </svg>
+);
+
+/** Figma: ArrowsDownUp (6080:105480). A sortable Table header that is not sorted yet. */
+export const ArrowsDownUpIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M14 22L10 26L6 22" />
+    <path d="M10 6V26" />
+    <path d="M18 10L22 6L26 10" />
+    <path d="M22 26V6" />
+  </svg>
+);
+
+/** Figma: DotsThree (6080:105704). Filled. Table's option button. */
+export const DotsThreeIcon = (p: P) => (
+  <svg viewBox="0 0 32 32" fill="currentColor" {...p}>
+    <path d="M16 17.5C16.8284 17.5 17.5 16.8284 17.5 16C17.5 15.1716 16.8284 14.5 16 14.5C15.1716 14.5 14.5 15.1716 14.5 16C14.5 16.8284 15.1716 17.5 16 17.5Z" />
+    <path d="M24.5 17.5C25.3284 17.5 26 16.8284 26 16C26 15.1716 25.3284 14.5 24.5 14.5C23.6716 14.5 23 15.1716 23 16C23 16.8284 23.6716 17.5 24.5 17.5Z" />
+    <path d="M7.5 17.5C8.32843 17.5 9 16.8284 9 16C9 15.1716 8.32843 14.5 7.5 14.5C6.67157 14.5 6 15.1716 6 16C6 16.8284 6.67157 17.5 7.5 17.5Z" />
+  </svg>
+);

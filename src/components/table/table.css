@@ -1,0 +1,229 @@
+/*
+ * Table (Figma: Table page, sets "Table-row", "_table-header", "_table-cell").
+ *
+ *   <div class="bland-scroll-area bland-table" data-size="sm|md|lg">         ScrollArea axis="x"
+ *     <div class="bland-scroll-area__viewport">…
+ *       <table class="bland-table__table">
+ *         <thead class="bland-table__head">
+ *           <tr class="bland-table__row" [data-selected]>
+ *             <th class="bland-table__header" data-structure="basic|control" [data-sortable] [data-sorted]>
+ *               <span|button class="bland-table__inner [bland-table__sort]">
+ *                 <span class="bland-table__slot" data-slot="leading">…</span>
+ *                 <span class="bland-table__label">Head</span>
+ *                 <span class="bland-table__slot" data-slot="trailing">…</span> | sort icon
+ *         <tbody class="bland-table__body">
+ *           <tr class="bland-table__row" [aria-selected] [data-selected] [data-disabled]>
+ *             <td class="bland-table__cell" data-structure="basic|control" [data-disabled]>…
+ *
+ * Figma's cell root and its Inner frame are one element here: the th or td carries the fill and the
+ * divider, and __inner lays out the padding, gap and slots. Every cell is at least the row height
+ * (table/sm, md, lg). Basic cells are at least table/cell-width wide and share the rest of the
+ * width; control cells (selection, expand, option) are squares of the row height. The table fills
+ * its container: table/width (640) is Figma's frame ("use Fill container in layouts").
+ */
+
+.bland-table {
+  --_h: var(--table-sm);
+  --_slot: var(--table-slot-sm);
+  --_slot-icon: var(--icon-md);
+}
+
+.bland-table[data-size="md"] {
+  --_h: var(--table-md);
+  --_slot: var(--table-slot-md);
+  --_slot-icon: var(--icon-lg);
+}
+
+.bland-table[data-size="lg"] {
+  --_h: var(--table-lg);
+  --_slot: var(--table-slot-lg);
+  --_slot-icon: var(--icon-lg);
+}
+
+.bland-table__table {
+  width: 100%;
+  margin: var(--space-none);
+  border-spacing: var(--space-none);
+  border-collapse: separate;
+}
+
+/* ---- Cells: fill, divider, type ---- */
+
+.bland-table__header,
+.bland-table__cell {
+  box-sizing: border-box;
+  height: var(--_h);
+  padding: var(--space-none);
+  background-color: var(--_bg);
+  color: var(--_text);
+  text-align: start;
+  vertical-align: middle;
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+/*
+ * Dividers are Figma's inside strokes: an inset shadow along the bottom edge, so a row stays exactly
+ * the row height (a border would add its width).
+ */
+
+/* Header: Table/surface-header-*, a stroke-sm divider, body-lg-bold. */
+.bland-table__header {
+  --_bg: var(--table-surface-header-rest);
+  --_text: var(--text-bold);
+
+  box-shadow: inset 0 calc(var(--stroke-sm) * -1) 0 var(--border-subtle);
+  font: var(--type-body-lg-bold);
+}
+
+/* Body: Table/surface-cell-*, a stroke-xs divider, body-lg. */
+.bland-table__cell {
+  --_bg: var(--table-surface-cell-rest);
+  --_text: var(--text-bold);
+
+  box-shadow: inset 0 calc(var(--stroke-xs) * -1) 0 var(--border-subtle);
+  font: var(--type-body-lg);
+}
+
+/*
+ * Basic cells: at least table/cell-width wide. max-width 0 lets the table share its width between
+ * the columns instead of growing to fit every label, so a label that does not fit ends in an
+ * ellipsis; a table whose minimum widths exceed its container scrolls sideways instead.
+ */
+.bland-table__header[data-structure="basic"],
+.bland-table__cell[data-structure="basic"] {
+  min-width: var(--table-cell-width);
+  max-width: var(--space-none);
+}
+
+/* Control cells: squares of the row height. */
+.bland-table__header[data-structure="control"],
+.bland-table__cell[data-structure="control"] {
+  width: var(--_h);
+  min-width: var(--_h);
+}
+
+/* ---- Layout inside a cell ---- */
+
+.bland-table__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--_h);
+  padding: var(--space-none) var(--space-md);
+}
+
+[data-structure="control"] > .bland-table__inner {
+  justify-content: center;
+  padding: var(--space-none);
+}
+
+.bland-table__label {
+  flex: 1 1 auto;
+  min-width: var(--space-none);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Figma's 🧩 slots: at least table/slot-sm, md or lg square, content centred; wider content (a Badge) widens it. */
+.bland-table__slot {
+  --bland-icon-size: var(--_slot-icon);
+
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--_slot);
+  min-height: var(--_slot);
+  color: var(--icon-bold);
+}
+
+.bland-table__slot[data-slot="trailing"] {
+  color: var(--icon-subtle);
+}
+
+/* ---- Sortable header: a button that fills the th ---- */
+
+.bland-table__sort {
+  margin: var(--space-none);
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Figma's 👀 Focused ring is inset, because cells touch. The outline only draws on :focus-visible. */
+.bland-table .bland-table__sort.bland-focus-ring {
+  outline-offset: calc(var(--stroke-lg) * -1);
+}
+
+.bland-table__sort-icon {
+  --bland-icon-size: var(--icon-sm);
+
+  color: var(--icon-subtle);
+}
+
+.bland-table__header[data-sorted] .bland-table__sort-icon {
+  color: var(--icon-bold);
+}
+
+/* ---- Expand caret: turns while expanded ---- */
+
+.bland-table__expand .bland-icon {
+  transition: transform var(--duration-md) var(--easing-out);
+}
+
+.bland-table__expand[aria-expanded="true"] .bland-icon {
+  transform: rotate(180deg);
+}
+
+/* ---- States: hover (body rows, sortable headers), selected, disabled ---- */
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-table__body > .bland-table__row:not([data-selected], [data-disabled]):hover > .bland-table__cell {
+    --_bg: var(--table-surface-cell-hover);
+  }
+
+  .bland-table__header[data-sortable]:hover {
+    --_bg: var(--table-surface-header-hover);
+  }
+}
+
+.bland-table__row[data-selected] > .bland-table__cell {
+  --_bg: var(--table-surface-cell-selected);
+}
+
+/* The head takes Figma's header selected fill while every row is selected (its Checkbox is checked). */
+.bland-table__row[data-selected] > .bland-table__header {
+  --_bg: var(--table-surface-header-selected);
+}
+
+.bland-table__cell[data-disabled] {
+  --_text: var(--text-minimal);
+}
+
+.bland-table__cell[data-disabled] .bland-table__slot {
+  color: var(--icon-minimal);
+}
+
+/* ---- The scrolling element, focusable while the table overflows (Table.tsx) ---- */
+
+.bland-table > .bland-scroll-area__viewport:focus-visible {
+  outline: none;
+}
+
+.bland-table:has(> .bland-scroll-area__viewport:focus-visible) {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--space-2xs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bland-table__expand .bland-icon {
+    transition: none;
+  }
+}

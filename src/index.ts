@@ -105,3 +105,23 @@ export {
   type EmptyStateSize,
   type EmptyStateTitleAs,
 } from './components/empty-state/EmptyState';
+export {
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeaderCell,
+  TableCell,
+  TableExpandCell,
+  TableOptionCell,
+  type TableProps,
+  type TableSectionProps,
+  type TableRowProps,
+  type TableHeaderCellProps,
+  type TableCellProps,
+  type TableExpandCellProps,
+  type TableOptionCellProps,
+  type TableSize,
+  type TableSelectionMode,
+  type TableSort,
+} from './components/table/Table';

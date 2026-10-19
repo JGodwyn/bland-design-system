@@ -28,6 +28,8 @@ const disabledFieldText = [
   '.bland-progress-wizard__step[data-disabled]',
   // A disabled List row is drawn in Text/text-minimal by Figma's State=disabled; plain and link rows have no native disabled.
   '.bland-list-item[data-disabled]',
+  // A disabled Table cell (or a cell of a disabled row) is drawn in Text/text-minimal by Figma's State=disabled.
+  '.bland-table__cell[data-disabled]',
 ];
 
 for (const id of storyIds) {
