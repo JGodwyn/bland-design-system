@@ -22,6 +22,8 @@ const disabledFieldText = [
   '.bland-text-input:has(.bland-text-input__input:disabled)',
   '.bland-text-area:has(.bland-text-area__input:disabled)',
   '.bland-numeric-input-field:has(.bland-numeric-input-field__box:disabled)',
+  // A disabled Progress-wizard step is drawn in Text/text-minimal by Figma's State=disabled, like disabled fields.
+  '.bland-progress-wizard__step[data-disabled]',
 ];
 
 for (const id of storyIds) {

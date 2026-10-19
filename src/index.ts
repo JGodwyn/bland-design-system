@@ -78,3 +78,17 @@ export {
   type NotificationOrientation,
 } from './components/notification/Notification';
 export type { MessageIcon } from './components/message/Message';
+export {
+  ProgressBar,
+  type ProgressBarProps,
+  type ProgressBarSize,
+  type ProgressBarStatus,
+} from './components/progress-bar/ProgressBar';
+export {
+  ProgressWizard,
+  type ProgressWizardProps,
+  type ProgressWizardStep,
+  type ProgressWizardLayout,
+  type ProgressWizardStyle,
+  type ProgressWizardProgress,
+} from './components/progress-wizard/ProgressWizard';

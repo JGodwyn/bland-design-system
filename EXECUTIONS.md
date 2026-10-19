@@ -458,3 +458,24 @@ baselines looked at.
   a reused server's stale props. Both in LEARNINGS.md §Tooling.
 **Verified:** lint:css, typecheck, `npm test` 233 passed (after `npm run
 props`), build; baselines looked at in both themes.
+
+## 2026-10-18/19 — Progress-bar and Progress-wizard (progress session)
+**Asked:** build Progress-bar and Progress-wizard from the Figma Progress indicators page (180:6577).
+
+- Read the four sets (Progress-bar, Progress-wizard, `_progress-wizard-item`,
+  `_progress-icon`) with six read-only `use_figma` scripts on the second
+  connector: descriptions and properties, then every variant's tree with
+  bindings. The bar's full dump passed the 20 KB limit, so later scripts
+  printed only the lines that differ from a base variant.
+- Usage limit hit after the Figma read; findings and the planned API went to
+  `progress.md` in the side-session notes folder, and the build resumed from
+  it the next day.
+- Built `src/components/progress-bar/` and `src/components/progress-wizard/`
+  (components, CSS, stories), exports, `tests/progress-bar.spec.ts` (6) and
+  `tests/progress-wizard.spec.ts` (5). Decisions in INTERFACE.md §Progress,
+  map row in CLAUDE.md.
+- Dead end: steps first used `flex: 0 1 step-width` and came out about 120px
+  wide in the story (LEARNINGS, CSS); switched to a width.
+- axe flagged the disabled wizard steps' `text-minimal` text (12 nodes);
+  excluded like disabled field text, with the reason in `tests/a11y.spec.ts`.
+

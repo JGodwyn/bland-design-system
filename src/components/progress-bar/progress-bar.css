@@ -1,0 +1,138 @@
+/*
+ * Progress-bar (Figma: Progress indicators page, set "Progress-bar").
+ *
+ *   <div class="bland-progress-bar" data-size="sm" data-status="default">
+ *     <span class="bland-progress-bar__label">Uploading</span>
+ *     <div class="bland-progress-bar__row">
+ *       <div class="bland-progress-bar__track" role="progressbar" aria-valuenow="40" …>
+ *         <span class="bland-progress-bar__fill" style="--_value: 40%"></span>
+ *       </div>
+ *       <span class="bland-progress-bar__value">40%</span>
+ *       <span class="bland-icon bland-progress-bar__status-icon">…</span>        (success, danger)
+ *       <button class="bland-progress-bar__cancel bland-focus-ring bland-smooth">…</button>  (default + onCancel)
+ *     </div>
+ *     <span class="bland-progress-bar__helper">Helper text</span>
+ *   </div>
+ *
+ * Figma draws the fill as four quarter segments; code draws one bar the full track length and
+ * slides it in from the left (transform only), so its rounded end is kept at any value.
+ */
+
+.bland-progress-bar {
+  --_fill: var(--progress-fill-brand);
+  --_helper: var(--text-bold);
+  --_icon: var(--icon-bold);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: var(--progress-width);
+  max-width: 100%;
+  color: var(--text-bold);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+/* ---- Status: fill, helper and icon colors ---- */
+
+.bland-progress-bar[data-status="success"] {
+  --_fill: var(--progress-fill-success);
+  --_helper: var(--text-success);
+  --_icon: var(--icon-success);
+}
+
+.bland-progress-bar[data-status="danger"] {
+  --_fill: var(--progress-fill-danger);
+  --_helper: var(--text-danger);
+  --_icon: var(--icon-danger);
+}
+
+/* ---- Parts ---- */
+
+.bland-progress-bar__label {
+  font: var(--type-body-lg);
+}
+
+.bland-progress-bar__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.bland-progress-bar__track {
+  display: flex;
+  flex: 1;
+  min-width: var(--space-none);
+  height: var(--progress-track-sm);
+  overflow: hidden;
+  border-radius: var(--rad-rd);
+  background-color: var(--progress-track);
+}
+
+.bland-progress-bar[data-size="md"] .bland-progress-bar__track {
+  height: var(--progress-track-md);
+}
+
+.bland-progress-bar__fill {
+  flex: 1;
+  border-radius: var(--rad-rd);
+  background-color: var(--_fill);
+  transform: translateX(calc(var(--_value) - 100%));
+  transition:
+    transform var(--duration-md) var(--easing-linear),
+    background-color var(--duration-xs) var(--easing-ease);
+}
+
+.bland-progress-bar__value {
+  flex: none;
+  width: var(--progress-value-width);
+  font: var(--type-body-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.bland-progress-bar__status-icon {
+  --bland-icon-size: var(--icon-sm);
+
+  flex: none;
+  color: var(--_icon);
+}
+
+.bland-progress-bar__cancel {
+  --bland-icon-size: var(--icon-sm);
+  --bland-radius: var(--rad-sm); /* drawn by .bland-smooth */
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-xs);
+  height: var(--control-xs);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  background: none;
+  color: var(--icon-subtle);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--duration-sm) var(--easing-out);
+}
+
+.bland-progress-bar__cancel:active {
+  transform: scale(0.97);
+}
+
+.bland-progress-bar__helper {
+  font: var(--type-body-sm);
+  color: var(--_helper);
+}
+
+/* The fill jumps to its value; the cancel button keeps no press motion. */
+@media (prefers-reduced-motion: reduce) {
+  .bland-progress-bar__fill {
+    transition-property: background-color;
+  }
+
+  .bland-progress-bar__cancel:active {
+    transform: none;
+  }
+}

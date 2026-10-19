@@ -1,0 +1,209 @@
+/*
+ * Progress-wizard (Figma: Progress indicators page, sets "Progress-wizard", "_progress-wizard-item"
+ * and "_progress-icon").
+ *
+ *   <ol class="bland-progress-wizard" data-layout="inline" data-style="bar">
+ *     <li class="bland-progress-wizard__step" data-progress="done|current|next" aria-current="step">
+ *       <span class="bland-progress-wizard__marker-wrap">              (bar, and inline connector)
+ *       <span class="bland-progress-wizard__marker-row">               (centered and stacked connector)
+ *         <span class="bland-progress-wizard__line" data-side="start"> (centered only)
+ *         <span class="bland-progress-wizard__marker" role="img">…</span>
+ *         <span class="bland-progress-wizard__line" data-side="end">
+ *       <span class="bland-progress-wizard__text">
+ *         <span class="bland-progress-wizard__title">…</span>           (inline connector: in a title-row with the line)
+ *         <span class="bland-progress-wizard__description">…</span>
+ *
+ * Colors: each step names its reached color (--_reached, brand or checked-disabled) and its marker
+ * colors from data-progress and data-disabled; bars and lines read --_reached or the track.
+ */
+
+.bland-progress-wizard {
+  display: flex;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  list-style: none;
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+/* ---- Step: one per progress/step-width, shrinking to share a narrow row ---- */
+
+.bland-progress-wizard__step {
+  --_reached: var(--progress-fill-brand);
+  --_bar: var(--progress-track);
+  --_marker-fill: var(--surface-100);
+  --_marker-stroke: var(--stroke-sm);
+  --_marker-border: var(--border-input);
+  --_title: var(--text-bold);
+  --_description: var(--text-subtle);
+
+  display: flex;
+  flex: 0 1 auto;
+  gap: var(--space-sm);
+  /* A width, not a flex-basis, so a wizard in a shrink-to-fit container still measures 152 a step. */
+  width: var(--progress-step-width);
+  min-width: var(--space-none);
+  padding: var(--space-sm);
+}
+
+.bland-progress-wizard__step[data-disabled] {
+  --_reached: var(--control-checked-disabled);
+  --_marker-border: var(--border-subtle);
+  --_title: var(--text-minimal);
+  --_description: var(--text-minimal);
+}
+
+.bland-progress-wizard__step:is([data-progress="done"], [data-progress="current"]) {
+  --_bar: var(--_reached);
+}
+
+.bland-progress-wizard__step[data-progress="done"] {
+  --_marker-fill: var(--control-checked-rest);
+  --_marker-stroke: var(--stroke-none);
+}
+
+.bland-progress-wizard__step[data-progress="done"][data-disabled] {
+  --_marker-fill: var(--control-checked-disabled);
+}
+
+.bland-progress-wizard__step[data-progress="current"] {
+  --_marker-stroke: var(--stroke-lg);
+  --_marker-border: var(--border-brand);
+}
+
+.bland-progress-wizard__step[data-progress="current"][data-disabled] {
+  --_marker-border: var(--border-subtle);
+}
+
+/* ---- Style: bar is a stroke-lg inside stroke on top; connector moves the padding to the markers ---- */
+
+.bland-progress-wizard[data-style="bar"] .bland-progress-wizard__step {
+  box-shadow: inset var(--space-none) var(--stroke-lg) var(--space-none) var(--space-none) var(--_bar);
+}
+
+.bland-progress-wizard[data-style="connector"] .bland-progress-wizard__step {
+  padding-inline: var(--space-none);
+}
+
+/* ---- Layout ---- */
+
+.bland-progress-wizard[data-layout="centered"] .bland-progress-wizard__step {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.bland-progress-wizard[data-layout="stacked"] .bland-progress-wizard__step {
+  flex-direction: column;
+}
+
+/* Inline: the marker centres on the title's first line. */
+.bland-progress-wizard__marker-wrap {
+  display: flex;
+  flex: none;
+}
+
+.bland-progress-wizard[data-layout="inline"] .bland-progress-wizard__marker-wrap {
+  padding-top: var(--space-2xs);
+}
+
+.bland-progress-wizard__marker-row {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+}
+
+.bland-progress-wizard__text {
+  display: flex;
+  flex-direction: column;
+  min-width: var(--space-none);
+}
+
+.bland-progress-wizard[data-layout="inline"] .bland-progress-wizard__text {
+  flex: 1;
+}
+
+.bland-progress-wizard[data-layout="centered"] .bland-progress-wizard__text {
+  align-self: stretch;
+}
+
+.bland-progress-wizard[data-style="connector"][data-layout="centered"] .bland-progress-wizard__text {
+  padding-inline: var(--space-sm);
+}
+
+.bland-progress-wizard[data-style="connector"][data-layout="stacked"] .bland-progress-wizard__text {
+  padding-inline-end: var(--space-sm);
+}
+
+/* ---- Marker: progress/marker circle; done holds a check, current a dot ---- */
+
+.bland-progress-wizard__marker {
+  --bland-icon-size: var(--icon-xs);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--progress-marker);
+  height: var(--progress-marker);
+  border-radius: var(--rad-rd);
+  background-color: var(--_marker-fill);
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--_marker-stroke) var(--_marker-border);
+  color: var(--icon-on-color);
+}
+
+.bland-progress-wizard__dot {
+  width: var(--progress-marker-dot);
+  height: var(--progress-marker-dot);
+  border-radius: var(--rad-rd);
+  background-color: var(--control-checked-rest);
+}
+
+.bland-progress-wizard__step[data-disabled] .bland-progress-wizard__dot {
+  background-color: var(--control-checked-disabled);
+}
+
+/* ---- Connector lines: stroke-lg high, brand once the step they lead into is reached ---- */
+
+.bland-progress-wizard__line {
+  flex: 1;
+  height: var(--stroke-lg);
+  background-color: var(--progress-track);
+}
+
+.bland-progress-wizard__line[data-reached] {
+  background-color: var(--_reached);
+}
+
+/* A first step keeps an invisible start line so its marker stays centred. */
+.bland-progress-wizard__line[data-hidden] {
+  visibility: hidden;
+}
+
+.bland-progress-wizard__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.bland-progress-wizard__connector {
+  display: flex;
+  flex: 1;
+  min-width: var(--space-xl);
+  padding-inline-end: var(--space-sm);
+}
+
+/* ---- Text ---- */
+
+.bland-progress-wizard__title {
+  font: var(--type-body-lg);
+  color: var(--_title);
+}
+
+.bland-progress-wizard__step[data-progress="current"] .bland-progress-wizard__title {
+  font: var(--type-body-lg-bold);
+}
+
+.bland-progress-wizard__description {
+  font: var(--type-body-lg);
+  color: var(--_description);
+}

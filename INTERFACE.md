@@ -565,6 +565,70 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   gets `Breadcrumb/surface-hover`. No pressed state or motion (Figma has
   none; links are used constantly).
 
+### Progress-bar and Progress-wizard (2026-10-19)
+- `import { ProgressBar, ProgressWizard } from 'bland'`. Folders follow the
+  Figma sets: `progress-bar/`, `progress-wizard/` (with the private
+  `_progress-wizard-item` and `_progress-icon` drawn inside it).
+- **Progress-bar is determinate only**, as in Figma. `value` with `min` 0 and
+  `max` 100 by default; any value, though Figma draws quarters (its four
+  segments are a Figma drawing aid: code draws one fill).
+- **`role="progressbar"` sits on the track, not the root**, because the root
+  can hold the cancel button and a progressbar's children are presentational.
+  The track gets `aria-valuenow` / `min` / `max`, its name from `label`
+  (`aria-labelledby`) or `aria-label` / `aria-labelledby` (a TypeScript
+  union: one is required), and `helperText` through `aria-describedby`. The
+  visible "N%" is `aria-hidden`; the value attributes carry it.
+- From Figma: root `space-xs` gap, width `progress/width` capped at 100% of
+  its container (set a width to fill a layout); row `space-sm` gap; track
+  `progress/track-sm|md`, `rad-rd`, `Progress/track`; value column
+  `progress/value-width`, body-sm text-bold, tabular numbers; label body-lg
+  text-bold; helper body-sm text-bold, `text-success` / `text-danger` by
+  status. Default size **sm** (Figma's).
+- `status` default/success/danger sets the fill (`Progress/fill-*`) and, on
+  success and danger, a decorative status icon after the value (CheckCircle /
+  WarningOctagon, icon/sm, `Icon/icon-success|danger`). Say what happened in
+  `helperText`.
+- `onCancel` (Figma `👀 Cancel`, default status only): a `control/xs` button,
+  `rad-sm` with `.bland-smooth`, the X at icon/sm in `icon-subtle` (Figma's X
+  carries no readable color binding; Banner's close uses icon-subtle),
+  `cancelLabel` default "Cancel", press `scale(0.97)`, no hover (Figma has
+  none). Stopping the work is the app's job.
+- **Fill motion:** the fill is the full track length, rounded at both ends,
+  and slides in with `translateX(value - 100%)` inside the clipped track, so
+  the rounded end survives any value and only `transform` animates:
+  `duration/md` with `easing/linear` (docs/motion.md reserves linear for
+  progress fills). Under reduced motion it jumps.
+- **Progress-wizard** is an `<ol>` (name it with `aria-label`) of `<li>`
+  steps. `steps` is data (`title`, `description`, `disabled`), `current` the
+  index: earlier steps are done, later ones next, and `current =
+  steps.length` means all done. Figma's per-step `Progress` follows from
+  `current` instead of being set by hand. The current step gets
+  `aria-current="step"`; each marker is `role="img"` named "Completed",
+  "Current" or "Not started" (`progressLabels` to translate).
+- **Figma `Style` keeps its name** (`style="bar" | "connector"`), so the
+  native style attribute is `htmlStyle`, as Button's `type` / `htmlType`
+  (docs/components.md, "Props").
+- `layout` inline (default) / centered / stacked, `disabled` for all steps
+  or per step. Steps are `width: progress/step-width` and may shrink to share
+  a narrower row (a width, not a flex-basis: see LEARNINGS, CSS).
+- From Figma: bar style pads `space-sm` all round with a `stroke-lg` top
+  inside stroke (inset shadow), `Progress/fill-brand` on done and current,
+  `Progress/track` on next. Connector style drops the inline padding; lines
+  are `stroke-lg` high: inline puts one after the title (`space-xl` minimum,
+  `space-sm` end padding), centered draws one each side of the marker
+  (full bleed; the first step's is kept invisible so its marker stays
+  centred), stacked one after the marker. A line is brand once the step it
+  leads into is reached. Markers `progress/marker`: done `Control/checked-rest`
+  with a Check (icon/xs, `icon-on-color`), current `surface-100` with a
+  `stroke-lg` `border-brand` ring and a `progress/marker-dot`, next
+  `surface-100` with a `stroke-sm` `border-input` ring. Title body-lg
+  text-bold (current body-lg-bold), description body-lg text-subtle.
+- Disabled (Figma `State=disabled`): brand becomes `Control/checked-disabled`,
+  rings `border-subtle`, text `text-minimal`. axe skips that text in
+  `tests/a11y.spec.ts`, as it does for disabled fields.
+- Not interactive: nothing takes focus, so no Focused row. Circles skip
+  `.bland-smooth`.
+
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 
 - A sidebar of style pages (generated from `tokens.json`) and components
