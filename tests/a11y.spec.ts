@@ -30,6 +30,9 @@ const disabledFieldText = [
   '.bland-list-item[data-disabled]',
   // A disabled Table cell (or a cell of a disabled row) is drawn in Text/text-minimal by Figma's State=disabled.
   '.bland-table__cell[data-disabled]',
+  // A disabled Dropdown's field text and a disabled Menu or Dropdown row use Text/text-minimal, as disabled fields.
+  '.bland-dropdown[data-disabled]',
+  '.bland-menu__item[data-disabled]',
 ];
 
 for (const id of storyIds) {

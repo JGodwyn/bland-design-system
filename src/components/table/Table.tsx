@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   useState,
+  isValidElement,
   type HTMLAttributes,
   type MouseEventHandler,
   type ReactNode,
@@ -19,6 +20,7 @@ import { ArrowDownIcon, ArrowsDownUpIcon, ArrowUpIcon, CaretDownIcon, DotsThreeI
 import { IconButton } from '../button/IconButton';
 import { Checkbox } from '../checkbox/Checkbox';
 import { Icon } from '../icon/Icon';
+import { Menu, type MenuItemData, type MenuPlacement } from '../menu/Menu';
 import { Radio } from '../radio-button/Radio';
 import { ScrollArea } from '../scroll-area/ScrollArea';
 import './table.css';
@@ -428,9 +430,18 @@ export function TableExpandCell({ expanded = false, onExpandedChange, label = 'S
 }
 
 export interface TableOptionCellProps extends Omit<TdHTMLAttributes<HTMLTableCellElement>, 'onClick'> {
-  /** Your own trigger, such as a Dropdown's. Leave it out for Bland's ghost DotsThree Icon Button. */
+  /**
+   * Your own trigger. Leave it out for Bland's ghost DotsThree Icon Button. With `items` it must be one focusable
+   * element that takes a `ref` and DOM props (it becomes the Menu's trigger).
+   */
   children?: ReactNode;
-  /** Called when the DotsThree button is pressed. */
+  /** The row's actions: the trigger opens a Menu of them (Menu's `items`). Leave it out for a plain button. */
+  items?: MenuItemData[];
+  /** Called with an item's `id` when it is chosen from the menu. */
+  onAction?: (id: string) => void;
+  /** Where the menu opens. Default `bottom-end`, so it lines up under the button at the end of the row. */
+  menuPlacement?: MenuPlacement;
+  /** Called when the DotsThree button is pressed, when there are no `items`. */
   onClick?: MouseEventHandler<HTMLButtonElement>;
   /** Accessible name of the DotsThree button, such as "Options for Ada Lovelace". */
   label?: string;
@@ -438,17 +449,33 @@ export interface TableOptionCellProps extends Omit<TdHTMLAttributes<HTMLTableCel
 
 /**
  * Figma `Structure=option` (Table-row `👀 Option`): a square cell at the end of the row with a ghost Icon Button
- * (DotsThree), in the head and the body alike.
+ * (DotsThree), in the head and the body alike. With `items`, the button opens a Menu of the row's actions.
  */
-export function TableOptionCell({ children, onClick, label = 'Options', className, ...rest }: TableOptionCellProps) {
+export function TableOptionCell({
+  children,
+  items,
+  onAction,
+  menuPlacement = 'bottom-end',
+  onClick,
+  label = 'Options',
+  className,
+  ...rest
+}: TableOptionCellProps) {
   const row = useContext(RowContext);
   const size = useControlSize();
   const cellClass = useCellClass();
+  const trigger = children ?? (
+    <IconButton size={size} type="ghost" icon={<DotsThreeIcon />} aria-label={label} disabled={row.disabled} onClick={items ? undefined : onClick} />
+  );
   return (
     <td {...rest} className={`${cellClass}${className ? ` ${className}` : ''}`} data-structure="control" data-disabled={row.disabled || undefined}>
       <span className="bland-table__inner">
-        {children ?? (
-          <IconButton size={size} type="ghost" icon={<DotsThreeIcon />} aria-label={label} disabled={row.disabled} onClick={onClick} />
+        {items && isValidElement(trigger) ? (
+          <Menu items={items} onAction={onAction} placement={menuPlacement} disabled={row.disabled}>
+            {trigger}
+          </Menu>
+        ) : (
+          trigger
         )}
       </span>
     </td>

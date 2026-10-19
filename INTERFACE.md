@@ -19,7 +19,7 @@ when), `docs/components.md` (how to build one).
 
 ### Tokens are the only source of values
 - Figma owns every value; `npm run tokens` generates `src/tokens/tokens.css`
-  from the verified export. 616 variables, 521 CSS tokens (2026-10-19).
+  from the verified export. 620 variables, 524 CSS tokens (2026-10-19).
 - Components read only Theme and scale tokens. Primitives are never emitted.
 - No value without a token. When none fits, stop and ask Godwin; the answer is a
   new Figma variable, synced (that is how `duration/spin` came about).
@@ -556,10 +556,20 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - **Overflow** (decided 2026-10-19): `maxItems` collapses a trail longer
   than it (and longer than three) to the first item, an overflow crumb and
   the last two, the rule in the Figma description. Figma's overflow is the
-  text "…", not a DotsThree icon. Its description says it opens a menu of
-  the hidden items; Dropdown is not built yet, so for now pressing it
-  reveals them in place for good and moves focus to the first one. When
-  Dropdown exists, switch to a menu and keep the API.
+  text "…", not a DotsThree icon. It opens a Menu of the hidden items, as
+  its description says (switched from reveal-in-place 2026-10-19, API
+  unchanged).
+- **Overflow menu navigation** (decided 2026-10-19): Menu has no link
+  items, so the hidden crumbs' links are still rendered through
+  `renderLink`, inside a `hidden` span in the overflow `<li>` (out of
+  sight, out of the accessibility tree), and `onAction` clicks the
+  matching one. A plain `<a>` navigates and a router's link runs its own
+  click handler, so a project needs no second prop (no `onNavigate`).
+  Items: the label, the crumb's icon in the leading slot, Menu sm (Figma's
+  default). The menu is named by the button (React Aria's
+  `aria-labelledby`); the trail stays collapsed. Lost against real links:
+  modifier clicks (new tab) on a hidden crumb. Revisit if Menu gets link
+  items.
 - **Wraps in code**: the list wraps onto more lines rather than overflowing
   the page. Figma does not wrap; collapsing is still the intended fix.
 - Hover: link label underlined (`body-lg-underline`, same size); overflow
@@ -819,7 +829,13 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   over `duration/md` `easing/out`, `aria-expanded`, `controls` for
   `aria-controls`; the project renders the details row, usually one
   `TableCell` with `colSpan`) and `TableOptionCell` (ghost DotsThree Icon
-  Button, or `children` for a Dropdown trigger later). The Icon Button is
+  Button, or `children` as a custom trigger).
+- **Option menu** (decided 2026-10-19): `TableOptionCell` takes Menu's
+  `items` + `onAction`; the trigger (the DotsThree button, or `children`,
+  one element that forwards `ref`) then opens a Menu (sm, `menu/width`).
+  `menuPlacement` defaults to `bottom-end` so the panel lines up under the
+  button at the row's end; Floating UI still flips and shifts. A disabled
+  row disables the menu. Without `items` it is a plain button (`onClick`). The Icon Button is
   sm in sm and md tables, md in lg, as in Figma. In the head,
   TableExpandCell is Figma's blank `empty` header and TableOptionCell keeps
   its button (Figma draws one there).
@@ -947,6 +963,184 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   screenshot shows triggers only and `tests/tooltip.spec.ts`
   screenshots four tooltips opened by focus, in both themes. "focused"
   follows the trigger (the Button), never the tooltip.
+
+### Menu and Dropdown (2026-10-19)
+- `import { Menu, Dropdown } from 'bland'`, folders `menu/` and `dropdown/`.
+  Figma page Dropdown: sets `Menu` (580:9303), `_menu-item` (579:8897, 24
+  variants), `_dropdown-trigger` (562:29520, 96 variants) and `Dropdown`
+  (585:12559, 27 ready-made compositions); every variant's bindings read.
+- **Decided with Godwin (2026-10-19):**
+  - **Menu height:** no token. Floating UI's `size` middleware caps the
+    panel to the screen space left beside the trigger (space-sm from the
+    edge); past that it scrolls in a `ScrollArea`. A project caps it lower
+    with its own CSS (`max-height` on `.bland-menu`).
+  - **A Dropdown opens a Menu md** at every trigger size, as Figma draws it
+    (40px rows, a comfortable touch target); `menuSize` overrides it.
+  - **Disabled trigger matches Text Input**: label `text-subtle`, value,
+    placeholder, helper and icons `*-minimal`, border `border-subtle`. Figma
+    binds the trigger's disabled label to `text-minimal`; it needs the same
+    rebinding Text Input had on 2026-10-18.
+  - **Menu fade is `fade/sm`** (16), as the token and `docs/components.md`
+    say; Figma's Menu instance draws the md fade and should switch to sm.
+- **Two components, one panel.** Menu is an action menu (React Aria
+  `useMenuTrigger` / `useMenu` / `useMenuItem`, `role="menu"`), opened from
+  the caller's trigger like Tooltip. Dropdown is a select (Figma `Type`):
+  `basic` and `multi-select` are React Aria `useSelect` + `useListBox`
+  (`role="listbox"`, options with `aria-selected`, a `HiddenSelect` for
+  forms), `filterable` is `useComboBox` (an `<input role="combobox">`, the
+  options filtered as you type, virtual focus). Both draw the same
+  `.bland-menu` panel and `.bland-menu__item` rows (Figma `Menu` and
+  `_menu-item`), placed by the shared overlay helpers in
+  `src/components/overlay/` (the Tooltip pattern: manual popover after the
+  trigger, Floating UI fixed with `transform: false`, zoom-aware, tokens
+  read at run time).
+- **Items are data**, as Breadcrumb's `items` and Progress-wizard's
+  `steps`: `items: { id, label, textValue?, leading?, trailing?, danger?,
+  disabled?, divider? }[]`. `label` is Figma `✏️ Text` (wraps; a string
+  label is also the typeahead text, otherwise give `textValue`). `🧩
+  Leading` / `🧩 Trailing` → `leading` / `trailing` (menu/slot 24 square,
+  icons icon/md). `Danger=true` → `danger` (`text-danger` label; the
+  Menu's `👀 Danger` last item is just a danger item). `👀 Divider` →
+  `divider`: a `stroke-sm` `Menu/border` line along the item's bottom,
+  inset space-md, as Figma draws it.
+- Item states: hover fill `Menu/surface-hover`, pressed
+  `Menu/surface-pressed`, disabled label `text-minimal` (`aria-disabled`,
+  skipped by the keyboard). `👀 Focused` is an inset 2px `border-focused`
+  ring (Figma: inset because the menu clips its content), drawn on
+  keyboard focus only (React Aria's `isFocusVisible`, also for the
+  combobox's virtual focus). Item padding space-xs / sm / md by size
+  (rows 32, 40, 48 with one line), space-md at the sides, gap space-sm,
+  label body-lg `text-bold`.
+- Panel (Figma `Menu`): `Menu/surface-rest`, an inside `stroke-sm`
+  `Menu/border` (an inset shadow), `rad-md` with `.bland-smooth`,
+  `Elevation/neutral/mid`, content clipped, no padding. Width `menu/width`
+  (256) for Menu; a Dropdown's panel takes the field's width (Figma: Fill
+  container inside Dropdown). It sits space-xs (4) under the field or the
+  trigger (the Dropdown description), flips above when there is no room.
+- Selection marks: a single-select option (and a Menu item in a
+  `selectionMode`) shows Figma's Check in the trailing slot, `icon-bold`
+  (Figma draws no selected option, so the color is the plain bold icon).
+  A multi-select Dropdown option shows a checkbox in the leading slot, as
+  the description says: drawn as Checkbox sm's box (selection/box-sm in
+  the 24 slot, the Control/checked fills, `Icon/icon-on-color` Check), not
+  a native input, since an option can't hold a control.
+- **Menu API:** `children` is the trigger (cloned like Tooltip's; React
+  Aria's `useButton` props minus its native `type`, which would replace a
+  Bland Button's Figma `type`), `items`, `onAction(id)`, `size` (default
+  sm, Figma's), `placement` (default bottom-start), `open` / `defaultOpen`
+  / `onOpenChange`, `disabled`, and checkable items through
+  `selectionMode` + `selectedKeys` / `defaultSelectedKeys` /
+  `onSelectionChange` (`menuitemradio` / `menuitemcheckbox`). Width
+  `menu/width`.
+- **Dropdown API:** one component, `type` basic / filterable /
+  multi-select. `value` / `defaultValue` / `onValueChange` take an id
+  (or `null`), or an array of ids for multi-select. The trigger follows
+  Text Input's contract: `size`, `status` (border, helper, status icon,
+  `aria-invalid` on danger), `label`, `helperText`, `icon` (Figma `🌟
+  Icon`), `leading` (Figma `👀 Leading input`), `placeholder` (Figma's
+  empty `✏️ User input`: "Select…", "Type to filter…"), `disabled`,
+  `name`, `ref` (the button or the input), `fieldRef` (the box the menu
+  anchors to); other props go on the root. Basic and multi-select draw
+  an empty `<button>` over the whole field, under its content, so a
+  press anywhere opens it while the chips' remove buttons stay on top;
+  its name is the value then the label (React Aria's order), and for
+  multi-select a visually hidden list of the values, so the chips'
+  "Remove …" names stay out of it. Filterable shows Clear (XCircle,
+  `clearLabel`, not a Tab stop) while the input has text and a chevron
+  button that toggles the list (not a Tab stop either, React Aria's
+  combobox pattern); `inputValue` / `defaultInputValue` /
+  `onInputChange`. Figma swaps CaretDown for CaretUp while open; code
+  turns the CaretDown 180°, at once.
+- **Multi-select chips wrap** (code only): Chips of the field's size
+  (sm, md, lg), space-xs apart, wrap onto more lines and the field grows
+  from its `input/*` height, rather than hiding values. Figma keeps
+  "Select…" after the chips; code draws nothing there.
+- Not built yet: submenus (Figma's trailing caret is only an icon here),
+  sections and group headings, link items, filterable multi-select.
+- Motion: duration/md, easing/out, opacity 0 and `scale(0.96)` from the
+  trigger side (`transform-origin` from `data-side`), exit along the same
+  path; none when opened from the keyboard (the trigger or input matches
+  `:focus-visible`) or open from the start; opacity only under reduced
+  motion. The list stays mounted until the exit has played.
+
+### Modal (2026-10-19)
+- `import { Modal } from 'bland'`, folder `modal/`. Figma page Modals: set
+  `Modal` (6210:1009, Size sm/md) built from the private `_modal-title`
+  (614:14281), `_modal-body` (649:3797, Alignment left/center) and
+  `_modal-action-bar` (615:14570, Orientation x Alignment x Buttons); every
+  variant's bindings read.
+- **Decided with Godwin (2026-10-19):**
+  - **Backdrop is three Theme tokens**, added in Figma by Claude at
+    Godwin's request (2026-10-19; Figma had no scrim):
+    `Modal/backdrop-minimal`, `-subtle`, `-bold`, black (Neutral1000) at
+    10 / 24 / 40% in light and 24 / 40 / 60% in dark (a dark page needs a
+    stronger dim to read as dimmed). The dark bold step needed a new
+    primitive, `Neutral/Alpha/a60`. Code: `backdrop` prop, default
+    **subtle**; bold for a decision that needs full attention. The dialog
+    sets `--_backdrop` from `data-backdrop` and `::backdrop` reads it
+    (`::backdrop` inherits from its dialog).
+  - **Actions stack by themselves on narrow screens**: `actionsOrientation`
+    defaults to `auto`, vertical (full width, primary on top) below
+    `breakpoint/sm` (640) and horizontal from sm up; `horizontal` or
+    `vertical` forces one.
+- **A native `<dialog>` opened with `showModal()`**, rendered where the Modal
+  sits (not a portal), like the overlay popovers: top layer, the page behind
+  is inert (focus stays inside: Figma's "keep it inside while open"), it
+  inherits the theme, and `::backdrop` is the scrim. Implicit
+  `aria-modal`. React Aria supplies the rest: `useOverlayTriggerState`,
+  `useOverlayTrigger` + `useButton` for an optional `trigger` (cloned like
+  Menu's; React Aria gives it `aria-expanded` and, on purpose, no
+  `aria-haspopup`), `usePreventScroll`
+  while open, `useFocusVisible` for the keyboard check. No React Aria
+  `useModalOverlay`: it portals, which loses the theme.
+- **Focus:** on open the dialog itself takes focus (React Aria's `useDialog`
+  behaviour), so a screen reader reads the title and description first and
+  Tab reaches the first control; an element with `autoFocus` inside wins
+  (the content mounts only after `showModal()`, since React's `autoFocus`
+  can't focus inside a dialog that is still hidden).
+  On close focus goes back to what had it (the trigger).
+- **Closing:** Escape always closes (the native `cancel`, routed through
+  `onOpenChange`); a press on the backdrop closes unless `dismissable` is
+  false (an alert dialog that needs an answer); the close button (Figma
+  `👀 Close`, on by default) closes; a `<form method="dialog">` inside
+  closes natively and the state follows (the native `close` event).
+- Props: `size` sm/md (`modal/width-*`, default **sm**, Figma's). `title`
+  (`✏️ Title`; `👀 Title` off = no title, give `aria-label`), its element
+  `titleAs` (default h2, as Empty State), `aria-labelledby` points at it.
+  `icon` (`👀`/`🌟 Icon`, icon/md `icon-bold`, nudged space-2xs down to sit
+  on the first line). `closeButton` (default true) + `closeLabel`
+  ("Close"). `titleDivider` (`_modal-title` `👀 Divider`). `description`
+  (`✏️ Description`, `aria-describedby`), `top` (`🧩 Top slot`), `children`
+  (`🧩 Bottom slot`: the form, list or content), `align` left/center
+  (`_modal-body` Alignment). `actions` (`👀 Actions`, Buttons count = how
+  many you pass) **primary first**; `actionsAlign` left/right/fill (default
+  left, Figma's): right puts the primary last on the trailing edge (the DOM
+  order is reversed too, so Tab follows what you see), fill shares the
+  width. `actionsDivider` (`_modal-action-bar` `👀 Divider`).
+  `open`/`defaultOpen`/`onOpenChange`, `trigger`, `dismissable`.
+- **Resizing** (Figma: "can be resized wider in layouts") is a width
+  override from the project (`className` / `style` on the dialog), not a
+  drag handle. The dialog never gets closer than `Layout/margin-mobile`
+  (24) to the screen edge, in width or height; past that height the body
+  scrolls in a `ScrollArea` (fade md plus thumb) while the title and
+  actions stay put. No max-height token, as Menu.
+- Visuals: `Modal/surface`, inside `stroke-sm` `Border/border-subtle` (an
+  inset shadow, as Menu), `rad-md` with `.bland-smooth`,
+  `Elevation/neutral/far`. Title row padding space-lg top, space-sm
+  bottom, space-lg sides (top was space-sm until Godwin changed Figma on
+  2026-10-19), gap space-sm, **title-md** `text-bold` (Godwin rebound it
+  from body-lg-bold in Figma the same day), wraps. Close: Figma's control/xs box
+  with an icon/md `icon-subtle` X, drawn as an xs ghost Icon Button (as
+  Banner's). Body padding space-md / space-lg, gap space-sm, description
+  body-lg `text-bold`; center alignment centres the text and slots. Action
+  bar padding space-md / space-lg, gap space-sm; Figma draws md Buttons.
+  Dividers `stroke-sm` `border-subtle`, inset space-lg, under the title and
+  over the actions.
+- Motion: duration/lg (Modals), easing/out, opacity 0 and `scale(0.96)`,
+  centred (never from the trigger), the backdrop fading with it; exit along
+  the same path; none when opened from the keyboard or open from the start;
+  opacity only under reduced motion. Content stays mounted until the exit
+  has played and remounts on each open (a form starts fresh).
 
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 

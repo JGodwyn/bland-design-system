@@ -166,7 +166,8 @@
   flex-direction: column;
   gap: var(--space-md);
 }
-.docs-section h2 {
+/* Only the section's own heading: a descendant rule would restyle h2 titles inside component demos (Modal, Empty State). */
+.docs-section > h2 {
   margin: 0;
   font: var(--type-title-lg);
 }

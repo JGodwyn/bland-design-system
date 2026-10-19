@@ -1,0 +1,283 @@
+/*
+ * Modal (Figma: Modals page, set "Modal" with _modal-title, _modal-body, _modal-action-bar).
+ *
+ *   <dialog class="bland-modal bland-smooth" data-size="sm">          native, opened with showModal()
+ *     <div class="bland-modal__content">
+ *       <div class="bland-modal__header" data-divider>              _modal-title
+ *         <span class="bland-icon bland-modal__icon">…</span>
+ *         <h2 class="bland-modal__title">…</h2>
+ *         <button class="bland-button bland-icon-button bland-modal__close">…</button>
+ *       </div>
+ *       <div class="bland-scroll-area bland-modal__scroll">           scrolls past the screen height
+ *         <div class="bland-modal__body" data-align="left">          _modal-body
+ *           <div class="bland-modal__slot">…top</div>
+ *           <div class="bland-modal__description">…</div>
+ *           <div class="bland-modal__slot">…children</div>
+ *         </div>
+ *       </div>
+ *       <div class="bland-modal__actions" data-align="left" data-orientation="auto" data-divider>   _modal-action-bar
+ *     </div>
+ *   </dialog>
+ *
+ * The dialog sits in the top layer with ::backdrop behind it (Modal/backdrop-minimal, -subtle or -bold). It keeps Layout/margin-mobile from
+ * every screen edge; past that height the body scrolls while the title and actions stay put.
+ */
+
+.bland-modal {
+  --bland-radius: var(--rad-md);
+  --bland-modal-width: var(--modal-width-sm);
+  --_backdrop: var(--modal-backdrop-subtle);
+
+  /* Reset the dialog's UA box; centred in the viewport. */
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  padding: var(--space-none);
+  border: none;
+  width: var(--bland-modal-width);
+  max-width: calc(100vw - var(--layout-margin-mobile) * 2);
+  height: fit-content;
+  max-height: calc(100dvh - var(--layout-margin-mobile) * 2);
+  overflow: hidden;
+  /* Figma: Modal/surface, an inside stroke-sm Border/border-subtle, Elevation/neutral/far. */
+  background: var(--modal-surface);
+  color: var(--text-bold);
+  box-shadow:
+    inset 0 0 0 var(--stroke-sm) var(--border-subtle),
+    var(--elevation-neutral-far);
+  /* The dialog takes focus on open so the title is read first; it is not a control, so no ring. */
+  outline: none;
+
+  /* Opens and closes along the same path: opacity and a small scale, centred. */
+  opacity: 0;
+  transform: scale(0.96);
+  transition:
+    opacity var(--duration-lg) var(--easing-out),
+    transform var(--duration-lg) var(--easing-out),
+    display var(--duration-lg) allow-discrete,
+    overlay var(--duration-lg) allow-discrete;
+}
+
+.bland-modal[data-size="md"] {
+  --bland-modal-width: var(--modal-width-md);
+}
+
+.bland-modal[data-backdrop="minimal"] {
+  --_backdrop: var(--modal-backdrop-minimal);
+}
+
+.bland-modal[data-backdrop="bold"] {
+  --_backdrop: var(--modal-backdrop-bold);
+}
+
+.bland-modal[open] {
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .bland-modal[open] {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+.bland-modal::backdrop {
+  /* ::backdrop inherits from the dialog, so it reads the step picked there. */
+  background: var(--_backdrop);
+  opacity: 0;
+  transition:
+    opacity var(--duration-lg) var(--easing-out),
+    display var(--duration-lg) allow-discrete,
+    overlay var(--duration-lg) allow-discrete;
+}
+
+.bland-modal[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  .bland-modal[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+/* Opened from the keyboard or open from the start: no motion, in or out. */
+.bland-modal[data-instant],
+.bland-modal[data-instant]::backdrop {
+  transition: none;
+}
+
+.bland-modal__content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* _modal-title */
+.bland-modal__header {
+  --bland-icon-size: var(--icon-md);
+
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  flex: none;
+  gap: var(--space-sm);
+  /* Figma _modal-title: space-lg on top (Godwin 2026-10-19), space-sm under. */
+  padding: var(--space-lg) var(--space-lg) var(--space-sm);
+}
+
+.bland-modal__icon {
+  flex: none;
+  /* Figma's icon-wrap: space-2xs down, so the 20px icon sits on the title's first 24px line. */
+  margin-top: var(--space-2xs);
+  color: var(--icon-bold);
+}
+
+.bland-modal__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: var(--space-none);
+  /* title-md (Figma rebound _modal-title from body-lg-bold, Godwin 2026-10-19). */
+  font: var(--type-title-md);
+  color: var(--text-bold);
+  overflow-wrap: anywhere;
+}
+
+/* Figma's close is a control/xs box holding an icon/md X in icon-subtle: an xs ghost Icon Button. */
+.bland-modal .bland-button.bland-modal__close {
+  --bland-icon-size: var(--icon-md);
+  --_icon: var(--icon-subtle);
+
+  flex: none;
+  margin-inline-start: auto;
+}
+
+/* Figma's 👀 Divider: a stroke-sm line inset space-lg, under the title and over the actions. */
+.bland-modal__header[data-divider]::after,
+.bland-modal__actions[data-divider]::before {
+  content: "";
+  position: absolute;
+  left: var(--space-lg);
+  right: var(--space-lg);
+  height: var(--stroke-sm);
+  background: var(--border-subtle);
+}
+
+.bland-modal__header[data-divider]::after {
+  bottom: var(--space-none);
+}
+
+.bland-modal__actions[data-divider]::before {
+  top: var(--space-none);
+}
+
+/* _modal-body, in a ScrollArea that takes the height left. */
+.bland-modal__scroll {
+  flex: 0 1 auto;
+}
+
+/* A scrolling body is a Tab stop (Modal.tsx); its ring is inset, since the dialog clips anything outside. */
+.bland-modal__scroll > .bland-scroll-area__viewport:focus-visible {
+  outline: none;
+}
+
+.bland-modal__scroll:has(> .bland-scroll-area__viewport:focus-visible) {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: calc(var(--stroke-lg) * -1);
+}
+
+.bland-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  /* Slot content reads as the description unless it sets its own type. */
+  font: var(--type-body-lg);
+  color: var(--text-bold);
+}
+
+.bland-modal__description {
+  font: var(--type-body-lg);
+  color: var(--text-bold);
+  overflow-wrap: anywhere;
+}
+
+.bland-modal__slot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.bland-modal__body[data-align="center"] {
+  align-items: center;
+  text-align: center;
+}
+
+.bland-modal__body[data-align="center"] > .bland-modal__slot {
+  align-items: center;
+}
+
+/* _modal-action-bar. Mobile first: auto and vertical stack full width, primary on top. */
+.bland-modal__actions {
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+}
+
+/* Right alignment renders the primary last; stacked, it still goes on top. */
+.bland-modal__actions[data-orientation="auto"][data-align="right"] {
+  flex-direction: column-reverse;
+}
+
+.bland-modal__actions[data-orientation="horizontal"] {
+  flex-direction: row;
+  align-items: center;
+}
+
+.bland-modal__actions[data-orientation="horizontal"][data-align="right"] {
+  justify-content: flex-end;
+}
+
+.bland-modal__actions[data-orientation="horizontal"][data-align="fill"] > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .bland-modal__actions[data-orientation="auto"],
+  .bland-modal__actions[data-orientation="auto"][data-align="right"] {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .bland-modal__actions[data-orientation="auto"][data-align="right"] {
+    justify-content: flex-end;
+  }
+
+  .bland-modal__actions[data-orientation="auto"][data-align="fill"] > * {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Opacity only: no scale. */
+  .bland-modal {
+    transform: none;
+    transition-property: opacity, display, overlay;
+  }
+
+  @starting-style {
+    .bland-modal[open] {
+      transform: none;
+    }
+  }
+}

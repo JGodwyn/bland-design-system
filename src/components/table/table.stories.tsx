@@ -34,6 +34,13 @@ const people: Person[] = [
   { key: 'alan', name: 'Alan Turing', initials: 'AT', role: 'Editor', status: 'Paused', email: 'alan@example.com', seen: 'Oct 2' },
 ];
 
+// The option column's Menu (any Menu items).
+const rowActions = [
+  { id: 'edit', label: 'Edit' },
+  { id: 'message', label: 'Send a message', divider: true },
+  { id: 'remove', label: 'Remove', danger: true },
+];
+
 const emotion = { Active: 'success', Invited: 'brand', Paused: 'neutral' } as const;
 // The Avatar that fills each size's leading slot (table/slot-sm 20, md 24, lg 32).
 const avatarSize: Record<TableSize, AvatarSize> = { sm: 'xs', md: 'sm', lg: 'md' };
@@ -104,11 +111,12 @@ function SortableTable() {
   );
 }
 
-/** Expand and option columns: the expand button shows a details row below. */
+/** Expand and option columns: the expand button shows a details row below; the option button opens a Menu. */
 function ExpandableTable({ size = 'sm' }: { size?: TableSize }) {
   const [open, setOpen] = useState<string[]>(['grace']);
+  const [action, setAction] = useState('none');
   return (
-    <Table aria-label={`Expandable people ${size}`} size={size}>
+    <Table aria-label={`Expandable people ${size}`} size={size} data-last-action={action}>
       <TableHead>
         <TableRow>
           <TableExpandCell />
@@ -131,7 +139,7 @@ function ExpandableTable({ size = 'sm' }: { size?: TableSize }) {
               />
               <TableCell>{p.name}</TableCell>
               <TableCell>{p.role}</TableCell>
-              <TableOptionCell label={`Options for ${p.name}`} />
+              <TableOptionCell label={`Options for ${p.name}`} items={rowActions} onAction={(id) => setAction(`${p.key}:${id}`)} />
             </TableRow>,
             expanded && (
               <TableRow key={`${p.key}-details`} id={details}>
@@ -191,7 +199,7 @@ export default {
             {people.map((p) => (
               <TableRow key={p.key} rowKey={p.key} selectLabel={`Select ${p.name}`}>
                 <PersonCells person={p} size={size} avatar={avatars} />
-                {option && <TableOptionCell label={`Options for ${p.name}`} />}
+                {option && <TableOptionCell label={`Options for ${p.name}`} items={rowActions} onAction={() => {}} />}
               </TableRow>
             ))}
           </TableBody>
@@ -260,7 +268,7 @@ export default {
         <SortableTable />
       </Group>
 
-      <Group label="Expand and option columns (ghost Icon Buttons); blank header above the expand column; a disabled row">
+      <Group label="Expand and option columns (ghost Icon Buttons; the option button opens a Menu); blank header above the expand column; a disabled row">
         <ExpandableTable />
         <ExpandableTable size="lg" />
       </Group>

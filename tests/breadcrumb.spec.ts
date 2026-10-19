@@ -1,4 +1,4 @@
-// Behaviour of Breadcrumb: landmark and list, current page, separators, collapse and reveal.
+// Behaviour of Breadcrumb: landmark and list, current page, separators, collapse and the overflow menu.
 import { expect, test } from '@playwright/test';
 import { openStory } from './stories';
 
@@ -25,15 +25,37 @@ test('crumbs are control/xs high and the separator icon/xs', async ({ page }) =>
   expect([sep.width, sep.height]).toEqual([12, 12]);
 });
 
-test('a collapsed trail keeps the first and last two; the overflow crumb reveals the rest and focuses it', async ({ page }) => {
+test('a collapsed trail keeps the first and last two; the overflow crumb opens a menu of the rest', async ({ page }) => {
   const nav = page.getByRole('navigation', { name: 'Collapsed breadcrumb' });
+  await expect(nav.locator('ol > li')).toHaveCount(4);
   await expect(nav.getByRole('link')).toHaveText(['Home', 'Breadcrumb']);
   const overflow = nav.getByRole('button', { name: 'Show hidden pages (4)' });
+  await expect(overflow).toHaveAttribute('aria-haspopup', 'true');
   await overflow.focus();
   await page.keyboard.press('Enter');
-  await expect(nav.locator('ol > li')).toHaveCount(7);
-  await expect(nav.getByRole('button')).toHaveCount(0);
-  await expect(nav.getByRole('link', { name: 'Projects' })).toBeFocused();
+  const menu = page.getByRole('menu', { name: 'Show hidden pages (4)' });
+  await expect(menu).toBeVisible();
+  await expect(menu.getByRole('menuitem')).toHaveText(['Projects', 'Bland', 'Components', 'Navigation']);
+  await expect(menu.getByRole('menuitem', { name: 'Projects' })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(menu).toBeHidden();
+  await expect(overflow).toBeFocused();
+  // The trail stays collapsed; the hidden crumbs' links are out of sight and out of the accessibility tree.
+  await expect(nav.locator('ol > li')).toHaveCount(4);
+});
+
+test('choosing a hidden crumb follows its link (the rendered link is clicked, so routers work)', async ({ page }) => {
+  const nav = page.getByRole('navigation', { name: 'Collapsed breadcrumb' });
+  await nav.evaluate((el) =>
+    el.addEventListener('click', (e) => {
+      const a = (e.target as Element).closest('a');
+      if (a) el.setAttribute('data-followed', a.getAttribute('href') ?? '');
+    }),
+  );
+  await nav.getByRole('button', { name: 'Show hidden pages (4)' }).click();
+  await page.getByRole('menuitem', { name: 'Components' }).click();
+  await expect(page.getByRole('menu')).toBeHidden();
+  await expect(nav).toHaveAttribute('data-followed', '#/Projects/Bland/Components');
 });
 
 test('an icon-only crumb is named by its label', async ({ page }) => {

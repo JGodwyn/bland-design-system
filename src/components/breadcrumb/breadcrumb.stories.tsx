@@ -44,7 +44,7 @@ export default {
         ))}
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Collapsed (maxItems 4): first item, overflow, last two; press … to show the rest</span>
+        <span className="pg-label">Collapsed (maxItems 4): first item, overflow, last two; press … for a menu of the rest</span>
         <Breadcrumb {...prevent} data-testid="collapsed" aria-label="Collapsed breadcrumb" items={trail(7)} maxItems={4} />
       </div>
       <div className="pg-stack">

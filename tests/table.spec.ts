@@ -145,6 +145,24 @@ test('expand: the caret button sets aria-expanded and shows the details row; a d
   await expect(table.getByRole('button', { name: 'Table options' })).toBeEnabled();
 });
 
+test('option: the DotsThree button opens a Menu of the row actions; choosing one runs it and returns focus', async ({ page }) => {
+  const table = page.getByRole('table', { name: 'Expandable people sm' });
+  const ada = table.getByRole('button', { name: 'Options for Ada Lovelace' });
+  await expect(ada).toHaveAttribute('aria-haspopup', 'true');
+  await ada.click();
+  const menu = page.getByRole('menu');
+  await expect(menu).toBeVisible();
+  await expect(menu).toHaveAccessibleName('Options for Ada Lovelace');
+  await expect(menu.getByRole('menuitem')).toHaveText(['Edit', 'Send a message', 'Remove']);
+  // bottom-end: the menu's right edge lines up with the button's.
+  const [b, m] = [(await ada.boundingBox())!, (await menu.locator('xpath=ancestor::*[contains(@class,"bland-menu ")][1]').boundingBox())!];
+  expect(Math.round(m.x + m.width)).toBe(Math.round(b.x + b.width));
+  await page.getByRole('menuitem', { name: 'Remove' }).click();
+  await expect(menu).toBeHidden();
+  await expect(table).toHaveAttribute('data-last-action', 'ada:remove');
+  await expect(ada).toBeFocused();
+});
+
 test('a table wider than its container scrolls sideways and takes focus; labels end in an ellipsis', async ({ page }) => {
   const viewport = page.getByTestId('narrow').locator('.bland-scroll-area__viewport');
   expect(await viewport.evaluate((e) => e.scrollWidth > e.clientWidth)).toBe(true);

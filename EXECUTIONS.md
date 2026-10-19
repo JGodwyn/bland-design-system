@@ -670,3 +670,128 @@ variable if standard; use 256 and fix the Figma description.
 - New spec: frame at `zoom: 1.5`, top and right-end tooltips on their
   triggers with the gap zoomed. 13 tooltip specs; tooltip screenshots
   re-baselined.
+
+## 2026-10-19 — Menu and Dropdown (menu session)
+**Asked:** build Dropdown and Menu.
+
+- Read `docs/components.md`, INTERFACE (Tooltip pattern), LEARNINGS (Figma,
+  CSS), the Text Input, Search Input, Chip, Checkbox and ScrollArea code.
+- Figma, five read-only `use_figma` calls on the second official connector:
+  page and set list with descriptions and properties; `_menu-item` (rest per
+  size in full, every state's fills); `Menu` (all three sizes, items as
+  instances, the divider's position); `_dropdown-trigger` (sm rest in full,
+  every sm state and status); the field colors per state, icon colors and
+  the `Dropdown` compositions (menu size and offset per variant). A shared
+  dump helper kept each call under 20 KB.
+- Found: every Dropdown opens a Menu md; the menu sits 4 under the trigger;
+  the trigger's disabled label is `text-minimal` (Text Input's was rebound
+  to `text-subtle`); Figma's Menu fade instance is md while the token says
+  sm; no token for a menu's max height. Asked Godwin all four: fit screen
+  space, md, match Text Input, sm.
+- Mid-task, a Tooltip session landed a zoom-aware Floating UI platform on
+  main; the shared helpers move to `src/components/overlay/` so Tooltip,
+  Menu and Dropdown use one copy.
+- Built `overlay/floating.ts` (Tooltip now imports it), `overlay/Popover.tsx`
+  and `popover.css`, `menu/items.tsx` (item model and row), `Menu.tsx`,
+  `menu.css`, `dropdown/Dropdown.tsx` (`useSelect` for basic and
+  multi-select, `useComboBox` for filterable) and `dropdown.css`; stories
+  with a static panel of every row state; `tests/menu.spec.ts` (10) and
+  `tests/dropdown.spec.ts` (8), with open-menu screenshots in both themes.
+- Dead ends, each now in LEARNINGS: the trigger lost its Button style
+  (`useButton`'s `type`); a menu near the bottom never flipped (`size` cap
+  fed back into `flip`); excluding the trigger from outside presses stopped
+  it toggling shut; filterable did not filter (`items` vs `defaultItems`);
+  every mouse press counted as keyboard (`:focus-visible` after script
+  focus). The forced Focused row had no ring until the field took
+  `bland-focus-ring`.
+- Checks: lint:css, typecheck, build, `npm test` 359 passed. New
+  baselines: menu and dropdown stories, 2 menu-open and 6 dropdown-open
+  screenshots, all looked at.
+- Left for later: Breadcrumb's overflow crumb and Table's option cell can
+  now open a Menu; Figma's trigger disabled label and Menu fade instance
+  need rebinding (text-subtle, fade sm).
+
+## Breadcrumb overflow and Table option cell open a Menu (2026-10-19, side session)
+- Read INTERFACE "Breadcrumb", "Table", "Menu and Dropdown" and `Menu.tsx`.
+  Menu has no link items, so the open question was how a menu choice
+  navigates through `renderLink`. Chose to render the hidden crumbs' links
+  in a `hidden` span and click the matching one from `onAction`: one API
+  for plain links and routers, no new `onNavigate` prop.
+- Breadcrumb: dropped the expanded state and focus effect; the overflow
+  `<button>` is now Menu's trigger (items: label, icon as leading). API
+  unchanged (`maxItems`, `overflowLabel`).
+- Table: `TableOptionCell` gained `items`, `onAction`, `menuPlacement`
+  (default bottom-end); the DotsThree button or `children` becomes the
+  Menu trigger; a disabled row disables it. Stories: row actions on the
+  expandable tables and the demo's option column.
+- Specs: breadcrumb (menu opens from Enter, focus to the first item,
+  Escape returns; a choice clicks the hidden link with its href), table
+  (option menu named by its button, bottom-end aligned, action runs, focus
+  returns). Only the Table story label grew a line: re-baselined
+  table-light/dark (looked at the diff: only the shift). Breadcrumb stayed
+  within tolerance.
+- Checks: lint:css, typecheck, `npm test` 361 passed.
+
+## 2026-10-19 — Modal (modal session)
+**Asked:** build Modal.
+
+- Read `docs/components.md`, INTERFACE (Tooltip, Menu and Dropdown),
+  LEARNINGS (Figma, CSS, parallel sessions), `overlay/Popover.tsx`, Menu,
+  Message (Banner's close), ScrollArea, Table's overflow focus.
+- Figma, three read-only `use_figma` calls on the second official connector:
+  the Modals page's sets with descriptions and properties; every part's
+  tree and bindings (Modal sm/md, `_modal-title`, `_modal-body` left/center,
+  action bar right 2, fill 2, vertical 2); a search for any backdrop
+  variable (none), the center text alignment and the dividers' placement.
+- Asked Godwin: backdrop (no token) → add `Modal/backdrop` in Figma; narrow
+  screens → actions stack by themselves below breakpoint/sm.
+- Built `modal/Modal.tsx` (native `<dialog>` + `showModal()`, React Aria
+  `useOverlayTriggerState`, `useOverlayTrigger`, `useButton`,
+  `usePreventScroll`, `useFocusVisible`; internal `ModalContent` for the
+  inside), `modal.css`, `modal.stories.tsx` (static panels of every
+  variant, four real modals), `tests/modal.spec.ts` (11 tests).
+- Dead ends, each now in LEARNINGS: every closed Modal pulled focus to its
+  trigger on mount (focus now moves only after a real open); `autoFocus`
+  failed in the hidden dialog (content mounts after `showModal()`); a quick
+  reopen after Escape shut again (queued `close` event); specs measured the
+  scaling entrance. React Aria sets no `aria-haspopup` for dialogs; kept.
+  axe flagged the static long body (scrollable region): the body's viewport
+  is a Tab stop while it overflows, with an inset ring.
+- Checks: lint:css, typecheck, `npm test` (modal specs 5x repeated clean).
+  New baselines: modal-light/dark, modal-open-light/dark, looked at.
+- Left: `Modal/backdrop` in Figma, then sync and re-baseline
+  modal-open-*.png; nothing committed (other sessions' Menu/Dropdown work
+  is uncommitted in the same tree).
+
+## 2026-10-19 — Modal backdrop tokens (modal session)
+**Asked:** add the Modal backdrop in Figma, three transparency steps
+(minimal, subtle, bold), and wire it in code.
+
+- Read Theme conventions in Figma (Modal/surface scopes, Shadow aliases,
+  the Neutral alphas: black at 6, 10, 24, 40%). Created
+  `Neutral/Alpha/a60` (_Core Colors, no scopes) and Theme
+  `Modal/backdrop-minimal`, `-subtle`, `-bold` (FRAME_FILL, SHAPE_FILL):
+  a10/a24/a40 light, a24/a40/a60 dark. Descriptions first written with
+  quotes came back escaped; reworded without them.
+- Sync: instead of retyping the 17 KB check.js, Figma returned the four
+  new records and one combined hash of the other 616, which matched the
+  repo's; wrote result-0.json with `metaChanged: false` (the Typography
+  rename stays out, as before), `tokens:drift` reported exactly 4 added
+  and 3 CSS tokens, applied, `npm run tokens`. The checksum differs from
+  Figma's for the known Typography metadata only.
+- Code: `backdrop` prop (default subtle) → `data-backdrop` → `--_backdrop`
+  → `::backdrop`. Story alert uses bold; new spec checks the painted
+  colors. Re-baselined modal-open-* and modal-light/dark, looked at.
+- Figma Modal set description: one pointer line. Rewriting it doubled the
+  old `&quot;` entities (LEARNINGS); rewrote it whole with plain quotes.
+- Checks: lint:css, typecheck, build, `npm test` 378 passed.
+- Godwin saw the Modal title too big in the playground: the docs'
+  `.docs-section h2` rule beat `.bland-modal__title`. Scoped it to
+  `.docs-section > h2` (playground/docs/docs.css); the title computes to
+  body-lg-bold 16/24 in the demo now.
+- Godwin then chose title-md for the title (Figma binds body-lg-bold);
+  changed `.bland-modal__title`, re-baselined the four Modal screenshots,
+  looked at them. Figma's `_modal-title` still says body-lg-bold.
+- Godwin rebound `_modal-title` in Figma: title text Title/title-md and
+  top padding space-lg (16). Read both back with a read-only `use_figma`;
+  the title row is now `space-lg space-lg space-sm`.

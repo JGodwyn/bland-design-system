@@ -81,6 +81,12 @@ description says the content wraps at 264; `tooltip/max-width` is 256. →
 The variable wins (it is what the frame is bound to); report the stale
 description.
 
+**Figma returns descriptions HTML-escaped, and a setter stores what you give
+it.** Appending a line to the Modal set's description by reading it and
+writing it back turned `&quot;` into `&amp;quot;`; a description written with
+real quotes reads back as `&quot;`. → Never round-trip a description:
+write the whole text fresh, with plain characters.
+
 ## Fonts
 
 **Fontsource *variable* packages register a different family name**
@@ -103,6 +109,19 @@ or type declarations for side-effect import of './icon.css'"). →
 
 **React 19 types have no global `JSX` namespace.** `() => JSX.Element` fails
 with TS2503. → Import `ReactElement` (or `ReactNode`) from `react`.
+
+**React's `autoFocus` does nothing inside a `<dialog>` that is not shown yet.**
+A Modal's form field with `autoFocus` never got focus: React focuses it
+during the commit, before the layout effect that calls `showModal()`, while
+the dialog is still `display: none`. React renders no `autofocus` attribute
+either, so the dialog can't find it afterwards. → Call `showModal()` first,
+then mount the content (Modal sets `mounted` in that layout effect).
+
+**A dialog's `close` event is queued, so it can land after a reopen.** A
+Modal closed with Escape and reopened at once from the keyboard shut again:
+the `close` event from our own `dialog.close()` arrived after the new
+`showModal()` and closed the state. → In the `close` handler, act only if
+the dialog is still closed (`!dialog.open`).
 
 ## CSS
 
@@ -148,6 +167,47 @@ thumb, outside the fade mask.
 (`Brand50`) on `surface-200` read as no selection at all in the docs sidebar. →
 On `surface-200` and darker, mark a selected option with `stroke` (an outline),
 not `secondary`.
+
+**React Aria's `useButton` props overwrite a Bland Button's `type`.** A Menu
+trigger `<Button type="stroke">` lost its styling: `buttonProps` carries the
+native `type="button"`, and merged onto the cloned Button it replaced the
+Figma `type`. → Drop `type` from React Aria's button props before merging
+them into a Bland control (Bland's buttons are `type="button"` already).
+
+**`flip()` never flips a panel that `size()` has already capped.** A menu
+under a trigger near the bottom of the screen stayed squeezed below:
+`size()` set `max-height` to the space left, and on every later compute
+`flip()` measured the capped panel, which always fits. → Lift the cap and
+re-measure at the start of each computation (`uncap` middleware in
+`overlay/Popover.tsx`, `reset: { rects: true }` once).
+
+**A trigger press closes React Aria's overlay and is swallowed.** Excluding
+the trigger from `shouldCloseOnInteractOutside` (so it could toggle) left
+the menu open: `useMenuTrigger` only ever *opens* on a mouse press. React
+Aria relies on `useOverlay` closing on the outside press and swallowing it.
+→ Leave the trigger "outside"; it toggles the menu shut that way.
+
+**`useComboBoxState` does not filter `items`.** Typing in a filterable
+Dropdown left all 20 options: controlled `items` are taken as already
+filtered by the caller. → Pass the options as `defaultItems` (read on every
+render) so `defaultFilter` applies.
+
+**React Aria names a select button value first.** Its `aria-labelledby` is
+the value then the label ("Banana Basic"), so a test looking for a name
+starting with the label finds nothing. → Find Dropdown triggers by test id,
+or match the full value-then-label name.
+
+**An element focused by script matches `:focus-visible`.** React Aria's
+`useMenuTrigger` focuses the trigger on a mouse press, so checking
+`:focus-visible` to skip motion treated every press as keyboard. → Ask
+React Aria's modality (`useFocusVisible()`) instead.
+
+**A docs-site descendant rule restyled a component's heading.** The Modal
+title (an `h2`) showed at title-lg in the playground demo: `.docs-section
+h2` (0,1,1) beat `.bland-modal__title` (0,1,0). Raw story pages and
+screenshots were fine, so no test caught it. → Playground rules target
+their own elements with child combinators (`.docs-section > h2`), never
+bare descendant tags that reach into demos.
 
 ## Tooling
 
@@ -264,6 +324,11 @@ it, positions divided by it, and pointers placed by your own middleware
 Adding react-aria grew `dist/index.js` from 62 to 117 KB. → List each
 runtime dependency in `rollupOptions.external`, with a regex for its
 subpaths (`/^react-aria(\/|$)/`), and check `dist/index.js` imports them.
+
+**A bounding box taken while an element scales in is the scaled one.**
+Modal specs measured the dialog 7px off its margin and buttons 3px apart:
+the `scale(0.96)` entrance was still running. → Open it from the keyboard
+(no motion) before measuring, or wait for the animation.
 
 ## Working with parallel sessions
 

@@ -1,0 +1,186 @@
+/*
+ * Menu (Figma: Dropdown page, sets "Menu" and "_menu-item"). Dropdown's options use the same panel and rows.
+ *
+ *   <div class="bland-popover" popover="manual">                         overlay/popover.css
+ *     <div class="bland-menu bland-smooth" data-size="sm">              Figma Menu
+ *       <div class="bland-scroll-area bland-menu__scroll">…             fade/sm and the thumb, once it overflows
+ *         <ul class="bland-menu__list" role="menu">
+ *           <li class="bland-menu__item" role="menuitem" data-size="sm" data-danger data-divider
+ *               data-focus-visible data-pressed data-disabled>        Figma _menu-item
+ *             <span class="bland-menu__slot" data-slot="leading">…</span>
+ *             <span class="bland-menu__label">Menu item</span>
+ *             <span class="bland-menu__slot" data-slot="trailing">…</span>
+ *           </li>
+ *
+ * The panel clips its rows; its inside stroke is drawn over them (::after), so a hovered row never hides it.
+ * Keyboard focus (React Aria's isFocusVisible, real or virtual) is an inset ring, because the panel clips.
+ */
+
+.bland-menu {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: var(--menu-width);
+  max-width: 100%;
+  max-height: var(--_available-height, none);
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+  background-color: var(--menu-surface-rest);
+  box-shadow: var(--elevation-neutral-mid);
+  overflow: hidden;
+}
+
+/* Inside a Dropdown the panel takes the field's width (Figma: Fill container). */
+.bland-popover[data-match-width] .bland-menu {
+  width: 100%;
+}
+
+/* Figma's inside stroke, above the rows. */
+.bland-menu::after {
+  content: "";
+  position: absolute;
+  inset: var(--space-none);
+  border-radius: inherit;
+  corner-shape: inherit;
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--menu-border);
+  pointer-events: none;
+}
+
+.bland-menu__scroll {
+  flex: 1;
+}
+
+.bland-menu__list {
+  display: flex;
+  flex-direction: column;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  list-style: none;
+  outline: none;
+}
+
+/* ---- Item: Figma _menu-item ---- */
+
+.bland-menu__item {
+  --_label: var(--text-bold);
+  --_fill: transparent;
+  --bland-icon-size: var(--icon-md);
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--_pad) var(--space-md);
+  background-color: var(--_fill);
+  color: var(--_label);
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bland-menu__item[data-size="sm"] { --_pad: var(--space-xs); }
+.bland-menu__item[data-size="md"] { --_pad: var(--space-sm); }
+.bland-menu__item[data-size="lg"] { --_pad: var(--space-md); }
+
+.bland-menu__label {
+  flex: 1;
+  min-width: var(--space-none);
+  color: var(--_label);
+  overflow-wrap: break-word;
+}
+
+/* menu/slot 24 square; its content centred (an icon at icon/md, a Checkbox, an Avatar). */
+.bland-menu__slot {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--menu-slot);
+  height: var(--menu-slot);
+  color: var(--icon-subtle);
+}
+
+.bland-menu__slot[data-slot="trailing"] {
+  color: var(--text-subtle); /* a shortcut or a value; an icon there takes the same subtle color */
+  white-space: nowrap;
+}
+
+/* A single selection's mark: Figma's Check in the trailing slot. */
+.bland-menu__item .bland-menu__check {
+  color: var(--icon-bold);
+}
+
+/* A multi-select option's mark: Checkbox sm's box (selection/box-sm) in the leading slot, not a native input. */
+.bland-menu__checkbox {
+  --bland-icon-size: var(--icon-xs);
+  --bland-radius: var(--rad-sm); /* drawn by .bland-smooth */
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--selection-box-sm);
+  height: var(--selection-box-sm);
+  background-color: var(--surface-200);
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-input);
+}
+
+.bland-menu__checkbox[data-checked] {
+  background-color: var(--control-checked-rest);
+  box-shadow: none;
+}
+
+.bland-menu__checkbox .bland-menu__checkbox-check {
+  color: var(--icon-on-color);
+}
+
+/* Figma 👀 Divider: stroke-sm Menu/border along the bottom edge, inset space-md. */
+.bland-menu__item[data-divider]::after {
+  content: "";
+  position: absolute;
+  right: var(--space-md);
+  bottom: var(--space-none);
+  left: var(--space-md);
+  height: var(--stroke-sm);
+  background-color: var(--menu-border);
+}
+
+/* Figma 👀 Focused: an inset 2px ring, on keyboard focus only. */
+.bland-menu__item[data-focus-visible] {
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-lg) var(--border-focused);
+}
+
+/* ---- States: hover, pressed, danger, disabled. Rows are scanned constantly, so nothing animates. ---- */
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-menu__item:hover:not([data-disabled]) {
+    --_fill: var(--menu-surface-hover);
+  }
+}
+
+.bland-menu__item[data-pressed]:not([data-disabled]) {
+  --_fill: var(--menu-surface-pressed);
+}
+
+.bland-menu__item[data-danger] {
+  --_label: var(--text-danger);
+}
+
+.bland-menu__item[data-disabled] {
+  --_label: var(--text-minimal);
+  cursor: not-allowed;
+}
+
+.bland-menu__item[data-disabled] .bland-menu__slot {
+  color: var(--icon-minimal);
+}
+
+.bland-menu__item[data-disabled] .bland-menu__checkbox {
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-subtle);
+}
+
+.bland-menu__item[data-disabled] .bland-menu__checkbox[data-checked] {
+  background-color: var(--control-checked-disabled);
+  box-shadow: none;
+}

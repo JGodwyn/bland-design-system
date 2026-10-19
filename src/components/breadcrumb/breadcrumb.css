@@ -8,7 +8,8 @@
  *         <span class="bland-icon bland-breadcrumb__separator">CaretRight</span>
  *       </li>
  *       <li class="bland-breadcrumb__item">
- *         <button class="bland-breadcrumb__crumb bland-breadcrumb__overflow …">…</button> + separator
+ *         <button class="bland-breadcrumb__crumb bland-breadcrumb__overflow …">…</button> + its Menu + separator
+ *         <span hidden>the hidden crumbs' links, clicked by the Menu's choices</span>
  *       </li>
  *       <li class="bland-breadcrumb__item">
  *         <span class="bland-breadcrumb__crumb bland-breadcrumb__current" aria-current="page">…</span>

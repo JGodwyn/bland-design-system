@@ -17,13 +17,12 @@ import {
   hide,
   limitShift,
   offset,
-  platform,
   shift,
   useFloating,
   type Middleware,
   type Placement,
-  type Platform,
 } from '@floating-ui/react-dom';
+import { sideOf, tokenMs, tokenPx, zoomAwarePlatform, zoomOf } from '../overlay/floating';
 import './tooltip.css';
 
 /** Floating UI's placement names: the side of the trigger, then start, center (no suffix) or end alignment. */
@@ -61,42 +60,6 @@ export interface TooltipProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
   /** Reaches the tooltip element. */
   ref?: Ref<HTMLDivElement>;
 }
-
-/** The CSS `zoom` an element renders at, its own and its ancestors' (1 where the browser has no currentCSSZoom). */
-const zoomOf = (el: Element) => (el as Element & { currentCSSZoom?: number }).currentCSSZoom ?? 1;
-
-/**
- * A length token in screen px, read where the tooltip sits (0 if tokens.css is not loaded). Under a CSS `zoom`
- * (the docs' zoom control, or an app's) a token's 4px draws as 4 x zoom, and Floating UI works in screen px.
- */
-function tokenPx(el: Element, token: string) {
-  return (parseFloat(getComputedStyle(el).getPropertyValue(token)) || 0) * zoomOf(el);
-}
-
-/**
- * Floating UI under CSS `zoom`: the trigger's rect comes back in screen px, but the tooltip's and the pointer's
- * sizes in their own unzoomed px. Scale those to screen px; the render divides the results back by the zoom,
- * because `left` and `top` are drawn zoomed again.
- */
-const zoomAwarePlatform: Platform = {
-  ...platform,
-  getDimensions: async (el) => {
-    const size = await platform.getDimensions(el);
-    const zoom = zoomOf(el);
-    return { width: size.width * zoom, height: size.height * zoom };
-  },
-};
-
-/** A Motion token in ms, read from the root where tokens.css defines it (undefined if it is not loaded). */
-function tokenMs(token: string) {
-  if (typeof document === 'undefined') return undefined;
-  const raw = getComputedStyle(document.documentElement).getPropertyValue(token).trim();
-  const value = parseFloat(raw);
-  if (Number.isNaN(value)) return undefined;
-  return raw.endsWith('ms') ? value : value * 1000;
-}
-
-const sideOf = (placement: Placement) => placement.split('-')[0] as 'top' | 'right' | 'bottom' | 'left';
 
 /**
  * Aims the pointer at the trigger's centre, kept space-md from the tooltip's corners (Figma's start and end

@@ -126,3 +126,31 @@ export {
   type TableSort,
 } from './components/table/Table';
 export { Tooltip, type TooltipProps, type TooltipPlacement } from './components/tooltip/Tooltip';
+export {
+  Menu,
+  type MenuProps,
+  type MenuItemData,
+  type MenuSize,
+  type MenuPlacement,
+  type MenuSelectionMode,
+} from './components/menu/Menu';
+export {
+  Dropdown,
+  type DropdownProps,
+  type DropdownSingleProps,
+  type DropdownMultipleProps,
+  type DropdownItem,
+  type DropdownType,
+  type DropdownSize,
+  type DropdownStatus,
+} from './components/dropdown/Dropdown';
+export {
+  Modal,
+  type ModalProps,
+  type ModalSize,
+  type ModalTitleAs,
+  type ModalAlign,
+  type ModalActionsAlign,
+  type ModalActionsOrientation,
+  type ModalBackdrop,
+} from './components/modal/Modal';

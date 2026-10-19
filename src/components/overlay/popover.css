@@ -1,0 +1,80 @@
+/*
+ * Floating panel shared by Menu and Dropdown (overlay/Popover.tsx).
+ *
+ *   <div class="bland-popover" popover="manual" data-side="bottom" data-placement="bottom-start">
+ *     …the panel (.bland-menu)
+ *   </div>
+ *
+ * A manual popover in the top layer, right after its trigger in the DOM so it inherits the theme. Floating UI
+ * sets `left` and `top` (fixed strategy), `--_available-height` (the screen space left) and, for a Dropdown, the
+ * width. The root has no box of its own: the panel inside draws it.
+ */
+
+.bland-popover {
+  /* Reset the popover's UA box. */
+  position: fixed;
+  inset: auto;
+  width: max-content;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  background: transparent;
+  overflow: visible;
+
+  /* Opens and closes along the same path: opacity and a small scale from the trigger side. */
+  opacity: 0;
+  transform: scale(0.96);
+  transition:
+    opacity var(--duration-md) var(--easing-out),
+    transform var(--duration-md) var(--easing-out),
+    display var(--duration-md) allow-discrete,
+    overlay var(--duration-md) allow-discrete;
+}
+
+.bland-popover:popover-open {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .bland-popover:popover-open {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* Opened from the keyboard or open from the start: no motion, in or out. */
+.bland-popover[data-instant] {
+  transition: none;
+}
+
+/* Scale from the trigger: the edge facing it, at the aligned end. */
+.bland-popover[data-side="bottom"] { transform-origin: top center; }
+.bland-popover[data-side="top"] { transform-origin: bottom center; }
+.bland-popover[data-side="left"] { transform-origin: center right; }
+.bland-popover[data-side="right"] { transform-origin: center left; }
+.bland-popover[data-placement="bottom-start"] { transform-origin: top left; }
+.bland-popover[data-placement="bottom-end"] { transform-origin: top right; }
+.bland-popover[data-placement="top-start"] { transform-origin: bottom left; }
+.bland-popover[data-placement="top-end"] { transform-origin: bottom right; }
+.bland-popover[data-placement="left-start"] { transform-origin: top right; }
+.bland-popover[data-placement="left-end"] { transform-origin: bottom right; }
+.bland-popover[data-placement="right-start"] { transform-origin: top left; }
+.bland-popover[data-placement="right-end"] { transform-origin: bottom left; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Opacity only: no scale. */
+  .bland-popover {
+    transform: none;
+    transition-property: opacity, display, overlay;
+  }
+
+  @starting-style {
+    .bland-popover:popover-open {
+      transform: none;
+    }
+  }
+}

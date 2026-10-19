@@ -1,0 +1,282 @@
+/*
+ * Dropdown (Figma: Dropdown page, sets "Dropdown" and "_dropdown-trigger"). The menu is Menu's panel (menu.css).
+ *
+ *   <div class="bland-dropdown" data-type="basic" data-size="sm" data-status="default" data-filled data-open>
+ *     <span class="bland-dropdown__label">Label</span>                 a <label> when filterable
+ *     <div class="bland-dropdown__field bland-focus-ring bland-smooth">  Figma field / inner-border
+ *       <button class="bland-dropdown__button">                        basic, multi-select: laid over the field
+ *       <span class="bland-dropdown__addon">…</span>                   Figma 👀 Leading input
+ *       <span class="bland-dropdown__main">                            Figma main
+ *         icon, chips or value or <input class="bland-dropdown__input">, status icon, clear, chevron
+ *       </span>
+ *     </div>
+ *     <span class="bland-dropdown__helper">Helper text</span>
+ *     <div class="bland-popover">…</div>
+ *   </div>
+ *
+ * Built like Text Input (the Figma description): the same sizes, statuses and disabled colors, with the
+ * Dropdown surface tokens. The basic and multi-select button covers the whole field, under the content, so a
+ * press anywhere opens it while the chips' remove buttons stay pressable above it.
+ */
+
+.bland-dropdown {
+  --_border: var(--border-input);
+  --_helper: var(--text-subtle);
+  --_status: var(--icon-subtle);
+  --_label: var(--text-bold);
+  --_text: var(--text-bold);
+  --_placeholder: var(--text-subtle);
+  --_addon: var(--text-subtle);
+  --_icon: var(--icon-subtle);
+  --_fill: var(--dropdown-surface-rest);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: var(--dropdown-width);
+  max-width: 100%;
+  min-width: var(--space-none);
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.bland-dropdown__label {
+  color: var(--_label);
+  overflow-wrap: break-word;
+}
+
+.bland-dropdown__field {
+  --bland-icon-size: var(--icon-md);
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  min-height: var(--_height);
+  background-color: var(--_fill);
+  /* Figma's inside stroke, drawn inside the box so it adds no size. */
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--_border);
+  cursor: pointer;
+  transition: background-color var(--duration-xs) var(--easing-ease);
+}
+
+.bland-dropdown[data-type="filterable"] .bland-dropdown__field {
+  cursor: text;
+}
+
+/* Same ring as .bland-focus-ring, on the box, while its button or input has visible focus. */
+.bland-dropdown__field:has(:is(.bland-dropdown__button, .bland-dropdown__input):focus-visible) {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--space-2xs);
+}
+
+/* The basic and multi-select trigger: an empty button over the whole field; its name comes from aria-labelledby. */
+.bland-dropdown__button {
+  position: absolute;
+  inset: var(--space-none);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  border-radius: inherit;
+  background: transparent;
+  cursor: inherit;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bland-dropdown__main {
+  position: relative; /* above the button; presses pass through to it */
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: var(--space-none);
+  padding: var(--space-xs) var(--space-md);
+  pointer-events: none;
+}
+
+.bland-dropdown[data-type="filterable"] .bland-dropdown__main {
+  flex-wrap: nowrap;
+  pointer-events: auto;
+}
+
+.bland-dropdown__value {
+  flex: 1;
+  min-width: var(--space-none);
+  overflow: hidden;
+  color: var(--_placeholder);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bland-dropdown[data-filled] .bland-dropdown__value {
+  color: var(--_text);
+}
+
+.bland-dropdown__input {
+  flex: 1;
+  min-width: var(--space-none);
+  height: 100%;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  background: none;
+  color: var(--_text);
+  font: inherit;
+  letter-spacing: inherit;
+  text-overflow: ellipsis;
+  outline: none;
+}
+
+.bland-dropdown__input::placeholder {
+  color: var(--_placeholder);
+  opacity: 1;
+}
+
+/* Figma 🧩 Chips: Chips of the field's size, space-xs apart; they wrap onto more lines rather than overflow. */
+.bland-dropdown__chips {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  min-width: var(--space-none);
+}
+
+.bland-dropdown__chips .bland-chip__close {
+  pointer-events: auto;
+}
+
+.bland-dropdown .bland-dropdown__icon,
+.bland-dropdown .bland-dropdown__chevron {
+  color: var(--_icon);
+}
+
+.bland-dropdown .bland-dropdown__status {
+  color: var(--_status);
+}
+
+/* Figma swaps CaretDown for CaretUp while open; code turns it. Not animated: it follows the menu at once. */
+.bland-dropdown[data-open] .bland-dropdown__chevron {
+  rotate: 180deg;
+}
+
+/* Filterable: the chevron toggles the menu and Clear empties the input. Neither is a Tab stop (Search Input). */
+.bland-dropdown__toggle,
+.bland-dropdown__clear {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  background: none;
+  color: var(--_icon);
+  cursor: pointer;
+}
+
+.bland-dropdown .bland-dropdown__clear-icon {
+  color: var(--_icon);
+}
+
+/* ---- Leading add-on: an inner box (padding 4 / 8, gap 4) and a 1px divider, as Text Input ---- */
+
+.bland-dropdown__addon {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  pointer-events: none;
+}
+
+.bland-dropdown__addon-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  height: 100%;
+  padding: var(--space-xs) var(--space-sm);
+  color: var(--_addon);
+  white-space: nowrap;
+}
+
+.bland-dropdown__divider {
+  flex: none;
+  width: var(--stroke-sm);
+  height: var(--_divider);
+  border-radius: var(--rad-rd);
+  background-color: var(--border-bold);
+}
+
+/* ---- Sizes: field height input/*, divider icon/md (sm, md) or icon/lg (lg) ---- */
+
+.bland-dropdown[data-size="sm"] {
+  --_height: var(--input-sm);
+  --_divider: var(--icon-md);
+}
+
+.bland-dropdown[data-size="md"] {
+  --_height: var(--input-md);
+  --_divider: var(--icon-md);
+}
+
+.bland-dropdown[data-size="lg"] {
+  --_height: var(--input-lg);
+  --_divider: var(--icon-lg);
+}
+
+/* ---- Status ---- */
+
+.bland-dropdown[data-status="danger"] {
+  --_border: var(--border-danger);
+  --_helper: var(--text-danger);
+  --_status: var(--icon-danger);
+}
+
+.bland-dropdown[data-status="success"] {
+  --_border: var(--border-success);
+  --_helper: var(--text-success);
+  --_status: var(--icon-success);
+}
+
+.bland-dropdown[data-status="warning"] {
+  --_border: var(--border-warning);
+  --_helper: var(--text-warning);
+  --_status: var(--icon-warning);
+}
+
+.bland-dropdown__helper {
+  color: var(--_helper);
+  font: var(--type-body-sm);
+  overflow-wrap: break-word;
+}
+
+/* ---- States: filled (add-on label bold), hover, disabled (as Text Input, Godwin 2026-10-19). Focus is above. ---- */
+
+.bland-dropdown[data-filled] {
+  --_addon: var(--text-bold);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-dropdown:not([data-disabled]) .bland-dropdown__field:hover {
+    --_fill: var(--dropdown-surface-hover);
+    --_addon: var(--text-bold);
+  }
+}
+
+.bland-dropdown[data-disabled] {
+  --_border: var(--border-subtle);
+  --_helper: var(--text-minimal);
+  --_status: var(--icon-minimal);
+  --_label: var(--text-subtle);
+  --_text: var(--text-minimal);
+  --_placeholder: var(--text-minimal);
+  --_addon: var(--text-minimal);
+  --_icon: var(--icon-minimal);
+}
+
+.bland-dropdown[data-disabled] .bland-dropdown__field,
+.bland-dropdown[data-disabled] .bland-dropdown__toggle {
+  cursor: not-allowed;
+}
