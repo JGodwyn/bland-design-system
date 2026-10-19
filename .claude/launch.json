@@ -4,8 +4,24 @@
     {
       "name": "docs",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "docs"],
+      "runtimeArgs": [
+        "run",
+        "docs"
+      ],
       "port": 5180
+    },
+    {
+      "name": "docs-5181",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--config",
+        "playground/vite.config.ts",
+        "--port",
+        "5181",
+        "--strictPort"
+      ],
+      "port": 5181
     }
   ]
 }

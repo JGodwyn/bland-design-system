@@ -1,0 +1,140 @@
+/*
+ * Segmented bar (Figma: Segmented bar page, sets "Segmented-bar" and "_segmented-bar-item").
+ *
+ *   Radio group (no panels):
+ *   <div class="bland-segmented-bar" data-size="md">
+ *     <div role="radiogroup" class="bland-segmented-bar__track bland-smooth">
+ *       <label class="bland-segmented-bar__item bland-smooth" data-selected>
+ *         <input type="radio" class="bland-segmented-bar__input bland-focus-ring bland-smooth">  covers the segment
+ *         icon, label
+ *       </label>
+ *
+ *   Tabs (items with panels): the track is role="tablist" and each item a role="tab" with the focus ring;
+ *   the selected panel follows the bar.
+ *
+ * Track: Segment/track, rad-md, space-2xs inset, height segment/md or segment/lg; it fills its container.
+ * Items share the track equally; each is rad-md (Godwin raised it from rad-sm in Figma, 2026-10-19) with
+ * Figma's padding. Selected: body-lg-bold over the thumb, the track's sliding indicator (tabs.css) with
+ * the Segment/selected fill and Elevation/neutral/near; selected disabled: surface-200, no elevation.
+ * The radio has no look of its own (appearance: none): it is the segment's hit area and carries its focus
+ * ring.
+ */
+
+.bland-segmented-bar {
+  min-width: var(--space-none);
+}
+
+.bland-segmented-bar__track {
+  --bland-radius: var(--rad-md);
+
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: var(--segment-md);
+  padding: var(--space-2xs);
+  background-color: var(--segment-track);
+}
+
+.bland-segmented-bar[data-size="lg"] .bland-segmented-bar__track {
+  height: var(--segment-lg);
+}
+
+.bland-segmented-bar__item {
+  --_fill: transparent;
+  --_text: var(--text-subtle);
+  --_icon: var(--icon-subtle);
+  --bland-radius: var(--rad-md);
+  --bland-icon-size: var(--icon-sm);
+
+  position: relative;
+  display: flex;
+  flex: 1 1 var(--space-none);
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  min-width: var(--space-none);
+  padding: var(--space-2xs) var(--space-sm);
+  background-color: var(--_fill);
+  color: var(--_text);
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--duration-xs) var(--easing-ease),
+    color var(--duration-xs) var(--easing-ease);
+}
+
+.bland-segmented-bar[data-size="lg"] .bland-segmented-bar__item {
+  --bland-icon-size: var(--icon-md);
+
+  padding-inline: var(--space-md);
+}
+
+/* The focused segment's ring paints over its neighbours. */
+.bland-segmented-bar__item:is(:focus-visible, :has(:focus-visible)) {
+  z-index: 1;
+}
+
+.bland-segmented-bar__input {
+  /* Its own radius, for the focus ring: .bland-smooth would otherwise give it none. */
+  --bland-radius: var(--rad-md);
+
+  position: absolute;
+  inset: var(--space-none);
+  margin: var(--space-none);
+  border: none;
+  background: none;
+  cursor: inherit;
+  appearance: none;
+}
+
+.bland-segmented-bar__icon {
+  color: var(--_icon);
+}
+
+.bland-segmented-bar__label {
+  min-width: var(--space-none);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Selected, hover, disabled. Focus is .bland-focus-ring. ---- */
+
+.bland-segmented-bar__thumb {
+  --bland-radius: var(--rad-md);
+
+  background-color: var(--segment-selected);
+  box-shadow: var(--elevation-neutral-near);
+}
+
+.bland-segmented-bar__thumb[data-disabled] {
+  background-color: var(--surface-200);
+  box-shadow: none;
+}
+
+.bland-segmented-bar__item[data-selected] {
+  --_text: var(--text-bold);
+  --_icon: var(--icon-bold);
+
+  font: var(--type-body-lg-bold);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-segmented-bar__item:not([data-selected], [data-disabled]):hover {
+    --_fill: var(--segment-hover);
+    --_text: var(--text-bold);
+    --_icon: var(--icon-bold);
+  }
+}
+
+.bland-segmented-bar__item[data-disabled] {
+  --_text: var(--text-minimal);
+  --_icon: var(--icon-minimal);
+
+  cursor: not-allowed;
+}
+

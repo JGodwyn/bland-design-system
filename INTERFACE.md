@@ -89,7 +89,8 @@ when), `docs/components.md` (how to build one).
 - Bland's own icons (`src/icons/`) are exported from the Figma Icons page as
   components need them: Check, X, CaretDown, CaretRight, Plus, Minus, User, Spinner,
   MagnifyingGlass, XCircle, WarningOctagon, CheckCircle, WarningCircle, Info,
-  ArrowUp, ArrowDown, ArrowsDownUp, DotsThree (filled) so far.
+  ArrowUp, ArrowDown, ArrowsDownUp, DotsThree (filled), CaretLeft, CloudArrowUp,
+  FileArrowUp, Copy, Eye, EyeClosed so far.
 
 ## 4. Overflow
 
@@ -1141,6 +1142,469 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   the same path; none when opened from the keyboard or open from the start;
   opacity only under reduced motion. Content stays mounted until the exit
   has played and remounts on each open (a form starts fresh).
+
+### Tabs: Section tab, Pill tab, File tab, Segmented bar, Tab bar (2026-10-19)
+- `import { SectionTabs, PillTabs, FileTabs, SegmentedBar, TabBar } from 'bland'`,
+  folders named after the Figma sets: `section-tab/`, `pill-tab/`,
+  `file-tab/`, `segmented-bar/`, `tab-bar/`, plus the internal `tabs/`.
+  Figma: `Section-tab` (1471:35740) + `_section-tab-item` (1471:35889, 18),
+  `Pill-tab` (632:15552, built from Pills), `File-tab` (1475:3316) +
+  `_file-tab-item` (1472:36096, 36), `Segmented-bar` (1471:18170) +
+  `_segmented-bar-item` (1471:18248, 12), `Tab-bar` (1471:26961) +
+  `_tab-bar-item` (1471:27031, 2); every variant's bindings read.
+- **Names**: a component draws the Figma row, so it is plural where the row
+  is a set of tabs (`SectionTabs`, `PillTabs`, `FileTabs`) and keeps Figma's
+  name otherwise (`SegmentedBar`, `TabBar`).
+- **Shared behaviour** (`tabs/tabs.tsx`, not exported): React Aria
+  `useTabListState` + `useTabList` / `useTab` / `useTabPanel`, Bland renders
+  every element (the Tooltip pattern). Rows are data, as Menu and
+  Breadcrumb: `items: { id, label, textValue?, disabled?, panel? }[]` plus
+  each row's own fields. Selection is `value` / `defaultValue` /
+  `onValueChange` (an id), as Dropdown and RadioGroup; the default is the
+  first enabled tab (Figma: "the first is selected"). `keyboardActivation`
+  automatic (default) or manual; `disabled` disables the whole row and keeps
+  its selection (Figma's Selected + disabled).
+- **Panels**: an item's `panel` shows under the row in a `role="tabpanel"`
+  labelled by its tab, a Tab stop with the focus ring only while it holds
+  nothing focusable (React Aria). No Figma spacing between the row and the
+  panel, so none in code: the page spaces it. A tab with no `panel` (tabs
+  that drive content elsewhere) drops React Aria's `aria-controls`, which
+  would point at nothing. One panel element per tab (keyed), because React
+  Aria's panel keeps the id it first got (LEARNINGS). Link tabs (routing)
+  are not built yet; use TabBar for navigation.
+- **Overflow scrolls sideways, fade only** (Godwin, 2026-10-19): Section,
+  Pill and File rows sit in a `ScrollArea axis="x" scrollbar={false}`
+  (fade sm, no thumb: an exception to the overflow rule, Godwin's second
+  call the same day; `scrollbar` is a new ScrollArea prop, default true).
+  Figma's `👀 Overflow` DotsThree item is not used in code (both set
+  descriptions say so). With no thumb to drag, a vertical mouse wheel
+  scrolls the row sideways (`TabScroll`), handing back to the page at
+  either end; arrow keys move focus, which scrolls the focused tab clear of
+  the fade. The list keeps space-xs of room on every side for the focus
+  ring, given back by a negative margin on the scroll area; the row around
+  it is a flex container so those margins never collapse through it (they
+  did: the File tab bar showed 4px around its tabs and the Section divider
+  sat 4px under the underline; Figma has neither).
+- **The selection slides** (Godwin, 2026-10-19): Section's underline and
+  Segmented bar's raised thumb are a list indicator
+  (`useSelectionIndicator`, `.bland-tabs__indicator`) placed over the
+  `data-selected` tab from its rect (fractions kept, divided by CSS zoom),
+  and moving by `translate`, `width` and `height` over duration/md
+  easing/out when a pointer picks the tab. Arrow keys, the first render and
+  resizes place it at once (no motion on keyboard navigation,
+  docs/motion.md); reduced motion keeps only the color change. Section's
+  underline sits over the tabs (a hovered fill would hide it). **Pill tabs
+  do not slide** (Godwin, the same day, after trying it): the pressed pill
+  takes its own Control/checked fill. File tab and Tab bar change color
+  only.
+- **Section tab**: tab height `tab/sm|md|lg` (40, 48, 56, default sm,
+  Figma's); Figma's inner frame carries padding space-sm / md / lg, gap
+  space-sm, rad-sm and the hover fill `surface-200`. Label body-lg
+  `text-subtle`, bold on hover and selected, minimal disabled; icon icon/md
+  with the same colors (Figma binds none on hover; it follows the label).
+  Count: a square-cornered box (rad-xs) `tab/count-*` high and wide at
+  least, padding space-xs, `surface-200` (hover 300), body-sm-bold (lg
+  body-md-bold) `text-subtle`. Selected: a stroke-lg `border-brand`
+  underline across the tab's bottom over the row's stroke-sm `border-subtle`
+  divider (an inset shadow on the row, as wide as the row);
+  `control-checked-disabled` when disabled. The row fills its container.
+- **Pill tab**: each tab is a Pill (pills.css; its selected rule now reads
+  `aria-selected` as well as `aria-pressed`), a `role="tab"` element, row
+  gap space-xs. `count` becomes the Pill's Indicator xl secondary.
+- **File tab** (fills decided with Godwin, 2026-10-19): Figma bound full
+  unselected tabs to surface-300 / hover 400 but Minimized ones and the
+  description to 200 / 300. Decision: **unselected surface-300, hover
+  surface-400**, the bar's own color, so unselected tabs blend into the bar;
+  Minimized rebound in Figma and the description rewritten. Disabled 200,
+  selected 100 whatever the state. Height `file-tab/*`, square corners,
+  padding space-md (lg space-lg), gap space-sm, body-lg; leading slot
+  icon/sm, md, lg by size; separators are Figma's 1px border-subtle gap
+  (space-3xs). Close box `file-tab/close-*`, rad-xs, X icon/xs, sm, md
+  `icon-subtle`; its fill matches an unselected tab, one step above a
+  selected (200) or disabled (300) one; Figma has no close hover, so code has
+  none. Minimized: a `file-tab/*` square with the slot only, no close.
+- **File tab close** (decided 2026-10-19): a tab's content is presentational
+  (ARIA), so the close button cannot sit inside the `role="tab"`, and a
+  button beside it inside the tablist fails axe's allowed children. So the
+  tab and the button share a `role="presentation"` item that draws the tab;
+  the button is pointer only (`tabIndex=-1`, `aria-hidden`), and Delete on a
+  focused tab closes it, announced with `aria-keyshortcuts="Delete"` (as
+  Search Input's clear is not a Tab stop). `onClose(id)` on the row, per
+  item `closable` (default true). Closing the selected tab first selects its
+  neighbour (next, else previous) and keeps keyboard focus on it. The focus
+  ring is the item's (`:has(:focus-visible)`), square like the tab (Figma
+  rounds it rad-xs).
+- **Segmented bar**: Figma's "radio group, or tabs if it switches panels"
+  is decided by the data: without `panel`s it is native radios
+  (`appearance: none`, laid over the whole segment as its hit area and focus
+  ring) in a `role="radiogroup"`, with `name` for forms; with `panel`s it is
+  the shared tab list. Track `segment/md|lg` (32, 40, default md, Figma's),
+  `Segment/track`, rad-md, space-2xs inset, fills its container
+  (`segment/width` is Figma's frame). Segments share it equally, rad-md (Godwin raised them from rad-sm in Figma, 2026-10-19),
+  padding space-2xs / sm (lg md), gap space-xs, icon icon/sm (lg md).
+  Selected `Segment/selected` + `Elevation/neutral/near` + body-lg-bold;
+  hover `Segment/hover`; disabled minimal text; selected disabled
+  `surface-200` without elevation.
+- **Tab bar**: navigation, not tabs: a `<nav>` (default name "Main") of
+  links in a list; the current one gets `aria-current="page"`. `current`
+  (controlled, from your router) or `defaultCurrent` (default the first);
+  pressing an item makes it current and calls `onCurrentChange` (Godwin,
+  2026-10-19), then the link is followed. `renderLink` for routers
+  (Breadcrumb's contract, plus the `onClick` to keep). Height `tab-bar/height`, `surface-100`, a
+  stroke-sm `border-subtle` divider along the top (inset shadow); items share
+  the width, icon/lg over body-sm, space-2xs apart, padding space-xs at the
+  sides; current `icon-brand` + body-sm-bold `text-brand`. `indicator`:
+  Indicator sm danger with its ring, space-2xs outside the icon's top right
+  corner; a string is read after the label through the link's
+  `aria-label`. No hover (Figma: touch) and no press motion (used all day).
+- Motion: color and fill changes ease over duration/xs (as Pill); the
+  selection slides as above.
+
+### Pagination and Pagination-table (2026-10-19)
+- `import { Pagination, PaginationTable } from 'bland'`, folders `pagination/`
+  and `pagination-table/`. Figma: `_pagination-item` (786:9, 18 variants),
+  `Pagination-simple` (787:1338, 3), `Pagination-table` (787:2186, 6); every
+  variant's bindings read in three read-only `use_figma` calls.
+- **Names**: `Pagination` is Figma's Pagination-simple (the plain row is the
+  one most pages use); `PaginationTable` keeps Figma's name, as ProgressBar
+  and ProgressWizard do.
+- **Overflow is automatic** (as Menu's): up to seven pages show every page;
+  past that the row always holds seven slots: the first and last page, the
+  current page with one page either side, and an overflow item for each gap
+  (`1 2 3 4 5 … 10`, `1 … 4 5 6 … 10`, `1 … 6 7 8 9 10`), so the row keeps its
+  length as the page changes. Figma's sm example (1 to 5, then 10) is exactly
+  the first case. No `siblings` prop yet.
+- **The overflow item is a mark, not a control**: DotsThree in the item's
+  box, `aria-hidden`, no hover. A Menu of the hidden pages (Breadcrumb's
+  pattern) does not scale to hundreds of pages, and the page field of the
+  advanced table covers jumping.
+- **Previous and next at the ends are `aria-disabled`, not `disabled`**, so
+  pressing previous onto page 1 keeps focus on it (a native disabled button
+  drops focus to the page). The `disabled` prop disables every item natively.
+- **Buttons or links**: items are buttons named "Page N" (`pageLabel`);
+  `getHref(page)` makes them links, rendered through `renderLink` (TabBar's
+  contract, `onClick` kept) and still calling `onPageChange`.
+- **Item**: control/xs, sm, md high and at least as wide (more digits
+  grow it), padding space-xs (lg space-sm), rad-sm, body-md (sm) or body-lg,
+  icons icon/sm (sm) or icon/md `icon-bold`; tabular figures. Hover
+  `Pagination/surface-hover`; current Control/checked-rest (hover
+  checked-hover) with text-on-color; disabled text-minimal and icon-minimal
+  (Figma binds icon-minimal on the disabled caret), current disabled
+  checked-disabled. Figma has no pressed state, so no press motion; fills
+  ease over duration/xs. The box: an inside stroke-sm `border-subtle` (inset
+  shadow), rad-md, padding space-xs, gap space-2xs.
+- **Pagination-table**: `total` and `pageSize` (default 10) give the page
+  count and the summary ("1-10 of 100 items", "0 items", singular for one);
+  `summary` and `pagesLabel` take a node to replace the text (translations)
+  or `false` to hide it (Figma `👀 Items`, `👀 Pages`). Summary fills the
+  row, padding space-sm, body-md (sm) or body-lg, text-bold; space-sm to the
+  navigation. Advanced: a `<nav>` of the page field, the page count (which
+  describes the field) and a box of previous and next.
+- **The page field is a Text Input sm at every table size**, as Figma draws
+  it (56 x 32 even in the 48 high row), pagination/input-width wide. React
+  Aria `useNumberField` drives it: Enter or blur commits, out of range clamps
+  to 1 to the page count, an empty or unreadable entry goes back to the
+  current page, arrow keys step a page; the wheel is off so scrolling past a
+  focused field never changes the page. No grouping (page 1000, not 1,000).
+- Fills its container (pagination/width is Figma's frame). Code only: on a
+  row too narrow for both, the navigation wraps under the summary.
+- New icon: CaretLeft (6080:106855), exported from Figma.
+
+### Slider (2026-10-19)
+- `import { Slider } from 'bland'`, folder `slider/`. Figma: `Slider`
+  (289:10407, 12 variants), private `_knob` (289:3819, 9) and
+  `_slider-labels` (350:1341, 8); bindings read for every size and type,
+  rest and disabled, in three read-only `use_figma` calls.
+- **One component, `type` single / double** (Figma `Type`), typed as a
+  union like Dropdown: single takes a number, double a `[start, end]`
+  tuple, for `value` / `defaultValue` / `onValueChange` and
+  `onValueCommit` (React Aria's `onChangeEnd`: pointer up, a key, a field
+  commit). Defaults `min` 0, `max` 100, `step` 1; the value defaults to
+  `min` (single) or `[min, max]`.
+- **Behaviour is React Aria** (`useSliderState`, `useSlider`,
+  `useSliderThumb`): each thumb is a visually hidden native range input
+  (arrows, Page Up and Down, Home and End, forms through `name`), drags
+  and track presses move the nearest thumb, a range's thumbs cannot
+  cross. Figma has no visible label: name it with `aria-label` /
+  `aria-labelledby`; a range's thumbs add `thumbLabels` (default
+  Minimum, Maximum). `formatOptions` formats the tooltip, the labels, the
+  fields and `aria-valuetext`.
+- **Geometry**: a thumb's centre sits on its value, half a thumb in from
+  each end, so a thumb never leaves the track (Figma's fr grid puts it
+  space-2xs in; a grid cannot share one travel between two thumbs). The
+  element React Aria measures is a `__rail` inset by half a thumb, so a
+  drag keeps the thumb under the pointer. Bars stop space-2xs short of
+  each thumb (Figma's column gap); where a range's thumbs meet, the
+  middle bar is simply gone. Row control/xs, sm, md; thumb
+  slider/thumb-*; dot selection/dot-sm (sm) or dot-md (md, lg); track
+  slider/track; width slider/width, capped at its container.
+- **Colors** (Figma bindings): active bar and thumb
+  `Control/checked-rest`, thumb hover (and while dragged)
+  `checked-hover`, inactive bar `surface-300`, dot `surface-100`; disabled:
+  `checked-disabled`, inactive `surface-200`, labels `text-minimal`. No
+  press scale (dragging a scaled thumb reads wrong), no motion on the
+  value (keys and drags must be direct); the thumb fill eases over
+  duration/xs.
+- **Value tooltip, on by default** (Godwin 2026-10-19; Figma's `👀
+  Tooltip` is off): the real Tooltip, placement top, shows a thumb's
+  value while it is hovered, focused from the keyboard or dragged, at once
+  (no hover delay), and follows the thumb. Escape hides it until the next
+  key, pointer entry or press. `tooltip={false}` turns it off. Tooltip now
+  also skips its motion when the trigger holds the focused element
+  (`:has(:focus-visible)`), which a thumb does.
+- **Labels on their values** (Godwin 2026-10-19; Figma spreads them
+  space-between): `labels` true (default, Figma's, five values), 2 to 5
+  values spread from min to max and snapped to the step, an array of
+  exact values, or false. The ones at min and max sit flush with the
+  ends. body-md `text-subtle`, space-xs under the track row, `aria-hidden`
+  (the thumbs already read their values and ends).
+- **Value fields** (`inputField`, Figma `👀 Input field`): a Text Input
+  slider/input-width wide, sm for sm and md, md for lg (as Figma), driven
+  by React Aria `useNumberField`: Enter or blur commits, out of range
+  clamps (a range's start stays at or under its end), empty goes back.
+  **A range gets two** (Godwin 2026-10-19), the start before the track
+  and the end after it, named by the slider plus the thumb ("Price
+  Minimum"). Fields line up with the track row, not with track and labels
+  together (Figma centres the whole column). With two fields the track is
+  short: use fewer labels.
+- Not RTL-aware yet.
+
+### Calendar, Date Picker, Date Range Picker, Time Picker (2026-10-19)
+- Imports `Calendar`, `DatePicker`, `DateRangePicker`, `TimePicker`; folders
+  `calendar/` (with `dates.ts`), `date-picker/`, `date-range-picker/`,
+  `time-picker/` and the internal `date-field/`. Figma: Date & Time page,
+  sets Calendar (464:28555), `_calendar-item` (461:13963),
+  `_calendar-title-bar` (463:19382), `_calendar-action-bar` (474:3709),
+  Single Date picker (483:16976), Date range picker (499:39378), Time picker
+  (504:56895). Read in five read-only `use_figma` calls.
+- **Values are ISO strings** (Godwin 2026-10-19, asked): a date
+  `"2024-11-09"`, a range `{ start, end }`, a time 24-hour `"14:30"`. Same as
+  native inputs; no timezone, no extra library in client code. React Aria's
+  `@internationalized/date` objects stay inside (now a direct, external
+  dependency). Props are parsed once per string (`useDateProp` and friends):
+  see LEARNINGS.
+- **Segmented fields** (Godwin, asked): React Aria DateField / TimeField
+  segments drawn inside Text Input's markup and CSS (`date-field/`). The
+  order, separators and placeholders follow `locale` (default the app's
+  I18nProvider, else the browser's): en-GB dd/mm/yyyy, en-US mm/dd/yyyy,
+  nl-NL dd-mm-jjjj. Leading zeros always. Time placeholders are Figma's
+  hh / mm / ss. An empty field draws its separators in the placeholder
+  color. The segment being edited is Control/checked-rest behind
+  text-on-color (code only: Figma has no editing state). Text Input's
+  disabled rules now also read `data-disabled` on the root.
+- **Time Picker is the field only** (Godwin, asked): no list of times until
+  Figma has one. `hourCycle` 12 puts the AM / PM segment in Figma's trailing
+  add-on (the whole box is React Aria's field so arrows reach it); 24 has
+  no add-on. Value stays 24-hour.
+- **Calendar views**: day grid from React Aria; month and year grids are
+  Bland's (3 x 4 buttons in role grid, roving focus, arrows by 1 and 3,
+  Home / End, Enter). The title toggle is a button with `aria-expanded`:
+  day → month → year (the year view's range label is static, Figma's
+  `👀 Dropdown` off). Picking a year keeps the month and opens the month
+  view, picking a month opens the days, focus following. The month or year
+  in view is the selected cell. Year pages: twelve years from a decade
+  (2020 – 2031, as Figma), arrows step ten. Prev / next reuse Pagination
+  item sm (Figma's exposed `_pagination-item`); the toggle's hover is
+  Pagination/surface-hover too (Figma draws no toggle hover).
+- **Title bar as Figma**: the arrows sit right after the toggle, not at the
+  far end.
+- **Today**: an underline under the label (stroke-lg, border-brand;
+  icon-on-color on selected, border-bold when disabled). Figma's bar is an
+  absolutely placed rectangle with unbound insets, so code uses
+  `text-decoration` with tokens; its width follows the label.
+- **Outside-month days** show in text-minimal and are not selectable
+  (Figma: State=disabled). Weeks per month vary (4 to 6 rows), so the
+  height changes between months.
+- **Action bar**: Calendar takes any `actions` (they share the width);
+  the pickers' `confirm` builds Cancel / Apply sized xs, sm, md per size,
+  and a pick waits for Apply. Off by default (Figma's `👀 Action-bar`).
+- **Pickers**: the calendar button is a Tab stop (Figma CalendarBlank); the
+  calendar opens in the shared Popover as `role="dialog"`, under the field
+  (range: under the start field), the same size as the field, focus on the
+  selected day, Escape or an outside press closes, focus returns to the
+  button. A value out of bounds or unavailable turns the field danger by
+  itself. The range picker has one helper under both fields and its group is
+  named by `aria-label` (default "Date range"); each field's segments are
+  labelled by its own visible label. All fill their container (Figma's 287
+  and 582 are frames).
+- Screenshots and specs run these stories on a fixed clock, 11 November 2024
+  (Figma's today), in `tests/stories.ts`.
+
+### File Upload (2026-10-19)
+- `import { FileUpload } from 'bland'`, folder `file-upload/`. Figma: File
+  Upload page, sets File-upload (608:7433), `_uploader` (608:207),
+  `_file-upload-progress` (608:384). Read in three read-only `use_figma`
+  calls (descriptions and properties, bindings, icon colors and exports).
+- **One component, rows as data.** The two `_` sets are private, so code
+  has one `FileUpload` with `files` `{ id, name, status, description,
+  progress }[]`, like Tabs' `items`. `status` defaults to **uploaded** (the
+  rows File-upload shows), not Figma's uploading: a file row with no status
+  is a file already there. Uploading itself is the app's job: `onFilesAdd`
+  hands over the files, the app puts rows in `files` and updates them.
+- **The drop zone is a `<label>` around a visually hidden native
+  `<input type="file">`** (Figma: "a button or label tied to a hidden file
+  input"). The input is the Tab stop, so click, Enter and Space open the
+  picker natively and forms work; the zone draws the focus ring with
+  `:has(input:focus-visible)`, as Text Input's field. The input is named by
+  `title` (`aria-labelledby`; without a title `aria-label` or
+  `aria-labelledby` is required, a TypeScript union as Progress-bar) and
+  described by `description` and `fileTypes`.
+- **Drag-over is automatic**, not a prop: `data-drag-over` while files are
+  dragged over the zone (a depth counter, so moving over its children does
+  not flicker); only drags that carry files count. A drop is filtered
+  against `accept` (".pdf", "image/*", "image/png", as the picker does);
+  misses go to `onFilesReject`. Without `multiple` a drop keeps one file.
+- **The input and forms:** without `name` the input is cleared after each
+  pick, so picking the same file again (after removing it) still fires;
+  with `name` it keeps the last pick, and drops are copied into it with a
+  `DataTransfer`, so a plain form submit carries them.
+- **Announcements:** a polite `role="status"` region, always rendered, says
+  "Added a.png, b.png" on a pick or drop and "<name> uploaded" / "<name>
+  failed to upload" when a row turns success or danger. `announcements`
+  overrides each sentence. The list itself is not live (progress would be
+  read out on every step).
+- **Disabled hides the file list**, as Figma's description says; the input
+  is disabled and drops are ignored.
+- From Figma: root and lists `space-sm` gap, header `space-2xs`; title
+  body-lg-bold text-bold, description body-lg text-subtle. Zone: padding
+  `space-xl` / `space-lg`, gap `space-sm`, `rad-md` with `.bland-smooth`,
+  `stroke-sm` dashed `border-input` on `surface-200`; disc `space-sm`
+  padding, `rad-rd`, `surface-300`, CloudArrowUp icon/md `icon-subtle`;
+  instruction body-lg text-bold (Figma breaks after "or", so the default
+  does too), file types body-sm-bold text-subtle. Hover `surface-300`, disc
+  `surface-400`. Drag-over `surface-brand-light`, `border-brand`, disc
+  `surface-100`, icon `icon-brand`. Disabled `border-subtle`, text and icon
+  minimal. Row: `FileUpload/surface`, `stroke-sm` `border-subtle`, `rad-md`
+  smooth, padding `space-md`, gap `space-sm`; FileArrowUp icon/md
+  `icon-subtle` with `space-2xs` top padding; filename body-lg one line with
+  an ellipsis; description body-sm text-subtle; uploading adds the
+  ProgressBar sm (value column on) under the text, `space-sm` apart; danger
+  swaps the icon for WarningOctagon `icon-danger`, the border for
+  `border-danger`, the description for `text-danger`; success puts a
+  CheckCircle `icon-success` where the close button was. Close:
+  `control/xs`, `rad-rd`, `FileUpload/close`, X icon/sm `icon-subtle`, no
+  hover in Figma, press `scale(0.97)`; named `removeLabel(file)`.
+- **Code only:** the border is CSS `dashed` (the browser's dash length,
+  not Figma's 4/4 pattern, which has no token); the component fills its
+  container (`file-upload/width` is Figma's frame, used by the story);
+  zone colors transition over `duration/xs` `easing/ease`, as Button.
+
+### Code snippet and Code text (2026-10-19)
+- `import { CodeSnippet, CodeText } from 'bland'`, folder `code-snippet/`.
+  Figma: Code snippet page, sets Code-snippet (990:11356), `_code-action-bar`
+  (988:10933), Code-text (6259:1754). Read in three read-only `use_figma`
+  calls plus one icon export (Copy, Eye, EyeClosed).
+- **Godwin's calls (2026-10-19):**
+  - **Bring your own highlighter.** Bland ships none. `highlight(code,
+    language)` returns nodes; Bland's CSS maps the usual token classes
+    (highlight.js `hljs-*`, Prism `.token.*`, Shiki's css-variables theme
+    `--shiki-*`, or Bland's own `data-token`) to the five `Code/*` colors.
+    Without it, the code is plain `Code/text`.
+  - **Files x languages.** `files: { id, name, code }[]` drive the File tabs;
+    `code` is a string or `{ [language]: string }`. `languages: { id, label
+    }[]` drive the switcher (`switcher` dropdown / tabs / pills). One file is
+    `code` (+ `language`), no tabs.
+  - **Fullscreen is a layout variant**, `fullscreen`: square corners, fills
+    its container's height, scrolls inside, no Show more. No button enters
+    it (Figma has none).
+  - **Code text ships too**, the inline `<code>`.
+- **Structure:** root `<div>` (surface-100, stroke-sm border-subtle, rad-md
+  smooth, clips); with `files` the File tabs' tab panel holds the main area
+  (action bar, body, toggle), so the files are a real tablist + tabpanel.
+  The body is a vertical ScrollArea around the gutter and a horizontal
+  ScrollArea around `pre > code`: long lines scroll sideways while the line
+  numbers stay put, and the code never wraps. Each scrolling viewport is a
+  Tab stop while it overflows (as Table), its ring drawn inside because the
+  snippet clips.
+- **Show more only when it is needed:** the toggle appears when the body is
+  taller than `code-snippet/height-collapsed` (measured with a
+  ResizeObserver). Collapsed without `collapsible` stays capped and scrolls.
+  With the toggle, the body keeps `space-xl + control/sm` of room under the
+  last line, so the floating button never hides code once scrolled or
+  expanded (code only; Figma lets it cover the last lines). Centered with
+  auto margins, not a transform, so the Button's press scale still works.
+- **Copy feedback without a timer:** the icon turns into a Check and a
+  polite `role="status"` says "Copied"; both reset when the pointer leaves
+  the button or it blurs. No duration token is needed. The prop is
+  `onCopied`, because `onCopy` is the native clipboard event.
+- **The language switcher:** dropdown is a Code/body-md button (surface-200,
+  stroke-xs, CaretDown icon/xs icon-subtle; Figma has no hover) opening a
+  single-select Menu at bottom-end; with one language it is a plain label
+  (no menu to open). Tabs and pills reuse SectionTabs and PillTabs sm, named
+  "Language". Without languages the switcher is absent.
+- **Highlight mapping:** comment `hljs-comment`, `hljs-quote`, `.token.comment`
+  / `prolog` / `doctype`; keyword `hljs-keyword`, `hljs-literal`,
+  `.token.keyword` / `boolean`; function `hljs-title`, `.token.function` /
+  `class-name`; string `hljs-string`, `.token.string` / `char` /
+  `attr-value`; plus `data-token` and the `--shiki-token-*` variables.
+- **Dropped from the old map row:** "resizable height". Figma has no
+  resizer on Code-snippet; ask before adding one.
+- **Code text:** `<span>` (surface-200, stroke-xs border-subtle inset,
+  rad-sm, padding space-2xs on sm, space-xs on md and lg) around `<code>`
+  in Code/body-sm, -md, -lg text-bold; copy icon icon/xs (sm, md) or icon/sm
+  (lg) in icon-subtle (Figma binds none); default size sm (Figma's), so set
+  it to match the surrounding text. The copy target is under 24px, as
+  Figma's description warns.
+
+### Sidebar (2026-10-19)
+- `import { Sidebar } from 'bland'`, folder `sidebar/`. Figma: `Sidebar`
+  (1084:13817, 12 variants), `_sidebar-item-group` (1078:9910, 16),
+  `_sidebar-item` (1077:3151, 48); every variant's bindings read.
+- **Godwin's calls (2026-10-19):** the minimized rail uses the **hover peek**
+  (Figma's Minimized State=hover), not tooltips and group menus: the pointer
+  over the rail, or keyboard focus in it, opens the full sidebar over the
+  page; it closes when the pointer or focus leaves, or on Escape. Rows are
+  **data** (`items`, as TabBar, Breadcrumb and Menu), not composable parts.
+  **No mobile layout**: below md the app hides it or uses TabBar; a drawer
+  waits for a Figma frame.
+- **Structure:** the root is the layout box (sidebar/width, or the rail:
+  item + space-sm each side); a panel inside draws everything (surface-100,
+  a stroke-sm border-subtle right edge as an inset shadow, space-sm above).
+  Outside the rail the panel is always sidebar/width, so collapse and expand
+  only animate the root's width (duration/2xl, easing/drawer): the page
+  slides while the labels never reflow. The peek lays the panel over the
+  page (`position: absolute`, `z-index: 1`, no elevation, as Figma's hover
+  variant) and reveals it from the rail's edge with `clip-path`; it slides
+  back the same way (`data-peek="closing"` until the transition time has
+  passed). Keyboard-opened peeks and keyboard toggles are instant
+  (`data-instant`); reduced motion drops both transitions.
+- **Peek triggers:** mouse pointer only (`pointerType === 'mouse'`), and
+  focus only when it is `:focus-visible`: a click leaves focus on the link
+  after the pointer has gone, which would keep it open.
+- **Rows:** every row is a link (`renderLink` for routers); a disabled row
+  loses its `href` and gets `role="link"` + `aria-disabled`. A row with
+  `items` is a group: its header is a button (`aria-expanded`,
+  `aria-controls`) and cannot be a link. One level of nesting (Figma).
+  Default current: the first enabled link (as TabBar's first item);
+  default open groups: the one holding the current row.
+- **From Figma:** row height sidebar/item-sm|md|lg|xl (24, 32, 40, 48,
+  default sm), padding space-xs|sm|md|lg, gap space-sm, rad-sm, icons icon/sm
+  at sm and icon/md above; label body-lg text-bold (selected body-lg-bold
+  Sidebar/text-selected), icons icon-subtle (selected Sidebar/icon-selected),
+  disabled text-minimal / icon-minimal. Fills: hover surface-200, selected
+  Sidebar/surface-selected, selected hover -selected-hover, selected
+  disabled surface-200. Count box sidebar/count-* high and wide at least,
+  padding space-2xs (lg/xl space-xs), rad-xs, surface-200 (hover 300,
+  selected Sidebar/count-selected), body-sm-bold (lg/xl body-md-bold)
+  text-subtle (selected Sidebar/count-selected-content). Nested rows: an
+  icon-wide indent before the icon. List padding space-lg (rail: space-sm
+  at the sides), gap space-xs; group and nest gap space-xs. Slots gap
+  space-sm and no padding (content brings its own, as Figma's Upper and
+  Lower slot examples). Scrolling: ScrollArea with `fadeSize="sm"` (Figma's
+  16px fade-mask) and the visible thumb.
+- **Rail:** square rows (sidebar/item-*), the icon alone; label and count
+  are visually hidden (clip-path), not `display: none`, so the link's name
+  stays "Inbox 8" in both layouts; indent, trailing and chevron are hidden;
+  nested rows are hidden. `top` and `bottom` may be functions of
+  `{ rail }` to draw a narrow version (Figma's rail slot is 32 wide).
+- **Collapse button (code decisions):** Figma's collapse frame binds no icon
+  color and no hover; code uses icon-subtle, icon-bold on hover, and a 24px
+  hit area (control/xs) around the 20px icon. It sits where Figma puts it,
+  space-lg from the top and right, over the top slot's row, so a top slot
+  should leave that corner free; without a top slot it overlaps the first
+  row (as in Figma). DOM order: after the top slot, before the nav.
+- **Not built:** Figma's Pipe frame in the minimized group's hidden nest
+  (vestigial), tooltips and menus in the rail (replaced by the peek).
 
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 

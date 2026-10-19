@@ -59,11 +59,11 @@
   pointer-events: auto;
   touch-action: none;
 }
-.bland-scroll-area[data-axis="y"] .bland-scroll-area__thumb {
+.bland-scroll-area[data-axis="y"] > .bland-scroll-area__track > .bland-scroll-area__thumb {
   width: 100%;
   min-height: var(--control-xs);
 }
-.bland-scroll-area[data-axis="x"] .bland-scroll-area__thumb {
+.bland-scroll-area[data-axis="x"] > .bland-scroll-area__track > .bland-scroll-area__thumb {
   height: 100%;
   min-width: var(--control-xs);
 }

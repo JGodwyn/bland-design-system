@@ -1,0 +1,59 @@
+/*
+ * Pagination-table (Figma: Pagination page, set "Pagination-table"): a table footer.
+ *
+ *   <div class="bland-pagination-table" data-size="sm">
+ *     <div class="bland-pagination-table__summary">1-10 of 100 items</div>
+ *     <nav class="bland-pagination">…</nav>                                     Navigation=simple
+ *     <nav class="bland-pagination-table__nav">                                 Navigation=advanced
+ *       <div class="bland-pagination-table__jump">
+ *         <div class="bland-text-input bland-pagination-table__field">…</div>  Text Input sm, pagination/input-width
+ *         <span class="bland-pagination-table__pages">of 10 pages</span>
+ *       </div>
+ *       <div class="bland-pagination"><ul class="bland-pagination__list">previous, next</ul></div>
+ *
+ * Summary and navigation sit space-sm apart; the summary fills the row, padding space-sm at the sides,
+ * body-md (sm) or body-lg (md, lg) text-bold, as is the page count. The page field is a Text Input sm at
+ * every size, as in Figma. Fills its container (pagination/width is Figma's frame). Code only: on a row
+ * too narrow for both, the navigation wraps under the summary.
+ */
+
+.bland-pagination-table {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: var(--space-none);
+}
+
+.bland-pagination-table__summary,
+.bland-pagination-table__pages {
+  color: var(--text-bold);
+  font: var(--type-body-md);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.bland-pagination-table__summary {
+  flex: 1 1 var(--space-none);
+  padding: var(--space-none) var(--space-sm);
+  white-space: nowrap;
+}
+
+.bland-pagination-table__pages {
+  padding: var(--space-none) var(--space-sm);
+  white-space: nowrap;
+}
+
+.bland-pagination-table:is([data-size="md"], [data-size="lg"]) :is(.bland-pagination-table__summary, .bland-pagination-table__pages) {
+  font: var(--type-body-lg);
+}
+
+.bland-pagination-table__nav,
+.bland-pagination-table__jump {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.bland-pagination-table__field {
+  width: var(--pagination-input-width);
+}

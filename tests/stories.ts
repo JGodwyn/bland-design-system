@@ -9,8 +9,15 @@ export const storyIds = readdirSync(resolve(import.meta.dirname, '../src/compone
 
 export const themes = ['light', 'dark'] as const;
 
+/**
+ * Stories that mark today (Calendar and the date pickers) run on a fixed clock: 11 November 2024, the today
+ * Figma draws. Only these, so components that time things with Date.now keep the real clock.
+ */
+const fixedToday = new Set(['calendar', 'date-picker', 'date-range-picker', 'time-picker']);
+
 /** Open one story in one theme and wait until fonts are in, so screenshots are stable. */
 export async function openStory(page: Page, id: string, theme: (typeof themes)[number]) {
+  if (fixedToday.has(id)) await page.clock.setFixedTime(new Date('2024-11-11T12:00:00'));
   await page.goto(`/#/raw/${id}?theme=${theme}`);
   await page.getByTestId(`frame-${theme}`).waitFor();
   await page.evaluate(() => document.fonts.ready);

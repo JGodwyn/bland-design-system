@@ -1,0 +1,29 @@
+/*
+ * Pill tab (Figma: Pill tab page, set "Pill-tab", built from Pills instances).
+ *
+ *   <div class="bland-pill-tabs">
+ *     <div class="bland-pill-tabs__row"> ScrollArea > <div role="tablist" class="bland-tabs__list bland-pill-tabs__list">
+ *       <div role="tab" aria-selected="true" class="bland-pill bland-pill-tabs__tab bland-focus-ring" data-size="sm">…</div>
+ *     <div role="tabpanel" class="bland-tab-panel">…</div>
+ *   </div>
+ *
+ * Each tab is drawn by pills.css (one pill look across filters and tabs); selected reads aria-selected
+ * there. The selection does not slide between pills (Godwin 2026-10-19), unlike Section tab and
+ * Segmented bar: the pill just changes color.
+ */
+
+.bland-pill-tabs {
+  min-width: var(--space-none);
+}
+
+.bland-pill-tabs__row {
+  display: flex;
+}
+
+.bland-pill-tabs__list {
+  gap: var(--space-xs);
+}
+
+.bland-pill-tabs__tab {
+  max-width: none;
+}

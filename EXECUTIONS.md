@@ -795,3 +795,219 @@ variable if standard; use 256 and fix the Figma description.
 - Godwin rebound `_modal-title` in Figma: title text Title/title-md and
   top padding space-lg (16). Read both back with a read-only `use_figma`;
   the title row is now `space-lg space-lg space-sm`.
+
+## 2026-10-19 — Tabs: Section tab, Pill tab, File tab, Segmented bar, Tab bar
+**Asked:** build the five tab components.
+
+- Figma, read only: listed the sets on the five pages (descriptions and
+  properties), then dumped every item variant's bindings (hidden icon and
+  focus-ring frames included) and one row per set, in seven `use_figma`
+  calls on the plugin connector. Found File tab fills disagreeing (full
+  unselected 300/400, Minimized and the description 200/300).
+- Asked Godwin: File tab fill (first question unclear to him; reasked in
+  plain words) → darker 300/400; overflow → scroll sideways, not a
+  DotsThree menu.
+- Built internal `tabs/` (React Aria tab list, panels), then SectionTabs,
+  PillTabs (pills.css selected rule now also reads aria-selected),
+  FileTabs, SegmentedBar (native radios, or tabs with panels), TabBar.
+- Dead end: the File tab close button inside the tablist; settled on a
+  presentational item holding the tab and a pointer-only close, with
+  Delete for keyboards (INTERFACE.md).
+- Restarted the docs server (one from 15:09 held 5180 and predated the new
+  folders). Checked every story in the browser pane, both themes; moved
+  the scroll thumb under the tabs after it covered a Section underline.
+- Specs: section-tab (5), pill-tab (2), file-tab (5), segmented-bar (4),
+  tab-bar (2). Fixed on the way: stale tab panel id (axe), a stray space in
+  the Tab bar's indicator name, mid-transition color reads, a radio laid
+  over its label text (all in LEARNINGS).
+- Baselines for the five stories, looked at.
+- Figma: rebound the six Minimized unselected `_file-tab-item` fills to
+  surface-300 / 400 and rewrote its description; added a code overflow
+  pointer to the Section-tab and Pill-tab descriptions.
+- Godwin's review (same day): no scrollbar under tab rows (fade only), the
+  selection slides between tabs, no gap between the Section underline and
+  divider, Segmented items rad-md (his Figma change), no padding around
+  the File tab bar, Tab bar selects on press. Re-read Figma: Section row 48
+  with the underline at 46 to 48 over the divider at 47, items and focus
+  rings rad-md. Both gaps were one bug: negative margins collapsing through
+  the row (LEARNINGS). Added ScrollArea `scrollbar`, `TabScroll` (wheel
+  scrolls sideways), `useSelectionIndicator`; TabBar `defaultCurrent` and
+  `onCurrentChange`. Dead ends on the indicator: measured from the thumb
+  (ref not attached yet), observing itself (slide cut short), rounded
+  offsets; and the radio's square focus ring (`--bland-radius` does not
+  inherit). Specs updated and extended, the five baselines re-taken and
+  looked at.
+- Godwin, after trying it: Pill tabs should not slide. Removed the Pill
+  tab indicator (the selected pill keeps its own fill, as before); Section
+  and Segmented still slide. Pill spec and baselines updated.
+
+## Pagination and Pagination-table (2026-10-19)
+
+- Read `docs/components.md`, `INTERFACE.md` conventions and the Tabs section,
+  LEARNINGS (Figma, parallel sessions). Tabs work from another session was
+  uncommitted in the tree; left it alone.
+- Figma, four read-only `use_figma` calls on the second official connector:
+  the page's three sets with descriptions and properties, `_pagination-item`
+  bindings (18 variants), `Pagination-simple` and `Pagination-table` bindings,
+  and the CaretLeft SVG plus the disabled caret's color (icon-minimal).
+- Found: the advanced page field is Text Input sm at every size; the overflow
+  item is just a DotsThree item; Figma's sm example is the seven slot window.
+- Built `pagination/` (Pagination, `pageSlots`) and `pagination-table/`
+  (PaginationTable with a React Aria NumberField page field over TextInput),
+  CaretLeft icon, stories, two specs. Decided: automatic overflow with seven
+  fixed slots, a static overflow mark, aria-disabled ends, buttons or links.
+- Port 5180 was held by another session's docs server (same folder), so
+  previewed through it instead of starting one.
+- Specs first failed on `name: 'Page 1'` also matching "Page 10" (fixed with
+  `exact`). `npm run test:update -- -g pagination` wrote four baselines;
+  looked at them. lint:css, typecheck and `npm test` (445) pass.
+- Not committed (the tree also holds the Tabs session's uncommitted work).
+
+
+## Slider (2026-10-19)
+
+- Read `docs/components.md`, INTERFACE (foundations, Tooltip), LEARNINGS
+  (Figma, tooling, parallel sessions). Tabs and Pagination work from other
+  sessions was uncommitted in the tree; left it alone.
+- Figma, three read-only `use_figma` calls: the page's sets (Slider,
+  `_knob`, `_slider-labels`) with descriptions and properties; bindings of
+  md single/double/disabled and lg; `_knob` variants and sm. Found the
+  bars' space-2xs gap to the thumb, the dot sizes, the field as Text Input
+  sm (md on lg).
+- Asked Godwin three things (tooltip, range field, label placement); all
+  three took the recommended option (INTERFACE).
+- Built `slider/` (React Aria state and hooks, Tooltip per thumb,
+  NumberField fields over TextInput), story, spec; one line in Tooltip for
+  `:has(:focus-visible)`.
+- Port 5180 was held by another chat's docs server (same folder);
+  `preview_start` failed on it, so checked through Playwright screenshots
+  against that server instead.
+- Dead end: Escape hid the tooltip only without a preceding Page Up;
+  React Aria's document listener (LEARNINGS). Specs first asserted
+  `aria-valuenow` (LEARNINGS). Range story with fields got labels 3:
+  five crowded the 128px track.
+- Baselines: slider light/dark and two tooltip shots, looked at.
+  lint:css, typecheck, `npm test` (461) pass.
+
+
+## Calendar and Date and Time pickers (2026-10-19)
+
+- Read `docs/components.md`, LEARNINGS (Figma, TypeScript and React),
+  INTERFACE (Slider, Popover pattern), Dropdown, Popover, Text Input code.
+- Figma, five read-only `use_figma` calls: the page's seven sets with
+  descriptions and properties; `_calendar-item` bindings; the Calendar tree
+  (sm, lg range, md, month and year views, action bar sizes, title bar);
+  picker layouts; today-bar geometry. One more to export CalendarBlank and
+  Clock. Screenshots of all four sets.
+- Asked Godwin three questions; he chose ISO strings (and asked about AM/PM
+  and dd-mm-yyyy: both covered by `hourCycle` and `locale`), segmented
+  fields and a field-only Time Picker.
+- Added `@internationalized/date` 3.12.4 (already installed through React
+  Aria) as a direct dependency, external in Vite.
+- Built `calendar/` (Calendar, internal SingleCalendar / RangeCalendar for
+  the pickers, `dates.ts`), `date-field/` (internal segmented Text Input),
+  `date-picker/`, `date-range-picker/`, `time-picker/`, two icons, stories,
+  four specs. Text Input CSS reads `data-disabled`; a11y spec exempts
+  disabled date fields like other disabled fields.
+- Dead ends: the Date Picker story crashed with "Too many re-renders"
+  (controlled value parsed every render; LEARNINGS). A `defaultOpen` picker
+  never got focus, so the next press anywhere was swallowed: Popover now
+  shows from its own ref (LEARNINGS). React Aria's dialog props have no
+  role; added `role="dialog"`. Picking a year jumped to January; it keeps
+  the month now. Segments first had space-2xs padding, too airy next to
+  Figma's dd/mm/yyyy. The open-calendar variants moved to the top of their
+  stories: at the bottom the screenshot viewport flipped them upward.
+- The docs server needed a restart to list new story files.
+- Baselines for calendar, date-picker, date-range-picker, time-picker (light
+  and dark), looked at. lint:css, typecheck, `npm test` (499) pass.
+- Not committed.
+- Figma (Godwin's yes): wrote the seven Date & Time set descriptions fresh
+  with an "In code (2026-10-19)" pointer to INTERFACE.md, one `use_figma`
+  call. Calendar, Single Date picker and Time picker held `&amp;quot;`
+  from an earlier round-trip; the fresh text has plain quotes again.
+
+## File Upload (2026-10-19)
+
+- Read `docs/components.md`, INTERFACE (conventions, Progress-bar),
+  LEARNINGS (Figma, parallel sessions).
+- Figma, three read-only `use_figma` calls on the second official
+  connector: the page's sets with descriptions and properties; every
+  variant's tree with bindings (the first dump was cut at 19 KB, so a
+  second one read the success and danger rows, icon colors inside
+  instances, and File-upload itself); row strokes per status and the
+  CloudArrowUp and FileArrowUp SVGs. One more for screenshots to compare.
+- Built `file-upload/` (FileUpload.tsx, file-upload.css, story), two icons,
+  export in `src/index.ts`, `tests/file-upload.spec.ts` (8 tests).
+- First draft let the instruction wrap by itself; Figma breaks after "or",
+  so the default does too.
+- Drag-over in the story: a real `dragenter` with a `DataTransfer` on mount
+  (LEARNINGS). The drag-over spec first read the border mid-transition;
+  polls now (LEARNINGS).
+- Baselines for file-upload light and dark only (`-g file-upload
+  --update-snapshots`, so other sessions' baselines stay as they are),
+  looked at in both themes. lint:css, typecheck, `npm test` (512) pass.
+- Not committed (other sessions' Date, Tabs, Pagination and Slider work is
+  uncommitted in the same tree). Figma descriptions not touched.
+
+## Code snippet and Code text (2026-10-19)
+
+- Read `docs/components.md`, INTERFACE (foundations, conventions),
+  LEARNINGS (Figma, parallel sessions, Claude Docs, Browser pane), the
+  FileTabs, SectionTabs, PillTabs, Menu, ScrollArea and Table code.
+- Figma, three read-only `use_figma` calls on the second official
+  connector: the page's three sets (Code-text, `_code-action-bar`,
+  Code-snippet) with descriptions, properties and bindings (the first dump
+  was cut at 19 KB, so the second read Code-snippet alone, without nested
+  instances); gutter stroke sides, the action bar divider, toggle icons and
+  the Copy SVG. One more to export Eye and EyeClosed. One screenshot.
+- Found Code-text on the page (not in the map). Asked Godwin four
+  questions: bring-your-own highlighter, files x languages, fullscreen as a
+  layout variant, ship Code text too. All four as recommended.
+- Built `code-snippet/` (CodeSnippet.tsx, CodeText.tsx, shared `copy.tsx`,
+  two CSS files, one story), three icons, exports, `tests/code-snippet.spec.ts`
+  (9 tests). The story has a small regex highlighter emitting `data-token`
+  spans so the Code colors show.
+- Dead ends: `onCopy` clashed with the native prop (renamed `onCopied`,
+  LEARNINGS). The nested horizontal ScrollArea drew a vertical thumb: fixed
+  `scroll-area.css` to child combinators (LEARNINGS; whole suite still
+  passes). A single `language` without `languages` showed nothing; it is a
+  label now. In the spec, `mouse.move(0, 0)` did not reset the copied
+  state; hovering another element does.
+- Docs server: another session's server on 5180 picked the new story up
+  after `npm run props`, no restart needed.
+- Baselines for code-snippet light and dark only (`-g code-snippet
+  --update-snapshots`), looked at in both themes. lint:css, typecheck,
+  `npm test` (526) pass.
+- Figma: Code-snippet's description holds `pre &amp;amp;gt; code`
+  (double escaped). Not touched; descriptions not updated.
+- Not committed (other sessions' work is uncommitted in the same tree).
+
+## Sidebar (2026-10-19)
+
+**Asked:** "now let's do Sidebar".
+
+- Read `docs/components.md`, INTERFACE (conventions, List, Tabs), LEARNINGS
+  (Figma, parallel sessions, Claude Docs, Browser pane), TabBar and
+  ScrollArea code.
+- Figma, five read-only `use_figma` calls on the second official
+  connector: the page's sets with descriptions and properties; every
+  `_sidebar-item` variant's bindings (base in full, the rest as diffs);
+  the group and the Sidebar variants (full, rail, hover); the example
+  slots and the collapse frame with a page screenshot; the SidebarSimple SVG.
+- Found the conflict in Figma's Sidebar description (rail tooltips and
+  menus vs the hover peek). Asked Godwin three questions: rail behaviour,
+  data rows vs parts, mobile. Hover peek, data rows, leave mobile to the app.
+- Built `sidebar/` (Sidebar.tsx, sidebar.css, story), SidebarSimple icon,
+  export, `tests/sidebar.spec.ts` (10 tests).
+- Dead end: the rail hid the count with `display: none`, which dropped it
+  from the link's name ("Inbox" vs "Inbox 8"); it is visually hidden now.
+- Docs server: another session holds 5180, so `.claude/launch.json` got a
+  `docs-5181` entry (it landed on 5182); Playwright reused the 5180 server.
+- Baselines for sidebar light and dark only, looked at in both themes;
+  moved the Focused example into a row with a top slot (it stretched and
+  the collapse button sat on the first row). lint:css, typecheck,
+  `npm test` (541) pass.
+- Figma: the Sidebar description's `aria-current` quote is escaped five
+  times (`&amp;amp;amp;amp;amp;quot;`). Not touched; descriptions not updated.
+- Not committed (other sessions' work is uncommitted in the same tree).
+

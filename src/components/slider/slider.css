@@ -1,0 +1,204 @@
+/*
+ * Slider (Figma: Slider page, set "Slider", with the private _knob and _slider-labels).
+ *
+ *   <div class="bland-slider" role="group" data-size="sm" data-type="single" data-input="end">
+ *     <div class="bland-text-input bland-slider__field">…</div>                    double + inputField: start field
+ *     <div class="bland-slider__track">                                            Figma track, control/* high
+ *       <span class="bland-slider__rail"></span>                                    the thumbs' travel, measured by React Aria
+ *       <span class="bland-slider__bar" data-part="active" data-end></span>         Figma active / inactive bars
+ *       <span class="bland-slider__bar" data-part="inactive" data-start></span>
+ *       <div class="bland-slider__thumb bland-focus-ring">                          Figma _knob
+ *         <span class="bland-slider__dot"></span>
+ *         <input type="range">                                                      visually hidden, takes focus and keys
+ *       </div>
+ *       <div class="bland-tooltip" popover>…</div>                                  the value, while hovered, focused or dragged
+ *     </div>
+ *     <div class="bland-text-input bland-slider__field">…</div>                    inputField: (end) field
+ *     <div class="bland-slider__labels"><span class="bland-slider__label">0</span>…</div>   Figma _slider-labels
+ *   </div>
+ *
+ * A thumb's centre sits on its value: half a thumb in from the track's end at min and max, so it never leaves the
+ * track (Figma's grid puts it space-2xs in). The bars stop space-2xs short of each thumb, as Figma's column gap
+ * draws them; where two thumbs meet the middle bar is simply gone. Fields line up with the track row, under which
+ * the labels sit space-xs down (Figma centres the field on track and labels together). Labels sit on their values
+ * (Godwin 2026-10-19; Figma spreads them space-between), the ones at min and max flush with the ends.
+ * Track bars, thumb and dot are full-radius, so no .bland-smooth. Not RTL-aware yet.
+ */
+
+.bland-slider {
+  --_thumb: var(--slider-thumb-sm);
+  --_row: var(--control-xs);
+  --_dot: var(--selection-dot-sm);
+  --_active: var(--control-checked-rest);
+  --_inactive: var(--surface-300);
+  --_thumb-bg: var(--control-checked-rest);
+  --_thumb-hover: var(--control-checked-hover);
+  --_label: var(--text-subtle);
+
+  display: grid;
+  grid-template-columns: minmax(var(--space-none), 1fr);
+  align-items: center;
+  column-gap: var(--space-sm);
+  row-gap: var(--space-xs);
+  width: var(--slider-width);
+  max-width: 100%;
+}
+
+.bland-slider[data-size="md"] {
+  --_thumb: var(--slider-thumb-md);
+  --_row: var(--control-sm);
+  --_dot: var(--selection-dot-md);
+}
+
+.bland-slider[data-size="lg"] {
+  --_thumb: var(--slider-thumb-lg);
+  --_row: var(--control-md);
+  --_dot: var(--selection-dot-md);
+}
+
+/* ---- Value fields: one after the track, or the start before it and the end after it in a range ---- */
+
+.bland-slider[data-input="end"] {
+  grid-template-columns: minmax(var(--space-none), 1fr) auto;
+}
+
+.bland-slider[data-input="both"] {
+  grid-template-columns: auto minmax(var(--space-none), 1fr) auto;
+}
+
+.bland-slider[data-input="both"] :is(.bland-slider__track, .bland-slider__labels) {
+  grid-column: 2;
+}
+
+.bland-slider__field {
+  grid-row: 1;
+  width: var(--slider-input-width);
+}
+
+/* ---- Track, bars, thumbs ---- */
+
+.bland-slider__track {
+  position: relative;
+  grid-row: 1;
+  height: var(--_row);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.bland-slider__rail {
+  position: absolute;
+  inset: var(--space-none) calc(var(--_thumb) / 2);
+  pointer-events: none;
+}
+
+/* A bar runs from the track's start, or space-2xs past a thumb, to space-2xs before a thumb, or the track's end. */
+.bland-slider__bar {
+  position: absolute;
+  top: 50%;
+  right: var(--space-none);
+  left: var(--space-none);
+  height: var(--slider-track);
+  border-radius: var(--rad-rd);
+  background-color: var(--_inactive);
+  translate: var(--space-none) -50%;
+}
+
+.bland-slider__bar[data-part="active"] {
+  background-color: var(--_active);
+}
+
+.bland-slider__bar[data-start] {
+  left: calc(var(--_start) * (100% - var(--_thumb)) + var(--_thumb) + var(--space-2xs));
+}
+
+.bland-slider__bar[data-end] {
+  right: calc(100% - var(--_end) * (100% - var(--_thumb)) + var(--space-2xs));
+}
+
+.bland-slider__thumb {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--_p) * (100% - var(--_thumb)));
+  display: grid;
+  place-items: center;
+  width: var(--_thumb);
+  height: var(--_thumb);
+  border-radius: var(--rad-rd);
+  background-color: var(--_thumb-bg);
+  translate: var(--space-none) -50%;
+  transition: background-color var(--duration-xs) var(--easing-ease);
+}
+
+.bland-slider__dot {
+  width: var(--_dot);
+  height: var(--_dot);
+  border-radius: var(--rad-rd);
+  background-color: var(--surface-100);
+}
+
+/* Same ring as .bland-focus-ring, on the thumb, while its hidden range input has keyboard focus. */
+.bland-slider__thumb:has(input:focus-visible) {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--space-2xs);
+}
+
+/* Figma _knob State=hover; it stays while the thumb is dragged off it. */
+.bland-slider__thumb[data-dragging] {
+  background-color: var(--_thumb-hover);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-slider:not([data-disabled]) .bland-slider__thumb:hover {
+    background-color: var(--_thumb-hover);
+  }
+}
+
+/* ---- Labels: body-md under the track, each on its value ---- */
+
+.bland-slider__labels {
+  display: grid;
+  grid-row: 2;
+  color: var(--_label);
+  font: var(--type-body-md);
+  letter-spacing: var(--letter-spacing-normal);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* All in one cell; the margin (a share of the cell's width) moves each to its value, the translate centres it. */
+.bland-slider__label {
+  grid-area: 1 / 1;
+  justify-self: start;
+  margin-left: calc(var(--_thumb) / 2 + var(--_p) * (100% - var(--_thumb)));
+  translate: -50%;
+}
+
+.bland-slider__label[data-edge="start"] {
+  margin-left: var(--space-none);
+  translate: none;
+}
+
+.bland-slider__label[data-edge="end"] {
+  justify-self: end;
+  margin-left: var(--space-none);
+  translate: none;
+}
+
+/* ---- Disabled: Control/checked-disabled, surface-200, text-minimal ---- */
+
+.bland-slider[data-disabled] {
+  --_active: var(--control-checked-disabled);
+  --_inactive: var(--surface-200);
+  --_thumb-bg: var(--control-checked-disabled);
+  --_label: var(--text-minimal);
+}
+
+.bland-slider[data-disabled] .bland-slider__track {
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bland-slider__thumb {
+    transition: none;
+  }
+}

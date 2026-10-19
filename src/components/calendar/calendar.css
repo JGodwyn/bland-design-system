@@ -1,0 +1,273 @@
+/*
+ * Calendar (Figma: Date & Time page, sets "Calendar", "_calendar-title-bar", "_calendar-item",
+ * "_calendar-action-bar").
+ *
+ *   <div class="bland-calendar bland-smooth" data-size="sm" data-view="day" data-range>
+ *     <div class="bland-calendar__title">                                 Figma _calendar-title-bar
+ *       <button class="bland-calendar__toggle …" aria-expanded>Nov 2024 ⌄</button>
+ *       <span class="bland-calendar__nav"><button class="bland-pagination__item bland-calendar__arrow">‹</button>…</span>
+ *     </div>
+ *     <table class="bland-calendar__grid">                                day view (React Aria grid)
+ *       <th class="bland-calendar__weekday">S</th> …
+ *       <td><div class="bland-calendar__item …" data-selection="selected" aria-current="date">
+ *         <span class="bland-calendar__label">9</span></div></td>
+ *     </table>
+ *     <div class="bland-calendar__periods" role="grid">…</div>             month and year views, 3 x 4
+ *     <div class="bland-calendar__extra">…</div>                           Figma 🧩 Slot
+ *     <div class="bland-calendar__actions">…</div>                         Figma _calendar-action-bar
+ *   </div>
+ *
+ * The box: Date/Calendar/surface, an inside stroke-sm Date/Calendar/border, rad-md, padding space-md, rows
+ * space-sm apart, Elevation/neutral/mid. Day cells are control/xs, sm, md squares with no gap (rad-xs);
+ * month and year cells fill three columns space-xs apart. Hover Date/Calendar-item/surface-hover; a range's
+ * days surface-range (hover range-hover); the selected date or a range's ends surface-checked with
+ * text-on-color. Days outside the month and disabled or unavailable dates are text-minimal. Today is
+ * underlined (stroke-lg, border-brand).
+ */
+
+.bland-calendar {
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+  --_cell: var(--control-xs);
+  --_width: var(--calendar-width-sm);
+  --_type: var(--type-body-md);
+  --_type-bold: var(--type-body-md-bold);
+  --_weekday-type: var(--type-body-sm);
+
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  box-sizing: border-box;
+  width: max-content;
+  padding: var(--space-md);
+  background-color: var(--date-calendar-surface);
+  /* Figma's inside stroke over the elevation. */
+  box-shadow:
+    inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--date-calendar-border),
+    var(--elevation-neutral-mid);
+  color: var(--text-bold);
+  font: var(--_type);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.bland-calendar[data-size="md"] {
+  --_cell: var(--control-sm);
+  --_width: var(--calendar-width-md);
+  --_type: var(--type-body-lg);
+  --_type-bold: var(--type-body-lg-bold);
+  --_weekday-type: var(--type-body-md);
+}
+
+.bland-calendar[data-size="lg"] {
+  --_cell: var(--control-md);
+  --_width: var(--calendar-width-lg);
+  --_type: var(--type-body-lg);
+  --_type-bold: var(--type-body-lg-bold);
+  --_weekday-type: var(--type-body-md);
+}
+
+/* ---- Title bar: the toggle, then previous and next right after it (as in Figma), over a divider ---- */
+
+.bland-calendar__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  box-sizing: border-box;
+  width: var(--_width);
+  padding-bottom: var(--space-sm);
+  box-shadow: inset var(--space-none) calc(var(--stroke-sm) * -1) var(--space-none) var(--space-none) var(--date-calendar-border);
+}
+
+.bland-calendar__toggle {
+  --bland-radius: var(--rad-sm); /* drawn by .bland-smooth */
+  --bland-icon-size: var(--icon-sm);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin: var(--space-none);
+  padding: var(--space-none) var(--space-2xs);
+  border: none;
+  background-color: transparent;
+  color: var(--text-bold);
+  font: var(--_type);
+  letter-spacing: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--duration-xs) var(--easing-ease);
+}
+
+.bland-calendar__toggle[data-static] {
+  cursor: default;
+}
+
+.bland-calendar__title-month {
+  font: var(--_type-bold);
+}
+
+.bland-calendar__caret {
+  color: var(--icon-bold);
+}
+
+.bland-calendar__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+/* ---- Day view ---- */
+
+.bland-calendar__grid {
+  border-collapse: collapse;
+  border-spacing: var(--space-none);
+}
+
+.bland-calendar__grid :is(th, td) {
+  padding: var(--space-none);
+}
+
+.bland-calendar__weekday {
+  width: var(--_cell);
+  height: var(--_cell);
+  color: var(--text-subtle);
+  font: var(--_weekday-type);
+  text-align: center;
+}
+
+/* One cell: a day, a month or a year (Figma _calendar-item). */
+.bland-calendar__item {
+  --bland-radius: var(--rad-xs); /* drawn by .bland-smooth */
+  --_bg: transparent;
+  --_text: var(--text-bold);
+  --_today: var(--border-brand);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--_cell);
+  height: var(--_cell);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  background-color: var(--_bg);
+  color: var(--_text);
+  font: var(--_type);
+  letter-spacing: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--duration-xs) var(--easing-ease),
+    color var(--duration-xs) var(--easing-ease);
+}
+
+/* Today: a stroke-lg underline under the label (Figma's today bar). */
+.bland-calendar__item[aria-current="date"] .bland-calendar__label {
+  text-decoration-line: underline;
+  text-decoration-color: var(--_today);
+  text-decoration-thickness: var(--stroke-lg);
+  text-underline-offset: var(--space-2xs);
+}
+
+.bland-calendar__item[data-selection="range"] {
+  --_bg: var(--date-calendar-item-surface-range);
+}
+
+.bland-calendar__item[data-selection="selected"] {
+  --_bg: var(--date-calendar-item-surface-checked);
+  --_text: var(--text-on-color);
+  --_today: var(--icon-on-color);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-calendar__toggle:not([data-static]):hover:not(:disabled) {
+    background-color: var(--pagination-surface-hover);
+  }
+
+  .bland-calendar__item:hover:not([data-disabled]) {
+    --_bg: var(--date-calendar-item-surface-hover);
+  }
+
+  .bland-calendar__item[data-selection="range"]:hover:not([data-disabled]) {
+    --_bg: var(--date-calendar-item-surface-range-hover);
+  }
+
+  .bland-calendar__item[data-selection="selected"]:hover:not([data-disabled]) {
+    --_bg: var(--date-calendar-item-surface-checked-hover);
+  }
+}
+
+/* Disabled (Figma State=disabled): days outside the month, dates out of bounds or unavailable, a disabled calendar. */
+.bland-calendar__item[data-disabled] {
+  --_text: var(--text-minimal);
+  --_today: var(--border-bold);
+
+  cursor: default;
+}
+
+.bland-calendar__item[data-disabled][data-selection="selected"] {
+  --_bg: var(--control-checked-disabled);
+  --_text: var(--text-on-color);
+  --_today: var(--icon-on-color);
+}
+
+.bland-calendar[data-disabled] .bland-calendar__toggle {
+  color: var(--text-minimal);
+  cursor: default;
+}
+
+.bland-calendar[data-disabled] .bland-calendar__caret {
+  color: var(--icon-minimal);
+}
+
+/* ---- Month and year views: 3 columns space-xs apart, the calendar's width ---- */
+
+.bland-calendar__periods {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: var(--_width);
+}
+
+.bland-calendar__period-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(var(--space-none), 1fr));
+  gap: var(--space-xs);
+}
+
+.bland-calendar__period-cell {
+  display: flex;
+}
+
+.bland-calendar__periods .bland-calendar__item {
+  flex: 1;
+  width: auto;
+  min-width: var(--_cell);
+  padding: var(--space-none) var(--space-sm);
+  white-space: nowrap;
+}
+
+/* ---- Slot and action bar ---- */
+
+.bland-calendar__extra {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: var(--_width);
+}
+
+.bland-calendar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  box-sizing: border-box;
+  width: var(--_width);
+  padding-top: var(--space-sm);
+  box-shadow: inset var(--space-none) var(--stroke-sm) var(--space-none) var(--space-none) var(--date-calendar-border);
+}
+
+.bland-calendar__actions > * {
+  flex: 1;
+  min-width: var(--space-none);
+}

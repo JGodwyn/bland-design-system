@@ -1,0 +1,248 @@
+/*
+ * File Upload (Figma: File Upload page, sets "File-upload", "_uploader" and "_file-upload-progress").
+ *
+ *   <div class="bland-file-upload">                                              File-upload
+ *     <div class="bland-file-upload__header">                                    _uploader header
+ *       <span class="bland-file-upload__title">Upload file</span>
+ *       <span class="bland-file-upload__description">…</span>
+ *     </div>
+ *     <label class="bland-file-upload__dropzone bland-focus-ring bland-smooth" data-drag-over>   dropzone
+ *       <input type="file" class="bland-file-upload__input">                     visually hidden
+ *       <span class="bland-file-upload__disc"><span class="bland-icon">…</span></span>
+ *       <span class="bland-file-upload__instruction">Drag and drop files here or click to upload</span>
+ *       <span class="bland-file-upload__types">SVG, PNG, JPG, or GIF</span>
+ *     </label>
+ *     <ul class="bland-file-upload__files">                                      files
+ *       <li class="bland-file-upload__file bland-smooth" data-status="uploading">   _file-upload-progress
+ *         <span class="bland-file-upload__file-icon">…</span>
+ *         <span class="bland-file-upload__file-content">
+ *           <span class="bland-file-upload__file-text">name, description</span>
+ *           <div class="bland-progress-bar bland-file-upload__progress">…</div>  (uploading)
+ *         </span>
+ *         <span class="bland-file-upload__file-status">…</span>                (success)
+ *         <button class="bland-file-upload__close bland-focus-ring">…</button>  (not success)
+ *       </li>
+ *     </ul>
+ *   </div>
+ *
+ * The native file input is the focus target: the drop zone shows the ring while it has keyboard focus.
+ * Figma dashes the zone's border 4/4; code uses border-style: dashed (the browser's dash length).
+ */
+
+.bland-file-upload {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+  color: var(--text-bold);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+/* ---- Header ---- */
+
+.bland-file-upload__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.bland-file-upload__title {
+  font: var(--type-body-lg-bold);
+  color: var(--text-bold);
+}
+
+.bland-file-upload__description {
+  font: var(--type-body-lg);
+  color: var(--text-subtle);
+}
+
+/* ---- Drop zone: rest, hover, drag-over, disabled ---- */
+
+.bland-file-upload__dropzone {
+  --bland-icon-size: var(--icon-md);
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+  --_zone: var(--surface-200);
+  --_disc: var(--surface-300);
+  --_border: var(--border-input);
+  --_icon: var(--icon-subtle);
+  --_text: var(--text-bold);
+  --_types: var(--text-subtle);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl) var(--space-lg);
+  border: var(--stroke-sm) dashed var(--_border);
+  background-color: var(--_zone);
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--duration-xs) var(--easing-ease),
+    border-color var(--duration-xs) var(--easing-ease);
+}
+
+/* Same ring as .bland-focus-ring, on the zone, while the input inside has keyboard focus. */
+.bland-file-upload__dropzone:has(.bland-file-upload__input:focus-visible) {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--space-2xs);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-file-upload:not([data-disabled]) .bland-file-upload__dropzone:hover {
+    --_zone: var(--surface-300);
+    --_disc: var(--surface-400);
+  }
+}
+
+.bland-file-upload__dropzone[data-drag-over] {
+  --_zone: var(--surface-brand-light);
+  --_disc: var(--surface-100);
+  --_border: var(--border-brand);
+  --_icon: var(--icon-brand);
+}
+
+.bland-file-upload[data-disabled] .bland-file-upload__dropzone {
+  --_border: var(--border-subtle);
+  --_icon: var(--icon-minimal);
+  --_text: var(--text-minimal);
+  --_types: var(--text-minimal);
+
+  cursor: default;
+}
+
+.bland-file-upload[data-disabled] .bland-file-upload__title,
+.bland-file-upload[data-disabled] .bland-file-upload__description {
+  color: var(--text-minimal);
+}
+
+.bland-file-upload__disc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm);
+  border-radius: var(--rad-rd);
+  background-color: var(--_disc);
+  color: var(--_icon);
+  transition: background-color var(--duration-xs) var(--easing-ease);
+}
+
+.bland-file-upload__instruction {
+  font: var(--type-body-lg);
+  color: var(--_text);
+}
+
+.bland-file-upload__types {
+  font: var(--type-body-sm-bold);
+  color: var(--_types);
+}
+
+/* ---- File list ---- */
+
+.bland-file-upload__files {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  list-style: none;
+}
+
+.bland-file-upload__file {
+  --bland-icon-size: var(--icon-md);
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+  --_border: var(--border-subtle);
+  --_icon: var(--icon-subtle);
+  --_description: var(--text-subtle);
+
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: var(--stroke-sm) solid var(--_border);
+  background-color: var(--file-upload-surface);
+}
+
+.bland-file-upload__file[data-status="danger"] {
+  --_border: var(--border-danger);
+  --_icon: var(--icon-danger);
+  --_description: var(--text-danger);
+}
+
+.bland-file-upload__file-icon,
+.bland-file-upload__file-status {
+  display: flex;
+  flex: none;
+  padding-top: var(--space-2xs);
+  color: var(--_icon);
+}
+
+.bland-file-upload__file-status {
+  color: var(--icon-success);
+}
+
+.bland-file-upload__file-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-width: var(--space-none);
+}
+
+.bland-file-upload__file-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  min-width: var(--space-none);
+}
+
+.bland-file-upload__file-name {
+  overflow: hidden;
+  font: var(--type-body-lg);
+  color: var(--text-bold);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bland-file-upload__file-description {
+  font: var(--type-body-sm);
+  color: var(--_description);
+}
+
+.bland-file-upload__progress {
+  width: 100%;
+}
+
+.bland-file-upload__close {
+  --bland-icon-size: var(--icon-sm);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-xs);
+  height: var(--control-xs);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  border-radius: var(--rad-rd);
+  background-color: var(--file-upload-close);
+  color: var(--icon-subtle);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--duration-sm) var(--easing-out);
+}
+
+.bland-file-upload__close:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bland-file-upload__close:active {
+    transform: none;
+  }
+}

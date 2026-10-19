@@ -1,0 +1,67 @@
+/*
+ * Shared by the tab rows (Section tab, Pill tab, File tab, Segmented bar with panels).
+ *
+ *   <div class="…__row">                                               display: flex, so no margins collapse
+ *     <div class="bland-scroll-area bland-tabs__scroll" data-axis="x">   rows that scroll sideways
+ *       … <div role="tablist" class="bland-tabs__list …">
+ *         <span class="bland-tabs__indicator …" aria-hidden="true">    the sliding selection
+ *         tabs
+ *   <div role="tabpanel" class="bland-tab-panel bland-focus-ring">…</div>
+ *
+ * A row that overflows scrolls sideways in a ScrollArea with the fade alone, no thumb (Godwin
+ * 2026-10-19, an exception to the overflow rule, in place of Figma's DotsThree overflow item). A
+ * scroller clips everything outside it, the 2px focus ring included, so the list carries space-xs of
+ * room on every side and the scroll area gives it back with a negative margin: the tabs sit exactly
+ * where they would without it. The row around it is a flex container, or those margins would collapse
+ * through it and leave the room showing (the File tab bar, the Section tab divider).
+ */
+
+.bland-tabs__scroll {
+  flex: 1 1 auto;
+  margin: calc(var(--space-xs) * -1);
+}
+
+.bland-tabs__list {
+  position: relative;
+  display: flex;
+  width: max-content;
+  min-width: 100%;
+  padding: var(--space-xs);
+}
+
+/*
+ * The selection indicator: useSelectionIndicator() sets --_ind-x, -y, -w, -h from the selected tab.
+ * It slides (data-moving) only when a pointer changed the selection; duration/md, easing/out.
+ */
+.bland-tabs__indicator {
+  --_ind-x: 0px;
+  --_ind-y: 0px;
+  --_ind-w: 0px;
+  --_ind-h: 0px;
+
+  position: absolute;
+  top: var(--space-none);
+  left: var(--space-none);
+  width: var(--_ind-w);
+  height: var(--_ind-h);
+  translate: var(--_ind-x) var(--_ind-y);
+  pointer-events: none;
+}
+
+.bland-tabs__indicator[data-moving] {
+  transition:
+    translate var(--duration-md) var(--easing-out),
+    width var(--duration-md) var(--easing-out),
+    height var(--duration-md) var(--easing-out),
+    background-color var(--duration-xs) var(--easing-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bland-tabs__indicator[data-moving] {
+    transition-property: background-color;
+  }
+}
+
+.bland-tab-panel {
+  min-width: var(--space-none);
+}

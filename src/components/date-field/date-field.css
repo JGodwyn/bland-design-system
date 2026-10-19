@@ -1,0 +1,99 @@
+/*
+ * The segmented field of Date Picker, Date Range Picker and Time Picker (internal date-field/). The box, label,
+ * helper, statuses, add-on and disabled colors are Text Input's (text-input.css); this adds the segments and
+ * the calendar button.
+ *
+ *   <div class="bland-text-input bland-date-field" data-size="sm" data-filled data-disabled>
+ *     <span class="bland-text-input__label">Label</span>
+ *     <div class="bland-text-input__field bland-smooth">                  the picker's group
+ *       <span class="bland-text-input__main">
+ *         <div class="bland-date-field__segments">                         React Aria's field
+ *           <span class="bland-date-field__segment" data-segment="day" data-placeholder>dd</span>
+ *           <span class="bland-date-field__segment" data-segment="literal">/</span> …
+ *         </div>
+ *         <button class="bland-date-field__button …">CalendarBlank</button>
+ *       </span>
+ *       <span class="bland-text-input__addon" data-side="end">AM</span>   Time Picker, 12-hour
+ *     </div>
+ *   </div>
+ */
+
+.bland-date-field .bland-text-input__field {
+  cursor: text;
+}
+
+/* Text Input's ring on the box while a segment is being edited (as while its input has focus). */
+.bland-date-field .bland-text-input__field:has(.bland-date-field__segment:focus-visible) {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--space-2xs);
+}
+
+.bland-date-field__segments {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: var(--space-none);
+  overflow: hidden;
+  color: var(--_text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.bland-date-field__segment {
+  --bland-radius: var(--rad-xs);
+
+  padding: var(--space-none);
+  border-radius: var(--bland-radius);
+  caret-color: transparent;
+  outline: none;
+}
+
+/* Empty: the placeholder letters, text-subtle as Text Input's placeholder. */
+.bland-date-field__segment[data-placeholder] {
+  color: var(--_placeholder);
+}
+
+/* An empty field reads as one placeholder, separators included (Figma: dd/mm/yyyy in text-subtle). */
+.bland-date-field:not([data-filled]) .bland-date-field__segment[data-segment="literal"] {
+  color: var(--_placeholder);
+}
+
+/* The segment being edited: Control/checked-rest behind text-on-color, like a text selection (code only). */
+.bland-date-field__segment:focus {
+  background-color: var(--control-checked-rest);
+  color: var(--text-on-color);
+}
+
+/* The Time Picker's AM / PM sits in the trailing add-on; it reads like the add-on's label. */
+.bland-text-input__addon-content .bland-date-field__segment {
+  color: inherit;
+}
+
+.bland-text-input__addon-content .bland-date-field__segment:focus {
+  color: var(--text-on-color);
+}
+
+.bland-date-field[data-disabled] .bland-date-field__segment {
+  cursor: not-allowed;
+}
+
+/* ---- The calendar button: the field's end icon, pressable ---- */
+
+.bland-date-field__button {
+  --bland-radius: var(--rad-sm); /* drawn by .bland-smooth */
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bland-date-field__button:disabled {
+  cursor: not-allowed;
+}

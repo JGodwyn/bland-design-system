@@ -1,0 +1,60 @@
+/*
+ * Code text (Figma: Code snippet page, set "Code-text"). Inline code in running text.
+ *
+ *   <span class="bland-code-text bland-smooth" data-size="sm">
+ *     <code class="bland-code-text__code">…</code>
+ *     <button class="bland-code-text__copy bland-focus-ring bland-smooth" aria-label="Copy code">Copy</button>
+ *     <span role="status">…</span>                                  visually hidden, says "Copied"
+ *   </span>
+ *
+ * From Figma: surface-200 fill, stroke-xs border-subtle inside, rad-sm, no vertical padding; sm pads and gaps
+ * space-2xs, md and lg space-xs. Code/body-sm, -md, -lg in text-bold. The copy icon is icon/xs (sm, md) or
+ * icon/sm (lg); Figma binds no color to it (hidden by default), so it takes icon-subtle. No hover in Figma.
+ */
+
+.bland-code-text {
+  --bland-radius: var(--rad-sm);
+  --bland-icon-size: var(--icon-xs);
+  --_pad: var(--space-xs);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--_pad);
+  padding: var(--space-none) var(--_pad);
+  vertical-align: baseline;
+  background-color: var(--surface-200);
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-xs) var(--border-subtle);
+}
+
+.bland-code-text[data-size="sm"] {
+  --_pad: var(--space-2xs);
+}
+.bland-code-text[data-size="lg"] {
+  --bland-icon-size: var(--icon-sm);
+}
+
+.bland-code-text__code {
+  font: var(--type-code-body-sm);
+  color: var(--text-bold);
+  overflow-wrap: anywhere;
+}
+.bland-code-text[data-size="md"] .bland-code-text__code {
+  font: var(--type-code-body-md);
+}
+.bland-code-text[data-size="lg"] .bland-code-text__code {
+  font: var(--type-code-body-lg);
+}
+
+.bland-code-text__copy {
+  --bland-radius: var(--rad-xs);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-none);
+  border: none;
+  background: none;
+  color: var(--icon-subtle);
+  cursor: pointer;
+}

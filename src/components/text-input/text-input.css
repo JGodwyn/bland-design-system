@@ -177,20 +177,21 @@
   overflow-wrap: break-word;
 }
 
-/* ---- States: filled (add-on labels go bold), hover, disabled. Focus is above. ---- */
+/* ---- States: filled (add-on labels go bold), hover, disabled (a disabled input, or data-disabled on the root
+   for the date and time fields, which have no input). Focus is above. ---- */
 
 .bland-text-input[data-filled] {
   --_addon: var(--text-bold);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .bland-text-input__field:hover:not(:has(:disabled)) {
+  .bland-text-input:not([data-disabled]) .bland-text-input__field:hover:not(:has(:disabled)) {
     --_fill: var(--text-input-surface-hover);
     --_addon: var(--text-bold);
   }
 }
 
-.bland-text-input:has(.bland-text-input__input:disabled) {
+.bland-text-input:is([data-disabled], :has(.bland-text-input__input:disabled)) {
   --_border: var(--border-subtle);
   --_helper: var(--text-minimal);
   --_status: var(--icon-minimal);
@@ -201,7 +202,7 @@
   --_icon: var(--icon-minimal);
 }
 
-.bland-text-input:has(.bland-text-input__input:disabled) .bland-text-input__field {
+.bland-text-input:is([data-disabled], :has(.bland-text-input__input:disabled)) .bland-text-input__field {
   cursor: not-allowed;
 }
 

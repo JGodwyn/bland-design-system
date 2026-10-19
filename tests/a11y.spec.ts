@@ -22,6 +22,9 @@ const disabledFieldText = [
   '.bland-text-input:has(.bland-text-input__input:disabled)',
   '.bland-text-area:has(.bland-text-area__input:disabled)',
   '.bland-numeric-input-field:has(.bland-numeric-input-field__box:disabled)',
+  // Date and time fields have no input to disable: their root says data-disabled (the range picker's helper too).
+  '.bland-date-field[data-disabled]',
+  '.bland-date-range-picker[data-disabled]',
   // A disabled Accordion's open content is drawn in Text/text-minimal by Figma's State=disabled; its header is aria-disabled.
   '.bland-accordion[data-disabled] .bland-accordion__content',
   // A disabled Progress-wizard step is drawn in Text/text-minimal by Figma's State=disabled, like disabled fields.

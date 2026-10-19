@@ -1,0 +1,222 @@
+/*
+ * Code snippet (Figma: Code snippet page, sets "Code-snippet" and "_code-action-bar").
+ *
+ *   <div class="bland-code-snippet bland-smooth" data-expanded data-fullscreen>
+ *     FileTabs.bland-code-snippet__files                       only with `files`; its tab panel holds __main
+ *     <div class="bland-code-snippet__main">
+ *       <div class="bland-code-snippet__bar" data-switcher="dropdown">
+ *         description, the switcher (language button + Menu, SectionTabs or PillTabs), copy IconButton, status
+ *       ScrollArea.bland-code-snippet__scroll                  vertical: capped while collapsed
+ *         <div class="bland-code-snippet__body">
+ *           <div class="bland-code-snippet__gutter" aria-hidden>1 2 3 …</div>
+ *           ScrollArea axis="x".bland-code-snippet__code-scroll  long lines scroll sideways, the gutter stays
+ *             <pre class="bland-code-snippet__pre"><code class="bland-code-snippet__code">…</code></pre>
+ *       Button.bland-code-snippet__toggle                      Show more / Show less, over the code's bottom
+ *
+ * From Figma: root surface-100, stroke-sm border-subtle inside, rad-md (fullscreen rad-null), clips. Action bar
+ * surface-100, gap space-lg, padding space-xs space-xs space-xs space-md (tabs: no vertical padding), a stroke-sm
+ * border-subtle divider along its bottom, 40 tall. Description body-lg text-subtle, fills. Language button
+ * surface-200, stroke-xs border-subtle, rad-sm, padding space-2xs space-sm, gap space-2xs, Code/body-md
+ * text-bold, CaretDown icon/xs icon-subtle (Figma has no hover state for it). Copy is a ghost sm Icon Button.
+ * Gutter padding space-md, a stroke-sm border-subtle line on its right, Code/body-md text-subtle. Code padding
+ * space-md, Code/body-md in the Code/* colors. Collapsed caps the body at code-snippet/height-collapsed.
+ * Toggle: Button sm brand primary with Elevation/neutral/mid, centered, space-xl above the bottom edge.
+ */
+
+.bland-code-snippet {
+  --bland-radius: var(--rad-md);
+
+  display: flex;
+  flex-direction: column;
+  min-width: var(--space-none);
+  overflow: hidden;
+  border: var(--stroke-sm) solid var(--border-subtle);
+  background-color: var(--surface-100);
+}
+
+.bland-code-snippet[data-fullscreen] {
+  height: 100%;
+  border-radius: var(--rad-null);
+}
+
+/* With file tabs, the tab panel is the main area; in fullscreen it takes the height left under the tabs. */
+.bland-code-snippet__files {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: var(--space-none);
+}
+.bland-code-snippet__files > .bland-tab-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: var(--space-none);
+}
+/* The snippet clips, so rings on its parts sit inside them. */
+.bland-code-snippet__files > .bland-tab-panel:focus-visible {
+  outline-offset: calc(var(--stroke-lg) * -1);
+}
+
+.bland-code-snippet__main {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: var(--space-none);
+}
+
+/* Action bar (_code-action-bar). */
+.bland-code-snippet__bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-xs) var(--space-xs) var(--space-xs) var(--space-md);
+  background-color: var(--surface-100);
+  box-shadow: inset var(--space-none) calc(var(--stroke-sm) * -1) var(--space-none) var(--space-none) var(--border-subtle);
+}
+.bland-code-snippet__bar[data-switcher="tabs"] {
+  padding-block: var(--space-none);
+}
+
+.bland-code-snippet__description {
+  flex: 1;
+  min-width: var(--space-none);
+  overflow: hidden;
+  font: var(--type-body-lg);
+  color: var(--text-subtle);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bland-code-snippet__language {
+  --bland-radius: var(--rad-sm);
+  --bland-icon-size: var(--icon-xs);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-2xs) var(--space-sm);
+  border: none;
+  background-color: var(--surface-200);
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-xs) var(--border-subtle);
+  font: var(--type-code-body-md);
+  color: var(--text-bold);
+}
+button.bland-code-snippet__language {
+  cursor: pointer;
+}
+.bland-code-snippet__caret {
+  color: var(--icon-subtle);
+}
+
+.bland-code-snippet__tabs {
+  flex: 1;
+  min-width: var(--space-none);
+}
+
+.bland-code-snippet__copy {
+  flex: none;
+  margin-inline-start: auto;
+}
+
+/* Code body. */
+.bland-code-snippet__scroll {
+  flex: none;
+}
+.bland-code-snippet:not([data-expanded], [data-fullscreen]) .bland-code-snippet__scroll {
+  max-height: var(--code-snippet-height-collapsed);
+}
+.bland-code-snippet[data-fullscreen] .bland-code-snippet__scroll {
+  flex: 1;
+}
+
+/* A scrolling area is a Tab stop while it overflows (CodeSnippet.tsx); its ring sits inside, the snippet clips. */
+.bland-code-snippet__scroll:has(> .bland-scroll-area__viewport:focus-visible),
+.bland-code-snippet__code-scroll:has(> .bland-scroll-area__viewport:focus-visible) {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: calc(var(--stroke-lg) * -1);
+}
+.bland-code-snippet .bland-scroll-area__viewport:focus-visible {
+  outline: none;
+}
+
+.bland-code-snippet__body {
+  display: flex;
+  min-width: var(--space-none);
+}
+/* Room under the last line for the toggle, so it never covers code once scrolled or expanded (code only). */
+.bland-code-snippet__scroll[data-toggle] .bland-code-snippet__body {
+  padding-bottom: calc(var(--space-xl) + var(--control-sm));
+}
+
+.bland-code-snippet__gutter {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  padding: var(--space-md);
+  box-shadow: inset calc(var(--stroke-sm) * -1) var(--space-none) var(--space-none) var(--space-none) var(--border-subtle);
+  font: var(--type-code-body-md);
+  color: var(--text-subtle);
+  user-select: none;
+}
+
+.bland-code-snippet__code-scroll {
+  flex: 1;
+}
+
+.bland-code-snippet__pre {
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 100%;
+  margin: var(--space-none);
+  padding: var(--space-md);
+  font: var(--type-code-body-md);
+  color: var(--code-text);
+  tab-size: 4;
+}
+
+/*
+ * Syntax colors. Bland ships no highlighter (Godwin 2026-10-19): `highlight` returns nodes, and the usual token
+ * classes take the five Code/* colors. Anything else stays Code/text.
+ */
+.bland-code-snippet__code {
+  /* Shiki's css-variables theme (createCssVariablesTheme). */
+  --shiki-foreground: var(--code-text);
+  --shiki-background: transparent;
+  --shiki-token-comment: var(--code-comment);
+  --shiki-token-keyword: var(--code-keyword);
+  --shiki-token-function: var(--code-function);
+  --shiki-token-string: var(--code-string);
+  --shiki-token-string-expression: var(--code-string);
+  --shiki-token-constant: var(--code-text);
+  --shiki-token-parameter: var(--code-text);
+  --shiki-token-punctuation: var(--code-text);
+  --shiki-token-link: var(--code-string);
+
+  font: inherit;
+}
+.bland-code-snippet__code :is([data-token="comment"], .hljs-comment, .hljs-quote, .token.comment, .token.prolog, .token.doctype) {
+  color: var(--code-comment);
+}
+.bland-code-snippet__code :is([data-token="keyword"], .hljs-keyword, .hljs-literal, .token.keyword, .token.boolean) {
+  color: var(--code-keyword);
+}
+.bland-code-snippet__code :is([data-token="function"], .hljs-title, .token.function, .token.class-name) {
+  color: var(--code-function);
+}
+.bland-code-snippet__code :is([data-token="string"], .hljs-string, .token.string, .token.char, .token.attr-value) {
+  color: var(--code-string);
+}
+
+/* Show more / Show less: centered without a transform, so the Button's press scale still works. */
+.bland-code-snippet__toggle {
+  position: absolute;
+  right: var(--space-none);
+  bottom: var(--space-xl);
+  left: var(--space-none);
+  width: fit-content;
+  margin-inline: auto;
+  box-shadow: var(--elevation-neutral-mid);
+}

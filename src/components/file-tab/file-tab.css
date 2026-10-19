@@ -1,0 +1,203 @@
+/*
+ * File tab (Figma: File tab page, sets "File-tab" and "_file-tab-item").
+ *
+ *   <div class="bland-file-tabs" data-size="sm">
+ *     <div class="bland-file-tabs__bar">                         surface-300 behind the tabs
+ *       ScrollArea > <div role="tablist" class="bland-tabs__list bland-file-tabs__list">
+ *         <div role="presentation" class="bland-file-tabs__item bland-focus-ring" data-selected>
+ *           <div role="tab" class="bland-file-tabs__tab">leading, label, close space</div>
+ *           <button class="bland-file-tabs__close bland-smooth" aria-hidden="true" tabindex="-1">X</button>
+ *         </div>
+ *     <div role="tabpanel" class="bland-tab-panel">…</div>
+ *   </div>
+ *
+ * The item draws Figma's tab (fill, height, square corners); the tab element fills it, and the close
+ * button sits over the space the tab keeps for it (both in one grid cell, so nothing is positioned and
+ * the focus ring paints over the neighbours). The ring is the item's, while its tab has keyboard focus;
+ * the tabs are square, so the ring is too (Figma rounds it rad-xs).
+ *
+ * Fills (Godwin 2026-10-19): unselected surface-300, hover surface-400, the bar's own color, so unselected
+ * tabs blend into the bar; disabled surface-200; selected surface-100 whatever the state. Figma's close
+ * box is one step above a selected (surface-200) or disabled (surface-300) tab and the tab's own fill
+ * otherwise; Figma has no close hover state. Separators: Figma's 1px border-subtle gap (space-3xs).
+ */
+
+.bland-file-tabs {
+  min-width: var(--space-none);
+}
+
+.bland-file-tabs__bar {
+  display: flex;
+  background-color: var(--surface-300);
+}
+
+.bland-file-tabs__list {
+  gap: var(--space-3xs);
+}
+
+.bland-file-tabs__item {
+  --_fill: var(--surface-300);
+  --_text: var(--text-subtle);
+  --_icon: var(--icon-subtle);
+  --_close-fill: var(--_fill);
+  --_size: var(--file-tab-sm);
+  --_pad: var(--space-md);
+  --bland-icon-size: var(--icon-sm);
+
+  display: grid;
+  flex: none;
+  grid-template-areas: "tab";
+  height: var(--_size);
+  background-color: var(--_fill);
+  color: var(--_text);
+  transition:
+    background-color var(--duration-xs) var(--easing-ease),
+    color var(--duration-xs) var(--easing-ease);
+}
+
+/* Figma's separator: the tabs frame shows border-subtle through a space-3xs gap. */
+.bland-file-tabs__item + .bland-file-tabs__item {
+  box-shadow: calc(var(--space-3xs) * -1) var(--space-none) var(--space-none) var(--space-none) var(--border-subtle);
+}
+
+/* ---- Size: height, side padding, icon and close sizes ---- */
+
+.bland-file-tabs[data-size="md"] .bland-file-tabs__item {
+  --_size: var(--file-tab-md);
+  --bland-icon-size: var(--icon-md);
+}
+
+.bland-file-tabs[data-size="lg"] .bland-file-tabs__item {
+  --_size: var(--file-tab-lg);
+  --_pad: var(--space-lg);
+  --bland-icon-size: var(--icon-lg);
+}
+
+/* ---- Parts ---- */
+
+.bland-file-tabs__tab {
+  display: flex;
+  grid-area: tab;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: var(--space-none);
+  padding-inline: var(--_pad);
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The item shows the ring (.bland-focus-ring rule below), not the tab. */
+.bland-file-tabs__tab:focus {
+  outline: none;
+}
+
+.bland-file-tabs__item:has(> .bland-file-tabs__tab:focus-visible) {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--space-2xs);
+}
+
+.bland-file-tabs__leading {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--bland-icon-size);
+  height: var(--bland-icon-size);
+  color: var(--_icon);
+}
+
+.bland-file-tabs__close-space {
+  flex: none;
+  width: var(--file-tab-close-sm);
+}
+
+.bland-file-tabs__close {
+  --bland-radius: var(--rad-xs);
+  --bland-icon-size: var(--icon-xs);
+
+  display: inline-flex;
+  grid-area: tab;
+  align-items: center;
+  align-self: center;
+  justify-content: center;
+  justify-self: end;
+  width: var(--file-tab-close-sm);
+  height: var(--file-tab-close-sm);
+  margin: var(--space-none);
+  margin-inline-end: var(--_pad);
+  padding: var(--space-none);
+  border: none;
+  background-color: var(--_close-fill);
+  color: var(--icon-subtle);
+  cursor: pointer;
+  transition: background-color var(--duration-xs) var(--easing-ease);
+}
+
+.bland-file-tabs[data-size="md"] :is(.bland-file-tabs__close, .bland-file-tabs__close-space) {
+  --bland-icon-size: var(--icon-sm);
+
+  width: var(--file-tab-close-md);
+  height: var(--file-tab-close-md);
+}
+
+.bland-file-tabs[data-size="lg"] :is(.bland-file-tabs__close, .bland-file-tabs__close-space) {
+  --bland-icon-size: var(--icon-md);
+
+  width: var(--file-tab-close-lg);
+  height: var(--file-tab-close-lg);
+}
+
+/* ---- Minimized: a square tab with the leading slot only ---- */
+
+.bland-file-tabs__item[data-minimized] {
+  width: var(--_size);
+}
+
+.bland-file-tabs__item[data-minimized] .bland-file-tabs__tab {
+  justify-content: center;
+  padding-inline: var(--space-none);
+}
+
+/* ---- Selected, hover, disabled ---- */
+
+.bland-file-tabs__item[data-selected] {
+  --_fill: var(--surface-100);
+  --_text: var(--text-bold);
+  --_close-fill: var(--surface-200);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-file-tabs__item:not([data-selected], [data-disabled]):hover {
+    --_fill: var(--surface-400);
+    --_text: var(--text-bold);
+  }
+}
+
+.bland-file-tabs__item[data-disabled] {
+  --_text: var(--text-minimal);
+  --_icon: var(--icon-minimal);
+}
+
+.bland-file-tabs__item[data-disabled]:not([data-selected]) {
+  --_fill: var(--surface-200);
+  --_close-fill: var(--surface-300);
+}
+
+.bland-file-tabs__item[data-disabled] :is(.bland-file-tabs__tab, .bland-file-tabs__close) {
+  cursor: not-allowed;
+}
+
+.bland-file-tabs__item[data-disabled] .bland-file-tabs__close {
+  color: var(--icon-minimal);
+}
+
+/* A bare SVG in the slot takes the slot's icon size; an Icon, an Avatar or any other node keeps its own. */
+.bland-file-tabs__leading > svg {
+  width: 100%;
+  height: 100%;
+}

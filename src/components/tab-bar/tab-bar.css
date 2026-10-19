@@ -1,0 +1,87 @@
+/*
+ * Tab bar (Figma: Tab bar page, sets "Tab-bar" and "_tab-bar-item"): mobile bottom navigation.
+ *
+ *   <nav class="bland-tab-bar" aria-label="Main">
+ *     <ul class="bland-tab-bar__list">
+ *       <li class="bland-tab-bar__entry">
+ *         <a class="bland-tab-bar__item bland-focus-ring bland-smooth" aria-current="page">
+ *           <span class="bland-tab-bar__icon-wrap">icon, Indicator sm danger with ring</span>
+ *           <span class="bland-tab-bar__label">Home</span>
+ *         </a>
+ *
+ * Height tab-bar/height, surface-100, a stroke-sm border-subtle divider along the top (drawn inside,
+ * as Figma's rectangle is). Items share the width; icon/lg over a body-sm label, space-2xs apart.
+ * Current: icon-brand and body-sm-bold text-brand. No hover state (touch), no press motion: it is used
+ * all day. The Indicator sits on the icon's top right corner, space-2xs outside it (Figma: 18, -2 on a 24
+ * icon with an 8 dot).
+ */
+
+.bland-tab-bar {
+  min-width: var(--space-none);
+  background-color: var(--surface-100);
+  box-shadow: inset var(--space-none) var(--stroke-sm) var(--space-none) var(--space-none) var(--border-subtle);
+}
+
+.bland-tab-bar__list {
+  display: flex;
+  height: var(--tab-bar-height);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  list-style: none;
+}
+
+.bland-tab-bar__entry {
+  display: flex;
+  flex: 1 1 var(--space-none);
+  min-width: var(--space-none);
+}
+
+.bland-tab-bar__item {
+  --_text: var(--text-subtle);
+  --_icon: var(--icon-subtle);
+  --bland-radius: var(--rad-md);
+  --bland-icon-size: var(--icon-lg);
+
+  display: flex;
+  flex: 1 1 var(--space-none);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  min-width: var(--space-none);
+  padding-inline: var(--space-xs);
+  color: var(--_text);
+  font: var(--type-body-sm);
+  letter-spacing: var(--letter-spacing-normal);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bland-tab-bar__item[aria-current="page"] {
+  --_text: var(--text-brand);
+  --_icon: var(--icon-brand);
+
+  font: var(--type-body-sm-bold);
+}
+
+.bland-tab-bar__icon-wrap {
+  position: relative;
+  display: flex;
+}
+
+.bland-tab-bar__icon {
+  color: var(--_icon);
+}
+
+.bland-tab-bar__indicator {
+  position: absolute;
+  top: calc(var(--space-2xs) * -1);
+  right: calc(var(--space-2xs) * -1);
+}
+
+.bland-tab-bar__label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

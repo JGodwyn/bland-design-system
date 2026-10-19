@@ -7,7 +7,7 @@
  *     <span class="bland-pill__count">…Indicator…</span>
  *   </button>
  *
- * Selected comes from aria-pressed, not a class. Figma's outer frame has no padding; its inner
+ * Selected comes from aria-pressed (aria-selected on a Pill tab), not a class. Figma's outer frame has no padding; its inner
  * frame's padding, fill and stroke sit on the button. Every size uses body-lg and icon/md.
  * The radius is rad-rd without .bland-smooth: on a full radius Figma's smoothing has no straight
  * edge to spread over, and superellipse() would square the ends off.
@@ -69,8 +69,9 @@
 }
 
 /* ---- Selected: Control/checked fills, white content in both modes, no stroke ---- */
+/* aria-selected is a Pill tab (role="tab"), which draws the same pill. */
 
-.bland-pill[aria-pressed="true"] {
+.bland-pill:is([aria-pressed="true"], [aria-selected="true"]) {
   --_bg: var(--control-checked-rest);
   --_bg-hover: var(--control-checked-hover);
   --_bg-disabled: var(--control-checked-disabled);

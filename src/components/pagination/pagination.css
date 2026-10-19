@@ -1,0 +1,134 @@
+/*
+ * Pagination (Figma: Pagination page, sets "Pagination-simple" and "_pagination-item").
+ *
+ *   <nav class="bland-pagination" aria-label="Pagination" data-size="sm">
+ *     <ul class="bland-pagination__list bland-smooth">          the bordered box
+ *       <li><button class="bland-pagination__item …" aria-label="Previous page">CaretLeft</button></li>
+ *       <li><button class="bland-pagination__item …" aria-current="page" aria-label="Page 1">1</button></li>
+ *       <li class="bland-pagination__item bland-pagination__gap" aria-hidden="true">DotsThree</li>
+ *       <li><button class="bland-pagination__item …" aria-label="Next page">CaretRight</button></li>
+ *
+ * The box: padding space-xs, items space-2xs apart, an inside stroke-sm border-subtle (an inset shadow),
+ * rad-md. An item is control/xs, sm, md high and at least as wide (more digits grow it), padding space-xs
+ * (lg space-sm), rad-sm. Labels body-md (sm) or body-lg (md, lg) text-bold, icons icon/sm (sm) or icon/md
+ * icon-bold. Hover Pagination/surface-hover. The current page is Control/checked with text-on-color.
+ * Disabled: text-minimal, icon-minimal, no fill; the current page keeps Control/checked-disabled.
+ * Figma has no pressed state, so there is no press motion.
+ */
+
+.bland-pagination {
+  display: flex;
+}
+
+.bland-pagination__list {
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin: var(--space-none);
+  padding: var(--space-xs);
+  list-style: none;
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-subtle);
+}
+
+.bland-pagination__list > li {
+  display: flex;
+}
+
+.bland-pagination__item {
+  --bland-radius: var(--rad-sm); /* drawn by .bland-smooth */
+  --bland-icon-size: var(--icon-sm);
+  --_bg: transparent;
+  --_text: var(--text-bold);
+  --_icon: var(--icon-bold);
+
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  box-sizing: border-box;
+  height: var(--control-xs);
+  min-width: var(--control-xs);
+  margin: var(--space-none);
+  padding: var(--space-none) var(--space-xs);
+  border: none;
+  background-color: var(--_bg);
+  color: var(--_text);
+  font: var(--type-body-md);
+  letter-spacing: var(--letter-spacing-normal);
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-xs) var(--easing-ease),
+    color var(--duration-xs) var(--easing-ease);
+}
+
+.bland-pagination__item .bland-icon {
+  color: var(--_icon);
+}
+
+.bland-pagination[data-size="md"] .bland-pagination__item {
+  --bland-icon-size: var(--icon-md);
+
+  height: var(--control-sm);
+  min-width: var(--control-sm);
+  font: var(--type-body-lg);
+}
+
+.bland-pagination[data-size="lg"] .bland-pagination__item {
+  --bland-icon-size: var(--icon-md);
+
+  height: var(--control-md);
+  min-width: var(--control-md);
+  padding: var(--space-none) var(--space-sm);
+  font: var(--type-body-lg);
+}
+
+/* ---- The overflow item: a mark, not a control ---- */
+
+.bland-pagination__gap {
+  cursor: default;
+}
+
+/* ---- Hover ---- */
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-pagination__item:is(button, a):hover:not(:disabled, [aria-disabled="true"]) {
+    --_bg: var(--pagination-surface-hover);
+  }
+
+  .bland-pagination__item[aria-current="page"]:hover:not(:disabled) {
+    --_bg: var(--control-checked-hover);
+  }
+}
+
+/* ---- Current page ---- */
+
+.bland-pagination__item[aria-current="page"] {
+  --_bg: var(--control-checked-rest);
+  --_text: var(--text-on-color);
+  --_icon: var(--icon-on-color);
+}
+
+/* ---- Disabled: previous or next at the ends, or the whole row ---- */
+
+.bland-pagination__item:disabled,
+.bland-pagination__item[aria-disabled="true"] {
+  --_text: var(--text-minimal);
+  --_icon: var(--icon-minimal);
+
+  cursor: default;
+}
+
+.bland-pagination[data-disabled] .bland-pagination__gap {
+  --_icon: var(--icon-minimal);
+}
+
+.bland-pagination__item[aria-current="page"]:disabled {
+  --_bg: var(--control-checked-disabled);
+  --_text: var(--text-on-color);
+}

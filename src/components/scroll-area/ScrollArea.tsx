@@ -10,13 +10,26 @@ export interface ScrollAreaProps extends HTMLAttributes<HTMLDivElement> {
   fadeSize?: 'sm' | 'md';
   /** Extra props for the scrolling element, e.g. a role or an aria-label. */
   viewportProps?: HTMLAttributes<HTMLDivElement>;
+  /**
+   * Draws the visible thumb. Default true, as the overflow rule asks; tab rows turn it off and show more
+   * content with the fade alone (Godwin, 2026-10-19).
+   */
+  scrollbar?: boolean;
 }
 
 /**
  * Every scroll area that overflows shows a visible scrollbar and an edge fade (CLAUDE.md, "Overflow").
  * Size it from outside (a max-height or a flex parent); it scrolls when its content is larger.
  */
-export function ScrollArea({ children, axis = 'y', fadeSize = 'md', viewportProps, className, ...rest }: ScrollAreaProps) {
+export function ScrollArea({
+  children,
+  axis = 'y',
+  fadeSize = 'md',
+  viewportProps,
+  scrollbar = true,
+  className,
+  ...rest
+}: ScrollAreaProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -28,7 +41,7 @@ export function ScrollArea({ children, axis = 'y', fadeSize = 'md', viewportProp
     const vp = viewportRef.current;
     const track = trackRef.current;
     const thumb = thumbRef.current;
-    if (!root || !vp || !track || !thumb) return;
+    if (!root || !vp) return;
 
     const y = axis === 'y';
     const pos = y ? vp.scrollTop : vp.scrollLeft;
@@ -40,7 +53,7 @@ export function ScrollArea({ children, axis = 'y', fadeSize = 'md', viewportProp
     toggle(root, 'data-overflow', overflow);
     toggle(vp, 'data-fade-start', overflow && pos > 1);
     toggle(vp, 'data-fade-end', overflow && pos < max - 1);
-    if (!overflow) return;
+    if (!overflow || !track || !thumb) return;
 
     const trackSize = y ? track.clientHeight : track.clientWidth;
     // Proportional thumb; its CSS min size (control/xs) wins when content is very long.
@@ -109,9 +122,11 @@ export function ScrollArea({ children, axis = 'y', fadeSize = 'md', viewportProp
           {children}
         </div>
       </div>
-      <div ref={trackRef} className="bland-scroll-area__track" aria-hidden="true">
-        <div ref={thumbRef} className="bland-scroll-area__thumb" onPointerDown={onThumbPointerDown} />
-      </div>
+      {scrollbar && (
+        <div ref={trackRef} className="bland-scroll-area__track" aria-hidden="true">
+          <div ref={thumbRef} className="bland-scroll-area__thumb" onPointerDown={onThumbPointerDown} />
+        </div>
+      )}
     </div>
   );
 }

@@ -122,13 +122,13 @@ export function Tooltip({
   const { tooltipProps } = useTooltip({}, state);
 
   // No motion when it opens from the keyboard (React Aria opens on focus only when it is focus-visible, so the
-  // trigger matches :focus-visible), when it opens warm (another tooltip was just open, React Aria's
+  // trigger matches :focus-visible, or holds the focused element, as a Slider thumb does), when it opens warm (another tooltip was just open, React Aria's
   // shouldSkipAnimation), or when it starts open. It leaves the way it came: no entrance, no exit.
   const [prevOpen, setPrevOpen] = useState(state.isOpen);
   const [instant, setInstant] = useState(true);
   if (state.isOpen !== prevOpen) {
     setPrevOpen(state.isOpen);
-    setInstant(state.isOpen ? state.shouldSkipAnimation || !!triggerRef.current?.matches(':focus-visible') : instant || state.shouldSkipAnimation);
+    setInstant(state.isOpen ? state.shouldSkipAnimation || !!triggerRef.current?.matches(':focus-visible, :has(:focus-visible)') : instant || state.shouldSkipAnimation);
   }
 
   const { refs, elements, update, x, y, placement: placed, middlewareData } = useFloating<HTMLElement>({

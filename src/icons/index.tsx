@@ -28,6 +28,13 @@ export const CaretDownIcon = (p: P) => (
   </svg>
 );
 
+/** Figma: CaretLeft (6080:106855). Pagination's previous page. */
+export const CaretLeftIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M20 26L10 16L20 6" />
+  </svg>
+);
+
 /** Figma: CaretRight (6080:106193). Breadcrumb's separator. */
 export const CaretRightIcon = (p: P) => (
   <svg {...stroked} {...p}>
@@ -149,5 +156,78 @@ export const DotsThreeIcon = (p: P) => (
     <path d="M16 17.5C16.8284 17.5 17.5 16.8284 17.5 16C17.5 15.1716 16.8284 14.5 16 14.5C15.1716 14.5 14.5 15.1716 14.5 16C14.5 16.8284 15.1716 17.5 16 17.5Z" />
     <path d="M24.5 17.5C25.3284 17.5 26 16.8284 26 16C26 15.1716 25.3284 14.5 24.5 14.5C23.6716 14.5 23 15.1716 23 16C23 16.8284 23.6716 17.5 24.5 17.5Z" />
     <path d="M7.5 17.5C8.32843 17.5 9 16.8284 9 16C9 15.1716 8.32843 14.5 7.5 14.5C6.67157 14.5 6 15.1716 6 16C6 16.8284 6.67157 17.5 7.5 17.5Z" />
+  </svg>
+);
+
+/** Figma: CalendarBlank (6080:106067). The Date pickers' calendar button. */
+export const CalendarBlankIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M26 5H6C5.44772 5 5 5.44772 5 6V26C5 26.5523 5.44772 27 6 27H26C26.5523 27 27 26.5523 27 26V6C27 5.44772 26.5523 5 26 5Z" />
+    <path d="M22 3V7" />
+    <path d="M10 3V7" />
+    <path d="M5 11H27" />
+  </svg>
+);
+
+/** Figma: Clock (6080:105872). The Time picker's icon. */
+export const ClockIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M16 28C22.6274 28 28 22.6274 28 16C28 9.37258 22.6274 4 16 4C9.37258 4 4 9.37258 4 16C4 22.6274 9.37258 28 16 28Z" />
+    <path d="M16 9V16H23" />
+  </svg>
+);
+
+/** Figma: CloudArrowUp (6080:106702). File Upload's drop zone icon. */
+export const CloudArrowUpIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M14 26H9.00003C8.00748 25.9988 7.02654 25.7865 6.12229 25.3772C5.21805 24.9679 4.41118 24.3711 3.75522 23.6262C3.09927 22.8813 2.60922 22.0054 2.31761 21.0566C2.02599 20.1079 1.93947 19.108 2.06379 18.1232C2.18811 17.1385 2.52043 16.1915 3.03869 15.345C3.55695 14.4985 4.2493 13.7718 5.06981 13.2133C5.89032 12.6548 6.82022 12.2772 7.79781 12.1055C8.77539 11.9338 9.77832 11.972 10.74 12.2175" />
+    <path d="M15 20L19 16L23 20" />
+    <path d="M19 26V16" />
+    <path d="M10 16C10.0004 14.1972 10.4882 12.428 11.4117 10.8797C12.3352 9.33142 13.6601 8.06157 15.2461 7.20455C16.8322 6.34752 18.6205 5.9352 20.4216 6.01121C22.2228 6.08723 23.97 6.64875 25.4782 7.63636C26.9864 8.62398 28.1996 10.0009 28.9894 11.6215C29.7791 13.2421 30.1161 15.0461 29.9646 16.8425C29.8132 18.639 29.1789 20.361 28.1289 21.8265C27.0789 23.292 25.6523 24.4464 24 25.1675" />
+  </svg>
+);
+
+/** Figma: FileArrowUp (6080:106688). File Upload's file row icon. */
+export const FileArrowUpIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M25 28H7C6.73478 28 6.48043 27.8946 6.29289 27.7071C6.10536 27.5196 6 27.2652 6 27V5C6 4.73478 6.10536 4.48043 6.29289 4.29289C6.48043 4.10536 6.73478 4 7 4H19L26 11V27C26 27.2652 25.8946 27.5196 25.7071 27.7071C25.5196 27.8946 25.2652 28 25 28Z" />
+    <path d="M19 4V11H26" />
+    <path d="M13 18L16 15L19 18" />
+    <path d="M16 23V15" />
+  </svg>
+);
+
+/** Figma: Copy (6080:106113). Code snippet and Code text copy buttons. */
+export const CopyIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M21 21H27V5H11V11" />
+    <path d="M21 11H5V27H21V11Z" />
+  </svg>
+);
+
+/** Figma: Eye (6080:106819). Code snippet's Show more. */
+export const EyeIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M16 7C6 7 2 16 2 16C2 16 6 25 16 25C26 25 30 16 30 16C30 16 26 7 16 7Z" />
+    <path d="M16 21C18.7614 21 21 18.7614 21 16C21 13.2386 18.7614 11 16 11C13.2386 11 11 13.2386 11 16C11 18.7614 13.2386 21 16 21Z" />
+  </svg>
+);
+
+/** Figma: EyeClosed (6080:105744). Code snippet's Show less. */
+export const EyeClosedIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M4 13C6.10125 15.6012 9.95375 19 16 19C22.0462 19 25.8988 15.6012 28 13" />
+    <path d="M28 21L25.0775 15.8862" />
+    <path d="M20 24L19.1138 18.6813" />
+    <path d="M12 24L12.8862 18.6813" />
+    <path d="M4 21L6.9225 15.8862" />
+  </svg>
+);
+
+/** Figma: SidebarSimple (6080:106739). Sidebar's collapse button; mirrored, its expand button. */
+export const SidebarSimpleIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M11 6V26" />
+    <path d="M27 6H5C4.44772 6 4 6.44772 4 7V25C4 25.5523 4.44772 26 5 26H27C27.5523 26 28 25.5523 28 25V7C28 6.44772 27.5523 6 27 6Z" />
   </svg>
 );

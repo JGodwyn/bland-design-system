@@ -123,6 +123,43 @@ the `close` event from our own `dialog.close()` arrived after the new
 `showModal()` and closed the state. → In the `close` handler, act only if
 the dialog is still closed (`!dialog.open`).
 
+**React Aria's tab panel keeps the id it first got.** After an arrow key
+moved to the next tab, the panel showed the new content but kept the old
+tab's `tabpanel` id, so the selected tab's `aria-controls` pointed at
+nothing (axe: aria-valid-attr-value). `useTabPanel` passes its id through
+`useLabels`, which holds the first value. → Render one panel per tab: key
+the panel component by the selected id (`tabs/tabs.tsx`).
+
+**React Aria's tooltip eats Escape at the document, but only sometimes.**
+A Slider thumb hid its value tooltip on Escape after an arrow key, but
+not after Page Up: `useTooltipTrigger` adds a capture-phase `keydown`
+listener on `document` while open and stops Escape there, so the thumb's
+own `onKeyDown` saw it in one case and not the other. → To react to
+Escape near a tooltip, listen on `document` in the capture phase too
+(listeners on the same node all run), as `Slider.tsx` does.
+
+**A popover open from the start showed a render too late for autofocus.**
+A `defaultOpen` Date Picker drew its calendar, but focus never went in, so
+Escape did nothing and the open popover swallowed the next press anywhere
+(React Aria's useOverlay stops an outside press while it closes). Popover
+showed itself from Floating UI's `elements.floating`, which is set by a ref
+callback and arrives one render later; the calendar cell's focus effect had
+already run on a hidden element. → Show and hide the popover from its own
+ref in the layout effect (`overlay/Popover.tsx`); a passive autofocus then
+finds it in the top layer.
+
+**A controlled date value parsed every render loops React Aria's date field.**
+The Date Picker story crashed with "Too many re-renders": the picker turned
+its `value` string into a new `CalendarDate` on every render, and
+`useDateFieldState` compares the value by identity and resets its display
+state during render when it changes. → Parse props once per string
+(`useDateProp`, `useRangeProp`, `useTimeProp` in `calendar/dates.ts`), never
+inline `parseDate(value)` in the props passed to React Aria.
+
+**React Aria's slider thumb is a native range input: no `aria-valuenow`.**
+A spec waiting for `aria-valuenow="51"` timed out; the value is the
+input's `value` (and `aria-valuetext`). → Assert with `toHaveValue`.
+
 ## CSS
 
 **A custom property's default set on the element itself beats the parent's
@@ -208,6 +245,71 @@ h2` (0,1,1) beat `.bland-modal__title` (0,1,0). Raw story pages and
 screenshots were fine, so no test caught it. → Playground rules target
 their own elements with child combinators (`.docs-section > h2`), never
 bare descendant tags that reach into demos.
+
+**A visually hidden element adds a space to an accessible name.** A tab bar
+link named "Inbox" plus a hidden ", new activity" read "Inbox , new
+activity": the hidden span is absolutely positioned, so Chromium treats it
+as a block and separates it with a space. → Put a combined name in
+`aria-label` instead of appending hidden text.
+
+**Negative margins collapse through a parent with no border or padding.**
+The tab rows give their scroll area `margin: -space-xs` to cancel the
+list's focus-ring room; inside a plain block the margins escaped the
+parent, which grew by 8px, so the File tab bar showed 4px of grey around
+its tabs and the Section divider sat 4px under the underline. → Make the
+parent a flex container (no margin collapsing).
+
+**`--bland-radius` does not inherit.** A radio laid over a Segmented bar
+segment (`.bland-smooth`) drew a square focus ring: base.css registers
+`--bland-radius` with `@property`, not inherited, initial 0. → Every
+`.bland-smooth` element sets its own `--bland-radius`.
+
+**A child's layout effect runs before its parent's ref is attached.** The
+Segmented bar's thumb measured nothing on the first render when the hook
+lived in the thumb: React attaches refs child first, so the track's ref was
+still null. → Call measuring hooks in the component that owns the ref.
+
+**A ResizeObserver on an animating element stops the animation.** The
+sliding indicator re-placed itself (without a transition) on every resize
+it observed, its own width included, so the slide jumped to its end. →
+Observe the list and the tabs, never the indicator, and skip the
+observer's first report.
+
+**`offsetLeft` and `offsetWidth` round to whole pixels.** The indicator
+sat a fraction of a pixel off the selected tab. → Measure with
+`getBoundingClientRect` against the list (divided by CSS zoom).
+
+**A drag state can be shown and tested without a mouse.** Playwright has no
+file drag from the OS. → Dispatch real events: build a `DataTransfer`, add
+a `new File(...)`, and send `new DragEvent('dragenter' | 'dragover' |
+'drop', { bubbles: true, cancelable: true, dataTransfer })` to the zone;
+React handles them like real drags (File Upload's story shows drag-over
+this way, and the spec drops files with it).
+
+**A computed color read right after a state change can be mid-transition.**
+File Upload's drag-over border read gray once, because `border-color`
+transitions over `duration/xs`. → Read transitioned colors with
+`expect.poll`, never once.
+
+**A ScrollArea inside another ScrollArea took the outer one's thumb
+shape.** Code snippet nests a horizontal ScrollArea in a vertical one; the
+inner thumb drew as a 24px tall vertical bar, because
+`.bland-scroll-area[data-axis="y"] .bland-scroll-area__thumb` (a descendant
+selector) matched it too. → Scope component rules to their own parts with
+child combinators (`> .bland-scroll-area__track > .bland-scroll-area__thumb`
+since 2026-10-19); write any rule that a nested copy of the same component
+could match that way.
+
+**`onCopy` is a native React prop.** A component prop `onCopy?: (text) =>
+void` on a type extending `HTMLAttributes` fails to compile (it clashes with
+the clipboard event handler). → Name callbacks that report a result in the
+past tense (`onCopied`), so they never collide with a native event.
+
+**`display: none` drops text from an accessible name.** Sidebar's rail
+hid each row's count with `display: none`, so the link read "Inbox" in the
+rail and "Inbox 8" in the full sidebar. → Hide text that belongs to a
+name visually (`position: absolute; overflow: hidden; clip-path: inset(50%)`),
+and keep `display: none` for decoration.
 
 ## Tooling
 
@@ -329,6 +431,21 @@ subpaths (`/^react-aria(\/|$)/`), and check `dist/index.js` imports them.
 Modal specs measured the dialog 7px off its margin and buttons 3px apart:
 the `scale(0.96)` entrance was still running. → Open it from the keyboard
 (no motion) before measuring, or wait for the animation.
+
+**A color read right after mount can be mid-transition.** A Pill tab's
+selected fill read light blue: React Aria selects the first tab after the
+first render, so `aria-selected` arrives a frame late and the fill eases in
+over duration/xs. → Read state colors with `expect.poll`, even on load.
+
+**An input laid over its label swallows clicks on the text.** Clicking a
+Segmented bar's label text timed out in Playwright ("intercepts pointer
+events"): the radio covers the segment as its hit area. → Click the radio
+itself (`getByRole('radio')`).
+
+**Playwright's `getByRole` name matches substrings.** In the Pagination spec
+`{ name: 'Page 1' }` also matched "Page 10" and failed in strict mode. → Pass
+`exact: true` whenever one accessible name is a prefix of another (numbered
+items, "Page 1" / "Page 10").
 
 ## Working with parallel sessions
 

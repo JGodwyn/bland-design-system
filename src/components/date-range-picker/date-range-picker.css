@@ -1,0 +1,54 @@
+/*
+ * Date Range Picker (Figma: Date & Time page, set "Date range picker").
+ *
+ *   <div class="bland-date-range-picker" data-size="sm">
+ *     <div class="bland-date-range-picker__fields" role="group">   React Aria's group
+ *       <div class="bland-text-input bland-date-field">Start date …</div>
+ *       <div class="bland-text-input bland-date-field">End date …</div>
+ *     </div>
+ *     <span class="bland-date-range-picker__helper">Helper text</span>
+ *     <div class="bland-popover">…the Range calendar</div>
+ *   </div>
+ *
+ * Fills its container (Figma's 582 is its frame); the two fields share it equally, space-sm apart. One helper
+ * text under both, colored by the status as Text Input's.
+ */
+
+.bland-date-range-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: var(--space-none);
+}
+
+.bland-date-range-picker__fields {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.bland-date-range-picker__fields > * {
+  flex: 1;
+}
+
+.bland-date-range-picker__helper {
+  color: var(--text-subtle);
+  font: var(--type-body-sm);
+  letter-spacing: var(--letter-spacing-normal);
+  overflow-wrap: break-word;
+}
+
+.bland-date-range-picker__helper[data-status="danger"] {
+  color: var(--text-danger);
+}
+
+.bland-date-range-picker__helper[data-status="success"] {
+  color: var(--text-success);
+}
+
+.bland-date-range-picker__helper[data-status="warning"] {
+  color: var(--text-warning);
+}
+
+.bland-date-range-picker[data-disabled] .bland-date-range-picker__helper {
+  color: var(--text-minimal);
+}

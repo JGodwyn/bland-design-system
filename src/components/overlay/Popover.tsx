@@ -110,7 +110,9 @@ export function Popover({
   });
 
   useLayoutEffect(() => {
-    const floating = elements.floating;
+    // Our own ref, not Floating UI's element: that one arrives a render later, so a panel open from the start
+    // would still be hidden when its content's autofocus runs (a defaultOpen date picker's calendar).
+    const floating = popoverRef.current;
     if (!floating || !('showPopover' in floating)) return;
     if (!open) {
       // Focus goes back first, so hiding a panel that holds focus never drops it on the body.

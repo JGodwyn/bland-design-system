@@ -1,0 +1,153 @@
+/*
+ * Section tab (Figma: Section tab page, sets "Section-tab" and "_section-tab-item").
+ *
+ *   <div class="bland-section-tabs" data-size="sm">
+ *     <div class="bland-section-tabs__row">                  the 1px divider along its bottom
+ *       ScrollArea > <div role="tablist" class="bland-tabs__list bland-section-tabs__list">
+ *         <div role="tab" aria-selected="true" class="bland-section-tabs__tab bland-focus-ring bland-smooth">
+ *           <span class="bland-section-tabs__inner bland-smooth">icon, label, count</span>
+ *         </div>
+ *     </div>
+ *     <div role="tabpanel" class="bland-tab-panel">…</div>
+ *   </div>
+ *
+ * Figma's outer item frame is the tab (height tab/*); its inner frame carries the padding, the gap, the
+ * hover fill and rad-sm. Selected is aria-selected; its 2px underline (stroke-lg) is the list's sliding
+ * indicator (tabs.css), along the tab's bottom edge over the row's divider, as Figma draws it (no gap).
+ * Figma binds no icon color for hover; it follows the label (bold).
+ */
+
+.bland-section-tabs {
+  min-width: var(--space-none);
+}
+
+.bland-section-tabs__row {
+  position: relative;
+  display: flex;
+  /* Figma's divider: a stroke-sm border-subtle line under the items, as wide as the row. */
+  box-shadow: inset var(--space-none) calc(var(--stroke-sm) * -1) var(--space-none) var(--space-none) var(--border-subtle);
+}
+
+.bland-section-tabs__tab {
+  --_fill: transparent;
+  --_text: var(--text-subtle);
+  --_icon: var(--icon-subtle);
+  --_count-fill: var(--surface-200);
+  --_count-text: var(--text-subtle);
+  --bland-radius: var(--rad-sm);
+  --bland-icon-size: var(--icon-md);
+
+  position: relative;
+  display: flex;
+  flex: none;
+  height: var(--tab-sm);
+  color: var(--_text);
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bland-section-tabs__inner {
+  --bland-radius: var(--rad-sm);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-inline: var(--space-sm);
+  background-color: var(--_fill);
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+  white-space: nowrap;
+  transition:
+    background-color var(--duration-xs) var(--easing-ease),
+    color var(--duration-xs) var(--easing-ease);
+}
+
+/* ---- Size: tab height, side padding, count box ---- */
+
+.bland-section-tabs[data-size="md"] .bland-section-tabs__tab {
+  height: var(--tab-md);
+}
+.bland-section-tabs[data-size="md"] .bland-section-tabs__inner {
+  padding-inline: var(--space-md);
+}
+
+.bland-section-tabs[data-size="lg"] .bland-section-tabs__tab {
+  height: var(--tab-lg);
+}
+.bland-section-tabs[data-size="lg"] .bland-section-tabs__inner {
+  padding-inline: var(--space-lg);
+}
+
+/* ---- Parts ---- */
+
+.bland-section-tabs__icon {
+  color: var(--_icon);
+}
+
+.bland-section-tabs__count {
+  --bland-radius: var(--rad-xs);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tab-count-sm);
+  height: var(--tab-count-sm);
+  padding-inline: var(--space-xs);
+  background-color: var(--_count-fill);
+  color: var(--_count-text);
+  font: var(--type-body-sm-bold);
+  font-variant-numeric: tabular-nums;
+  transition: background-color var(--duration-xs) var(--easing-ease);
+}
+
+.bland-section-tabs[data-size="md"] .bland-section-tabs__count {
+  min-width: var(--tab-count-md);
+  height: var(--tab-count-md);
+}
+
+.bland-section-tabs[data-size="lg"] .bland-section-tabs__count {
+  min-width: var(--tab-count-lg);
+  height: var(--tab-count-lg);
+  font: var(--type-body-md-bold);
+}
+
+/* ---- Selected: bold label and icon, the brand underline over the divider ---- */
+
+.bland-section-tabs__tab[aria-selected="true"] {
+  --_text: var(--text-bold);
+  --_icon: var(--icon-bold);
+}
+
+.bland-section-tabs__underline {
+  /* Over the tabs, so a hovered tab's fill never covers it. */
+  z-index: 1;
+  height: var(--stroke-lg);
+  background-color: var(--border-brand);
+  translate: var(--_ind-x) calc(var(--_ind-y) + var(--_ind-h) - var(--stroke-lg));
+}
+
+.bland-section-tabs__underline[data-disabled] {
+  background-color: var(--control-checked-disabled);
+}
+
+/* ---- States: hover, disabled. Focus is .bland-focus-ring. ---- */
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-section-tabs__tab:hover:not([aria-disabled="true"]) {
+    --_fill: var(--surface-200);
+    --_text: var(--text-bold);
+    --_icon: var(--icon-bold);
+    --_count-fill: var(--surface-300);
+  }
+}
+
+.bland-section-tabs__tab[aria-disabled="true"] {
+  --_text: var(--text-minimal);
+  --_icon: var(--icon-minimal);
+  --_count-text: var(--text-minimal);
+
+  cursor: not-allowed;
+}
