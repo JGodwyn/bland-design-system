@@ -730,6 +730,9 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   rows are used constantly); the fill eases over `duration/xs`.
 - Long lists: Figma does not scroll a List, so ListItem has no ScrollArea;
   a project that scrolls rows wraps the `<ul>` in `ScrollArea`.
+- The docs story spaces rows `space-xs` apart (Godwin, 2026-10-19): with no
+  gap, filled rows run together in dark mode. That gap is the story's, not
+  the component's; a project picks its own gap on its `<ul>`.
 
 ### Empty State (2026-10-19)
 - `import { EmptyState } from 'bland'`, folder `empty-state/`. Figma: set

@@ -623,4 +623,5 @@ overlays that follow.
   settled, because Figma's collection metadata differs.
 - Confirmed the Table sets still bind the same six variables;
   re-baselined the Table screenshots on purpose and looked at them.
-
+- Follow-up (Godwin): the story's lists now space rows `space-xs` apart, since
+  filled rows ran together in dark mode; list baselines re-taken.

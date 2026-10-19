@@ -8,10 +8,19 @@ import { Icon } from '../icon/Icon';
 import { Toggle } from '../toggle/Toggle';
 import { ListItem, type ListItemProps } from './ListItem';
 
-/** A reset list at Figma's list/width, as a project would place rows. */
+/** A reset list at Figma's list/width, as a project would place rows. The gap is the docs' own, so rows read apart in dark mode. */
 function Rows({ children, label }: { children: ReactNode; label?: string }) {
   return (
-    <ul aria-label={label} style={{ listStyle: 'none', margin: 0, padding: 0, width: 'var(--list-width)', maxWidth: '100%' }}>
+    <ul aria-label={label} style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--space-xs)',
+        listStyle: 'none',
+        margin: 0,
+        padding: 0,
+        width: 'var(--list-width)',
+        maxWidth: '100%',
+      }}>
       {children}
     </ul>
   );
