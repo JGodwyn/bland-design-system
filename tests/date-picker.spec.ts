@@ -69,3 +69,37 @@ test('a date before minValue turns the field danger', async ({ page }) => {
   await page.keyboard.type('12');
   await expect(field).toHaveAttribute('data-status', 'default');
 });
+
+test('a press on the field opens the calendar and keeps focus there for typing', async ({ page }) => {
+  const dayField = picker(page).getByRole('spinbutton', { name: /day/i });
+  await dayField.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  await expect(dayField).toBeFocused();
+  // Typing moves the value and the calendar follows to the typed month.
+  await page.keyboard.type('15');
+  await expect(value(page)).toHaveText('2024-11-15');
+  const month = picker(page).getByRole('spinbutton', { name: /month/i });
+  await month.click();
+  await expect(dialog).toBeVisible();
+  await page.keyboard.type('02');
+  await expect(value(page)).toHaveText('2024-02-15');
+  await expect(dialog.locator('.bland-calendar__toggle')).toHaveText(/Feb\s*2024/);
+  await expect(dialog.locator('[aria-selected="true"]')).toHaveText('15');
+  // Escape in the field closes it; focus stays in the field (typing moved it on to the next segment).
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(picker(page).locator('.bland-date-field__segments :focus')).toHaveCount(1);
+});
+
+test('focus leaving the field closes a calendar it opened', async ({ page }) => {
+  await picker(page).getByRole('spinbutton', { name: /day/i }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.keyboard.press('Shift+Tab');
+  await expect(page.getByRole('dialog')).toBeHidden();
+});
+
+test('the calendar is md by default whatever the field size; calendarSize changes it', async ({ page }) => {
+  await picker(page).getByRole('button', { name: 'Calendar' }).click();
+  await expect(page.getByRole('dialog').locator('.bland-calendar')).toHaveAttribute('data-size', 'md');
+});

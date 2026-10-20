@@ -19,7 +19,7 @@ when), `docs/components.md` (how to build one).
 
 ### Tokens are the only source of values
 - Figma owns every value; `npm run tokens` generates `src/tokens/tokens.css`
-  from the verified export. 620 variables, 524 CSS tokens (2026-10-19).
+  from the verified export. 624 variables, 528 CSS tokens (2026-10-20).
 - Components read only Theme and scale tokens. Primitives are never emitted.
 - No value without a token. When none fits, stop and ask Godwin; the answer is a
   new Figma variable, synced (that is how `duration/spin` came about).
@@ -123,6 +123,13 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Icon Button requires `aria-label`; loading swaps its icon for the spinner.
 - CSS pattern every component copies: emotion and type blocks set private
   custom properties, and one rule per state reads them.
+
+- **Dark ghost and stroke hover** (Godwin 2026-10-20: too hard to see): the
+  hover and pressed fills of ghost and stroke Buttons and Icon Buttons used
+  each family's darkest tones in dark mode (Brand1000/950, Green, Red and
+  Amber 1100/1000), barely off the #0a0c10 page. They moved one step
+  lighter in Figma: hover Brand900, Green1000, Red1000, Amber1000; pressed
+  Brand800, Green900, Red900, Amber900. Light mode is unchanged.
 
 ### Indicator (2026-10-18)
 - `import { Indicator } from 'bland'`. Props: `size` sm/md/lg/xl/2xl (default
@@ -1406,10 +1413,10 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   view, picking a month opens the days, focus following. The month or year
   in view is the selected cell. Year pages: twelve years from a decade
   (2020 – 2031, as Figma), arrows step ten. Prev / next reuse Pagination
-  item sm (Figma's exposed `_pagination-item`); the toggle's hover is
-  Pagination/surface-hover too (Figma draws no toggle hover).
-- **Title bar as Figma**: the arrows sit right after the toggle, not at the
-  far end.
+  item sm (Figma's exposed `_pagination-item`). The toggle has no hover
+  (Figma draws none; see the 2026-10-20 redesign below).
+- **Title bar**: redesigned in Figma on 2026-10-20 (below); the arrows now
+  sit at the far end.
 - **Today**: an underline under the label (stroke-lg, border-brand;
   icon-on-color on selected, border-bold when disabled). Figma's bar is an
   absolutely placed rectangle with unbound insets, so code uses
@@ -1429,6 +1436,49 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   named by `aria-label` (default "Date range"); each field's segments are
   labelled by its own visible label. All fill their container (Figma's 287
   and 582 are frames).
+- **Title bar redesign (Figma, 2026-10-20)**: the toggle is a pill filled
+  with the new Date/Calendar-title-bar/surface (rad-md, padding space-sm
+  start, space-xs end, gap space-xs) holding the bold month or year, the
+  plain year, and the List icon (icon/sm, icon-subtle) where the caret
+  was; the arrows sit at the far end (space-between). The year view's
+  range is bold plain text filling the row. Figma draws no hover for the
+  toggle, so code has none (the Pagination hover is gone). The variable
+  arrived spelled "Calender" with no description; Godwin chose to fix it
+  in Figma before the sync, so the token is
+  `--date-calendar-title-bar-surface`.
+- **Dividers off by default** (Figma `👀 Divider` on `_calendar-title-bar`
+  and `_calendar-action-bar`, 2026-10-20): `titleDivider` and
+  `actionsDivider`, both false. The bars keep their space-sm padding
+  either way.
+- **Height eases** (Godwin 2026-10-20): the area holding the day, month or
+  year grid measures its content (ResizeObserver) and sets its own height,
+  which transitions over duration/md easing/out, so a five-week month
+  growing to six or a switch to the 3 x 4 views slides instead of jumping.
+  At once when the change comes from the keyboard (React Aria's modality;
+  also before any interaction) and under reduced motion. The area clips
+  while it eases with a space-xs clip margin, so focus rings still show.
+  The title bar and action bar don't move; a popover around it follows
+  through Floating UI's autoUpdate.
+- **Feedback round (Godwin 2026-10-20)**:
+  - Calendar defaults to **md** (Figma's default variant is sm). The
+    pickers' calendar has its own `calendarSize`, default md whatever the
+    field's size; the action bar's Buttons follow the calendar's size.
+  - **A press on a picker's field opens the calendar** (segments or
+    padding, not only the CalendarBlank button) and leaves focus in the
+    segment, so typing goes on. The field is not "outside" the popover
+    (Popover `keepOpenOn`), so pressing another segment keeps it open;
+    Escape in the field, or focus leaving field and calendar, closes it.
+    The button still opens it with focus on the selected day and toggles
+    it shut. The calendar follows a typed date to its month (unless focus
+    is in the calendar); with `confirm` the pending date follows the field.
+    React Aria's segments stop `pointerdown`, so the field listens in the
+    capture phase.
+  - **AM / PM toggles on a press** (two values); typing A or P and the
+    arrows still work.
+  - Stories keep no room under an open calendar: it opens over what is
+    below.
+  - The "can't type 0" report was the docs page's zoom shortcut eating the
+    key in contenteditable segments, not the components (LEARNINGS).
 - Screenshots and specs run these stories on a fixed clock, 11 November 2024
   (Figma's today), in `tests/stories.ts`.
 
@@ -1486,6 +1536,12 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   CheckCircle `icon-success` where the close button was. Close:
   `control/xs`, `rad-rd`, `FileUpload/close`, X icon/sm `icon-subtle`, no
   hover in Figma, press `scale(0.97)`; named `removeLabel(file)`.
+- **Dark row colors** (Godwin 2026-10-20): `FileUpload/surface` is
+  Neutral900 and `FileUpload/close` Neutral800 in dark (were 800 and 700),
+  set in Figma and synced; the descriptions were rewritten to match.
+- **Docs demo height:** a story's `demo.height` sets the playground's
+  minimum height (default 320); File Upload uses 640 so added rows stay in
+  view.
 - **Code only:** the border is CSS `dashed` (the browser's dash length,
   not Figma's 4/4 pattern, which has no token); the component fills its
   container (`file-upload/width` is Figma's frame, used by the story);
@@ -1521,10 +1577,13 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - **Show more only when it is needed:** the toggle appears when the body is
   taller than `code-snippet/height-collapsed` (measured with a
   ResizeObserver). Collapsed without `collapsible` stays capped and scrolls.
-  With the toggle, the body keeps `space-xl + control/sm` of room under the
-  last line, so the floating button never hides code once scrolled or
-  expanded (code only; Figma lets it cover the last lines). Centered with
-  auto margins, not a transform, so the Button's press scale still works.
+  The toggle floats over the bottom of the code, as Figma draws it, and
+  scrolling stops at the last line plus the code's own padding (Godwin
+  2026-10-20: no extra room under the last line, which the first build
+  added). Centered with auto margins, not a transform, so the Button's
+  press scale still works.
+- **The language menu hugs its labels** (`width: max-content`, Godwin
+  2026-10-20), not Menu's `menu/width`.
 - **Copy feedback without a timer:** the icon turns into a Check and a
   polite `role="status"` says "Copied"; both reset when the pointer leaves
   the button or it blurs. No duration token is needed. The prop is
@@ -1624,11 +1683,21 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   played bars) come from the project's `<audio>`. Figma's `audio-playing` is
   `playing`. Waveform: levels 1 to 5 map to chat-bubble/wave-xs to wave-xl;
   default Figma's 26 bars.
-- **Typing dots are static**, as in Figma's frame (icon-minimal,
-  icon-subtle, receiver content). There is no Motion token for a looping
-  pulse; animating them is a question for Godwin. The dots are
+- **Typing dots wave** (Godwin 2026-10-20, superseding the static dots):
+  each dot steps faint, mid, strong and back (Figma's three dot colors:
+  icon-minimal, icon-subtle, receiver content; sender `Messaging/sender-wave`,
+  `sender-content-subtle`, `sender-content`) and lifts space-xs at 30% of
+  the cycle. One wave per `duration/typing` (1200ms, added to Figma's Motion
+  collection for this), `easing/in-out`, looping; dots start a sixth of the
+  cycle apart (200ms; a wave, not a list stagger). Reduced motion runs a
+  second keyframe with the colors only. Figma's frame is one moment of the
+  wave and is also the look without animation (and in the screenshots,
+  where Playwright cancels infinite animations). The dots are
   `aria-hidden`; `typingLabel` is read instead (visually hidden), since an
   `aria-label` on a generic span is not allowed.
+- **Sender typing** (Godwin 2026-10-20): Figma had the receiver's only;
+  `Who=sender, Type=typing` was added to the set (brand bubble, mirrored
+  tail, dots in sender colors), so `who` works with `type="typing"`.
 - **Tail:** Figma's tail is a 20 x 16 vector in an 8 x 16 frame; 12 of it
   lies under the bubble's rounded corner. Code draws the same path as an
   inline SVG (`height: 100%`, width from the viewBox), mirrored with
@@ -1651,7 +1720,11 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   ring is inset, since the media box clips.
 - **File meta separator:** Figma draws an unbound 6px vertical line; code
   uses `stroke-sm` x `space-sm` (8), the nearest token (raised on the
-  tracker).
+  tracker). Its color is `Messaging/receiver-separator` /
+  `sender-separator` (Godwin 2026-10-20: the content-subtle color pulled
+  attention from the details on either side). Godwin named them
+  `*-content-border`; renamed to `*-separator` for what they draw, with
+  descriptions.
 - Press scale 0.97 on the audio and video play buttons (duration/sm,
   easing/out, none under reduced motion). No hover: Figma has none.
 - **ChatListItem** follows ListItem: an `<li>` holding one link
@@ -1705,12 +1778,95 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   space-sm; field Messaging/surface-messagebar, inside stroke-sm
   `border-input`, rad-md, padding 0 space-md, gap space-sm, icons icon/md
   icon-subtle (Trash icon-danger); send md primary brand Icon Button.
+- **Wrapped messages** (Godwin 2026-10-20): the field aligns to its bottom,
+  and the field icons sit (input/md - icon/md) / 2 above it, so they stay
+  level with the last line of text and with the send button (the bar
+  aligns to its bottom too). Recording stays one centred line.
+- **The reply panel is as wide as the field** (Godwin 2026-10-20): it sits
+  in a column with the field, beside the send button, not across the
+  whole bar.
+- The docs playground's bar is fixed at message-bar/width (384), so a
+  wrapping message doesn't resize it, and it works: record starts the
+  recording state with a running timer, delete and send end it, the
+  reply's close button closes the reply.
 - Field icons are plain 20px buttons (rad-xs ring, icon-bold on hover);
   Figma draws icons, not Icon Buttons. Placeholder `text-subtle` (Text
   Input's). Disabled is Text Input's look (border-subtle, text-minimal,
   icon-minimal). The ring sits on the field while the textarea has focus.
 
+- **Revised 2026-10-20 (Godwin's review):**
+  - **Collapse closes at once.** A pointer collapse used to leave the full
+    sidebar open over the page (the pointer was still over it) while the page
+    slid underneath. Now it slides to the rail (`data-peek="closing"`, panel
+    clip and root width together), and hover does not reopen it until the
+    pointer has left (`suppressed`). The page follows the root's width in
+    step (Godwin: page follows). A keyboard collapse is instant and keeps
+    the focus peek, so the focused button stays usable.
+  - **No icon jumps.** `data-compact` (minimized and not open) puts the
+    rows in the rail's places (list padding space-sm, icon inset
+    (item - icon) / 2, row width sidebar/item-*) while the labels stay drawn;
+    padding and width move with the panel (duration/2xl, easing/drawer), so
+    icons and fills slide from rail to full and back. Labels hide only in
+    the rail itself. Open groups fold while compact.
+  - **Toggle in flow** in a header row: beside the top slot (end of the
+    row, space-lg in), or in its place when there is none, a row-sized
+    button whose icon lines up with the rows' (the size's icon, not
+    Figma's icon/md); the list then starts space-xs under it. In the rail
+    it stays as the expand button, except beside a top slot (no room).
+  - **Panel surface-200** (Figma, 2026-10-20). Figma still binds row hover,
+    the count box and the selected disabled fill to surface-200, which
+    vanish on it; code goes one step up (hover surface-300, count 300 / hover
+    400, selected disabled 300 / count 400), Godwin's call, for Figma to
+    rebind.
+  - **No scrollbar** on the list, the fade alone (Godwin), a second
+    exception to the overflow rule after tab rows.
+  - **Groups animate:** the nest's height (and its space-xs top padding)
+    eases over duration/md easing/out with `interpolate-size`; closed it is
+    `visibility: hidden` as well, out of the Tab order;
+    `overflow-clip-margin: space-xs` keeps nested focus rings whole.
+    Keyboard toggles are instant.
+
+- **Revised again 2026-10-20 (hover and slots):**
+  - **Hover intent.** Quick passes flashed the rail open and shut. It now
+    opens only once the pointer rests on it for `peekDelay` (each
+    `pointermove` restarts the wait) and closes `peekCloseDelay` after it
+    leaves, so a brief exit does not close it. Defaults are the Motion
+    tokens `duration/sidebar-peek-delay` and
+    `duration/sidebar-peek-close-delay`, which Godwin adds in Figma
+    (suggested 200 and 300 ms, as Tooltip's delays came about); until the
+    sync `tokenMs` finds neither and both are 0. The props take ms, as
+    Tooltip's `delay` / `closeDelay`.
+  - **Slots cross-fade.** A slot function now gets `rail` from the compact
+    state (minimized and not open), so it switches when the slide starts,
+    not when it ends. `SlotFade` keeps the old version as an out-of-flow,
+    inert, `aria-hidden` layer that fades out into a blur while the new one
+    fades in out of it (opacity + `blur(var(--space-xs))`, Godwin's call:
+    space-xs as the radius), over duration/md easing/out; the slot's height
+    eases from the measured old height to the new one. Reduced motion keeps
+    the opacity only; keyboard switches are instant.
+  - While sliding, labels are clipped (`text-overflow: clip`) instead of
+    re-ellipsized every frame; at rest they still end in an ellipsis.
+
+- **Revised a third time 2026-10-20:**
+  - **The hover delays exist now.** Claude added `duration/sidebar-peek-delay`
+    (200ms) and `duration/sidebar-peek-close-delay` (300ms) to Figma's
+    Motion collection, with descriptions, and synced them (docs/tokens.md).
+    Tweak them there for every Sidebar, or per Sidebar with `peekDelay` /
+    `peekCloseDelay` (ms).
+  - **Rail slots are centred.** A slot function's rail version is laid out
+    in a rail-wide box with its content centred (`data-rail` on the slot
+    layer), during the slide as well as at rest, so a logo mark or an
+    account icon sits on the rail's centre line with the row icons. The
+    rail version brings no side padding of its own.
+  - **Story:** one sidebar per row, each in a full-width frame with a page
+    beside it, so collapsing one never moves another; the demo frame is as
+    wide as the playground stage (`100cqi`), so it never re-centres.
+
 ## 7. The docs site (`npm run docs`, 2026-10-17)
+
+- The demo stage is an inline-size container (2026-10-20), so a demo that
+  fills its container can size to it: Code snippet's frame is
+  `min(var(--code-snippet-width), 100cqi)`.
 
 - A sidebar of style pages (generated from `tokens.json`) and components
   (one per story), and a System / Light / Dark switch remembered per browser.

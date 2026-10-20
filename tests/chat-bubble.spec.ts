@@ -70,11 +70,59 @@ test('delivery status is read as a word next to the time', async ({ page }) => {
   await expect(items.nth(2).locator('.bland-message-sent-indicator')).toHaveCSS('color', await tokenColor(page, '--icon-brand'));
 });
 
-test('the typing bubble reads its label and hides the dots', async ({ page }) => {
-  const typing = page.locator('.bland-chat-bubble[data-type="typing"]');
-  await expect(typing).toHaveText('Jane is typing');
-  await expect(typing.locator('.bland-chat-bubble__dots')).toHaveAttribute('aria-hidden', 'true');
-  expect((await box(typing.locator('.bland-chat-bubble__bubble'))).height).toBe(32);
+test('typing bubbles, receiver and sender, read their label and hide the dots', async ({ page }) => {
+  const receiver = page.locator('.bland-chat-bubble[data-type="typing"][data-who="receiver"]');
+  const sender = page.locator('.bland-chat-bubble[data-type="typing"][data-who="sender"]');
+  await expect(receiver).toHaveText('Jane is typing');
+  await expect(sender).toHaveText('You are typing');
+  await expect(receiver.locator('.bland-chat-bubble__dots')).toHaveAttribute('aria-hidden', 'true');
+  expect((await box(receiver.locator('.bland-chat-bubble__bubble'))).height).toBe(32);
+  await expect(sender.locator('.bland-chat-bubble__bubble')).toHaveCSS('background-color', await tokenColor(page, '--messaging-surface-sender'));
+});
+
+test('the typing dots loop over duration/typing, each starting a sixth of the cycle after the last', async ({ page }) => {
+  const dots = page.locator('.bland-chat-bubble[data-type="typing"][data-who="receiver"] .bland-chat-bubble__dot');
+  const anim = await dots.evaluateAll((els) =>
+    els.map((e) => {
+      const cs = getComputedStyle(e);
+      return [cs.animationName, cs.animationDuration, cs.animationIterationCount, cs.animationDelay];
+    }),
+  );
+  expect(anim).toEqual([
+    ['bland-chat-bubble-typing', '1.2s', 'infinite', '0s'],
+    ['bland-chat-bubble-typing', '1.2s', 'infinite', '0.2s'],
+    ['bland-chat-bubble-typing', '1.2s', 'infinite', '0.4s'],
+  ]);
+  // At 30% of its cycle the first dot is at its strongest color, lifted by space-xs.
+  const peak = await dots.first().evaluate((e) => {
+    const a = e.getAnimations()[0]!;
+    a.pause();
+    a.currentTime = 360;
+    const cs = getComputedStyle(e);
+    return [cs.backgroundColor, cs.translate];
+  });
+  expect(peak).toEqual([await tokenColor(page, '--messaging-receiver-content'), '0px -4px']);
+});
+
+test('under reduced motion the dots still brighten in turn but do not move', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const dot = page.locator('.bland-chat-bubble[data-type="typing"][data-who="sender"] .bland-chat-bubble__dot').first();
+  await expect(dot).toHaveCSS('animation-name', 'bland-chat-bubble-typing-still');
+  const peak = await dot.evaluate((e) => {
+    const a = e.getAnimations()[0]!;
+    a.pause();
+    a.currentTime = 360;
+    const cs = getComputedStyle(e);
+    return [cs.backgroundColor, cs.translate];
+  });
+  expect(peak).toEqual([await tokenColor(page, '--messaging-sender-content'), 'none']);
+});
+
+test('the file details separator takes the softer separator color on each side', async ({ page }) => {
+  const log = page.getByRole('log', { name: 'receiver types' });
+  await expect(log.locator('.bland-chat-bubble__separator')).toHaveCSS('background-color', await tokenColor(page, '--messaging-receiver-separator'));
+  const sent = page.getByRole('log', { name: 'sender types' });
+  await expect(sent.locator('.bland-chat-bubble__separator')).toHaveCSS('background-color', await tokenColor(page, '--messaging-sender-separator'));
 });
 
 test('text hugs short messages and wraps at chat-bubble/max-width; media bubbles take the full width', async ({ page }) => {

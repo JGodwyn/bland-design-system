@@ -1,5 +1,5 @@
-import { useRef, useState, type HTMLAttributes, type ReactNode, type Ref } from 'react';
-import { I18nProvider, mergeRefs, useDateField, useDatePicker, useFocusVisible, useLocale } from 'react-aria';
+import { useRef, useState, type HTMLAttributes, type ReactNode, type Ref, type RefObject } from 'react';
+import { I18nProvider, mergeProps, mergeRefs, useDateField, useDatePicker, useFocusVisible, useLocale } from 'react-aria';
 import { useDateFieldState, useDatePickerState, type DateValue } from 'react-stately';
 import { createCalendar } from '@internationalized/date';
 import { CalendarBlankIcon } from '../../icons';
@@ -18,8 +18,10 @@ export const actionButtonSize = { sm: 'xs', md: 'sm', lg: 'md' } as const;
 
 /** Props Date Picker and Date Range Picker share. */
 export interface DatePickerBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
-  /** Figma `Size`: the field (input/*, 32, 40, 48) and its calendar (sm, md, lg). Default sm, as in Figma. */
+  /** Figma `Size`: the field (input/*, 32, 40, 48). Default sm, as in Figma. */
   size?: DatePickerSize;
+  /** The calendar's size (Calendar `size`), whatever the field's. Default md (Godwin 2026-10-20). */
+  calendarSize?: CalendarSize;
   /** Figma `Status` on the exposed Text Input: border, helper color and status icon. A date out of bounds or unavailable shows danger by itself. */
   status?: DatePickerStatus;
   /** Figma `✏️ Helper text`, under the field and read with it. Put the error message here for danger. */
@@ -94,6 +96,50 @@ export function DatePicker(props: DatePickerProps) {
   );
 }
 
+/**
+ * Pressing the field (its segments or padding, not the calendar button) opens the calendar and leaves focus
+ * where it was, so typing goes on (Godwin 2026-10-20). Those presses don't count as outside the popover;
+ * Escape in the field or focus leaving field and popover closes it. The button opens it as before, with focus
+ * in the calendar. `fromField` says how the open calendar was opened.
+ */
+export function useFieldOpen(
+  state: { isOpen: boolean; setOpen: (open: boolean) => void },
+  group: HTMLElement | null,
+  popover: RefObject<HTMLElement | null>,
+  enabled: boolean,
+) {
+  const pressed = useRef(false);
+  const [fromField, setFromField] = useState(false);
+  const [prevOpen, setPrevOpen] = useState(state.isOpen);
+  if (state.isOpen !== prevOpen) {
+    setPrevOpen(state.isOpen);
+    if (state.isOpen) setFromField(pressed.current);
+    pressed.current = false;
+  }
+  const isButton = (el: Element) => el.closest('.bland-date-field__button') != null;
+  const handlers: HTMLAttributes<HTMLElement> = {
+    // Capture phase: React Aria's segments stop pointerdown from bubbling.
+    onPointerDownCapture: (event) => {
+      if (!enabled || event.button !== 0 || state.isOpen || isButton(event.target as Element)) return;
+      pressed.current = true;
+      state.setOpen(true);
+    },
+    onKeyDown: (event) => {
+      if (event.key !== 'Escape' || !state.isOpen) return;
+      event.stopPropagation();
+      state.setOpen(false);
+    },
+    onBlur: (event) => {
+      if (!state.isOpen || !fromField) return;
+      const next = event.relatedTarget as Node | null;
+      if (next && (event.currentTarget.contains(next) || popover.current?.contains(next))) return;
+      state.setOpen(false);
+    },
+  };
+  const keepOpenOn = (el: Element) => group?.contains(el) === true && !isButton(el);
+  return { fromField, handlers, keepOpenOn };
+}
+
 /** No motion when it opens from the keyboard (React Aria's input modality), as Dropdown. */
 export function useInstant(open: boolean) {
   const { isFocusVisible: keyboard } = useFocusVisible();
@@ -108,6 +154,7 @@ export function useInstant(open: boolean) {
 
 function DatePickerInner({
   size = 'sm',
+  calendarSize = 'md',
   status = 'default',
   label,
   helperText,
@@ -175,14 +222,18 @@ function DatePickerInner({
   const field = useDateField(fieldProps, fieldState, segmentsRef);
 
   // With confirm, the calendar edits a pending date that Apply commits; it starts from the value on each open.
+  // Typing while it is open moves the pending date too.
   const [pending, setPending] = useState<DateValue | null>(state.value);
   const [prevOpen, setPrevOpen] = useState(state.isOpen);
-  if (state.isOpen !== prevOpen) {
+  const [prevValue, setPrevValue] = useState(state.value);
+  if (state.isOpen !== prevOpen || state.value !== prevValue) {
     setPrevOpen(state.isOpen);
+    setPrevValue(state.value);
     if (state.isOpen) setPending(state.value);
   }
   const instant = useInstant(state.isOpen);
-  const calendarSize: CalendarSize = size;
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const fieldOpen = useFieldOpen(state, box, popoverRef, !disabled && !readOnly);
 
   return (
     <FieldShell
@@ -193,7 +244,7 @@ function DatePickerInner({
       helperText={helperText}
       labelProps={labelProps}
       helperProps={descriptionProps}
-      boxProps={groupProps}
+      boxProps={mergeProps(groupProps, fieldOpen.handlers)}
       boxRef={mergeRefs<HTMLDivElement>(boxRef, (el: HTMLDivElement | null) => setBox(el), fieldRef)}
       disabled={disabled}
       filled={state.value != null}
@@ -214,21 +265,27 @@ function DatePickerInner({
             placement="bottom-start"
             instant={instant}
             onClose={() => state.setOpen(false)}
+            keepOpenOn={fieldOpen.keepOpenOn}
             returnFocus={buttonRef}
+            ref={popoverRef}
           >
             <div {...dialogProps} role="dialog" className="bland-date-picker__dialog">
               <SingleCalendar
                 size={calendarSize}
                 firstDayOfWeek={firstDayOfWeek}
-                aria={confirm ? { ...calendarProps, value: pending, onChange: setPending } : calendarProps}
+                aria={{
+                  ...calendarProps,
+                  autoFocus: !fieldOpen.fromField,
+                  ...(confirm && { value: pending, onChange: setPending }),
+                }}
                 actions={
                   confirm && (
                     <>
-                      <Button size={actionButtonSize[size]} type="secondary" onClick={() => state.setOpen(false)}>
+                      <Button size={actionButtonSize[calendarSize]} type="secondary" onClick={() => state.setOpen(false)}>
                         {cancelLabel}
                       </Button>
                       <Button
-                        size={actionButtonSize[size]}
+                        size={actionButtonSize[calendarSize]}
                         onClick={() => {
                           if (pending) state.setValue(pending);
                           state.setOpen(false);

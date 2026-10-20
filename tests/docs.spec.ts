@@ -143,3 +143,13 @@ test('the Avatar demo builds its slot content from the controls', async ({ page 
   await expect(code).toContainText('topSlot={<Indicator ring size="lg" emotion="danger">12</Indicator>}');
   await expect(code).not.toContainText('bottomSlot');
 });
+
+test('the demo zoom keys leave date and time segments alone (0 types a zero)', async ({ page }) => {
+  await page.goto('/#/components/date-picker');
+  const stage = page.locator('.docs-demo-stage');
+  const year = stage.getByRole('spinbutton', { name: /year/i });
+  await stage.hover();
+  await year.focus();
+  await page.keyboard.type('2026');
+  await expect(year).toHaveText('2026');
+});

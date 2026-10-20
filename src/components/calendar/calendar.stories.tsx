@@ -15,9 +15,22 @@ export default {
   components: ['Calendar'],
   demo: {
     component: 'Calendar',
-    args: { size: 'sm', range: false, defaultView: 'day', disabled: false, readOnly: false },
+    args: {
+      size: 'md',
+      range: false,
+      defaultView: 'day',
+      actionBar: false,
+      titleDivider: false,
+      actionsDivider: false,
+      disabled: false,
+      readOnly: false,
+    },
     controls: {
       range: { kind: 'boolean' },
+      // Figma 👀 Action-bar: builds the actions slot (Cancel and Apply sized for the calendar).
+      actionBar: { kind: 'boolean' },
+      actions: false,
+      extra: false,
       value: false,
       defaultValue: false,
       defaultFocusedValue: false,
@@ -28,12 +41,31 @@ export default {
       'aria-label': false,
     },
     // Range changes the value's shape, so switching it starts a new calendar.
-    render: ({ range, defaultView, ...args }) =>
-      range ? (
-        <Calendar key={`range-${defaultView}`} {...args} defaultView={defaultView} range aria-label="Stay" />
+    render: ({ range, defaultView, actionBar, ...args }) => {
+      const size = (args.size ?? 'md') as CalendarSize;
+      const actions = actionBar ? (
+        <>
+          <Button size={buttonSize[size]} type="secondary">
+            Cancel
+          </Button>
+          <Button size={buttonSize[size]}>Apply</Button>
+        </>
+      ) : undefined;
+      return range ? (
+        <Calendar key={`range-${defaultView}`} {...args} defaultView={defaultView} actions={actions} range aria-label="Stay" />
       ) : (
-        <Calendar key={`single-${defaultView}`} {...args} defaultView={defaultView} aria-label="Date" />
-      ),
+        <Calendar key={`single-${defaultView}`} {...args} defaultView={defaultView} actions={actions} aria-label="Date" />
+      );
+    },
+    code: ({ actionBar, ...args }) => {
+      const b = buttonSize[(args.size ?? 'md') as CalendarSize];
+      return {
+        ...args,
+        actions: actionBar
+          ? `<><Button size="${b}" type="secondary">Cancel</Button><Button size="${b}">Apply</Button></>`
+          : undefined,
+      };
+    },
   },
   render: () => (
     <>
@@ -80,7 +112,7 @@ export default {
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">extra (Figma 🧩 Slot) and actions (Figma _calendar-action-bar): sm, md, lg</span>
+        <span className="pg-label">actions (Figma _calendar-action-bar) sm, md, lg; extra (Figma 🧩 Slot); titleDivider and actionsDivider (Figma 👀 Divider, off by default)</span>
         <div className="pg-row">
           {sizes.map((size) => (
             <Calendar
@@ -99,6 +131,20 @@ export default {
             />
           ))}
           <Calendar defaultValue="2024-11-20" aria-label="With slot" extra={<span className="pg-label">Times shown in UTC</span>} />
+          <Calendar
+            defaultValue="2024-11-20"
+            aria-label="With dividers"
+            titleDivider
+            actionsDivider
+            actions={
+              <>
+                <Button size="sm" type="secondary">
+                  Cancel
+                </Button>
+                <Button size="sm">Apply</Button>
+              </>
+            }
+          />
         </div>
       </div>
       <div className="pg-stack">

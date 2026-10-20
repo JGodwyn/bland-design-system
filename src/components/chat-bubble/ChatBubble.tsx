@@ -23,7 +23,7 @@ export interface ChatBubbleReply {
 export interface ChatBubbleProps extends Omit<LiHTMLAttributes<HTMLLIElement>, 'children' | 'title'> {
   /** Figma `Who`: receiver (left, neutral) or sender (right, brand). */
   who?: ChatBubbleWho;
-  /** Figma `Type`. Figma's audio-playing is `type="audio"` with `playing`. typing is for the receiver only. */
+  /** Figma `Type`. Figma's audio-playing is `type="audio"` with `playing`. typing: three dots that lift and brighten in turn, on either side. */
   type?: ChatBubbleType;
   /**
    * Figma `✏️ Message`: the text of a text bubble (it keeps line breaks and wraps at chat-bubble/max-width), the

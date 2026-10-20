@@ -181,35 +181,35 @@ export function ChatMessageBar({
       data-state={recording ? 'recording-audio' : filled ? 'filled' : 'rest'}
       data-disabled={disabled || undefined}
     >
-      {reply && (
-        <div className="bland-chat-message-bar__reply bland-smooth">
-          <Icon className="bland-chat-message-bar__reply-icon">
-            <ArrowBendUpLeftIcon />
-          </Icon>
-          <div className="bland-chat-message-bar__reply-text">
-            <span className="bland-chat-message-bar__reply-header">
-              <span className="bland-chat-message-bar__reply-to">{l.replyingTo}</span>{' '}
-              <span className="bland-chat-message-bar__reply-name">{reply.name}</span>
-            </span>
-            <span className="bland-chat-message-bar__reply-message">{reply.message}</span>
+      <div className="bland-chat-message-bar__main">
+        {reply && (
+          <div className="bland-chat-message-bar__reply bland-smooth">
+            <Icon className="bland-chat-message-bar__reply-icon">
+              <ArrowBendUpLeftIcon />
+            </Icon>
+            <div className="bland-chat-message-bar__reply-text">
+              <span className="bland-chat-message-bar__reply-header">
+                <span className="bland-chat-message-bar__reply-to">{l.replyingTo}</span>{' '}
+                <span className="bland-chat-message-bar__reply-name">{reply.name}</span>
+              </span>
+              <span className="bland-chat-message-bar__reply-message">{reply.message}</span>
+            </div>
+            {onReplyClose && (
+              <button
+                type="button"
+                className="bland-chat-message-bar__reply-close bland-focus-ring"
+                aria-label={l.cancelReply}
+                disabled={disabled}
+                onClick={onReplyClose}
+              >
+                <Icon>
+                  <XIcon />
+                </Icon>
+              </button>
+            )}
           </div>
-          {onReplyClose && (
-            <button
-              type="button"
-              className="bland-chat-message-bar__reply-close bland-focus-ring"
-              aria-label={l.cancelReply}
-              disabled={disabled}
-              onClick={onReplyClose}
-            >
-              <Icon>
-                <XIcon />
-              </Icon>
-            </button>
-          )}
-        </div>
-      )}
-      <div className="bland-chat-message-bar__row">
-        <div className="bland-chat-message-bar__field bland-smooth">
+        )}
+        <div className="bland-chat-message-bar__field bland-smooth" data-recording={recording || undefined}>
           {recording ? (
             <>
               {onRecordCancel && fieldButton(<TrashIcon />, l.deleteRecording, onRecordCancel, 'bland-chat-message-bar__delete')}
@@ -240,8 +240,8 @@ export function ChatMessageBar({
             </>
           )}
         </div>
-        {action}
       </div>
+      {action}
     </div>
   );
 }

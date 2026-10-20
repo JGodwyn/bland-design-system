@@ -2,6 +2,7 @@ import {
   useEffect,
   useId,
   useLayoutEffect,
+  useRef,
   useState,
   type FocusEvent,
   type HTMLAttributes,
@@ -58,7 +59,10 @@ export interface SidebarLinkProps {
 
 /** What a slot function receives. */
 export interface SidebarSlotState {
-  /** True while the sidebar is drawn as the narrow icon rail (minimized and not open on hover). */
+  /**
+   * True while the sidebar is minimized and not open: the rail, and the slide to it. The slot cross-fades
+   * between its two versions as this changes.
+   */
   rail: boolean;
 }
 
@@ -98,6 +102,13 @@ export interface SidebarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
    * icon mirrored) that pins the sidebar open.
    */
   collapsible?: boolean;
+  /**
+   * How long, in ms, the pointer rests on the rail before it opens. Defaults to duration/sidebar-peek-delay;
+   * moving restarts the wait, so passing over the rail never opens it.
+   */
+  peekDelay?: number;
+  /** How long, in ms, the open rail waits after the pointer leaves before it closes. Defaults to duration/sidebar-peek-close-delay. */
+  peekCloseDelay?: number;
   /** Accessible name of the collapse button. */
   collapseLabel?: string;
   /** Accessible name of the expand button. */
@@ -152,6 +163,8 @@ export function Sidebar({
   defaultMinimized = false,
   onMinimizedChange,
   collapsible = false,
+  peekDelay,
+  peekCloseDelay,
   collapseLabel = 'Collapse sidebar',
   expandLabel = 'Expand sidebar',
   top,
@@ -161,6 +174,7 @@ export function Sidebar({
   'aria-label': ariaLabel = 'Main',
   onPointerEnter,
   onPointerLeave,
+  onPointerMove,
   onFocus,
   onBlur,
   onKeyDown,
@@ -180,16 +194,33 @@ export function Sidebar({
 
   // The rail opens while the mouse is over it or keyboard focus is in it.
   const [hover, setHover] = useState(false);
+  // Hover intent: open once the pointer rests, close after it has been gone a moment, so passing over or
+  // brushing off the rail never flashes it open or shut.
+  const hoverTimer = useRef<number | undefined>(undefined);
+  const clearHoverTimer = () => window.clearTimeout(hoverTimer.current);
+  const setHoverAfter = (next: boolean, ms: number | undefined) => {
+    clearHoverTimer();
+    if (!ms) setHover(next);
+    else hoverTimer.current = window.setTimeout(() => setHover(next), ms);
+  };
+  useEffect(() => clearHoverTimer, []);
   const [keyboard, setKeyboard] = useState(false);
   // Keyboard-initiated changes are not animated (docs/motion.md).
   const [instant, setInstant] = useState(false);
   const [peek, setPeek] = useState<Peek>(null);
-  const wantPeek = isMinimized && (hover || keyboard);
+  // A collapse pressed with the pointer closes the sidebar for good: hovering it does not open it again until
+  // the pointer has left.
+  const [suppressed, setSuppressed] = useState(false);
+  const wantPeek = isMinimized && !suppressed && (hover || keyboard);
+  const wasMinimized = useRef(isMinimized);
 
   useLayoutEffect(() => {
+    const was = wasMinimized.current;
+    wasMinimized.current = isMinimized;
     if (!isMinimized) setPeek(null);
     else if (wantPeek) setPeek('open');
-    else setPeek((p) => (p ? 'closing' : null));
+    // Closing slides the full sidebar back to the rail, after a peek or a collapse alike.
+    else setPeek((p) => (p || !was ? 'closing' : null));
   }, [isMinimized, wantPeek]);
 
   // Ends the slide back: on the panel's transition end, or at once when nothing animates.
@@ -205,15 +236,20 @@ export function Sidebar({
   }, [peek, instant]);
 
   const rail = isMinimized && peek === null;
+  // Rows sit where the rail puts them whenever the sidebar is minimized and not open, so the icons slide with
+  // the panel as it opens or closes instead of jumping at either end.
+  const compact = isMinimized && peek !== 'open';
 
   const setMinimized = (next: boolean, event: MouseEvent) => {
     // A click with no pointer (detail 0) came from Enter or Space.
     setInstant(event.detail === 0);
+    if (next && event.detail !== 0) setSuppressed(true);
     if (minimized === undefined) setOwnMinimized(next);
     onMinimizedChange?.(next);
   };
 
-  const toggleGroup = (id: string) => {
+  const toggleGroup = (id: string, event: MouseEvent) => {
+    setInstant(event.detail === 0);
     const next = open.includes(id) ? open.filter((g) => g !== id) : [...open, id];
     if (expanded === undefined) setOwnExpanded(next);
     onExpandedChange?.(next);
@@ -261,7 +297,6 @@ export function Sidebar({
       item,
     );
 
-  const slot = (s: Slot) => (typeof s === 'function' ? s({ rail }) : s);
 
   const handleFocus = (event: FocusEvent<HTMLDivElement>) => {
     onFocus?.(event);
@@ -280,6 +315,7 @@ export function Sidebar({
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     onKeyDown?.(event);
     if (event.key === 'Escape' && peek === 'open') {
+      clearHoverTimer();
       setInstant(true);
       setHover(false);
       setKeyboard(false);
@@ -293,41 +329,58 @@ export function Sidebar({
       data-size={size}
       data-minimized={isMinimized || undefined}
       data-layout={rail ? 'rail' : 'full'}
+      data-compact={compact || undefined}
+      data-top={top !== undefined || undefined}
+      data-collapsible={collapsible || undefined}
       data-peek={peek ?? undefined}
       data-instant={instant || undefined}
       onPointerEnter={(event: PointerEvent<HTMLDivElement>) => {
         onPointerEnter?.(event);
         if (event.pointerType !== 'mouse') return;
         setInstant(false);
-        setHover(true);
+        if (hover) clearHoverTimer();
+        else setHoverAfter(true, peekDelay ?? tokenMs('--duration-sidebar-peek-delay'));
+      }}
+      onPointerMove={(event: PointerEvent<HTMLDivElement>) => {
+        onPointerMove?.(event);
+        // Still moving: the wait to open starts again.
+        if (event.pointerType === 'mouse' && !hover && isMinimized && !suppressed) {
+          setHoverAfter(true, peekDelay ?? tokenMs('--duration-sidebar-peek-delay'));
+        }
       }}
       onPointerLeave={(event: PointerEvent<HTMLDivElement>) => {
         onPointerLeave?.(event);
-        setHover(false);
+        setSuppressed(false);
+        if (hover) setHoverAfter(false, peekCloseDelay ?? tokenMs('--duration-sidebar-peek-close-delay'));
+        else clearHoverTimer();
       }}
       onFocus={handleFocus}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
     >
       <div className="bland-sidebar__panel">
-        {top !== undefined && <div className="bland-sidebar__slot bland-sidebar__top">{slot(top)}</div>}
-        {/* After the top slot in the Tab order: it sits at the top right. */}
-        {collapsible && !rail && (
-          <button
-            type="button"
-            className="bland-sidebar__toggle bland-focus-ring bland-smooth"
-            aria-expanded={!isMinimized}
-            aria-controls={navId}
-            aria-label={isMinimized ? expandLabel : collapseLabel}
-            onClick={(event) => setMinimized(!isMinimized, event)}
-          >
-            <Icon className="bland-sidebar__toggle-icon">
-              <SidebarSimpleIcon />
-            </Icon>
-          </button>
+        {(top !== undefined || collapsible) && (
+          <div className="bland-sidebar__header">
+            {top !== undefined && <SlotFade className="bland-sidebar__top" slot={top} rail={compact} instant={instant} />}
+            {/* In the header's flow: beside the top slot, or in its place when there is none. */}
+            {collapsible && (
+              <button
+                type="button"
+                className="bland-sidebar__toggle bland-focus-ring bland-smooth"
+                aria-expanded={!isMinimized}
+                aria-controls={navId}
+                aria-label={isMinimized ? expandLabel : collapseLabel}
+                onClick={(event) => setMinimized(!isMinimized, event)}
+              >
+                <Icon className="bland-sidebar__toggle-icon">
+                  <SidebarSimpleIcon />
+                </Icon>
+              </button>
+            )}
+          </div>
         )}
         <nav id={navId} aria-label={ariaLabel} className="bland-sidebar__nav">
-          <ScrollArea className="bland-sidebar__scroll" fadeSize="sm">
+          <ScrollArea className="bland-sidebar__scroll" fadeSize="sm" scrollbar={false}>
             <ul className="bland-sidebar__list">
               {items.map((item) => {
                 if (!item.items) {
@@ -338,6 +391,8 @@ export function Sidebar({
                   );
                 }
                 const isOpen = open.includes(item.id);
+                // Nested rows fold away in the rail, and while the sidebar slides to or from it.
+                const closed = !isOpen || compact;
                 const nestId = `${navId}-${item.id}`;
                 return (
                   <li key={item.id} className="bland-sidebar__entry bland-sidebar__group">
@@ -347,11 +402,11 @@ export function Sidebar({
                       aria-expanded={isOpen}
                       aria-controls={nestId}
                       disabled={item.disabled}
-                      onClick={() => toggleGroup(item.id)}
+                      onClick={(event) => toggleGroup(item.id, event)}
                     >
                       {content(item, false, true)}
                     </button>
-                    <ul id={nestId} className="bland-sidebar__nest" hidden={!isOpen || rail}>
+                    <ul id={nestId} className="bland-sidebar__nest" data-closed={closed || undefined}>
                       {item.items.map((child) => (
                         <li key={child.id} className="bland-sidebar__entry">
                           {link(child, true)}
@@ -364,8 +419,76 @@ export function Sidebar({
             </ul>
           </ScrollArea>
         </nav>
-        {bottom !== undefined && <div className="bland-sidebar__slot bland-sidebar__bottom">{slot(bottom)}</div>}
+        {bottom !== undefined && <SlotFade className="bland-sidebar__bottom" slot={bottom} rail={compact} instant={instant} />}
       </div>
     </div>
   );
 }
+
+/**
+ * A top or bottom slot. A slot function draws a rail and a full version; when it switches, the new one fades
+ * in out of a blur over the old one fading out, and the slot's height eases from one to the other.
+ */
+function SlotFade({ slot, rail, instant, className }: { slot: Slot; rail: boolean; instant: boolean; className: string }) {
+  const node = typeof slot === 'function' ? slot({ rail }) : slot;
+  const ref = useRef<HTMLDivElement>(null);
+  const last = useRef<{ node: ReactNode; height: number }>({ node, height: 0 });
+  const [swap, setSwap] = useState<{ gen: number; leaving: ReactNode; leavingRail: boolean } | null>(null);
+  const wasRail = useRef(rail);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    const changed = wasRail.current !== rail;
+    wasRail.current = rail;
+    if (!el || !changed || typeof slot !== 'function') return;
+    // From the keyboard it switches at once; under reduced motion the CSS keeps the fade and drops the rest.
+    if (instant) {
+      setSwap(null);
+      return;
+    }
+    setSwap((s) => ({ gen: (s?.gen ?? 0) + 1, leaving: last.current.node, leavingRail: !rail }));
+    // Ease from the old height to the new one; the outgoing layer is out of flow.
+    const to = el.scrollHeight;
+    el.style.height = `${last.current.height}px`;
+    void el.offsetHeight;
+    el.style.height = `${to}px`;
+  }, [rail]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Remember what is showing, for the next switch.
+  useLayoutEffect(() => {
+    if (!swap) last.current = { node, height: ref.current?.offsetHeight ?? 0 };
+    else last.current = { ...last.current, node };
+  });
+
+  const settle = () => {
+    if (ref.current) ref.current.style.height = '';
+    if (ref.current) last.current.height = ref.current.offsetHeight;
+    setSwap(null);
+  };
+
+  return (
+    <div ref={ref} className={`bland-sidebar__slot ${className}`}>
+      <div
+        key={swap?.gen ?? 0}
+        className="bland-sidebar__slot-layer"
+        data-enter={swap ? true : undefined}
+        data-rail={(typeof slot === 'function' && rail) || undefined}
+      >
+        {node}
+      </div>
+      {swap && (
+        <div
+          ref={(el) => el?.setAttribute('inert', '')}
+          className="bland-sidebar__slot-layer"
+          data-leave
+          data-rail={swap.leavingRail || undefined}
+          aria-hidden
+          onAnimationEnd={(e) => e.target === e.currentTarget && settle()}
+        >
+          {swap.leaving}
+        </div>
+      )}
+    </div>
+  );
+}
+

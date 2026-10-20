@@ -96,6 +96,10 @@ This supports both an explicit switch and the system preference. Which one the p
 
 Twelve collections; the table in `CLAUDE.md` lists what each holds. Emitted: `Theme` (Light and Dark), `Spacing`, `Corner Radius`, `Stroke`, `Typography`, `Effects`, `Sizing`, `Motion`, `Breakpoints`, plus the elevation and text styles. Hidden and never emitted: `_Core Colors`, `_Functional Colors`, `_Units`.
 
+## Sync of 2026-10-20 (Sidebar delays)
+
+Two Motion variables added in Figma for the Sidebar's hover intent, through the drift check (`--apply`): `duration/sidebar-peek-delay` (200ms, how long the pointer rests on the rail before it opens) and `duration/sidebar-peek-close-delay` (300ms, how long it lingers after the pointer leaves). Delays, not animations, like Tooltip's. The check also reported the Typography collection's rename to `_Typography`; only the variable records were taken (`metaChanged` false), as before. Checksum 626 variables, `679912ec`, equal in Figma and the repo.
+
 ## Sync of 2026-10-19 (Tooltip)
 
 - Added `duration/tooltip-delay` (500ms) and `duration/tooltip-close-delay` (100ms) in Motion and `tooltip/offset` (Sizing, alias of `unit/4`) for the Tooltip. Synced through the drift check (three added variables) and `--apply`; only `00.json` and `06.json` changed. Checksum: count 616, hash `e8f5443`, equal in Figma and locally. 521 tokens emitted.

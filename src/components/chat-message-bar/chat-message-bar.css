@@ -2,30 +2,40 @@
  * Chat message bar (Figma: Messaging page, set "Chat-message-bar").
  *
  *   <div class="bland-chat-message-bar" data-state="rest|filled|recording-audio" [data-disabled]>
- *     <div class="bland-chat-message-bar__reply bland-smooth">           Replying=true
- *       icon, "Replying to" + name, message, close
- *     </div>
- *     <div class="bland-chat-message-bar__row">
- *       <div class="bland-chat-message-bar__field bland-smooth">
+ *     <div class="bland-chat-message-bar__main">                         as wide as the field
+ *       <div class="bland-chat-message-bar__reply bland-smooth">         Replying=true
+ *         icon, "Replying to" + name, message, close
+ *       </div>
+ *       <div class="bland-chat-message-bar__field bland-smooth" [data-recording]>
  *         emoji, <textarea>, sticker, attach                              rest, filled
  *         delete, "Recording audio…", timer Chip                           recording-audio
  *       </div>
- *       Icon Button md primary: record (empty), send
  *     </div>
+ *     Icon Button md primary: record (empty), send                        bottom aligned
  *   </div>
  *
  * Fills its container: message-bar/width (384) is Figma's frame. Figma's field is one line, 40 high;
- * the textarea grows with its lines (code only).
+ * the textarea grows with its lines (code only), and the field's icons and the send button stay on the
+ * last line. The reply panel is as wide as the field, not the whole bar (Godwin 2026-10-20).
  */
 
 .bland-chat-message-bar {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
+  align-items: flex-end;
+  gap: var(--space-sm);
   box-sizing: border-box;
   width: 100%;
   font: var(--type-body-lg);
   letter-spacing: var(--letter-spacing-normal);
+}
+
+/* The reply panel and the field, stacked space-xs apart, beside the send button. */
+.bland-chat-message-bar__main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: var(--space-none);
 }
 
 /* ---- Reply panel ---- */
@@ -108,21 +118,14 @@
   transform: scale(0.97);
 }
 
-/* ---- Row: field and send ---- */
-
-.bland-chat-message-bar__row {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--space-sm);
-}
+/* ---- Field ---- */
 
 .bland-chat-message-bar__field {
   --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
   --bland-icon-size: var(--icon-md);
 
   display: flex;
-  flex: 1 1 auto;
-  align-items: center;
+  align-items: flex-end;
   gap: var(--space-sm);
   box-sizing: border-box;
   min-width: var(--space-none);
@@ -160,6 +163,15 @@
   opacity: 1;
 }
 
+.bland-chat-message-bar__field[data-recording] {
+  align-items: center;
+}
+
+/* Recording is one line, centred: the delete button needs no offset. */
+.bland-chat-message-bar__field[data-recording] .bland-chat-message-bar__tool {
+  margin: var(--space-none);
+}
+
 .bland-chat-message-bar__tool {
   --bland-radius: var(--rad-xs);
 
@@ -167,7 +179,8 @@
   flex: none;
   align-items: center;
   justify-content: center;
-  margin: var(--space-none);
+  /* Centred on the last line of text: (field height - icon) / 2 below it, so they stay level with the send button. */
+  margin: var(--space-none) var(--space-none) calc((var(--input-md) - var(--icon-md)) / 2);
   padding: var(--space-none);
   border: none;
   background: none;

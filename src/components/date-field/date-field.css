@@ -64,9 +64,10 @@
   color: var(--text-on-color);
 }
 
-/* The Time Picker's AM / PM sits in the trailing add-on; it reads like the add-on's label. */
+/* The Time Picker's AM / PM sits in the trailing add-on; it reads like the add-on's label, and a press switches it. */
 .bland-text-input__addon-content .bland-date-field__segment {
   color: inherit;
+  cursor: pointer;
 }
 
 .bland-text-input__addon-content .bland-date-field__segment:focus {

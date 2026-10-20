@@ -90,3 +90,29 @@ test('sizes: cells control/xs, sm, md; widths calendar/width-*', async ({ page }
     expect(title.width).toBe(width);
   }
 });
+
+test('the views area eases to a new height from a pointer, at once from the keyboard', async ({ page }) => {
+  const cal = calendar(page, 'Day md');
+  const views = cal.locator('.bland-calendar__views');
+  const height = async () => (await views.boundingBox())!.height;
+  const days = await height();
+  await cal.locator('button.bland-calendar__toggle').click();
+  await expect(views).not.toHaveAttribute('data-instant');
+  await expect(views).toHaveCSS('transition-duration', '0.2s');
+  // Five weeks of days (6 rows of 32) become four rows of months: it settles at the month grid's height.
+  await expect.poll(height).toBeLessThan(days);
+  const months = await height();
+  await cal.getByRole('button', { name: 'Nov' }).focus();
+  await page.keyboard.press('Enter');
+  await expect(views).toHaveAttribute('data-instant', '');
+  expect(await height()).toBe(days);
+  expect(months).toBeLessThan(days);
+});
+
+test('dividers are off by default and on with titleDivider and actionsDivider', async ({ page }) => {
+  const shadow = (name: string, part: string) => calendar(page, name).locator(part).evaluate((e) => getComputedStyle(e).boxShadow);
+  expect(await shadow('Actions sm', '.bland-calendar__title')).toBe('none');
+  expect(await shadow('Actions sm', '.bland-calendar__actions')).toBe('none');
+  expect(await shadow('With dividers', '.bland-calendar__title')).not.toBe('none');
+  expect(await shadow('With dividers', '.bland-calendar__actions')).not.toBe('none');
+});

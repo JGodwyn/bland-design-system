@@ -451,6 +451,8 @@ code,
   padding: var(--space-lg) var(--space-lg) var(--space-4xl);
   overflow: auto;
   background: var(--surface-100);
+  /* A demo that fills its container can size to the stage with cqi units (Code snippet). */
+  container-type: inline-size;
 }
 .docs-demo-stage[data-panning] {
   cursor: grabbing;

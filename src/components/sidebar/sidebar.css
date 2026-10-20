@@ -1,25 +1,28 @@
 /*
  * Sidebar (Figma: Sidebar page, sets "Sidebar", "_sidebar-item-group" and "_sidebar-item").
  *
- *   <div class="bland-sidebar" data-size data-minimized data-layout="full|rail" data-peek="open|closing">
+ *   <div class="bland-sidebar" data-size data-minimized data-layout="full|rail" data-compact
+ *        data-peek="open|closing" data-top data-collapsible>
  *     <div class="bland-sidebar__panel">
- *       <div class="bland-sidebar__slot bland-sidebar__top">…</div>
- *       <button class="bland-sidebar__toggle">SidebarSimple</button>
+ *       <div class="bland-sidebar__header">
+ *         <div class="bland-sidebar__slot bland-sidebar__top">…</div>
+ *         <button class="bland-sidebar__toggle">SidebarSimple</button>
  *       <nav class="bland-sidebar__nav"><ScrollArea><ul class="bland-sidebar__list">
  *         <li class="bland-sidebar__entry"><a class="bland-sidebar__item" aria-current="page">…</a></li>
  *         <li class="bland-sidebar__entry bland-sidebar__group">
  *           <button class="bland-sidebar__item" aria-expanded>…chevron</button>
- *           <ul class="bland-sidebar__nest">nested entries (indent, then the row)</ul>
+ *           <ul class="bland-sidebar__nest" data-closed>nested entries (indent, then the row)</ul>
  *       …
  *       <div class="bland-sidebar__slot bland-sidebar__bottom">…</div>
  *
  * The root is the box the page lays out (sidebar/width, or the rail: an item plus space-sm each side); the
- * panel draws everything: surface-100, a stroke-sm border-subtle edge on the right, space-sm above.
- * It fills its container's height (sidebar/height is Figma's frame). The panel is always drawn at
- * sidebar/width outside the rail, so a collapse or expand only resizes the root (duration/2xl,
- * easing/drawer) and the page slides while the labels stay put.
- * Peek (Figma Minimized State=hover): over the rail the panel is laid over the page at sidebar/width
- * and revealed from the rail's edge with clip-path; it slides back the same way when it closes.
+ * panel draws everything: surface-200 (Figma, 2026-10-20), a stroke-sm border-subtle edge on the right,
+ * space-sm above. It fills its container's height (sidebar/height is Figma's frame).
+ *
+ * Collapse, expand and the hover peek all move the same way (duration/2xl, easing/drawer): the panel is
+ * clipped from or to the rail's edge while the root's width follows, so the page slides in step. While
+ * the sidebar is minimized and not open (data-compact) the rows take the rail's places, so their icons
+ * slide with the panel instead of jumping at either end, and open groups fold away.
  */
 
 .bland-sidebar {
@@ -29,6 +32,8 @@
   --_count-pad: var(--space-2xs);
   --_count-type: var(--type-body-sm-bold);
   --_rail: calc(var(--_item) + var(--space-sm) * 2);
+  --_list-pad: var(--space-lg);
+  --_icon-x: var(--_pad);
   --bland-icon-size: var(--icon-sm);
 
   position: relative;
@@ -37,6 +42,7 @@
   width: var(--sidebar-width);
   height: 100%;
   min-height: var(--space-none);
+  interpolate-size: allow-keywords;
   transition: width var(--duration-2xl) var(--easing-drawer);
 }
 
@@ -69,6 +75,12 @@
   width: var(--_rail);
 }
 
+/* The rail's places: the list space-sm from the edges, each icon centred in a square row. */
+.bland-sidebar[data-compact] {
+  --_list-pad: var(--space-sm);
+  --_icon-x: calc((var(--_item) - var(--bland-icon-size)) / 2);
+}
+
 /* ---- Panel ---- */
 
 .bland-sidebar__panel {
@@ -80,13 +92,13 @@
   width: var(--sidebar-width);
   height: 100%;
   padding-top: var(--space-sm);
-  background-color: var(--surface-100);
+  background-color: var(--surface-200);
   box-shadow: inset calc(var(--stroke-sm) * -1) var(--space-none) var(--space-none) var(--space-none) var(--border-subtle);
   clip-path: inset(var(--space-none));
   transition: clip-path var(--duration-2xl) var(--easing-drawer);
 }
 
-/* The rail: the panel is as wide as the root. Its clip names the rail's edge, so a peek starts there. */
+/* The rail: the panel is as wide as the root. Its clip names the rail's edge, so an opening starts there. */
 .bland-sidebar[data-layout="rail"] > .bland-sidebar__panel {
   width: 100%;
 }
@@ -96,20 +108,99 @@
   clip-path: inset(var(--space-none) calc(100% - var(--_rail)) var(--space-none) var(--space-none));
 }
 
-/* Peek: over the page, from the rail's top left corner. */
+/* Open over the page, or sliding back to the rail: from the rail's top left corner. */
 .bland-sidebar[data-peek] > .bland-sidebar__panel {
   position: absolute;
   inset-block: var(--space-none);
   inset-inline-start: var(--space-none);
 }
 
-.bland-sidebar__slot {
+/* ---- Header: the top slot and the collapse button, in flow ---- */
+
+.bland-sidebar__header {
   display: flex;
   flex: none;
+  align-items: center;
+  min-width: var(--space-none);
+}
+
+.bland-sidebar[data-top] .bland-sidebar__header {
+  padding-inline-end: var(--_list-pad);
+  transition: padding-inline-end var(--duration-2xl) var(--easing-drawer);
+}
+
+/* No top slot: the button takes the logo's place, lined up with the rows' icons, the list right under it. */
+.bland-sidebar:not([data-top]) .bland-sidebar__header {
+  padding: var(--space-lg) var(--_list-pad) var(--space-none);
+  transition: padding-inline var(--duration-2xl) var(--easing-drawer);
+}
+
+.bland-sidebar[data-collapsible]:not([data-top]) .bland-sidebar__list {
+  padding-top: var(--space-xs);
+}
+
+.bland-sidebar__slot {
+  position: relative;
+  flex: none;
+  min-width: var(--space-none);
+  overflow: hidden;
+  transition: height var(--duration-md) var(--easing-out);
+}
+
+.bland-sidebar__slot-layer {
+  display: flex;
   flex-direction: column;
   gap: var(--space-sm);
   min-width: var(--space-none);
-  overflow: hidden;
+}
+
+/* A slot's rail version is centred in the rail, wherever the panel's edge is while it slides. */
+.bland-sidebar__slot-layer[data-rail] {
+  align-items: center;
+  width: var(--_rail);
+}
+
+/* Switching between a slot's rail and full versions: the new one comes out of a blur as the old one goes into it. */
+.bland-sidebar__slot-layer[data-enter] {
+  animation: bland-sidebar-slot-in var(--duration-md) var(--easing-out) both;
+}
+
+.bland-sidebar__slot-layer[data-leave] {
+  position: absolute;
+  inset-block-start: var(--space-none);
+  inset-inline: var(--space-none);
+  pointer-events: none;
+  animation: bland-sidebar-slot-out var(--duration-md) var(--easing-out) both;
+}
+
+@keyframes bland-sidebar-slot-in {
+  from {
+    opacity: 0;
+    filter: blur(var(--space-xs));
+  }
+}
+
+@keyframes bland-sidebar-slot-out {
+  to {
+    opacity: 0;
+    filter: blur(var(--space-xs));
+  }
+}
+
+@keyframes bland-sidebar-slot-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes bland-sidebar-slot-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.bland-sidebar__top {
+  flex: 1 1 var(--space-none);
 }
 
 .bland-sidebar__nav {
@@ -133,21 +224,28 @@
 }
 
 .bland-sidebar__list {
-  padding: var(--space-lg);
+  padding: var(--space-lg) var(--_list-pad);
+  transition: padding-inline var(--duration-2xl) var(--easing-drawer);
 }
 
-.bland-sidebar[data-layout="rail"] .bland-sidebar__list {
-  padding-inline: var(--space-sm);
+/* ---- Groups: the nested rows open and fold with their height ---- */
+
+.bland-sidebar__nest {
+  height: auto;
+  padding-top: var(--space-xs);
+  overflow: clip;
+  overflow-clip-margin: var(--space-xs);
+  transition:
+    height var(--duration-md) var(--easing-out),
+    padding-top var(--duration-md) var(--easing-out),
+    visibility var(--duration-md) var(--easing-out);
 }
 
-.bland-sidebar__nest[hidden] {
-  display: none;
-}
-
-.bland-sidebar__group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
+/* Hidden as well as folded, so its links leave the Tab order and the accessibility tree. */
+.bland-sidebar__nest[data-closed] {
+  height: var(--space-none);
+  padding-top: var(--space-none);
+  visibility: hidden;
 }
 
 /* ---- Item ---- */
@@ -156,7 +254,7 @@
   --_bg: transparent;
   --_text: var(--text-bold);
   --_icon: var(--icon-subtle);
-  --_count-bg: var(--surface-200);
+  --_count-bg: var(--surface-300);
   --_count-text: var(--text-subtle);
   --bland-radius: var(--rad-sm);
 
@@ -166,7 +264,7 @@
   width: 100%;
   height: var(--_item);
   margin: var(--space-none);
-  padding: var(--space-none) var(--_pad);
+  padding: var(--space-none) var(--_pad) var(--space-none) var(--_icon-x);
   border: none;
   background-color: var(--_bg);
   color: var(--_text);
@@ -177,14 +275,24 @@
   cursor: pointer;
   transition:
     background-color var(--duration-xs) var(--easing-out),
-    color var(--duration-xs) var(--easing-out);
+    color var(--duration-xs) var(--easing-out),
+    padding-inline-start var(--duration-2xl) var(--easing-drawer),
+    width var(--duration-2xl) var(--easing-drawer);
   -webkit-tap-highlight-color: transparent;
 }
 
+.bland-sidebar[data-compact] .bland-sidebar__item {
+  width: var(--_item);
+}
+
+/*
+ * Fills one step above Figma's (Godwin, 2026-10-20): the panel moved to surface-200, which Figma's
+ * hover, count box and selected disabled fill still use.
+ */
 @media (hover: hover) and (pointer: fine) {
   .bland-sidebar__item:hover:not(:disabled, [aria-disabled="true"]) {
-    --_bg: var(--surface-200);
-    --_count-bg: var(--surface-300);
+    --_bg: var(--surface-300);
+    --_count-bg: var(--surface-400);
   }
 
   .bland-sidebar__item[aria-current="page"]:hover:not([aria-disabled="true"]) {
@@ -212,10 +320,10 @@
   cursor: default;
 }
 
-/* Figma: a selected disabled row keeps a neutral fill, its count one step above. */
+/* A selected disabled row keeps a neutral fill, its count one step above. */
 .bland-sidebar__item[aria-current="page"][aria-disabled="true"] {
-  --_bg: var(--surface-200);
-  --_count-bg: var(--surface-300);
+  --_bg: var(--surface-300);
+  --_count-bg: var(--surface-400);
 }
 
 .bland-sidebar__icon,
@@ -266,13 +374,12 @@
   transform: rotate(180deg);
 }
 
-/* ---- Rail: square rows with the icon alone; the label and count stay in the accessible name ---- */
-
-.bland-sidebar[data-layout="rail"] .bland-sidebar__item {
-  justify-content: center;
-  width: var(--_item);
-  padding: var(--space-none);
+/* Sliding to or from the rail, labels are cut by the shrinking row, not ellipsized every frame. */
+.bland-sidebar[data-compact] .bland-sidebar__label {
+  text-overflow: clip;
 }
+
+/* ---- Rail: the icon alone; the label and count stay in the accessible name ---- */
 
 .bland-sidebar[data-layout="rail"] :is(.bland-sidebar__label, .bland-sidebar__count) {
   position: absolute;
@@ -285,31 +392,35 @@
   display: none;
 }
 
-/* ---- Collapse and expand: Figma's collapse frame, top right; the expand button mirrors the icon ---- */
+/* ---- Collapse and expand: a row-sized button, its icon lined up with the rows'; expand mirrors it ---- */
 
 .bland-sidebar__toggle {
   --bland-radius: var(--rad-sm);
-  --bland-icon-size: var(--icon-md);
 
-  position: absolute;
-  top: var(--space-lg);
-  right: var(--space-lg);
-  z-index: 1;
   display: flex;
+  flex: none;
+  align-items: center;
+  width: var(--_item);
+  height: var(--_item);
   margin: var(--space-none);
-  padding: var(--space-none);
+  padding: var(--space-none) var(--space-none) var(--space-none) var(--_icon-x);
   border: none;
   background: none;
   color: var(--icon-subtle);
   cursor: pointer;
-  transition: color var(--duration-xs) var(--easing-out);
+  transition:
+    color var(--duration-xs) var(--easing-out),
+    padding-inline-start var(--duration-2xl) var(--easing-drawer);
 }
 
-/* The hit area grows to control/xs (24) around the 20px icon. */
-.bland-sidebar__toggle::before {
-  content: "";
-  position: absolute;
-  inset: calc(var(--space-2xs) * -1);
+.bland-sidebar[data-top] .bland-sidebar__toggle {
+  justify-content: center;
+  padding: var(--space-none);
+}
+
+/* Beside a top slot there is no room in the rail; the button shows again when the rail opens. */
+.bland-sidebar[data-top][data-layout="rail"] .bland-sidebar__toggle {
+  display: none;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -325,14 +436,39 @@
 /* ---- Motion ---- */
 
 .bland-sidebar[data-instant],
-.bland-sidebar[data-instant] > .bland-sidebar__panel {
+.bland-sidebar[data-instant] :is(.bland-sidebar__panel, .bland-sidebar__header, .bland-sidebar__list, .bland-sidebar__nest, .bland-sidebar__chevron) {
   transition: none;
+}
+
+.bland-sidebar[data-instant] :is(.bland-sidebar__item, .bland-sidebar__toggle) {
+  transition-property: background-color, color;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .bland-sidebar,
   .bland-sidebar__panel,
+  .bland-sidebar__header,
+  .bland-sidebar__list,
+  .bland-sidebar__nest,
   .bland-sidebar__chevron {
     transition: none;
+  }
+
+  .bland-sidebar__item,
+  .bland-sidebar__toggle {
+    transition-property: background-color, color;
+  }
+
+  /* Opacity only: no blur, no height easing. */
+  .bland-sidebar__slot {
+    transition: none;
+  }
+
+  .bland-sidebar__slot-layer[data-enter] {
+    animation-name: bland-sidebar-slot-fade-in;
+  }
+
+  .bland-sidebar__slot-layer[data-leave] {
+    animation-name: bland-sidebar-slot-fade-out;
   }
 }

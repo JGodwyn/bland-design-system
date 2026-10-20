@@ -23,6 +23,8 @@ export interface Story {
     /** Override a generated control, or `false` to hide one. Props of type ReactNode never get one. */
     controls?: Record<string, Control | false>;
     render: (args: Record<string, any>) => ReactNode;
+    /** Minimum height of the demo view in px, for a demo that grows (File Upload's list). Defaults to 320. */
+    height?: number;
     /**
      * The args the code snippet shows, when they differ from the controls: controls that only build
      * a slot's content are removed, and a string starting with "<" is printed as JSX.

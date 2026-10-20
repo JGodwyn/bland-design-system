@@ -24,6 +24,11 @@
   --_subtle: var(--messaging-receiver-content-subtle);
   --_wave: var(--messaging-receiver-wave);
   --_wave-played: var(--messaging-receiver-wave-played);
+  --_separator: var(--messaging-receiver-separator);
+  /* Typing dots, faint to strong: Figma's three dot colors, which the animation steps through. */
+  --_dot-faint: var(--icon-minimal);
+  --_dot-mid: var(--icon-subtle);
+  --_dot-strong: var(--messaging-receiver-content);
 
   display: flex;
   flex-direction: column;
@@ -42,6 +47,10 @@
   --_subtle: var(--messaging-sender-content-subtle);
   --_wave: var(--messaging-sender-wave);
   --_wave-played: var(--messaging-sender-wave-played);
+  --_separator: var(--messaging-sender-separator);
+  --_dot-faint: var(--messaging-sender-wave);
+  --_dot-mid: var(--messaging-sender-content-subtle);
+  --_dot-strong: var(--messaging-sender-content);
 
   align-items: flex-end;
 }
@@ -294,15 +303,16 @@ button.bland-chat-bubble__video-play:active {
   font: var(--type-body-sm);
 }
 
-/* Figma's separator is an unbound 6px vertical line; space-sm (8) is the nearest token. */
+/* Figma's separator is an unbound 6px vertical line; space-sm (8) is the nearest token. Messaging/*-separator
+   is softer than the file details on either side, so it does not pull the eye. */
 .bland-chat-bubble__separator {
   flex: none;
   width: var(--stroke-sm);
   height: var(--space-sm);
-  background-color: currentcolor;
+  background-color: var(--_separator);
 }
 
-/* ---- Typing: three dots, from faint to strong (Figma's frame) ---- */
+/* ---- Typing: three dots that lift and brighten in turn, one wave per duration/typing, looping ---- */
 
 .bland-chat-bubble[data-type="typing"] .bland-chat-bubble__bubble {
   flex-direction: row;
@@ -315,19 +325,67 @@ button.bland-chat-bubble__video-play:active {
   gap: var(--space-xs);
 }
 
+/* Figma's frame (faint, mid, strong) is one moment of the wave; it is also the look without animation support. */
 .bland-chat-bubble__dot {
   width: var(--chat-bubble-dot);
   height: var(--chat-bubble-dot);
   border-radius: var(--rad-rd);
-  background-color: var(--icon-minimal);
+  background-color: var(--_dot-faint);
+  animation: bland-chat-bubble-typing var(--duration-typing) var(--easing-in-out) infinite both;
 }
 
 .bland-chat-bubble__dot:nth-child(2) {
-  background-color: var(--icon-subtle);
+  background-color: var(--_dot-mid);
+  animation-delay: calc(var(--duration-typing) / 6);
 }
 
 .bland-chat-bubble__dot:nth-child(3) {
-  background-color: var(--messaging-receiver-content);
+  background-color: var(--_dot-strong);
+  animation-delay: calc(var(--duration-typing) / 3);
+}
+
+/* Each dot: rests faint, then brightens and lifts by space-xs at 30% of the cycle, and settles by 60%. */
+@keyframes bland-chat-bubble-typing {
+  0%,
+  60%,
+  100% {
+    background-color: var(--_dot-faint);
+    translate: var(--space-none) var(--space-none);
+  }
+
+  15%,
+  45% {
+    background-color: var(--_dot-mid);
+  }
+
+  30% {
+    background-color: var(--_dot-strong);
+    translate: var(--space-none) calc(var(--space-xs) * -1);
+  }
+}
+
+/* Reduced motion: the dots still brighten in turn, but stay in place. */
+@keyframes bland-chat-bubble-typing-still {
+  0%,
+  60%,
+  100% {
+    background-color: var(--_dot-faint);
+  }
+
+  15%,
+  45% {
+    background-color: var(--_dot-mid);
+  }
+
+  30% {
+    background-color: var(--_dot-strong);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bland-chat-bubble__dot {
+    animation-name: bland-chat-bubble-typing-still;
+  }
 }
 
 .bland-chat-bubble__hidden {

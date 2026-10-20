@@ -36,3 +36,16 @@ test('24-hour time has no add-on', async ({ page }) => {
   await expect(field.locator('.bland-date-field__segments')).toHaveText(/^\W*14:30\W*$/);
   await expect(field.locator('.bland-text-input__addon')).toHaveCount(0);
 });
+
+test('a press on AM / PM switches it', async ({ page }) => {
+  const period = picker(page).locator('.bland-text-input__addon').getByRole('spinbutton');
+  await period.click();
+  await expect(period).toHaveText('AM');
+  await expect(value(page)).toHaveText('02:30');
+  await period.click();
+  await expect(period).toHaveText('PM');
+  await expect(value(page)).toHaveText('14:30');
+  // Typing still works.
+  await page.keyboard.type('a');
+  await expect(value(page)).toHaveText('02:30');
+});

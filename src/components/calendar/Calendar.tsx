@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type HTMLAttributes,
@@ -15,6 +16,7 @@ import {
   useCalendarCell,
   useCalendarGrid,
   useDateFormatter,
+  useFocusVisible,
   useLocale,
   useRangeCalendar,
   type AriaButtonProps,
@@ -33,10 +35,11 @@ import {
   isSameDay,
   isSameMonth,
   isToday,
+  toCalendarDate,
   today as todayIn,
   type CalendarDate,
 } from '@internationalized/date';
-import { CaretDownIcon, CaretLeftIcon, CaretRightIcon } from '../../icons';
+import { CaretLeftIcon, CaretRightIcon, ListIcon } from '../../icons';
 import { Icon } from '../icon/Icon';
 import { fromDate, fromRange, useDateOptProp, useDateProp, useRangeProp, type DateRange } from './dates';
 import '../pagination/pagination.css';
@@ -48,7 +51,7 @@ export type CalendarView = 'day' | 'month' | 'year';
 export type { DateRange } from './dates';
 
 interface CalendarBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
-  /** Figma `Size`: cells control/xs, sm, md (24, 32, 40), calendar/width-* wide. Default sm, as in Figma. */
+  /** Figma `Size`: cells control/xs, sm, md (24, 32, 40), calendar/width-* wide. Default md (Godwin 2026-10-20; Figma sm). */
   size?: CalendarSize;
   /**
    * Figma `Type`: the view it opens on. day (default) shows a month of days; the title toggle switches to the
@@ -77,10 +80,14 @@ interface CalendarBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaul
   /** Figma `🧩 Slot` (shown with `👀 Slot`): any content under the grid, space-sm below it. */
   extra?: ReactNode;
   /**
-   * Figma `👀 Action-bar`: buttons under a divider, sharing the width equally (Figma: Cancel secondary, then
+   * Figma `👀 Action-bar`: buttons under the grid, sharing the width equally (Figma: Cancel secondary, then
    * Apply primary). Use Buttons xs on a sm calendar, sm on md, md on lg.
    */
   actions?: ReactNode;
+  /** Figma `👀 Divider` on `_calendar-title-bar`: a line under the title bar. Default false, as in Figma. */
+  titleDivider?: boolean;
+  /** Figma `👀 Divider` on `_calendar-action-bar`: a line over the actions. Default false, as in Figma. */
+  actionsDivider?: boolean;
   /** Names the calendar's grid for screen readers, before the month it shows. */
   'aria-label'?: string;
   ref?: Ref<HTMLDivElement>;
@@ -165,6 +172,7 @@ export function SingleCalendar({ aria, disabled, readOnly, autoFocus, firstDayOf
   const { locale } = useLocale();
   const props = { ...aria, isDisabled: disabled ?? aria.isDisabled, isReadOnly: readOnly ?? aria.isReadOnly, autoFocus: autoFocus ?? aria.autoFocus, firstDayOfWeek, 'aria-label': ariaLabel ?? aria['aria-label'] };
   const state = useCalendarState({ ...props, locale, createCalendar });
+  useFollowValue(state, aria.value ?? null);
   const ref = useRef<HTMLDivElement>(null);
   const { calendarProps, prevButtonProps, nextButtonProps } = useCalendar(props, state);
   return <CalendarBody {...chrome} state={state} range={false} firstDayOfWeek={firstDayOfWeek} calendarProps={calendarProps} prevButtonProps={prevButtonProps} nextButtonProps={nextButtonProps} gridRef={ref} />;
@@ -175,9 +183,28 @@ export function RangeCalendar({ aria, disabled, readOnly, autoFocus, firstDayOfW
   const { locale } = useLocale();
   const props = { ...aria, isDisabled: disabled ?? aria.isDisabled, isReadOnly: readOnly ?? aria.isReadOnly, autoFocus: autoFocus ?? aria.autoFocus, firstDayOfWeek, 'aria-label': ariaLabel ?? aria['aria-label'] };
   const state = useRangeCalendarState({ ...props, locale, createCalendar });
+  useFollowValue(state, aria.value?.start ?? null);
   const ref = useRef<HTMLDivElement>(null);
   const { calendarProps, prevButtonProps, nextButtonProps } = useRangeCalendar(props, state, ref);
   return <CalendarBody {...chrome} state={state} range firstDayOfWeek={firstDayOfWeek} calendarProps={calendarProps} prevButtonProps={prevButtonProps} nextButtonProps={nextButtonProps} gridRef={ref} />;
+}
+
+/**
+ * A value changed from outside (a date typed into a picker's field while the calendar is open) brings its month
+ * into view, unless focus is in the calendar, where the person is choosing.
+ */
+function useFollowValue(state: CalendarState | RangeCalendarState, value: DateValue | null) {
+  const key = value ? fromDate(value) : null;
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    if (!value || state.isFocused || isSameMonth(value, state.focusedDate)) return;
+    state.setFocusedDate(toCalendarDate(value));
+    // Only when the value itself changes.
+  }, [key]);
 }
 
 // ---- The visible calendar ----
@@ -203,11 +230,13 @@ function CalendarBody({
   prevButtonProps,
   nextButtonProps,
   gridRef,
-  size = 'sm',
+  size = 'md',
   defaultView = 'day',
   firstDayOfWeek,
   extra,
   actions,
+  titleDivider = false,
+  actionsDivider = false,
   className,
   ref,
   ...rest
@@ -248,13 +277,13 @@ function CalendarBody({
     prev = prevButtonProps;
     next = nextButtonProps;
   } else if (view === 'month') {
-    toggle = <span>{fmtYear(focused)}</span>;
+    toggle = <span className="bland-calendar__title-month">{fmtYear(focused)}</span>;
     prev = { 'aria-label': prevButtonProps['aria-label'], isDisabled: state.isDisabled || (min != null && focused.year <= min.year), onPress: () => goto(focused.subtract({ years: 1 })) };
     next = { 'aria-label': nextButtonProps['aria-label'], isDisabled: state.isDisabled || (max != null && focused.year >= max.year), onPress: () => goto(focused.add({ years: 1 })) };
   } else {
     const start = pageStart(focused.year);
     gridLabel = `${fmtYear(focused.set({ year: start }))} – ${fmtYear(focused.set({ year: start + 11 }))}`;
-    toggle = <span>{gridLabel}</span>;
+    toggle = <span className="bland-calendar__title-month">{gridLabel}</span>;
     prev = { 'aria-label': prevButtonProps['aria-label'], isDisabled: state.isDisabled || (min != null && start <= min.year), onPress: () => goto(focused.set({ year: start - 10 })) };
     next = { 'aria-label': nextButtonProps['aria-label'], isDisabled: state.isDisabled || (max != null && start + 11 >= max.year), onPress: () => goto(focused.set({ year: start + 10 })) };
   }
@@ -272,6 +301,27 @@ function CalendarBody({
     setFocusNext(true);
   };
 
+  // The views area eases to its new height when a month has more or fewer weeks, or the view changes (Godwin
+  // 2026-10-20). It measures its content and sets its own height; at once from the keyboard (docs/motion.md).
+  const viewsRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const { isFocusVisible: keyboard } = useFocusVisible();
+  const keyboardRef = useRef(keyboard);
+  keyboardRef.current = keyboard;
+  useLayoutEffect(() => {
+    const views = viewsRef.current;
+    const content = contentRef.current;
+    if (!views || !content) return;
+    const fit = () => {
+      views.toggleAttribute('data-instant', keyboardRef.current);
+      views.style.height = `${content.offsetHeight}px`;
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(content);
+    return () => observer.disconnect();
+  }, []);
+
   const months = Array.from({ length: 12 }, (_, i) => focused.set({ month: i + 1, day: 1 }));
   const years = Array.from({ length: 12 }, (_, i) => focused.set({ year: pageStart(focused.year) + i, month: 1, day: 1 }));
 
@@ -285,7 +335,7 @@ function CalendarBody({
       data-range={range || undefined}
       data-disabled={state.isDisabled || undefined}
     >
-      <div className="bland-calendar__title">
+      <div className="bland-calendar__title" data-divider={titleDivider || undefined}>
         {view === 'year' ? (
           <span className="bland-calendar__toggle" data-static>
             {toggle}
@@ -304,25 +354,33 @@ function CalendarBody({
           <NavButton {...next} icon={<CaretRightIcon />} />
         </span>
       </div>
-      {view === 'day' ? (
-        <DayGrid state={state} range={range} firstDayOfWeek={firstDayOfWeek} gridRef={gridRef} />
-      ) : (
-        <PeriodGrid
-          key={view}
-          label={view === 'month' ? fmtYear(focused) : gridLabel}
-          items={(view === 'month' ? months : years).map((d) => ({
-            date: d,
-            label: view === 'month' ? fmtMonth(d) : fmtYear(d),
-            current: view === 'month' ? isSameMonth(d, focused) : d.year === focused.year,
-            today: view === 'month' ? isSameMonth(d, now) : d.year === now.year,
-            disabled: state.isDisabled || (view === 'month' ? monthOutOfBounds(d) : yearOutOfBounds(d)),
-          }))}
-          autoFocus={focusNext}
-          onPick={(d) => (view === 'month' ? pickMonth(d) : pickYear(d))}
-        />
-      )}
+      <div ref={viewsRef} className="bland-calendar__views">
+        <div ref={contentRef}>
+          {view === 'day' ? (
+            <DayGrid state={state} range={range} firstDayOfWeek={firstDayOfWeek} gridRef={gridRef} />
+          ) : (
+            <PeriodGrid
+              key={view}
+              label={view === 'month' ? fmtYear(focused) : gridLabel}
+              items={(view === 'month' ? months : years).map((d) => ({
+                date: d,
+                label: view === 'month' ? fmtMonth(d) : fmtYear(d),
+                current: view === 'month' ? isSameMonth(d, focused) : d.year === focused.year,
+                today: view === 'month' ? isSameMonth(d, now) : d.year === now.year,
+                disabled: state.isDisabled || (view === 'month' ? monthOutOfBounds(d) : yearOutOfBounds(d)),
+              }))}
+              autoFocus={focusNext}
+              onPick={(d) => (view === 'month' ? pickMonth(d) : pickYear(d))}
+            />
+          )}
+        </div>
+      </div>
       {extra != null && extra !== false && <div className="bland-calendar__extra">{extra}</div>}
-      {actions != null && actions !== false && <div className="bland-calendar__actions">{actions}</div>}
+      {actions != null && actions !== false && (
+        <div className="bland-calendar__actions" data-divider={actionsDivider || undefined}>
+          {actions}
+        </div>
+      )}
     </div>
   );
 }
@@ -334,7 +392,7 @@ function TitleToggle({ expanded, disabled, onPress, children }: { expanded: bool
     <button {...buttonProps} ref={ref} className="bland-calendar__toggle bland-focus-ring bland-smooth" aria-expanded={expanded}>
       {children}
       <Icon className="bland-calendar__caret">
-        <CaretDownIcon />
+        <ListIcon />
       </Icon>
     </button>
   );

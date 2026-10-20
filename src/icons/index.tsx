@@ -340,3 +340,12 @@ export const TrashIcon = (p: P) => (
     <path d="M21 7V5C21 4.46957 20.7893 3.96086 20.4142 3.58579C20.0391 3.21071 19.5304 3 19 3H13C12.4696 3 11.9609 3.21071 11.5858 3.58579C11.2107 3.96086 11 4.46957 11 5V7" />
   </svg>
 );
+
+/** Figma: List (6080:106319). The Calendar title toggle's icon. */
+export const ListIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M5 16H27" />
+    <path d="M5 8H27" />
+    <path d="M5 24H27" />
+  </svg>
+);

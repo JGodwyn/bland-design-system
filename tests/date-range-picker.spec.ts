@@ -30,3 +30,13 @@ test('typing the end date changes the range', async ({ page }) => {
   await page.keyboard.type('25');
   await expect(value(page)).toHaveText('2024-11-09 to 2024-11-25');
 });
+
+test('a press on either field opens the shared calendar with focus left in the field', async ({ page }) => {
+  const endDay = picker(page).getByRole('spinbutton', { name: /^day.*End date/ });
+  await endDay.click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(endDay).toBeFocused();
+  // A press on the other field keeps it open.
+  await picker(page).getByRole('spinbutton', { name: /^day.*Start date/ }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+});

@@ -54,7 +54,7 @@ function Demo({ demo }: { demo: NonNullable<Story['demo']> }) {
   return (
     <Section title="Playground">
       <div className="docs-demo">
-        <ZoomStage focused={focused}>
+        <ZoomStage focused={focused} height={demo.height}>
           <div ref={rendered} className="docs-demo-render">
             {demo.render(args)}
           </div>
@@ -127,7 +127,7 @@ const clampZoom = (z: number) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
  * over it, or by pinching on a trackpad; 0 resets the zoom and the position. Drag the background
  * to pan when zoomed in.
  */
-function ZoomStage({ children, focused }: { children: ReactNode; focused: boolean }) {
+function ZoomStage({ children, focused, height }: { children: ReactNode; focused: boolean; height?: number }) {
   const [zoom, setZoom] = useState(1);
   const view = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
@@ -169,8 +169,10 @@ function ZoomStage({ children, focused }: { children: ReactNode; focused: boolea
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!hovering.current || e.metaKey || e.ctrlKey || e.altKey) return;
-      // Leave typing alone: text fields and selects keep their keys; checkboxes and buttons don't need them.
-      if ((e.target as HTMLElement).closest('input:not([type=checkbox], [type=radio]), select, textarea')) return;
+      // Leave typing alone: text fields, selects and editable elements keep their keys (date and time segments are
+      // contenteditable spinbuttons, not inputs); checkboxes and buttons don't need them.
+      const target = e.target as HTMLElement;
+      if (target.isContentEditable || target.closest('input:not([type=checkbox], [type=radio]), select, textarea, [role=spinbutton]')) return;
       if (e.key === '+' || e.key === '=') step(1);
       else if (e.key === '-' || e.key === '_') step(-1);
       else if (e.key === '0') reset();
@@ -248,6 +250,7 @@ function ZoomStage({ children, focused }: { children: ReactNode; focused: boolea
     <div
       ref={view}
       className="docs-demo-view"
+      style={height ? { minHeight: height } : undefined}
       onPointerEnter={() => (hovering.current = true)}
       onPointerLeave={() => (hovering.current = false)}
     >

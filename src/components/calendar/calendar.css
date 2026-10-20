@@ -4,15 +4,17 @@
  *
  *   <div class="bland-calendar bland-smooth" data-size="sm" data-view="day" data-range>
  *     <div class="bland-calendar__title">                                 Figma _calendar-title-bar
- *       <button class="bland-calendar__toggle …" aria-expanded>Nov 2024 ⌄</button>
+ *       <button class="bland-calendar__toggle …" aria-expanded>Nov 2024 ☰</button>
  *       <span class="bland-calendar__nav"><button class="bland-pagination__item bland-calendar__arrow">‹</button>…</span>
  *     </div>
+ *     <div class="bland-calendar__views"><div>                             eases to its content's height
  *     <table class="bland-calendar__grid">                                day view (React Aria grid)
  *       <th class="bland-calendar__weekday">S</th> …
  *       <td><div class="bland-calendar__item …" data-selection="selected" aria-current="date">
  *         <span class="bland-calendar__label">9</span></div></td>
  *     </table>
  *     <div class="bland-calendar__periods" role="grid">…</div>             month and year views, 3 x 4
+ *     </div></div>
  *     <div class="bland-calendar__extra">…</div>                           Figma 🧩 Slot
  *     <div class="bland-calendar__actions">…</div>                         Figma _calendar-action-bar
  *   </div>
@@ -65,38 +67,46 @@
   --_weekday-type: var(--type-body-md);
 }
 
-/* ---- Title bar: the toggle, then previous and next right after it (as in Figma), over a divider ---- */
+/* ---- Title bar: the toggle at the start, previous and next at the end (Figma, 2026-10-20) ---- */
 
 .bland-calendar__title {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-sm);
   box-sizing: border-box;
   width: var(--_width);
   padding-bottom: var(--space-sm);
+}
+
+/* Figma 👀 Divider (off by default): a stroke-sm line along the bottom. */
+.bland-calendar__title[data-divider] {
   box-shadow: inset var(--space-none) calc(var(--stroke-sm) * -1) var(--space-none) var(--space-none) var(--date-calendar-border);
 }
 
+/* The month and year button: a filled pill with the List icon. Figma draws no hover for it. */
 .bland-calendar__toggle {
-  --bland-radius: var(--rad-sm); /* drawn by .bland-smooth */
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
   --bland-icon-size: var(--icon-sm);
 
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
   margin: var(--space-none);
-  padding: var(--space-none) var(--space-2xs);
+  padding: var(--space-none) var(--space-xs) var(--space-none) var(--space-sm);
   border: none;
-  background-color: transparent;
+  background-color: var(--date-calendar-title-bar-surface);
   color: var(--text-bold);
   font: var(--_type);
   letter-spacing: inherit;
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color var(--duration-xs) var(--easing-ease);
 }
 
+/* The year view's range: plain text filling the row (Figma: no fill, no icon). */
 .bland-calendar__toggle[data-static] {
+  flex: 1;
+  background-color: transparent;
   cursor: default;
 }
 
@@ -105,13 +115,33 @@
 }
 
 .bland-calendar__caret {
-  color: var(--icon-bold);
+  color: var(--icon-subtle);
 }
 
 .bland-calendar__nav {
   display: flex;
   align-items: center;
   gap: var(--space-2xs);
+}
+
+/* ---- Views: the area eases to its content's height (a month of 4 to 6 weeks, a 3 x 4 view) ---- */
+
+.bland-calendar__views {
+  /* Clips the content while it eases, but not the cells' focus rings (stroke-lg at a space-2xs offset). */
+  overflow: clip;
+  overflow-clip-margin: var(--space-xs);
+  transition: height var(--duration-md) var(--easing-out);
+}
+
+/* A change from the keyboard (Page Up, arrows across a month) moves at once. */
+.bland-calendar__views[data-instant] {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bland-calendar__views {
+    transition: none;
+  }
 }
 
 /* ---- Day view ---- */
@@ -181,10 +211,6 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .bland-calendar__toggle:not([data-static]):hover:not(:disabled) {
-    background-color: var(--pagination-surface-hover);
-  }
-
   .bland-calendar__item:hover:not([data-disabled]) {
     --_bg: var(--date-calendar-item-surface-hover);
   }
@@ -264,6 +290,10 @@
   box-sizing: border-box;
   width: var(--_width);
   padding-top: var(--space-sm);
+}
+
+/* Figma 👀 Divider (off by default): a stroke-sm line along the top. */
+.bland-calendar__actions[data-divider] {
   box-shadow: inset var(--space-none) var(--stroke-sm) var(--space-none) var(--space-none) var(--date-calendar-border);
 }
 

@@ -1,10 +1,42 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import type { Story } from '../../../playground/story';
 import { ChatMessageBar, type ChatMessageBarProps } from './ChatMessageBar';
 
-/** Figma's message-bar/width frame, shrinking on narrow screens. */
+/** Figma's message-bar/width frame: a fixed width (the width a wrapping message takes), shrinking only on narrow screens. */
 function Frame({ children }: { children: ReactNode }) {
-  return <div style={{ width: '100%', maxWidth: 'var(--message-bar-width)' }}>{children}</div>;
+  return <div style={{ width: 'var(--message-bar-width)', maxWidth: '100%' }}>{children}</div>;
+}
+
+/** m:ss for a count of seconds. */
+const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+
+/**
+ * The playground's bar works like the real thing: record switches to the recording state with a running timer, delete
+ * or send ends it, and the reply's close button closes the reply. The replying and recording controls set where it starts.
+ */
+function DemoBar({ replying, recording: startRecording, ...args }: ChatMessageBarProps & { replying: boolean }) {
+  const [replyOpen, setReplyOpen] = useState(replying);
+  const [recording, setRecording] = useState(!!startRecording);
+  const [seconds, setSeconds] = useState(0);
+  useEffect(() => {
+    if (!recording) return;
+    setSeconds(0);
+    const id = setInterval(() => setSeconds((n) => n + 1), 1000);
+    return () => clearInterval(id);
+  }, [recording]);
+  return (
+    <ChatMessageBar
+      {...args}
+      {...tools}
+      reply={replyOpen ? reply : undefined}
+      onReplyClose={() => setReplyOpen(false)}
+      onRecordStart={() => setRecording(true)}
+      recording={recording}
+      recordingTime={clock(seconds)}
+      onRecordCancel={() => setRecording(false)}
+      onRecordSend={() => setRecording(false)}
+    />
+  );
 }
 
 const reply = { name: 'Jane Doe', message: 'Replying to this message' };
@@ -50,27 +82,21 @@ export default {
   components: ['ChatMessageBar'],
   demo: {
     component: 'ChatMessageBar',
-    args: { defaultValue: '', replying: false, recording: false, recordingTime: '1:00', disabled: false },
+    args: { defaultValue: '', replying: true, recording: false, disabled: false },
     controls: {
       defaultValue: false,
       value: false,
+      recordingTime: false,
       placeholder: { kind: 'text' },
       replying: { kind: 'boolean' },
-      recordingTime: { kind: 'text' },
     },
-    render: ({ replying, ...args }) => (
+    render: ({ replying, recording, ...args }) => (
       <Frame>
-        <ChatMessageBar
-          {...(args as ChatMessageBarProps)}
-          {...tools}
-          reply={replying ? reply : undefined}
-          onReplyClose={() => {}}
-          onRecordCancel={() => {}}
-          onRecordSend={() => {}}
-        />
+        {/* A new key when a control changes, so the bar starts again from the controls. */}
+        <DemoBar key={`${replying}-${recording}`} {...(args as ChatMessageBarProps)} replying={replying} recording={recording} />
       </Frame>
     ),
-    code: ({ replying, recording, recordingTime, ...args }) => ({
+    code: ({ replying, recording, ...args }) => ({
       ...args,
       onSend: '{send}',
       onEmoji: '{openEmoji}',
@@ -80,7 +106,7 @@ export default {
       reply: replying ? "{{ name: 'Jane Doe', message: 'Replying to this message' }}" : undefined,
       onReplyClose: replying ? '{cancelReply}' : undefined,
       recording: recording || undefined,
-      recordingTime: recording ? recordingTime : undefined,
+      recordingTime: recording ? '{recordingTime}' : undefined,
       onRecordCancel: recording ? '{deleteRecording}' : undefined,
       onRecordSend: recording ? '{sendRecording}' : undefined,
     }),

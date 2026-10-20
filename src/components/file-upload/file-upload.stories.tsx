@@ -116,6 +116,7 @@ export default {
   components: ['FileUpload'],
   demo: {
     component: 'FileUpload',
+    height: 640,
     args: {
       title: 'Upload file',
       description: '',

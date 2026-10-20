@@ -78,30 +78,28 @@ const many: SidebarItem[] = Array.from({ length: 24 }, (_, i) => ({
 // Links stay on the docs page: the story's hrefs are fragments, which the playground would read as routes.
 const prevent = { onClick: (e: { preventDefault(): void }) => e.preventDefault() };
 
-/** A page-sized box: the sidebar fills its height, the page beside it shows what the rail opens over. */
-function Frame({ children, height = 'var(--sidebar-height)', page = true }: { children: ReactNode; height?: string; page?: boolean }) {
-  const style: CSSProperties = { display: 'flex', height, maxWidth: '100%', boxShadow: 'inset 0 0 0 var(--stroke-sm) var(--border-subtle)', overflow: 'hidden' };
+/** A page-wide box: one sidebar per row, so collapsing one never moves another. */
+function Frame({ children, height = 'var(--sidebar-height)', width = '100%' }: { children: ReactNode; height?: string; width?: string }) {
+  const style: CSSProperties = { display: 'flex', height, width, boxShadow: 'inset 0 0 0 var(--stroke-sm) var(--border-subtle)', overflow: 'hidden' };
   return (
     <div style={style} {...prevent}>
       {children}
-      {page && (
-        <div style={{ flex: 1, minWidth: 'var(--sidebar-width)', padding: 'var(--space-xl)', background: 'var(--surface-200)', color: 'var(--text-subtle)', font: 'var(--type-body-lg)' }}>
-          Page content
-        </div>
-      )}
+      <div style={{ flex: 1, minWidth: 0, padding: 'var(--space-xl)', background: 'var(--surface-100)', color: 'var(--text-subtle)', font: 'var(--type-body-lg)' }}>
+        Page content
+      </div>
     </div>
   );
 }
 
 const pad = { padding: 'var(--space-sm) var(--space-lg)' };
 const Logo = ({ rail }: { rail: boolean }) => (
-  <div style={{ ...pad, ...(rail ? { paddingInline: 'var(--space-sm)' } : {}), font: 'var(--type-title-md)', color: 'var(--text-bold)' }}>
+  <div style={{ ...pad, ...(rail ? { paddingInline: 0 } : {}), font: 'var(--type-title-md)', color: 'var(--text-bold)' }}>
     {rail ? 'B' : 'Bland'}
   </div>
 );
 const Plan = ({ rail }: { rail: boolean }) =>
   rail ? (
-    <div style={{ ...pad, paddingInline: 'var(--space-sm)' }}>
+    <div style={{ ...pad, paddingInline: 0, display: 'flex' }}>
       <Icon size="md" label="Account" style={{ color: 'var(--icon-subtle)' }}>
         <UserIcon />
       </Icon>
@@ -117,10 +115,12 @@ const sizes = ['sm', 'md', 'lg', 'xl'] as const;
 export default {
   title: 'Sidebar',
   description:
-    'App sidebar navigation. Size sets the item row height (24, 32, 40, 48). Minimized is the icon rail: while the pointer is over it (or keyboard focus is in it) the full sidebar opens over the page, and the expand button pins it open. The top slot holds the logo or workspace switcher, the bottom slot the plan, account or settings; both stay fixed while the list between them scrolls with a fade and a visible scrollbar. The collapse button minimizes it. A group header shows or hides its nested items, which indent under its label. In code: a nav of links with aria-current="page" on the current one.',
+    'App sidebar navigation. Size sets the item row height (24, 32, 40, 48). Minimized is the icon rail: once the pointer rests on it (or keyboard focus is in it) the full sidebar opens over the page, and the expand button pins it open. The top slot holds the logo or workspace switcher, the bottom slot the plan, account or settings; both stay fixed while the list between them scrolls with a fade. The collapse button minimizes it. A group header shows or hides its nested items, which indent under its label. In code: a nav of links with aria-current="page" on the current one.',
   components: ['Sidebar'],
   demo: {
     component: 'Sidebar',
+    // Room for the whole sidebar (sidebar/height) and the stage's padding.
+    height: 736,
     args: { size: 'sm', defaultCurrent: 'home', defaultMinimized: false, collapsible: true, slots: true },
     controls: {
       defaultCurrent: { kind: 'select', options: ['home', 'inbox', 'search', 'website', 'mobile', 'brand', 'calendar', 'team', 'settings'] },
@@ -133,8 +133,9 @@ export default {
       renderLink: false,
     },
     // The key restarts it when a default changes in the controls.
+    // As wide as the playground, so a collapse never re-centres the demo.
     render: ({ slots, ...args }) => (
-      <Frame>
+      <Frame width="100cqi">
         <Sidebar
           key={`${args.defaultCurrent}-${args.defaultMinimized}`}
           {...(args as Partial<SidebarProps>)}
@@ -154,27 +155,27 @@ export default {
     <>
       <div className="pg-stack">
         <span className="pg-label">Sizes sm, md, lg, xl; Projects is open because Mobile app is current</span>
-        <div className="pg-row" style={{ alignItems: 'stretch' }}>
+        <div className="pg-stack">
           {sizes.map((size) => (
-            <Frame key={size} page={false}>
-              <Sidebar aria-label={`Size ${size}`} size={size} items={items} defaultCurrent="mobile" />
+            <Frame key={size}>
+              <Sidebar aria-label={`Size ${size}`} size={size} items={items} defaultCurrent="mobile" collapsible />
             </Frame>
           ))}
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Minimized: the icon rail at each size; pointer over it or keyboard focus in it opens the full sidebar over the page</span>
-        <div className="pg-row" style={{ alignItems: 'stretch' }}>
+        <span className="pg-label">Minimized: the icon rail at each size, with the expand button in the logo's place; pointer over it or keyboard focus in it opens the full sidebar over the page</span>
+        <div className="pg-stack">
           {sizes.map((size) => (
-            <Frame key={size} height="var(--sidebar-width)">
+            <Frame key={size} height="var(--sidebar-height)">
               <Sidebar aria-label={`Rail ${size}`} data-testid={`rail-${size}`} size={size} items={items} defaultMinimized collapsible />
             </Frame>
           ))}
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Top and bottom slots with the collapse button; the list scrolls between them with the fade and the scrollbar</span>
-        <div className="pg-row" style={{ alignItems: 'stretch' }}>
+        <span className="pg-label">Top and bottom slots with the collapse button beside the logo; the list scrolls between them with the fade</span>
+        <div className="pg-stack">
           <Frame height="var(--sidebar-height)">
             <Sidebar
               aria-label="With slots"
@@ -189,11 +190,11 @@ export default {
       </div>
       <div className="pg-stack">
         <span className="pg-label">States: current, disabled (Reports), current and disabled, a count on the current row, a closed group</span>
-        <div className="pg-row" style={{ alignItems: 'stretch' }}>
-          <Frame height="var(--sidebar-width)" page={false}>
+        <div className="pg-stack">
+          <Frame height="var(--sidebar-height)">
             <Sidebar aria-label="Current inbox" items={items.slice(0, 6)} defaultCurrent="inbox" />
           </Frame>
-          <Frame height="var(--sidebar-width)" page={false}>
+          <Frame height="var(--sidebar-height)">
             <Sidebar
               aria-label="Current and disabled"
               items={items.slice(0, 6)}
@@ -204,8 +205,8 @@ export default {
       </div>
       <div className="pg-stack">
         <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
-        <div className="pg-focus pg-row">
-          <Frame height="var(--sidebar-width)" page={false}>
+        <div className="pg-focus pg-stack">
+          <Frame height="var(--sidebar-height)">
             <Sidebar aria-label="Focused" items={items.slice(0, 4)} collapsible top={({ rail }) => <Logo rail={rail} />} />
           </Frame>
         </div>

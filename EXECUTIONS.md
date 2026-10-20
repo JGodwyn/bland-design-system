@@ -1061,3 +1061,210 @@ variable if standard; use 256 and fix the Figma description.
 - Baselines for both stories in both themes, looked at. lint:css,
   typecheck, build, `npm test` (586) pass.
 - Not committed (the bubble and list work is uncommitted too).
+
+
+## Calendar: title bar redesign, dividers, height motion (2026-10-20)
+
+- Godwin asked for three things: animate the calendar's height changes,
+  the new `👀 Divider` on `_calendar-title-bar` and `_calendar-action-bar`
+  (hidden by default), and the redesigned title bar.
+- Figma, one read-only `use_figma`: both sets' properties and bindings.
+  Found the toggle's new fill bound to a new variable,
+  "Date/Calender-title-bar/surface", with no description, and the List
+  icon in place of the caret.
+- Drift check: one variable added; the result also carried the known
+  `_Typography` meta change, so saved it with `metaChanged` false
+  (LEARNINGS). Asked Godwin about the misspelling; he chose to rename it in
+  Figma. Renamed it and added a description (one `use_figma` write), applied
+  the drift, `npm run tokens`, checksum 621 / 7416e30a in both.
+- Exported the List icon. Calendar: new title bar CSS, `titleDivider` and
+  `actionsDivider`, a measured views area with a height transition
+  (instant from the keyboard). First pass ran Prettier over Calendar.tsx and
+  reformatted the whole file; restored it and re-applied the edits by hand.
+- Spec: the height eases from a click and jumps from Enter; dividers off
+  and on. React Aria reports keyboard modality before any interaction, so
+  the area starts out instant (the spec checks the duration after a click).
+- Dead end: `--update-snapshots` left the Date Picker and Date Range Picker
+  baselines on the old title bar: the change was under the page-wide
+  tolerance (LEARNINGS). Deleted those baselines and wrote them again;
+  looked at them.
+- Port 5180 was held by another session's docs server for this folder;
+  tested against it.
+- lint:css, typecheck, test:drift, `npm test` (588) pass.
+
+
+## Date and time pickers: feedback round (2026-10-20)
+
+- Godwin's list: action bar in the Calendar demo; md as the Calendar
+  default; 0 can't be typed in date or time fields; a press on the field
+  should open the calendar while typing still works; an md calendar under
+  an sm field; no reserved space under open calendars in the stories;
+  AM / PM switches on a press.
+- "Can't type 0": Playwright typed 2026 fine on `#/raw/`; the cause was
+  the component page's zoom shortcut (`0` resets zoom while hovering the
+  demo), which skipped only inputs. Fixed in `ComponentPage.tsx`, docs spec
+  added (LEARNINGS).
+- `useFieldOpen` in DatePicker (shared with DateRangePicker), Popover
+  `keepOpenOn`, Calendar `useFollowValue`, `calendarSize`, Segment toggles
+  AM / PM on click, Calendar default md, demo `actionBar` control.
+- Dead end: the field's `onPointerDown` never fired: React Aria's segments
+  stop pointerdown; moved to the capture phase. A spec expected focus to
+  stay on the month after typing two digits; React Aria moves it on.
+- Deleted and rewrote the calendar and picker baselines (four stories, both
+  themes); looked at them. lint:css, typecheck, `npm test` (594) pass.
+
+## Code snippet fixes from Godwin's review (2026-10-20)
+
+- Godwin: scrolling went past the last line; the playground cut the
+  snippet off; the language menu was too wide; asked what five props do.
+- Removed the toggle room under the body (scroll ends 12px under the last
+  line now). The language Menu takes `bland-code-snippet__menu`,
+  `width: max-content`.
+- The docs stage centres a 640 frame that is wider than it, so both sides
+  were cut. Made `.docs-demo-stage` an inline-size container and the story
+  frame `min(var(--code-snippet-width), 100cqi)`. The first try (width
+  100%) did nothing: the canvas sizes to its content.
+- Re-baselined code-snippet light and dark (intended), looked at them.
+  lint:css, typecheck, `npm test` (594) pass. Not committed.
+
+## File Upload: demo height, multiple, dark colors (2026-10-20)
+
+- Godwin: the playground is too short, multiple doesn't upload several
+  files, and the dark row and close should be Neutral900 and Neutral800.
+- Multiple: in the demo, two files picked at once and two dropped at once
+  all became rows; the input has `multiple`. The 320px demo view hid the new
+  rows below the drop zone, which looks like nothing happened. Not a
+  component bug.
+- Added `demo.height` to the Story type (`playground/story.ts`,
+  `ComponentPage.tsx`); File Upload's demo is 640 high.
+- Figma already had the dark values (Neutral900 / Neutral800); only the
+  repo was behind. Rewrote both descriptions in Figma (they named the old
+  steps), ran the drift check: two records. Its meta also differed (the
+  known `_Typography` change), so the saved result took the records only.
+  Applied, `npm run tokens`, checksum 6d913c72 equals Figma.
+- `--update-snapshots` kept the old dark PNG (under the threshold,
+  LEARNINGS); deleted and regenerated it. File Upload spec, axe, docs pass.
+- Port 5180 was held by another session's docs server; used it.
+
+## Sidebar revisions (2026-10-20)
+
+**Asked:** Godwin's review: collapse should close on click and not leave
+the page sliding under an open sidebar; taller story; surface-200
+background (done in Figma); icons jumped at the ends of the hover peek;
+no scrollbar; the collapse button in place of the logo, not floating over
+rows; groups should animate.
+
+- One `use_figma` read: only the Sidebar fill changed (surface-200); the
+  rows' hover, count and selected disabled fills still bind surface-200.
+  Asked Godwin: one step up in code; the page follows a collapse.
+- Sidebar.tsx: `suppressed` after a pointer collapse, a closing slide on
+  collapse, `data-compact`, a header row holding the top slot and the
+  toggle, nests with `data-closed`, `scrollbar={false}`. sidebar.css
+  rewritten around `--_list-pad` / `--_icon-x`.
+- Measured in Playwright (the browser pane throttles rAF in the
+  background): icon 14 to 24 and back, row fill 32 to 224 and back, no
+  step at either end.
+- Dead end in the spec: after collapsing the sidebar with a logo, the
+  pointer is off the rail, so it really has left; the stays-closed check
+  uses a sidebar without a logo, whose expand button stays under the pointer.
+- Story: frames sidebar/height tall, demo `height: 736` (the demo height
+  option another session added), page stand-in surface-100. Spec 15
+  tests; re-baselined sidebar light and dark, looked at; `npm test` 599 pass.
+
+
+## Messaging follow-up: separator tokens, sender typing, typing animation (2026-10-20)
+
+**Asked:** the doc type and size separator pulled attention, so Godwin added
+`Messaging/receiver-content-border` and `sender-content-border` in Figma
+(rename them if a better name fits, add descriptions); no sender typing
+state; typing should animate like chat apps.
+
+- Read the new variables: bound to the separators, descriptions copied from
+  `*-content-subtle`, scopes included TEXT_FILL. Asked Godwin: add a sender
+  typing variant (yes) and the loop length (1200ms).
+- Figma writes: renamed to `Messaging/receiver-separator` /
+  `sender-separator`, new descriptions, scopes SHAPE_FILL + STROKE_COLOR;
+  added `duration/typing` 1.2 (TIMING, left at ALL_SCOPES as the other
+  Motion variables); added `Who=sender, Type=typing` (clone of the
+  receiver's, sender tail, brand fill, dots sender-wave / content-subtle /
+  content); rewrote the Chat-bubble description (both typing sides, the
+  wave, duration/typing).
+- Sync: drift check found 3 added variables; `metaChanged` was the known
+  `_Typography` rename, so the result was saved without meta (LEARNINGS).
+  `--apply`, `npm run tokens`: 528 CSS tokens. Checksum still differs from
+  Figma's until the `_Typography` question is settled.
+- Code: `--_separator` per side; typing dots animate (lift + color wave,
+  a still keyframe under reduced motion), sender typing in the story;
+  four new tests (12 in the spec). Frames checked at six moments.
+- Baselines re-taken for chat-bubble only. lint:css, typecheck, `npm test`
+  (602) pass.
+- Other sessions' uncommitted work (calendar, sidebar, date pickers) is in
+  the same tree; only this task's files go in its commit.
+
+## Sidebar hover intent and slot fade (2026-10-20)
+
+**Asked:** no sharp open and close on quick hovers (wait for the pointer to
+rest); a graceful blur or fade for the logo and plan sections.
+
+- Asked Godwin: new Figma Motion tokens for the two delays (he adds them;
+  checked with `use_figma`: not there yet), and a fade with a space-xs blur.
+- Sidebar.tsx: hover timers (enter, move restarts, leave with a close
+  delay), `peekDelay` / `peekCloseDelay` props reading the pending tokens;
+  `SlotFade` for top and bottom. CSS: slot layers, two keyframe pairs
+  (blur and opacity only for reduced motion), clipped labels while compact.
+- Probe screenshots mid-collapse showed the new "B" in while "Bland" blurs
+  out, and busy "Sea…" ellipses on shrinking rows: clipped those.
+- Spec 17 tests (hover intent with the tokens set on the page, slot
+  cross-fade). The rail sits below the fold in the taller story: raw
+  `mouse.move` needs `scrollIntoViewIfNeeded` first. One icon test raced the
+  animation under full-suite load; it now checks the transition instead.
+  Re-baselined sidebar; `npm test` 604 pass.
+
+
+## Dark ghost hover, message bar layout and playground (2026-10-20)
+
+**Asked:** brighter dark-mode hover for no-fill buttons (Icon Buttons too);
+message bar: icons on the last line when text wraps, a fixed width in the
+playground, the reply panel as wide as the field, record and the reply's X
+working in the playground.
+
+- Button tokens: dark hover/pressed of ghost and stroke aliased each
+  family's darkest steps. Moved one step lighter in Figma (16 variables,
+  descriptions say which step); drift check returned exactly those 16
+  (meta saved as unchanged, the `_Typography` rename again); applied,
+  `npm run tokens`. Checked a hovered navbar Icon Button in dark.
+- Message bar: DOM now [main column: reply, field] + send; the bar and the
+  field align to the bottom; field icons offset (input/md - icon/md) / 2;
+  recording stays centred. Measured in the playground: icons, last line
+  and send share one centre.
+- Playground: Frame fixed at message-bar/width; a stateful DemoBar (keyed
+  by the controls) with a running timer.
+- Dead end: Prettier with defaults reformatted the file (double quotes,
+  80 columns); re-ran at the repo's style and restored the import.
+- Dead end: `--update-snapshots` did not rewrite the message bar
+  baselines (change under the tolerance); `--update-snapshots=all`
+  (LEARNINGS).
+- Three new tests in the message bar spec. lint:css, typecheck,
+  `npm test` (607) pass.
+
+## Sidebar delays, centred rail slots, one per row (2026-10-20)
+
+**Asked:** a tweakable delay before the rail opens (it still opened at
+once: the delay tokens did not exist yet); variant sidebars full width,
+not wrapped; rail contents centred (logo and account icon were off).
+
+- Created `duration/sidebar-peek-delay` 0.2 and
+  `duration/sidebar-peek-close-delay` 0.3 in Figma's Motion collection
+  (`use_figma`, TIMING, ALL_SCOPES like the others, descriptions).
+- Drift check: 2 added, plus the known `_Typography` meta change, dropped
+  (`metaChanged` false). `--apply`, `npm run tokens` (530 emitted),
+  checksum 626 / `679912ec` equal in Figma and locally. Another session's
+  uncommitted token changes were already in `tokens/figma/raw` and stay.
+- `SlotFade` marks the rail version's layer `data-rail`: rail-wide, items
+  centred. Story rail slots lost their side padding.
+- Story: `Frame` is always full width with a page; rows are `pg-stack`;
+  demo frame `100cqi` (`calc(100cqi - 2 * space-lg)` came out 462 on a 558
+  stage: the stage's padding is not space-lg, so plain `100cqi`).
+- Spec 19 tests (token values, centring). Re-baselined sidebar;
+  `npm test` 609 pass.
+

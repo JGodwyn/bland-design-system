@@ -1,5 +1,5 @@
 import { useRef, useState, type HTMLAttributes, type ReactNode } from 'react';
-import { I18nProvider, mergeRefs, useDateField, useDateRangePicker, useId, useLocale } from 'react-aria';
+import { I18nProvider, mergeProps, mergeRefs, useDateField, useDateRangePicker, useId, useLocale } from 'react-aria';
 import { useDateFieldState, useDateRangePickerState, type DateValue } from 'react-stately';
 import { createCalendar } from '@internationalized/date';
 import { CalendarBlankIcon } from '../../icons';
@@ -7,7 +7,7 @@ import { Button } from '../button/Button';
 import { RangeCalendar } from '../calendar/Calendar';
 import { fromDate, fromRange, useDateOptProp, useRangeProp, type DateRange } from '../calendar/dates';
 import { FieldButton, FieldShell, Segments } from '../date-field/DateField';
-import { actionButtonSize, useInstant, type DatePickerBaseProps } from '../date-picker/DatePicker';
+import { actionButtonSize, useFieldOpen, useInstant, type DatePickerBaseProps } from '../date-picker/DatePicker';
 import { Popover } from '../overlay/Popover';
 import '../overlay/popover.css';
 import './date-range-picker.css';
@@ -52,6 +52,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
 
 function DateRangePickerInner({
   size = 'sm',
+  calendarSize = 'md',
   status = 'default',
   helperText,
   value,
@@ -126,13 +127,19 @@ function DateRangePickerInner({
   const start = useDateField({ ...startFieldProps, 'aria-label': undefined, 'aria-labelledby': startLabelId }, startState, startRef);
   const end = useDateField({ ...endFieldProps, 'aria-label': undefined, 'aria-labelledby': endLabelId }, endState, endRef);
 
+  // Typing while it is open moves the pending range too.
   const [pending, setPending] = useState(state.value);
   const [prevOpen, setPrevOpen] = useState(state.isOpen);
-  if (state.isOpen !== prevOpen) {
+  const [prevValue, setPrevValue] = useState(state.value);
+  if (state.isOpen !== prevOpen || state.value !== prevValue) {
     setPrevOpen(state.isOpen);
+    setPrevValue(state.value);
     if (state.isOpen) setPending(state.value);
   }
   const instant = useInstant(state.isOpen);
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const [group, setGroup] = useState<HTMLDivElement | null>(null);
+  const fieldOpen = useFieldOpen(state, group, popoverRef, !disabled && !readOnly);
   const complete = (v: typeof state.value) => (v?.start && v?.end ? { start: v.start, end: v.end } : null);
   const invalid = status === 'default' && state.isInvalid ? 'danger' : status;
   const { id: _buttonId, ...endButtonProps } = buttonProps;
@@ -143,7 +150,11 @@ function DateRangePickerInner({
   return (
     <div {...rest} className={`bland-date-range-picker${className ? ` ${className}` : ''}`} data-size={size} data-disabled={disabled || undefined}>
       {/* React Aria's group (keys move between the four segments' fields); the popover stays outside it. */}
-      <div {...groupProps} ref={groupRef} className="bland-date-range-picker__fields">
+      <div
+        {...mergeProps(groupProps, fieldOpen.handlers)}
+        ref={mergeRefs<HTMLDivElement>(groupRef, (el: HTMLDivElement | null) => setGroup(el))}
+        className="bland-date-range-picker__fields"
+      >
         <FieldShell
           size={size}
           status={invalid}
@@ -181,21 +192,27 @@ function DateRangePickerInner({
         placement="bottom-start"
         instant={instant}
         onClose={() => state.setOpen(false)}
+        keepOpenOn={fieldOpen.keepOpenOn}
         returnFocus={buttonRef}
+        ref={popoverRef}
       >
         <div {...dialogProps} role="dialog" className="bland-date-picker__dialog">
           <RangeCalendar
-            size={size}
+            size={calendarSize}
             firstDayOfWeek={firstDayOfWeek}
-            aria={confirm ? { ...calendarProps, value: complete(pending), onChange: (v) => setPending(v) } : calendarProps}
+            aria={{
+              ...calendarProps,
+              autoFocus: !fieldOpen.fromField,
+              ...(confirm && { value: complete(pending), onChange: (v: { start: DateValue; end: DateValue } | null) => setPending(v ?? { start: null, end: null }) }),
+            }}
             actions={
               confirm && (
                 <>
-                  <Button size={actionButtonSize[size]} type="secondary" onClick={() => state.setOpen(false)}>
+                  <Button size={actionButtonSize[calendarSize]} type="secondary" onClick={() => state.setOpen(false)}>
                     {cancelLabel}
                   </Button>
                   <Button
-                    size={actionButtonSize[size]}
+                    size={actionButtonSize[calendarSize]}
                     onClick={() => {
                       const range = complete(pending);
                       if (range) state.setValue(range);

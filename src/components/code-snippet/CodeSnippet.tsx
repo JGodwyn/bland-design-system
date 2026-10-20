@@ -233,6 +233,7 @@ export function CodeSnippet({
         selectedKeys={[lang.id]}
         onSelectionChange={(ids) => ids[0] && setLangId(ids[0])}
         placement="bottom-end"
+        className="bland-code-snippet__menu"
         aria-label={languageLabel}
       >
         <button
@@ -272,7 +273,7 @@ export function CodeSnippet({
           {copyable && status}
         </div>
       )}
-      <ScrollArea className="bland-code-snippet__scroll" data-toggle={toggle || undefined}>
+      <ScrollArea className="bland-code-snippet__scroll">
         <div ref={bodyRef} id={bodyId} className="bland-code-snippet__body">
           {lineNumbers && (
             <div className="bland-code-snippet__gutter" aria-hidden="true">

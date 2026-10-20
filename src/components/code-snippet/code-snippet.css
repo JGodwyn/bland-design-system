@@ -107,6 +107,11 @@
 button.bland-code-snippet__language {
   cursor: pointer;
 }
+/* The language menu hugs its labels (Menu's menu/width is for rows with icons and text). */
+.bland-menu.bland-code-snippet__menu {
+  width: max-content;
+}
+
 .bland-code-snippet__caret {
   color: var(--icon-subtle);
 }
@@ -145,10 +150,6 @@ button.bland-code-snippet__language {
 .bland-code-snippet__body {
   display: flex;
   min-width: var(--space-none);
-}
-/* Room under the last line for the toggle, so it never covers code once scrolled or expanded (code only). */
-.bland-code-snippet__scroll[data-toggle] .bland-code-snippet__body {
-  padding-bottom: calc(var(--space-xl) + var(--control-sm));
 }
 
 .bland-code-snippet__gutter {

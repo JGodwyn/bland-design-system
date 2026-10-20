@@ -111,8 +111,9 @@ const tabLanguages = [
 ];
 
 /** Figma's frame, code-snippet/width; the snippet itself fills whatever holds it. */
+// In the docs playground it narrows to the stage (a size container), so the whole snippet shows.
 function Frame({ children, height }: { children: ReactNode; height?: string }) {
-  return <div style={{ width: 'var(--code-snippet-width)', maxWidth: '100%', height }}>{children}</div>;
+  return <div style={{ width: 'min(var(--code-snippet-width), 100cqi)', height }}>{children}</div>;
 }
 
 /** Reports its state, so tests/code-snippet.spec.ts can check the callbacks. */

@@ -159,6 +159,23 @@ own `onKeyDown` saw it in one case and not the other. → To react to
 Escape near a tooltip, listen on `document` in the capture phase too
 (listeners on the same node all run), as `Slider.tsx` does.
 
+**The docs page's zoom keys ate 0 in date fields.** Godwin couldn't type 0
+(or 2026) into any date or time segment on a component page, while
+Playwright on `#/raw/` could. The demo's zoom shortcut (`+`, `-`, `0` while
+hovering the demo) skipped only inputs, selects and textareas; React Aria's
+segments are contenteditable spinbuttons. → Global key shortcuts skip
+`isContentEditable` targets and `[role=spinbutton]` too
+(`playground/docs/ComponentPage.tsx`); test typing on the component page,
+not only the raw story.
+
+**`--update-snapshots` keeps a baseline when the change is under the tolerance.**
+After the Calendar title bar was redesigned, the Date Picker and Date Range
+Picker baselines still showed the old one: their open calendar's title bar
+is fewer pixels than `maxDiffPixelRatio` 0.002 of a full page (about 3,100
+on a 1024 x 1524 shot), so the tests passed and nothing was rewritten. →
+After an intended visual change, delete the affected baselines before
+`--update-snapshots` (or run `npm run test:update`), and look at them.
+
 **A popover open from the start showed a render too late for autofocus.**
 A `defaultOpen` Date Picker drew its calendar, but focus never went in, so
 Escape did nothing and the open popover swallowed the next press anywhere
@@ -331,6 +348,24 @@ hid each row's count with `display: none`, so the link read "Inbox" in the
 rail and "Inbox 8" in the full sidebar. → Hide text that belongs to a
 name visually (`position: absolute; overflow: hidden; clip-path: inset(50%)`),
 and keep `display: none` for decoration.
+
+**`--update-snapshots` keeps a baseline when the change is under the threshold.**
+File Upload's dark row went from #2b313b to #15181d and the update wrote
+nothing: Playwright's per-pixel color threshold counts two near-black greys
+as equal, so the test passes and the old PNG stays. → After a token change
+that only darkens or lightens a dark surface, delete that story's PNGs and
+run the update again, then check `git status` shows them changed.
+
+**A shrinking element can leave the pointer behind.** After the Sidebar
+collapsed, the pointer that pressed the collapse button was over the page,
+so `pointerleave` fired with no mouse move. → When a test or a "stays
+closed under the pointer" rule depends on hover, check where the pointer
+ends up once the layout settles.
+
+**The browser pane runs a hidden page as a background page.** Recording
+the Sidebar's motion there with `requestAnimationFrame` got two frames in
+a second. → Measure animations in Playwright (headless frames run
+normally), not in the pane.
 
 ## Tooling
 
@@ -519,6 +554,14 @@ session of the nearest full id printed above it (`mwfmcdf7qq7.4646` makes
 **Read the doc before writing.** Godwin and other sessions edit it between
 turns. → Start with `read( …, {"kind":"view","sinceRev":<last rev>} )` and keep
 their edits.
+
+**The screenshot tolerance can hide a real layout change.** After moving
+the message bar's reply panel and icons, `--update-snapshots` left the
+baselines untouched and `npm test` passed against the old layout: the
+change was mostly a near-white panel edge, under `maxDiffPixelRatio`
+0.002. → After an intended visual change, re-baseline with
+`--update-snapshots=all` for that story, then look at the PNG (its
+modified time tells you it was written).
 
 ## Browser pane
 

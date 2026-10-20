@@ -54,7 +54,7 @@ const long =
 export default {
   title: 'Chat bubble',
   description:
-    'Chat message bubble. Who: receiver (left, neutral) or sender (right, brand). Type: text, audio, audio-playing (pause icon, bars up to the playhead in the played wave color, elapsed time), image, video, document, typing (receiver only). The bubble hugs its text up to chat-bubble/max-width and wraps; image, video and document bubbles take the full width. Tail and bubble align to the bottom, so the curved tail joins the bubble\'s bottom corner. Bubbles are flat. Replying shows the quoted message. Time and delivery status sit under the bubble. In code each bubble is an li: put them in an ol inside a role="log" element.',
+    'Chat message bubble. Who: receiver (left, neutral) or sender (right, brand). Type: text, audio, audio-playing (pause icon, bars up to the playhead in the played wave color, elapsed time), image, video, document, typing (the dots lift and brighten in turn, one wave per duration/typing, looping). The bubble hugs its text up to chat-bubble/max-width and wraps; image, video and document bubbles take the full width. Tail and bubble align to the bottom, so the curved tail joins the bubble\'s bottom corner. Bubbles are flat. Replying shows the quoted message. Time and delivery status sit under the bubble. In code each bubble is an li: put them in an ol inside a role="log" element.',
   components: ['ChatBubble'],
   demo: {
     component: 'ChatBubble',
@@ -114,10 +114,10 @@ export default {
     <>
       {(['receiver', 'sender'] as const).map((who) => (
         <div key={who} className="pg-stack">
-          <span className="pg-label">{who}: text, audio, image, video, document{who === 'receiver' ? ', typing' : ''}</span>
+          <span className="pg-label">{who}: text, audio, image, video, document, typing (the dots lift and brighten in turn)</span>
           <Log label={`${who} types`}>
             {types.map((type) => example(type, who))}
-            {who === 'receiver' && <ChatBubble type="typing" typingLabel="Jane is typing" />}
+            <ChatBubble who={who} type="typing" typingLabel={who === 'receiver' ? 'Jane is typing' : 'You are typing'} />
           </Log>
         </div>
       ))}

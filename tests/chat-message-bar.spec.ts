@@ -87,3 +87,35 @@ test('long text grows the field; without onRecordStart send is disabled while em
   await expect(disabled.getByRole('textbox')).toBeDisabled();
   await expect(disabled.getByRole('button', { name: 'Emoji' })).toBeDisabled();
 });
+
+test('the reply panel is as wide as the field, not the whole bar', async ({ page }) => {
+  const bar = page.getByTestId('composer');
+  const reply = (await bar.locator('.bland-chat-message-bar__reply').boundingBox())!;
+  const field = (await bar.locator('.bland-chat-message-bar__field').boundingBox())!;
+  expect(reply.x).toBe(field.x);
+  expect(reply.width).toBe(field.width);
+  expect(reply.width).toBeLessThan((await bar.boundingBox())!.width);
+});
+
+test('on a wrapped message the field icons and the send button stay on the last line', async ({ page }) => {
+  const bar = page.locator('.bland-chat-message-bar').filter({ has: page.locator('textarea', { hasText: 'A longer message' }) });
+  const center = async (selector: string) =>
+    bar.locator(selector).evaluateAll((els) => els.map((e) => { const r = e.getBoundingClientRect(); return Math.round(r.top + r.height / 2); }));
+  const textarea = (await bar.locator('textarea').boundingBox())!;
+  const lastLine = Math.round(textarea.y + textarea.height - 8 - 12);
+  expect(await center('.bland-chat-message-bar__tool')).toEqual([lastLine, lastLine, lastLine]);
+  expect(await center('.bland-button')).toEqual([lastLine]);
+});
+
+test('in the docs playground, record starts recording and the reply closes', async ({ page }) => {
+  await page.goto('/#/components/chat-message-bar');
+  const demo = page.locator('.docs-demo-stage .bland-chat-message-bar');
+  await expect(demo).toHaveCSS('width', '384px');
+  await demo.getByRole('button', { name: 'Record voice message' }).click();
+  await expect(demo).toHaveAttribute('data-state', 'recording-audio');
+  await expect(demo.locator('.bland-chat-message-bar__timer')).toHaveText(/^0:0\d$/);
+  await demo.getByRole('button', { name: 'Cancel reply' }).click();
+  await expect(demo.locator('.bland-chat-message-bar__reply')).toHaveCount(0);
+  await demo.getByRole('button', { name: 'Delete recording' }).click();
+  await expect(demo).toHaveAttribute('data-state', 'rest');
+});

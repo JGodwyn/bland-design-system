@@ -41,6 +41,11 @@ export interface PopoverProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
   dismissable?: boolean;
   /** Called when it should close (Escape, a press outside, focus leaving). */
   onClose: () => void;
+  /**
+   * Presses on these elements don't count as outside, so they don't close the panel: a date field whose
+   * segments open the calendar while they keep focus. Default none.
+   */
+  keepOpenOn?: (element: Element) => boolean;
   /** Gets focus back when the panel closes while focus is inside it, as React Aria's FocusScope restoreFocus. */
   returnFocus?: RefObject<HTMLElement | null>;
   /** Mounted while open and during the exit; remounted on every open, so the list's autoFocus runs again. */
@@ -62,6 +67,7 @@ export function Popover({
   instant,
   dismissable = true,
   onClose,
+  keepOpenOn,
   returnFocus,
   children,
   className,
@@ -137,6 +143,7 @@ export function Popover({
       isDismissable: dismissable,
       shouldCloseOnBlur: dismissable,
       isKeyboardDismissDisabled: !dismissable,
+      shouldCloseOnInteractOutside: keepOpenOn ? (element) => !keepOpenOn(element) : undefined,
       // A press on the trigger counts as outside too: React Aria closes the panel and swallows that press, so
       // the trigger toggles it shut instead of reopening it.
     },

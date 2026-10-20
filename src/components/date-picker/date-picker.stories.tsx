@@ -14,7 +14,8 @@ const helper: Record<DatePickerStatus, string> = {
   warning: 'Close to the deadline',
 };
 const column: CSSProperties = { display: 'grid', gap: 16, width: '100%', maxWidth: 288 };
-const stage: CSSProperties = { display: 'grid', alignContent: 'start', minHeight: 340, width: '100%', maxWidth: 288 };
+// No room is kept for the calendar: it opens over whatever is under the field (Godwin 2026-10-20).
+const stage: CSSProperties = { display: 'grid', alignContent: 'start', width: '100%', maxWidth: 288 };
 
 /** A controlled picker that echoes its value, so tests/date-picker.spec.ts can check it. */
 function Controlled() {
@@ -36,7 +37,7 @@ export default {
   components: ['DatePicker'],
   demo: {
     component: 'DatePicker',
-    args: { size: 'sm', status: 'default', label: 'Label', helperText: '', locale: 'en-GB', confirm: false, disabled: false, readOnly: false },
+    args: { size: 'sm', calendarSize: 'md', status: 'default', label: 'Label', helperText: '', locale: 'en-GB', confirm: false, disabled: false, readOnly: false },
     controls: {
       label: { kind: 'text' },
       helperText: { kind: 'text' },
@@ -63,8 +64,8 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Open (defaultOpen) with confirm: the calendar under the field, Cancel and Apply</span>
-        <div style={{ ...stage, minHeight: 360 }}>
+        <span className="pg-label">Open (defaultOpen) with confirm: the calendar (md by default) opens over what is under the field, with Cancel and Apply</span>
+        <div style={stage}>
           <DatePicker locale="en-US" label="Label" defaultValue="2024-11-20" defaultOpen confirm />
         </div>
       </div>

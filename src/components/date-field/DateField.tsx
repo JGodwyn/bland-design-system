@@ -1,5 +1,5 @@
 import { useRef, type HTMLAttributes, type MouseEvent, type ReactNode, type Ref } from 'react';
-import { mergeRefs, useButton, useDateSegment, type AriaButtonProps } from 'react-aria';
+import { mergeProps, mergeRefs, useButton, useDateSegment, type AriaButtonProps } from 'react-aria';
 import type { DateFieldState, DateSegment } from 'react-stately';
 import { CheckCircleIcon, WarningCircleIcon, WarningOctagonIcon } from '../../icons';
 import { Icon } from '../icon/Icon';
@@ -123,14 +123,18 @@ export function FieldShell({
 /** Figma placeholders for the time segments ("hh:mm"); dates keep React Aria's localized ones (dd/mm/yyyy). */
 const timePlaceholders: Partial<Record<DateSegment['type'], string>> = { hour: 'hh', minute: 'mm', second: 'ss' };
 
-/** One editable segment (a spinbutton) or a literal between them. */
+/**
+ * One editable segment (a spinbutton) or a literal between them. A press on the AM / PM segment switches it to
+ * the other one (Godwin 2026-10-20); typing A or P and the arrows still work.
+ */
 export function Segment({ segment, state }: { segment: DateSegment; state: DateFieldState }) {
   const ref = useRef<HTMLSpanElement>(null);
   const { segmentProps } = useDateSegment(segment, state, ref);
+  const toggles = segment.type === 'dayPeriod' && !state.isDisabled && !state.isReadOnly;
   const placeholder = timePlaceholders[segment.type] ?? segment.placeholder;
   return (
     <span
-      {...segmentProps}
+      {...(toggles ? mergeProps(segmentProps, { onClick: () => state.increment('dayPeriod') }) : segmentProps)}
       ref={ref}
       className="bland-date-field__segment"
       data-segment={segment.type}
