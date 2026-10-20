@@ -87,6 +87,27 @@ writing it back turned `&quot;` into `&amp;quot;`; a description written with
 real quotes reads back as `&quot;`. → Never round-trip a description:
 write the whole text fresh, with plain characters.
 
+**Slicing a string with an emoji can break the `use_figma` reply.** A dump
+that returned `characters.slice(0, 20)` cut "🫧" in half; the lone surrogate
+made the connector fail with "Invalid JSON: unexpected end of hex escape".
+→ Don't return sliced text from Figma (or slice with `Array.from`); return
+names or ids instead.
+
+**The docs focus preview overrides component focus styles.** `.pg-focus
+.bland-focus-ring` sets the whole outline (brand color, 2px outward offset)
+at the same specificity as a component rule, so an `outline-color`
+override for a ring on a brand fill did not show in the preview. → Change
+the color by redefining `--border-focused` on the container, and the
+offset with a three-class selector (Chat bubble, Chat list item).
+
+**A long-running docs server misses new component folders.** With the
+5180 server started before `chat-navbar/` existed, `#/raw/chat-navbar`
+said "No story called" (the stories glob was cached), and
+`docs.spec.ts` failed on an empty props table because `props.json` is
+built only when `npm run docs` starts. → After adding a component, touch
+`playground/docs/data.ts` and run `npm run props` (or restart the docs
+server) before looking or testing.
+
 ## Fonts
 
 **Fontsource *variable* packages register a different family name**

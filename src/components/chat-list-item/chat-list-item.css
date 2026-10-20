@@ -1,0 +1,112 @@
+/*
+ * Chat list item (Figma: Messaging page, set "Chat-list-item").
+ *
+ *   <li class="bland-chat-list-item" data-type="receiver|sender">
+ *     <a|button|div class="bland-chat-list-item__row [bland-focus-ring]">
+ *       <span class="bland-chat-list-item__avatar">Avatar lg</span>
+ *       <span class="bland-chat-list-item__text">
+ *         <span class="bland-chat-list-item__header">name, date</span>
+ *         <span class="bland-chat-list-item__preview">message, unread dot | delivery status</span>
+ *       </span>
+ *     </…>
+ *   </li>
+ *
+ * Figma's root and inner frames are one element here, the row: padding space-md, avatar and text space-md apart.
+ * Square corners (rad-null), no elevation. Fills its container: chat-list-item/width (384) is Figma's frame.
+ */
+
+.bland-chat-list-item {
+  display: block;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  list-style: none;
+}
+
+.bland-chat-list-item__row {
+  --_bg: var(--surface-100);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  box-sizing: border-box;
+  width: 100%;
+  margin: var(--space-none);
+  padding: var(--space-md);
+  border: none;
+  border-radius: var(--rad-null);
+  background-color: var(--_bg);
+  color: var(--text-subtle);
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+  text-align: start;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--duration-xs) var(--easing-ease);
+}
+
+/* Figma's 👀 Focused ring is inset, because rows touch. */
+.bland-chat-list-item .bland-chat-list-item__row.bland-focus-ring {
+  outline-offset: calc(var(--stroke-lg) * -1);
+}
+
+.bland-chat-list-item__avatar {
+  display: flex;
+  flex: none;
+}
+
+.bland-chat-list-item__text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: var(--space-none);
+}
+
+.bland-chat-list-item__header,
+.bland-chat-list-item__preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: var(--space-none);
+}
+
+.bland-chat-list-item__name,
+.bland-chat-list-item__message {
+  flex: 1 1 auto;
+  min-width: var(--space-none);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bland-chat-list-item__name {
+  color: var(--text-bold);
+  font: var(--type-body-lg-bold);
+}
+
+.bland-chat-list-item__date {
+  flex: none;
+  white-space: nowrap;
+}
+
+.bland-chat-list-item__unread {
+  position: relative;
+  display: flex;
+  flex: none;
+}
+
+.bland-chat-list-item__hidden {
+  position: absolute;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- Hover on link and button rows (Figma State=hover). Focus is .bland-focus-ring. ---- */
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-chat-list-item__row:is(button, a[href]):hover {
+    --_bg: var(--surface-200);
+
+    cursor: pointer;
+  }
+}

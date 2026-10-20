@@ -1,0 +1,231 @@
+/*
+ * Chat message bar (Figma: Messaging page, set "Chat-message-bar").
+ *
+ *   <div class="bland-chat-message-bar" data-state="rest|filled|recording-audio" [data-disabled]>
+ *     <div class="bland-chat-message-bar__reply bland-smooth">           Replying=true
+ *       icon, "Replying to" + name, message, close
+ *     </div>
+ *     <div class="bland-chat-message-bar__row">
+ *       <div class="bland-chat-message-bar__field bland-smooth">
+ *         emoji, <textarea>, sticker, attach                              rest, filled
+ *         delete, "Recording audio…", timer Chip                           recording-audio
+ *       </div>
+ *       Icon Button md primary: record (empty), send
+ *     </div>
+ *   </div>
+ *
+ * Fills its container: message-bar/width (384) is Figma's frame. Figma's field is one line, 40 high;
+ * the textarea grows with its lines (code only).
+ */
+
+.bland-chat-message-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  box-sizing: border-box;
+  width: 100%;
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+/* ---- Reply panel ---- */
+
+.bland-chat-message-bar__reply {
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+  --bland-icon-size: var(--icon-md);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--messaging-surface-reply);
+  /* Figma's inside stroke. */
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--messaging-border-reply);
+}
+
+.bland-chat-message-bar__reply-icon {
+  flex: none;
+  color: var(--icon-subtle);
+}
+
+.bland-chat-message-bar__reply-text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: var(--space-none);
+}
+
+.bland-chat-message-bar__reply-header {
+  display: flex;
+  gap: var(--space-xs);
+  min-width: var(--space-none);
+  color: var(--text-subtle);
+  font: var(--type-body-sm);
+}
+
+.bland-chat-message-bar__reply-to {
+  flex: none;
+}
+
+.bland-chat-message-bar__reply-name {
+  font: var(--type-body-sm-bold);
+}
+
+.bland-chat-message-bar__reply-name,
+.bland-chat-message-bar__reply-message {
+  min-width: var(--space-none);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bland-chat-message-bar__reply-message {
+  color: var(--text-bold);
+}
+
+.bland-chat-message-bar__reply-close {
+  --bland-icon-size: var(--icon-sm);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-xs);
+  height: var(--control-xs);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  border-radius: var(--rad-rd);
+  background-color: var(--messaging-surface-reply-close);
+  color: var(--icon-brand);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--duration-sm) var(--easing-out);
+}
+
+.bland-chat-message-bar__reply-close:active {
+  transform: scale(0.97);
+}
+
+/* ---- Row: field and send ---- */
+
+.bland-chat-message-bar__row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-sm);
+}
+
+.bland-chat-message-bar__field {
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+  --bland-icon-size: var(--icon-md);
+
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--space-sm);
+  box-sizing: border-box;
+  min-width: var(--space-none);
+  min-height: var(--input-md);
+  padding: var(--space-none) var(--space-md);
+  background-color: var(--messaging-surface-messagebar);
+  /* Figma's inside stroke. */
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-input);
+  cursor: text;
+}
+
+/* Figma's 👀 Focused: the 2px ring on the field while the textarea has focus. */
+.bland-chat-message-bar__field:has(.bland-chat-message-bar__input:focus-visible) {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--space-2xs);
+}
+
+.bland-chat-message-bar__input {
+  flex: 1 1 auto;
+  min-width: var(--space-none);
+  margin: var(--space-none);
+  padding: var(--space-sm) var(--space-none);
+  border: none;
+  outline: none;
+  background: none;
+  color: var(--text-bold);
+  font: inherit;
+  letter-spacing: inherit;
+  field-sizing: content;
+  resize: none;
+}
+
+.bland-chat-message-bar__input::placeholder {
+  color: var(--text-subtle);
+  opacity: 1;
+}
+
+.bland-chat-message-bar__tool {
+  --bland-radius: var(--rad-xs);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  background: none;
+  color: var(--icon-subtle);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: color var(--duration-xs) var(--easing-ease);
+}
+
+.bland-chat-message-bar__delete {
+  color: var(--icon-danger);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-chat-message-bar__tool:enabled:hover {
+    color: var(--icon-bold);
+  }
+
+  .bland-chat-message-bar__delete:enabled:hover {
+    color: var(--icon-danger);
+  }
+}
+
+.bland-chat-message-bar__recording {
+  flex: 1 1 auto;
+  min-width: var(--space-none);
+  overflow: hidden;
+  color: var(--text-bold);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bland-chat-message-bar__timer {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Disabled: the Text Input disabled look ---- */
+
+.bland-chat-message-bar[data-disabled] .bland-chat-message-bar__field {
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-subtle);
+  cursor: not-allowed;
+}
+
+.bland-chat-message-bar[data-disabled] .bland-chat-message-bar__input,
+.bland-chat-message-bar[data-disabled] .bland-chat-message-bar__input::placeholder {
+  color: var(--text-minimal);
+  cursor: not-allowed;
+}
+
+.bland-chat-message-bar[data-disabled] .bland-chat-message-bar__tool {
+  color: var(--icon-minimal);
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bland-chat-message-bar__reply-close:active {
+    transform: none;
+  }
+}

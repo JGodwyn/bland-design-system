@@ -223,3 +223,25 @@ export {
   type CodeSource,
 } from './components/code-snippet/CodeSnippet';
 export { CodeText, type CodeTextProps, type CodeTextSize } from './components/code-snippet/CodeText';
+export {
+  ChatBubble,
+  type ChatBubbleProps,
+  type ChatBubbleWho,
+  type ChatBubbleType,
+  type ChatBubbleWaveLevel,
+  type ChatBubbleReply,
+} from './components/chat-bubble/ChatBubble';
+export {
+  ChatListItem,
+  type ChatListItemProps,
+  type ChatListItemType,
+  type ChatListItemLinkProps,
+} from './components/chat-list-item/ChatListItem';
+export type { MessageStatus, MessageStatusLabels } from './components/message-sent-indicator/MessageSentIndicator';
+export { ChatNavbar, type ChatNavbarProps, type ChatNavbarLabels } from './components/chat-navbar/ChatNavbar';
+export {
+  ChatMessageBar,
+  type ChatMessageBarProps,
+  type ChatMessageBarLabels,
+  type ChatMessageBarReply,
+} from './components/chat-message-bar/ChatMessageBar';

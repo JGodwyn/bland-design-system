@@ -1,0 +1,360 @@
+/*
+ * Chat bubble (Figma: Messaging page, set "Chat-bubble"; tail "_chat-bubble-tail").
+ *
+ *   <li class="bland-chat-bubble" data-who="receiver|sender" data-type="text|audio|image|video|document|typing" [data-playing]>
+ *     <span class="bland-chat-bubble__body">                       Figma body-wrap: tail and bubble, bottom aligned
+ *       <span class="bland-chat-bubble__tail"><svg>…</svg></span>  8 x 16; the svg (20 x 16) reaches under the bubble
+ *       <span class="bland-chat-bubble__bubble bland-smooth">
+ *         <span class="bland-chat-bubble__reply">name, message</span>   👀 Replying
+ *         text | audio (play, waveform, duration) | media + caption | file + file meta | dots
+ *       </span>
+ *     </span>
+ *     <span class="bland-chat-bubble__meta">time, delivery status</span>
+ *   </li>
+ *
+ * Sender bubbles mirror the receiver: the row reverses and the tail flips. Bubbles are flat; if a shadow is
+ * ever added, it goes on the body as filter: drop-shadow() so the tail casts it too (Figma's note).
+ */
+
+.bland-chat-bubble {
+  --_surface: var(--messaging-surface-receiver);
+  --_quote: var(--messaging-surface-receiver-quote);
+  --_quote-border: var(--border-subtle);
+  --_content: var(--messaging-receiver-content);
+  --_subtle: var(--messaging-receiver-content-subtle);
+  --_wave: var(--messaging-receiver-wave);
+  --_wave-played: var(--messaging-receiver-wave-played);
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2xs);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  list-style: none;
+}
+
+.bland-chat-bubble[data-who="sender"] {
+  --_surface: var(--messaging-surface-sender);
+  --_quote: var(--messaging-surface-sender-quote);
+  --_quote-border: transparent; /* Figma draws the quote's stroke on the receiver only */
+  --_content: var(--messaging-sender-content);
+  --_subtle: var(--messaging-sender-content-subtle);
+  --_wave: var(--messaging-sender-wave);
+  --_wave-played: var(--messaging-sender-wave-played);
+
+  align-items: flex-end;
+}
+
+/* ---- Body: the tail and the bubble, aligned to the bottom ---- */
+
+.bland-chat-bubble__body {
+  display: flex;
+  align-items: flex-end;
+  max-width: 100%;
+}
+
+.bland-chat-bubble[data-who="sender"] > .bland-chat-bubble__body {
+  flex-direction: row-reverse;
+}
+
+.bland-chat-bubble__tail {
+  position: relative;
+  flex: none;
+  width: var(--chat-bubble-tail-width);
+  height: var(--chat-bubble-tail-height);
+}
+
+.bland-chat-bubble__tail > svg {
+  position: absolute;
+  top: var(--space-none);
+  left: var(--space-none);
+  width: auto; /* 20 x 16 from the viewBox */
+  height: 100%;
+  overflow: visible;
+  fill: var(--_surface);
+}
+
+.bland-chat-bubble[data-who="sender"] .bland-chat-bubble__tail > svg {
+  right: var(--space-none);
+  left: auto;
+  transform: scaleX(-1);
+}
+
+.bland-chat-bubble__bubble {
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  box-sizing: border-box;
+  min-width: var(--space-none);
+  max-width: var(--chat-bubble-max-width);
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--_surface);
+  color: var(--_content);
+  font: var(--type-body-lg);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+/* Image, video and document bubbles take the full width. */
+.bland-chat-bubble:is([data-type="image"], [data-type="video"], [data-type="document"]) .bland-chat-bubble__bubble {
+  width: var(--chat-bubble-max-width);
+}
+
+.bland-chat-bubble__text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ---- Reply: the quoted message ---- */
+
+.bland-chat-bubble__reply {
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  min-width: var(--space-none);
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--_quote);
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-xs) var(--_quote-border);
+}
+
+.bland-chat-bubble__reply-name,
+.bland-chat-bubble__reply-message {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bland-chat-bubble__reply-name {
+  color: var(--_subtle);
+  font: var(--type-body-sm);
+}
+
+/* ---- Audio: play or pause, waveform, duration ---- */
+
+.bland-chat-bubble__audio {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.bland-chat-bubble__play {
+  --bland-icon-size: var(--icon-sm);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  border-radius: var(--rad-rd);
+  background-color: var(--_quote);
+  color: var(--_content);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--duration-sm) var(--easing-out);
+}
+
+.bland-chat-bubble__waveform {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2xs);
+  height: var(--chat-bubble-wave-xl);
+}
+
+.bland-chat-bubble__bar {
+  flex: none;
+  width: var(--chat-bubble-wave-bar);
+  height: var(--chat-bubble-wave-sm);
+  border-radius: var(--rad-rd);
+  background-color: var(--_wave);
+}
+
+.bland-chat-bubble__bar[data-level="1"] { height: var(--chat-bubble-wave-xs); }
+.bland-chat-bubble__bar[data-level="3"] { height: var(--chat-bubble-wave-md); }
+.bland-chat-bubble__bar[data-level="4"] { height: var(--chat-bubble-wave-lg); }
+.bland-chat-bubble__bar[data-level="5"] { height: var(--chat-bubble-wave-xl); }
+
+.bland-chat-bubble__bar[data-played] {
+  background-color: var(--_wave-played);
+}
+
+.bland-chat-bubble__duration {
+  flex: none;
+  color: var(--_subtle);
+  font: var(--type-body-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Image and video ---- */
+
+.bland-chat-bubble__media {
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--chat-bubble-media-height);
+  overflow: hidden;
+  background-color: var(--_quote);
+}
+
+.bland-chat-bubble__image {
+  position: absolute;
+  inset: var(--space-none);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bland-chat-bubble__video-play {
+  --bland-icon-size: var(--icon-sm);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  border-radius: var(--rad-rd);
+  background-color: var(--messaging-surface-video-control);
+  color: var(--messaging-video-control-content);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.bland-chat-bubble__video-play {
+  cursor: pointer;
+  transition: transform var(--duration-sm) var(--easing-out);
+}
+
+/* The poster is clipped by the media box, so its play button's ring sits inside the disc's edge. */
+.bland-chat-bubble .bland-chat-bubble__video-play.bland-focus-ring {
+  outline-offset: calc(var(--stroke-lg) * -1);
+}
+
+.bland-chat-bubble__play:active,
+button.bland-chat-bubble__video-play:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bland-chat-bubble__play:active,
+  button.bland-chat-bubble__video-play:active {
+    transform: none;
+  }
+}
+
+/* ---- Document: icon, file name, file type and size ---- */
+
+.bland-chat-bubble__file {
+  --bland-icon-size: var(--icon-md);
+  --bland-radius: var(--rad-xs);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: var(--space-none);
+  color: var(--_content);
+  text-decoration: none;
+}
+
+.bland-chat-bubble__filename {
+  flex: 1 1 auto;
+  min-width: var(--space-none);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a.bland-chat-bubble__file:hover .bland-chat-bubble__filename {
+    text-decoration: underline;
+  }
+}
+
+.bland-chat-bubble__file-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--_subtle);
+  font: var(--type-body-sm);
+}
+
+/* Figma's separator is an unbound 6px vertical line; space-sm (8) is the nearest token. */
+.bland-chat-bubble__separator {
+  flex: none;
+  width: var(--stroke-sm);
+  height: var(--space-sm);
+  background-color: currentcolor;
+}
+
+/* ---- Typing: three dots, from faint to strong (Figma's frame) ---- */
+
+.bland-chat-bubble[data-type="typing"] .bland-chat-bubble__bubble {
+  flex-direction: row;
+  padding: var(--space-md);
+}
+
+.bland-chat-bubble__dots {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.bland-chat-bubble__dot {
+  width: var(--chat-bubble-dot);
+  height: var(--chat-bubble-dot);
+  border-radius: var(--rad-rd);
+  background-color: var(--icon-minimal);
+}
+
+.bland-chat-bubble__dot:nth-child(2) {
+  background-color: var(--icon-subtle);
+}
+
+.bland-chat-bubble__dot:nth-child(3) {
+  background-color: var(--messaging-receiver-content);
+}
+
+.bland-chat-bubble__hidden {
+  position: absolute;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- Meta: time and delivery status under the bubble ---- */
+
+.bland-chat-bubble__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--text-subtle);
+  font: var(--type-body-sm);
+}
+
+/*
+ * The brand focus ring would vanish on the brand sender bubble and on a photo, so rings there take the content
+ * color (white). Redefined locally, so .bland-focus-ring (and the docs' focus preview) pick it up.
+ */
+.bland-chat-bubble[data-who="sender"] .bland-chat-bubble__bubble {
+  --border-focused: var(--messaging-sender-content);
+}
+
+.bland-chat-bubble__video-play {
+  --border-focused: var(--messaging-video-control-content);
+}

@@ -1011,3 +1011,53 @@ variable if standard; use 256 and fix the Figma description.
   times (`&amp;amp;amp;amp;amp;quot;`). Not touched; descriptions not updated.
 - Not committed (other sessions' work is uncommitted in the same tree).
 
+
+## Messaging: Chat bubble and Chat list item (2026-10-20)
+
+**Asked:** "now let's do Messaging: Chat-bubble and Chat-list-item".
+
+- Read `docs/components.md`, INTERFACE (conventions, List item), LEARNINGS
+  (Figma, tracker), ListItem, its story and spec, the Messaging tokens.
+- Figma, five read-only `use_figma` calls on the second official
+  connector: the page's sets (Chat-list-item, `_message-sent-indicator`,
+  Chat-navbar, Chat-message-bar, Chat-bubble, `_chat-bubble-tail`);
+  bindings of Chat-list-item, the indicator and the tail; receiver bubbles
+  in full; sender bubbles, icon colors and the tail paths; the Checks,
+  Play, Pause and File SVGs. Dead end: one dump sliced emoji text and the
+  reply failed as invalid JSON (LEARNINGS).
+- Built `chat-bubble/`, `chat-list-item/`, internal
+  `message-sent-indicator/`, four icons, exports, stories and specs (9 +
+  6 tests). Photo asset `playground/assets/chat-photo.svg` for the media
+  stories.
+- Fixes on the way: `--bland-radius` set on the root did nothing (it does
+  not inherit; set per part); a Figma render showed the file separator is a
+  vertical tick, not a dash; the brand focus ring vanished on the sender
+  bubble, now white through a local `--border-focused`.
+- Decided without asking (raised on the tracker): audio is controlled (the
+  project owns `<audio>`), typing dots static, `unread` off by default, no
+  look for the open chat, separator space-sm tall.
+- Docs server on 5180 was this checkout's own, reused. Baselines for both
+  stories in both themes, looked at. lint:css, typecheck, build, `npm test`
+  (566) pass.
+- Figma: Chat-bubble's description has escaped quotes
+  (`&amp;amp;amp;quot;`); not touched. Chat-navbar and Chat-message-bar
+  not built. Not committed.
+
+## Messaging: Chat navbar and Chat message bar (2026-10-20)
+
+**Asked:** "Do this task here: Build Chat navbar and Chat message bar"
+(the follow-up card from the bubble task).
+
+- Figma, four read-only `use_figma` calls: Chat-navbar's tree and
+  bindings plus the message bar's variant ids; three message bar variants
+  (replying rest, filled, recording) in full; icon colors in all three
+  plus the navbar; nine icon SVGs (Phone, VideoCamera, ArrowBendUpLeft,
+  Smiley, Sticker, PlusCircle, Microphone, PaperPlaneRight, Trash).
+- Built `chat-navbar/` and `chat-message-bar/` (TSX, CSS, stories),
+  exports, nine icons, `tests/chat-navbar.spec.ts` (4) and
+  `tests/chat-message-bar.spec.ts` (6).
+- Dead ends: `:is()` with `::placeholder` inside is invalid, split out;
+  the docs server had cached the stories glob and props.json (LEARNINGS).
+- Baselines for both stories in both themes, looked at. lint:css,
+  typecheck, build, `npm test` (586) pass.
+- Not committed (the bubble and list work is uncommitted too).

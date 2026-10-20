@@ -1,0 +1,28 @@
+/*
+ * Delivery status (Figma: Messaging page, set "_message-sent-indicator"). Internal: Chat-bubble and Chat-list-item.
+ *
+ *   <span class="bland-message-sent-indicator" data-status="sent|delivered|seen">
+ *     <span class="bland-icon">Check | Checks</span>                 icon/xs, decorative
+ *     <span class="bland-message-sent-indicator__label">Sent</span>  visually hidden
+ *   </span>
+ */
+
+.bland-message-sent-indicator {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--icon-subtle);
+}
+
+.bland-message-sent-indicator[data-status="seen"] {
+  color: var(--icon-brand);
+}
+
+.bland-message-sent-indicator__label {
+  position: absolute;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

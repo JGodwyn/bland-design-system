@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 256" width="512" height="256">
+  <!-- A flat landscape for the Chat-bubble image and video stories: deterministic, so screenshots stay stable. -->
+  <rect width="512" height="256" fill="#9cc3f5"/>
+  <circle cx="392" cy="72" r="28" fill="#fff4c2"/>
+  <path d="M0 176 L120 96 L210 160 L300 84 L512 196 L512 256 L0 256 Z" fill="#5b7fa8"/>
+  <path d="M0 210 C120 180 260 230 512 196 L512 256 L0 256 Z" fill="#3f6b4a"/>
+</svg>

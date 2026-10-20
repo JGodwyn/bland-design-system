@@ -90,7 +90,9 @@ when), `docs/components.md` (how to build one).
   components need them: Check, X, CaretDown, CaretRight, Plus, Minus, User, Spinner,
   MagnifyingGlass, XCircle, WarningOctagon, CheckCircle, WarningCircle, Info,
   ArrowUp, ArrowDown, ArrowsDownUp, DotsThree (filled), CaretLeft, CloudArrowUp,
-  FileArrowUp, Copy, Eye, EyeClosed so far.
+  FileArrowUp, Copy, Eye, EyeClosed, SidebarSimple, Checks, Play, Pause,
+  File, Phone, VideoCamera, ArrowBendUpLeft, Smiley (stroked, filled eyes),
+  Sticker, PlusCircle, Microphone, PaperPlaneRight, Trash so far.
 
 ## 4. Overflow
 
@@ -1605,6 +1607,108 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   row (as in Figma). DOM order: after the top slot, before the nav.
 - **Not built:** Figma's Pipe frame in the minimized group's hidden nest
   (vestigial), tooltips and menus in the rail (replaced by the peek).
+
+### Chat bubble and Chat list item (2026-10-20)
+- `import { ChatBubble, ChatListItem } from 'bland'`, folders `chat-bubble/`,
+  `chat-list-item/`, and internal `message-sent-indicator/` (Figma
+  `_message-sent-indicator`, used by both). Figma sets read with every
+  variant's bindings: Chat-bubble (926:9102, 13 variants), `_chat-bubble-tail`
+  (6258:1196), Chat-list-item (893:601), `_message-sent-indicator` (895:909).
+  Chat-navbar and Chat-message-bar follow below.
+- **A bubble is an `<li>`**, as ListItem: the project puts bubbles in an
+  `<ol>` inside an element with `role="log"` (Figma's note). Not `role="log"`
+  on the list itself: that drops the list role and orphans the `<li>`s.
+- **Audio is controlled; the project owns playback** (decided 2026-10-20,
+  open for Godwin on the tracker): Bland draws the play/pause button,
+  waveform and duration; `playing`/`onPlayingChange` and `progress` (0 to 1,
+  played bars) come from the project's `<audio>`. Figma's `audio-playing` is
+  `playing`. Waveform: levels 1 to 5 map to chat-bubble/wave-xs to wave-xl;
+  default Figma's 26 bars.
+- **Typing dots are static**, as in Figma's frame (icon-minimal,
+  icon-subtle, receiver content). There is no Motion token for a looping
+  pulse; animating them is a question for Godwin. The dots are
+  `aria-hidden`; `typingLabel` is read instead (visually hidden), since an
+  `aria-label` on a generic span is not allowed.
+- **Tail:** Figma's tail is a 20 x 16 vector in an 8 x 16 frame; 12 of it
+  lies under the bubble's rounded corner. Code draws the same path as an
+  inline SVG (`height: 100%`, width from the viewBox), mirrored with
+  `scaleX(-1)` for the sender (Figma's sender path is the exact mirror).
+  Body row aligns bottom, so the tail meets the bottom corner.
+- From Figma: bubble padding space-sm space-md, gap space-xs, rad-md
+  (`.bland-smooth`), max chat-bubble/max-width; image, video and document
+  bubbles are that width. Text body-lg in `Messaging/*-content`. Quote:
+  `Messaging/surface-*-quote`, padding space-sm space-md, gap space-2xs,
+  rad-md, name body-sm subtle, message body-lg, both one line; receiver
+  quote has a stroke-xs `border-subtle` inset stroke, sender none. Root
+  gap space-2xs to the meta row (time body-sm `text-subtle`, status, gap
+  space-xs). Typing bubble padding space-md (56 x 32). Video play disc
+  `Messaging/surface-video-control`, icon `video-control-content`.
+- **Focus rings on brand or photo:** `--border-focused` (brand) vanishes on
+  the sender bubble, so inside it `--border-focused` is redefined to
+  `Messaging/sender-content` (white), and on the video disc to
+  `video-control-content`. Redefining the token (not `outline-color`) keeps
+  `.bland-focus-ring` and the docs focus preview working. The poster's
+  ring is inset, since the media box clips.
+- **File meta separator:** Figma draws an unbound 6px vertical line; code
+  uses `stroke-sm` x `space-sm` (8), the nearest token (raised on the
+  tracker).
+- Press scale 0.97 on the audio and video play buttons (duration/sm,
+  easing/out, none under reduced motion). No hover: Figma has none.
+- **ChatListItem** follows ListItem: an `<li>` holding one link
+  (`renderLink`), one button, or a plain row. Square (rad-null, no
+  smoothing), `surface-100`, hover `surface-200`, padding space-md, avatar
+  to text space-md, name body-lg-bold `text-bold`, date and message body-lg
+  `text-subtle`, header and preview gap space-sm. Focus ring inset
+  (`outline-offset: -stroke-lg`), because rows touch (Figma).
+- `unread` defaults **false** (Figma's 👀 Unread is on): an unread dot by
+  default would be wrong data. It is an Indicator sm brand plus a visually
+  hidden "Unread". Sender rows show `status`, default delivered (Figma's).
+- `current` sets `aria-current` (`page` on a link, `true` on a button);
+  Figma draws no look for the open chat (raised on the tracker).
+
+### Chat navbar and Chat message bar (2026-10-20)
+- `import { ChatNavbar, ChatMessageBar } from 'bland'`, folders
+  `chat-navbar/`, `chat-message-bar/`. Figma: Chat-navbar (902:1874, one
+  component) and Chat-message-bar (904:3354, State x Replying, 6 variants);
+  every binding read.
+- **A button per handler** (decided 2026-10-20): Figma's `👀 Back`,
+  `Search`, `Voice-call`, `Video-call`, `More`, `Close` booleans become
+  `onBack` … `onClose`; a button shows when its handler is given, so a
+  shown button always does something. The same for the message bar's field
+  icons (`onEmoji`, `onSticker`, `onAttach`), which Figma always draws.
+- Navbar icons are fixed by the component (Figma's), so Bland ships them:
+  Phone and VideoCamera joined the icon set. `moreItems` + `onMoreAction`
+  turn More into a Menu trigger (bottom-end), as TableOptionCell.
+- Navbar from Figma: `<header>`, surface-100, padding space-sm space-md,
+  gap space-lg, user group gap space-sm, actions gap space-xs, sm ghost
+  Icon Buttons (icon-bold), Avatar md, name body-lg-bold `text-bold` (an
+  h2, `nameAs`), description body-sm `text-subtle`. Figma's divider is an
+  absolute stroke-sm `border-subtle` rectangle; code draws it as an inset
+  bottom shadow, so the bar stays 56.
+- **Message bar state is derived, not a prop:** filled = the text has
+  non-space characters; rest shows the record button (Microphone) only
+  with `onRecordStart`, otherwise send stays and is disabled while empty;
+  `recording` is the project's state (it owns the recorder), with
+  `recordingTime` in a Chip md + Indicator sm danger (Figma's timer).
+- **Sending:** the send button or Enter calls `onSend(text)`; Shift+Enter
+  is a new line; IME composition never sends. Uncontrolled, the field
+  clears after sending.
+- **The textarea grows with its lines** (`field-sizing: content`, code
+  only; Figma's field is one line at input/md). No cap: there is no token
+  for one (raised on the tracker). The send button stays at the bottom.
+- From Figma: root gap space-xs; reply panel Messaging/surface-reply,
+  inside stroke-sm `Messaging/border-reply`, rad-md, padding space-sm
+  space-md, gap space-sm, ArrowBendUpLeft icon/md icon-subtle, "Replying
+  to" body-sm `text-subtle` + name body-sm-bold, message body-lg
+  `text-bold` (one line each), close control/xs rad-rd
+  `Messaging/surface-reply-close` with an icon/sm X in icon-brand. Row gap
+  space-sm; field Messaging/surface-messagebar, inside stroke-sm
+  `border-input`, rad-md, padding 0 space-md, gap space-sm, icons icon/md
+  icon-subtle (Trash icon-danger); send md primary brand Icon Button.
+- Field icons are plain 20px buttons (rad-xs ring, icon-bold on hover);
+  Figma draws icons, not Icon Buttons. Placeholder `text-subtle` (Text
+  Input's). Disabled is Text Input's look (border-subtle, text-minimal,
+  icon-minimal). The ring sits on the field while the textarea has focus.
 
 ## 7. The docs site (`npm run docs`, 2026-10-17)
 
