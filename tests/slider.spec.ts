@@ -130,6 +130,79 @@ test('a range gets a field each side, kept on its side of the other thumb', asyn
   await expect(slider(page, 'Maximum Price')).toHaveValue('85');
 });
 
+test('snap: keys step from checkpoint to checkpoint', async ({ page }) => {
+  const input = slider(page, 'Snap single');
+  await expect(input).toHaveValue('50');
+  await input.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(input).toHaveValue('75');
+  await page.keyboard.press('PageUp');
+  await expect(input).toHaveValue('100');
+  await page.keyboard.press('ArrowRight');
+  await expect(input).toHaveValue('100');
+  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('ArrowLeft');
+  await expect(input).toHaveValue('50');
+  await page.keyboard.press('Home');
+  await expect(input).toHaveValue('0');
+  // An array of checkpoints, unevenly spaced.
+  const array = slider(page, 'Snap array');
+  await array.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(array).toHaveValue('50');
+  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('ArrowLeft');
+  await expect(array).toHaveValue('10');
+});
+
+test('snap: a drag and a track press land on the nearest checkpoint', async ({ page }) => {
+  const input = slider(page, 'Snap single');
+  await group(page, 'Snap single').scrollIntoViewIfNeeded();
+  const near = await pointAt(page, 'Snap single', 0.68);
+  await page.mouse.click(near.x, near.y);
+  await expect(input).toHaveValue('75');
+  const thumb = (await thumbOf(input).boundingBox())!;
+  await page.mouse.move(thumb.x + thumb.width / 2, thumb.y + thumb.height / 2);
+  await page.mouse.down();
+  const to = await pointAt(page, 'Snap single', 0.3);
+  await page.mouse.move(to.x, to.y, { steps: 8 });
+  await expect(input).toHaveValue('25');
+  // The thumb sits on its checkpoint, not under the pointer.
+  const moved = (await thumbOf(input).boundingBox())!;
+  const at = await pointAt(page, 'Snap single', 0.25);
+  expect(Math.abs(moved.x + moved.width / 2 - at.x)).toBeLessThan(1);
+  await page.mouse.up();
+});
+
+test('snap: a range stays on checkpoints and its thumbs never cross', async ({ page }) => {
+  const start = slider(page, 'Minimum Snap range');
+  const end = slider(page, 'Maximum Snap range');
+  await expect(start).toHaveValue('0');
+  await expect(end).toHaveValue('100');
+  await start.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(start).toHaveValue('33');
+  await end.focus();
+  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('ArrowLeft');
+  await expect(end).toHaveValue('33');
+  await page.keyboard.press('ArrowLeft');
+  await expect(end).toHaveValue('33');
+});
+
+test('snap: a typed value goes to the nearest checkpoint', async ({ page }) => {
+  const input = slider(page, 'Snap field');
+  const field = page.getByRole('textbox', { name: 'Snap field', exact: true });
+  await field.fill('30');
+  await field.press('Enter');
+  await expect(input).toHaveValue('50');
+  await expect(field).toHaveValue('50');
+  await field.fill('80');
+  await field.press('Enter');
+  await expect(input).toHaveValue('100');
+  await expect(field).toHaveValue('100');
+});
+
 test('disabled: no focus, no keys, no field', async ({ page }) => {
   await expect(slider(page, 'Disabled single')).toBeDisabled();
   await expect(slider(page, 'Minimum Disabled double')).toBeDisabled();

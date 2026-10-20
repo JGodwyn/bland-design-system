@@ -369,6 +369,12 @@ normally), not in the pane.
 
 ## Tooling
 
+**Playwright's mouse misses points below the viewport.** A Slider spec
+clicked a track 1352px down a 768px page and nothing happened (`boundingBox`
+gives page coordinates, `page.mouse` acts on the viewport). → Call
+`scrollIntoViewIfNeeded()` on the element before computing coordinates
+for `page.mouse`.
+
 **Port 5180 is fixed** (`strictPort`) because Playwright and the docs both expect
 it. A dev server left running from an earlier session makes `npm run docs` fail
 with "Port 5180 is already in use", and Playwright's `reuseExistingServer`

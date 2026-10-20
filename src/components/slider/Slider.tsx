@@ -34,6 +34,12 @@ interface SliderBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultV
    */
   labels?: boolean | number | readonly number[];
   /**
+   * Snaps the thumbs to checkpoints on the scale. `true` uses the labels' values (five from `min` to `max` when the
+   * labels are off), an array uses exactly those values. A drag lands on the nearest checkpoint, arrows and Page Up
+   * and Down move to the next one, Home and End to the first and last, a typed value to the nearest. Default false.
+   */
+  snap?: boolean | readonly number[];
+  /**
    * Figma `👀 Input field`: a value field (Text Input, slider/input-width wide) to type a value into, committed
    * on Enter or blur. A range gets two, the start before the track and the end after it.
    */
@@ -91,6 +97,30 @@ function scaleValues(labels: SliderBaseProps['labels'], min: number, max: number
     const raw = min + ((max - min) * i) / (count - 1);
     return Math.min(max, Math.max(min, min + Math.round((raw - min) / step) * step));
   });
+}
+
+/**
+ * Moves each changed thumb to a checkpoint. From a drag or a typed value it takes the nearest; from a key, when the
+ * nearest is where the thumb already is (an arrow moves a step, too little to reach the next), it goes on to the next
+ * checkpoint that way. A range's thumbs stay on their own side of each other.
+ */
+function snapValues(next: number[], current: number[], points: number[], fromKey: boolean): number[] {
+  const out = [...current];
+  next.forEach((raw, i) => {
+    const now = current[i] ?? raw;
+    if (raw === now) return;
+    const low = out[i - 1] ?? -Infinity;
+    const high = current[i + 1] ?? Infinity;
+    const allowed = points.filter((v) => v >= low && v <= high);
+    if (allowed.length === 0) return;
+    let pick = allowed.reduce((best, v) => (Math.abs(v - raw) < Math.abs(best - raw) ? v : best));
+    if (fromKey && pick === now) {
+      const onward = raw > now ? allowed.filter((v) => v > now) : allowed.filter((v) => v < now).reverse();
+      pick = onward[0] ?? now;
+    }
+    out[i] = pick;
+  });
+  return out;
 }
 
 /** A thumb: Figma `_knob`, a circle with a dot, over a visually hidden range input that takes focus and keys. */
@@ -222,6 +252,7 @@ export function Slider(props: SliderProps) {
     max = 100,
     step = 1,
     labels = true,
+    snap = false,
     inputField = false,
     tooltip = true,
     formatOptions,
@@ -254,6 +285,25 @@ export function Slider(props: SliderProps) {
 
   const toArray = (v: number | readonly number[] | undefined) => (v === undefined ? undefined : typeof v === 'number' ? [v] : [...v]);
   const fromArray = (v: number[]) => (double ? [v[0], v[1]] : v[0]) as never;
+
+  // Snapping: the checkpoints, sorted and inside min to max. The slider is then always controlled here, so each
+  // change can be moved to a checkpoint before anyone sees it.
+  const points =
+    snap === false
+      ? null
+      : [...new Set(snap === true ? scaleValues(labels === false ? true : labels, min, max, step) : snap)]
+          .filter((v) => v >= min && v <= max)
+          .sort((a, b) => a - b);
+  const checkpoints = points ?? [];
+  const snapping = checkpoints.length > 0;
+  const initial = toArray(defaultValue) ?? (double ? [min, max] : [min]);
+  const [own, setOwn] = useState(() =>
+    snapping ? initial.map((v) => checkpoints.reduce((best, p) => (Math.abs(p - v) < Math.abs(best - v) ? p : best))) : initial,
+  );
+  const current = toArray(value) ?? own;
+  // Whether the change comes from a thumb's keys (step on to the next checkpoint) or a drag or a field (the nearest).
+  const fromKey = useRef(false);
+
   const ariaProps = {
     id: groupId,
     'aria-label': ariaLabel,
@@ -262,9 +312,21 @@ export function Slider(props: SliderProps) {
     maxValue: max,
     step,
     isDisabled: disabled,
-    value: toArray(value),
-    defaultValue: toArray(defaultValue) ?? (double ? [min, max] : [min]),
-    onChange: (next: number[]) => onValueChange?.(fromArray(next)),
+    ...(snapping
+      ? {
+          value: current,
+          onChange: (next: number[]) => {
+            const snapped = snapValues(next, current, checkpoints, fromKey.current);
+            if (snapped.every((v, i) => v === current[i])) return;
+            if (value === undefined) setOwn(snapped);
+            onValueChange?.(fromArray(snapped));
+          },
+        }
+      : {
+          value: toArray(value),
+          defaultValue: initial,
+          onChange: (next: number[]) => onValueChange?.(fromArray(next)),
+        }),
     onChangeEnd: (next: number[]) => onValueCommit?.(fromArray(next)),
   };
   const numberFormatter = useNumberFormatter(formatOptions);
@@ -293,7 +355,16 @@ export function Slider(props: SliderProps) {
   return (
     <div
       {...mergeProps(rest, groupProps)}
+      onKeyDownCapture={(event) => {
+        fromKey.current = (event.target as HTMLElement).matches('input[type="range"]');
+        rest.onKeyDownCapture?.(event);
+      }}
+      onPointerDownCapture={(event) => {
+        fromKey.current = false;
+        rest.onPointerDownCapture?.(event);
+      }}
       className={`bland-slider${className ? ` ${className}` : ''}`}
+      data-snap={snapping || undefined}
       style={style}
       data-size={size}
       data-type={double ? 'double' : 'single'}

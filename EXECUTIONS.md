@@ -1268,3 +1268,22 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Spec 19 tests (token values, centring). Re-baselined sidebar;
   `npm test` 609 pass.
 
+## Slider snap to checkpoints (2026-10-20)
+
+- Godwin asked for the Slider to snap to the scale's numbers (25, 50, 75),
+  settable in code.
+- Added `snap` (true = the labels' values, or an array). React Aria's
+  slider state only steps evenly, so with `snap` the Slider holds the
+  value and moves every reported change to a checkpoint: nearest for a
+  drag, press or typed value; the next one for a key on a thumb (an
+  arrow's one step never reaches it). Decided: discrete snapping, not a
+  magnetic pull near the marks.
+- TypeScript's unchecked index access flagged the neighbour lookups;
+  fixed with `??` fallbacks.
+- Spec: four snap tests (keys, drag and press, range, field). The press
+  test first failed because the story row sat below the 768 viewport:
+  Playwright's mouse misses off-screen points (scrolled it into view).
+- Story: a snap row (labels, range of four, field, uneven array);
+  re-baselined slider light/dark.
+- Bash's permission check kept failing mid-task, so runs came in bursts.
+

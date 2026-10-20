@@ -16,10 +16,11 @@ export default {
   components: ['Slider'],
   demo: {
     component: 'Slider',
-    args: { type: 'single', size: 'sm', labels: true, inputField: false, tooltip: true, disabled: false, 'aria-label': 'Volume' },
+    args: { type: 'single', size: 'sm', labels: true, snap: false, inputField: false, tooltip: true, disabled: false, 'aria-label': 'Volume' },
     controls: {
       type: { kind: 'select', options: ['single', 'double'] },
       labels: { kind: 'select', options: Object.keys(labelOptions) },
+      snap: { kind: 'boolean' },
       'aria-label': { kind: 'text' },
       value: false,
       defaultValue: false,
@@ -76,6 +77,13 @@ export default {
           <Slider key={size} size={size} inputField defaultValue={50} aria-label={`Field ${size}`} />
         ))}
         <Slider type="double" inputField labels={3} defaultValue={[20, 80]} aria-label="Price" />
+      </div>
+      <div className="pg-stack">
+        <span className="pg-label">snap: to the labels (single, range of 4, with a field); to an array</span>
+        <Slider snap defaultValue={50} aria-label="Snap single" />
+        <Slider type="double" snap labels={4} defaultValue={[0, 100]} aria-label="Snap range" />
+        <Slider snap labels={3} inputField defaultValue={50} aria-label="Snap field" />
+        <Slider snap={[0, 10, 20, 50, 100]} labels={[0, 10, 20, 50, 100]} defaultValue={20} aria-label="Snap array" />
       </div>
       <div className="pg-stack">
         <span className="pg-label">Disabled</span>

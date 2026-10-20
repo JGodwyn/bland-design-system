@@ -1376,6 +1376,21 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   Minimum"). Fields line up with the track row, not with track and labels
   together (Figma centres the whole column). With two fields the track is
   short: use fewer labels.
+- **Snap to checkpoints** (Godwin 2026-10-20, code only; Figma has no
+  property for it): `snap` true keeps the thumbs on the labels' values
+  (the default five when labels are off), an array keeps them on exactly
+  those values, which need not be evenly spaced or match the labels.
+  Default false. A drag or a track press lands on the nearest checkpoint
+  (the thumb jumps, it does not follow the pointer between them); arrows
+  and Page Up and Down step to the next checkpoint that way, Home and End
+  to the first and last; a typed field value goes to the nearest. A
+  range's thumbs stay on their side of each other. How: React Aria's
+  state has only an even `step`, so with `snap` the Slider holds the
+  value itself and moves every change React Aria reports to a
+  checkpoint; a keydown on a thumb's range input marks the change as
+  from a key (step on), anything else takes the nearest. A first value
+  off the checkpoints starts on the nearest one; a controlled `value` is
+  shown as given.
 - Not RTL-aware yet.
 
 ### Calendar, Date Picker, Date Range Picker, Time Picker (2026-10-19)
