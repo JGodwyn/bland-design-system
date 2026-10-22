@@ -1,4 +1,5 @@
 // Data the docs site reads: the generated tokens, the generated props, and the component stories.
+import type { ComponentType } from 'react';
 import tokensFile from '../../tokens/tokens.json';
 import type { Story } from '../story';
 
@@ -41,12 +42,15 @@ export const stylePages = [
   { id: 'colors', title: 'Colors' },
   { id: 'typography', title: 'Typography' },
   { id: 'spacing', title: 'Spacing' },
-  { id: 'radius', title: 'Corner radius' },
-  { id: 'stroke', title: 'Stroke' },
+  { id: 'icons', title: 'Icons' },
+  { id: 'sizing', title: 'Sizing' },
+  { id: 'breakpoints', title: 'Breakpoints' },
   { id: 'elevation', title: 'Elevation' },
   { id: 'motion', title: 'Motion' },
-  { id: 'breakpoints', title: 'Breakpoints' },
-  { id: 'sizing', title: 'Sizing' },
-  { id: 'icons', title: 'Icons' },
+  { id: 'radius', title: 'Corner radius' },
+  { id: 'stroke', title: 'Stroke' },
 ] as const;
 export type StylePageId = (typeof stylePages)[number]['id'];
+
+/** A page of the docs, in sidebar order: what the previous and next buttons and the search walk through. */
+export type DocsPage = { href: string; title: string; kind: 'overview' | 'style' | 'component'; description: string; icon?: ComponentType };

@@ -1,9 +1,12 @@
 /*
  * Scroll area: the overflow rule in one component (CLAUDE.md, "Overflow").
- * A masked viewport (.bland-scroll-fade) plus an always-visible overlay thumb, Figma's _scrollbar:
- * Scrollbar/thumb, scrollbar/width, 4 in from the scrolling edge, outside the mask so the fade
- * never hides it. The native scrollbar is hidden; wheel, touch and keyboard scrolling stay native.
- * ScrollArea.tsx sets data-overflow, the fade edges and the thumb's size and position.
+ * A masked viewport (.bland-scroll-fade) plus an overlay thumb, Figma's _scrollbar: Scrollbar/thumb,
+ * scrollbar/width, 4 in from the scrolling edge, outside the mask so the fade never hides it. The
+ * thumb shows only while the area scrolls (data-scrolling, kept for duration/scrollbar-hide-delay
+ * after the last scroll), while it is dragged (data-dragging) or under the pointer, and fades in and
+ * out over duration/md (Godwin, 2026-10-22). The native scrollbar is hidden; wheel, touch and keyboard
+ * scrolling stay native. ScrollArea.tsx sets those attributes, data-overflow, the fade edges and the
+ * thumb's size and position.
  */
 .bland-scroll-area {
   position: relative;
@@ -56,8 +59,14 @@
   left: 0;
   border-radius: var(--rad-rd);
   background: var(--scrollbar-thumb);
+  opacity: 0;
   pointer-events: auto;
   touch-action: none;
+  transition: opacity var(--duration-md) var(--easing-out);
+}
+.bland-scroll-area:is([data-scrolling], [data-dragging]) > .bland-scroll-area__track > .bland-scroll-area__thumb,
+.bland-scroll-area__thumb:hover {
+  opacity: 1;
 }
 .bland-scroll-area[data-axis="y"] > .bland-scroll-area__track > .bland-scroll-area__thumb {
   width: 100%;

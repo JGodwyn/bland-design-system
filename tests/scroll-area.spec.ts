@@ -1,6 +1,6 @@
 // Behaviour of the overflow rule: fade edges and thumb follow the scroll position.
 import { expect, test } from '@playwright/test';
-import { openStory } from './stories';
+import { openStory, pickOption } from './stories';
 
 test('vertical scroll area shows the end fade at the top and both fades mid-way', async ({ page }) => {
   await openStory(page, 'scroll-area', 'light');
@@ -28,6 +28,23 @@ test('keyboard scrolling moves the thumb', async ({ page }) => {
   await expect.poll(async () => (await thumb.boundingBox())!.y).toBeGreaterThan(before!.y);
 });
 
+test('the thumb shows only while scrolling, then fades after duration/scrollbar-hide-delay', async ({ page }) => {
+  await openStory(page, 'scroll-area', 'light');
+  const area = page.getByTestId('scroll-y');
+  const thumb = area.locator('.bland-scroll-area__thumb');
+  const delay = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--duration-scrollbar-hide-delay')));
+  expect(delay).toBe(1000);
+  await expect(thumb).toHaveCSS('opacity', '0');
+  await area.locator('.bland-scroll-area__viewport').evaluate((el) => (el.scrollTop = 60));
+  await expect(area).toHaveAttribute('data-scrolling', '');
+  await expect(thumb).toHaveCSS('opacity', '1');
+  await expect(area).not.toHaveAttribute('data-scrolling', { timeout: delay + 1000 });
+  await expect(thumb).toHaveCSS('opacity', '0');
+  // Under the pointer it shows again, so it can be grabbed.
+  await thumb.hover();
+  await expect(thumb).toHaveCSS('opacity', '1');
+});
+
 test('content that fits shows no scrollbar and no fade', async ({ page }) => {
   await openStory(page, 'scroll-area', 'light');
   const area = page.getByTestId('scroll-fits');
@@ -53,13 +70,13 @@ test('switching the axis keeps the thumb the scrollbar width', async ({ page }) 
   const width = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--scrollbar-width')));
   await expect.poll(async () => Math.round((await thumb.boundingBox())!.width)).toBe(width);
 
-  await page.getByLabel('axis').selectOption('x');
+  await pickOption(page, 'axis', 'x');
   await expect.poll(async () => Math.round((await thumb.boundingBox())!.height)).toBe(width);
   // And it stays inside the area, on its bottom edge.
   const area = (await page.locator('.docs-demo-stage .bland-scroll-area').boundingBox())!;
   const box = (await thumb.boundingBox())!;
   expect(box.y + box.height).toBeLessThanOrEqual(area.y + area.height);
 
-  await page.getByLabel('axis').selectOption('y');
+  await pickOption(page, 'axis', 'y');
   await expect.poll(async () => Math.round((await thumb.boundingBox())!.width)).toBe(width);
 });

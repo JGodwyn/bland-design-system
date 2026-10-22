@@ -1,39 +1,53 @@
 // Small pieces shared by the docs pages.
-import { useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { CodeText } from '../../src/components/code-snippet/CodeText';
+import { IconButton } from '../../src/components/button/IconButton';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../../src/components/table/Table';
+import { CaretLeftIcon, CaretRightIcon } from '../../src/icons';
 import type { Token } from './data';
+import { docsPages } from './pages';
 
-/** A CSS variable name that copies itself on click. */
+/** A CSS variable name as Code text, with its copy button. */
 export function TokenName({ css }: { css: string }) {
-  const [copied, setCopied] = useState(false);
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(`var(${css})`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1200);
-    } catch {
-      /* Clipboard refused: the name stays selectable. */
-    }
-  };
   return (
-    <button type="button" className="docs-token bland-focus-ring" onClick={copy} title={`Copy var(${css})`}>
-      {copied ? 'Copied' : css}
-    </button>
+    <CodeText size="md" copyable className="docs-token">
+      {css}
+    </CodeText>
   );
 }
 
-export function PageHeader({ title, eyebrow, children }: { title: string; eyebrow: string; children?: ReactNode }) {
+/**
+ * A page's title with buttons to the previous and next page in sidebar order, then its lead text and
+ * anything else that belongs to the introduction (a component's import line). The contents rail
+ * lists it as Installation on component pages.
+ */
+export function PageHeader({ title, href, children }: { title: string; href: string; children?: ReactNode }) {
+  const at = docsPages.findIndex((p) => p.href === href);
+  const prev = at > 0 ? docsPages[at - 1] : undefined;
+  const next = at >= 0 && at < docsPages.length - 1 ? docsPages[at + 1] : undefined;
+  const go = (to: string) => () => {
+    location.hash = to;
+  };
   return (
-    <header className="docs-page-header">
-      <div className="docs-eyebrow">{eyebrow}</div>
-      <h1>{title}</h1>
+    <header className="docs-page-header" id="installation" data-toc={href.startsWith('#/components/') ? 'Installation' : 'Introduction'}>
+      <div className="docs-title-row">
+        <h1>{title}</h1>
+        <div className="docs-pager">
+          <IconButton size="sm" type="stroke" icon={<CaretLeftIcon />} aria-label={prev ? `Previous: ${prev.title}` : 'Previous'} disabled={!prev} onClick={prev && go(prev.href)} />
+          <IconButton size="sm" type="stroke" icon={<CaretRightIcon />} aria-label={next ? `Next: ${next.title}` : 'Next'} disabled={!next} onClick={next && go(next.href)} />
+        </div>
+      </div>
       {children && <div className="docs-lead">{children}</div>}
     </header>
   );
 }
 
-export function Section({ title, children, note }: { title: string; children: ReactNode; note?: ReactNode }) {
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+/** A titled section, listed in the page contents rail under its title. */
+export function Section({ id, title, children, note }: { id?: string; title: string; children: ReactNode; note?: ReactNode }) {
   return (
-    <section className="docs-section">
+    <section className="docs-section" id={id ?? slug(title)} data-toc={title}>
       <h2>{title}</h2>
       {note && <p className="docs-note">{note}</p>}
       {children}
@@ -56,35 +70,33 @@ export function Values({ token }: { token: Token }) {
   );
 }
 
-/** A table of tokens with a visual sample per row. */
+/** A table of tokens with a visual sample per row, in Bland's Table (as the props tables). */
 export function TokenTable({ items, sample, sampleLabel = 'Sample' }: { items: Token[]; sample?: (t: Token) => ReactNode; sampleLabel?: string }) {
   return (
-    <div className="docs-table-wrap">
-      <table className="docs-table">
-        <thead>
-          <tr>
-            {sample && <th scope="col">{sampleLabel}</th>}
-            <th scope="col">Token</th>
-            <th scope="col">Value</th>
-            <th scope="col">Use</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((t) => (
-            <tr key={t.css}>
-              {sample && <td className="docs-sample-cell">{sample(t)}</td>}
-              <td>
-                <TokenName css={t.css} />
-                <div className="docs-figma-name">{t.name}</div>
-              </td>
-              <td>
-                <Values token={t} />
-              </td>
-              <td className="docs-desc">{t.description}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Table size="md" className="docs-data docs-tokens" data-sample={sample ? '' : undefined} aria-label={items[0] ? `${items[0].collection} tokens` : 'Tokens'}>
+      <TableHead>
+        <TableRow>
+          {sample && <TableHeaderCell>{sampleLabel}</TableHeaderCell>}
+          <TableHeaderCell>Token</TableHeaderCell>
+          <TableHeaderCell>Value</TableHeaderCell>
+          <TableHeaderCell>Use</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {items.map((t) => (
+          <TableRow key={t.css}>
+            {sample && <TableCell>{sample(t)}</TableCell>}
+            <TableCell>
+              <TokenName css={t.css} />
+              <span className="docs-figma-name">{t.name}</span>
+            </TableCell>
+            <TableCell>
+              <Values token={t} />
+            </TableCell>
+            <TableCell>{t.description}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }

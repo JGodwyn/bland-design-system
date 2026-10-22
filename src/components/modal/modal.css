@@ -24,7 +24,7 @@
  */
 
 .bland-modal {
-  --bland-radius: var(--rad-md);
+  --bland-radius: var(--rad-lg);
   --bland-modal-width: var(--modal-width-sm);
   --_backdrop: var(--modal-backdrop-subtle);
 

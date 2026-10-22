@@ -22,3 +22,9 @@ export async function openStory(page: Page, id: string, theme: (typeof themes)[n
   await page.getByTestId(`frame-${theme}`).waitFor();
   await page.evaluate(() => document.fonts.ready);
 }
+
+/** Picks an option in a docs playground control (a Bland Dropdown: its trigger is #ctl-<prop>). */
+export async function pickOption(page: Page, prop: string, option: string) {
+  await page.locator(`#ctl-${prop}`).click();
+  await page.getByRole('option', { name: option, exact: true }).click();
+}

@@ -6,7 +6,7 @@ const rows = Array.from({ length: 24 }, (_, i) => `Row ${i + 1}`);
 export default {
   title: 'Scroll area',
   description:
-    'Every scroll area that overflows shows a visible scrollbar and an edge fade, always both. The fade appears only on edges with hidden content. Use the sm fade in compact areas such as Menu. Truncated text is not overflow: it ends in an ellipsis.',
+    'Every scroll area that overflows shows an edge fade, and a scrollbar while it scrolls (it fades out a second after scrolling stops). The fade appears only on edges with hidden content. Use the sm fade in compact areas such as Menu. Truncated text is not overflow: it ends in an ellipsis.',
   components: ['ScrollArea'],
   demo: {
     component: 'ScrollArea',

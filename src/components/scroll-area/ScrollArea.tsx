@@ -1,4 +1,5 @@
 import { useCallback, useLayoutEffect, useRef, type HTMLAttributes, type ReactNode } from 'react';
+import { tokenMs } from '../overlay/floating';
 import './scroll-fade.css';
 import './scroll-area.css';
 
@@ -11,15 +12,17 @@ export interface ScrollAreaProps extends HTMLAttributes<HTMLDivElement> {
   /** Extra props for the scrolling element, e.g. a role or an aria-label. */
   viewportProps?: HTMLAttributes<HTMLDivElement>;
   /**
-   * Draws the visible thumb. Default true, as the overflow rule asks; tab rows turn it off and show more
-   * content with the fade alone (Godwin, 2026-10-19).
+   * Draws the thumb, which shows while the area scrolls (Godwin, 2026-10-22). Default true, as the overflow
+   * rule asks; tab rows turn it off and show more content with the fade alone (Godwin, 2026-10-19).
    */
   scrollbar?: boolean;
 }
 
 /**
- * Every scroll area that overflows shows a visible scrollbar and an edge fade (CLAUDE.md, "Overflow").
- * Size it from outside (a max-height or a flex parent); it scrolls when its content is larger.
+ * Every scroll area that overflows shows an edge fade, and a scrollbar while it scrolls (CLAUDE.md, "Overflow"):
+ * the thumb appears on scroll and fades out duration/scrollbar-hide-delay after the last scroll, unless it is
+ * held or under the pointer. Size it from outside (a max-height or a flex parent); it scrolls when its content
+ * is larger.
  */
 export function ScrollArea({
   children,
@@ -67,16 +70,27 @@ export function ScrollArea({
   }, [axis]);
 
   useLayoutEffect(() => {
+    const root = rootRef.current;
     const vp = viewportRef.current;
     const content = contentRef.current;
-    if (!vp || !content) return;
+    if (!root || !vp || !content) return;
     update();
-    vp.addEventListener('scroll', update, { passive: true });
+    // Only a scroll shows the thumb (a resize or a content change does not); it hides once scrolling has
+    // stopped for the delay.
+    let hide: ReturnType<typeof setTimeout> | undefined;
+    const onScroll = () => {
+      update();
+      root.setAttribute('data-scrolling', '');
+      clearTimeout(hide);
+      hide = setTimeout(() => root.removeAttribute('data-scrolling'), tokenMs('--duration-scrollbar-hide-delay'));
+    };
+    vp.addEventListener('scroll', onScroll, { passive: true });
     const ro = new ResizeObserver(update);
     ro.observe(vp);
     ro.observe(content);
     return () => {
-      vp.removeEventListener('scroll', update);
+      clearTimeout(hide);
+      vp.removeEventListener('scroll', onScroll);
       ro.disconnect();
     };
   }, [update]);
@@ -94,12 +108,14 @@ export function ScrollArea({
     const max = (y ? vp.scrollHeight - vp.clientHeight : vp.scrollWidth - vp.clientWidth) || 1;
     const travel = (y ? track.clientHeight - thumb.offsetHeight : track.clientWidth - thumb.offsetWidth) || 1;
     thumb.setPointerCapture(e.pointerId);
+    rootRef.current?.setAttribute('data-dragging', '');
     const move = (ev: PointerEvent) => {
       const delta = ((y ? ev.clientY : ev.clientX) - start) * (max / travel);
       if (y) vp.scrollTop = startScroll + delta;
       else vp.scrollLeft = startScroll + delta;
     };
     const up = () => {
+      rootRef.current?.removeAttribute('data-dragging');
       thumb.removeEventListener('pointermove', move);
       thumb.removeEventListener('pointerup', up);
       thumb.removeEventListener('pointercancel', up);

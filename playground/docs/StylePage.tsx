@@ -5,6 +5,7 @@ import { Button } from '../../src/components/button/Button';
 import { Icon } from '../../src/components/icon/Icon';
 import * as BlandIcons from '../../src/icons';
 import { groupBy, inCollection, stylePages, tokensExportedAt, type StylePageId, type Token } from './data';
+import { leads } from './leads';
 import { PageHeader, Section, TokenName, TokenTable } from './parts';
 
 const v = (t: Token) => `var(${t.css})`;
@@ -15,29 +16,16 @@ export function StylePage({ id }: { id: StylePageId }) {
   const Page = pages[id];
   return (
     <>
-      <PageHeader eyebrow="Styles" title={title}>
+      <PageHeader title={title} href={`#/styles/${id}`}>
         {leads[id]}
       </PageHeader>
       <Page />
       <p className="docs-footnote">
-        Generated from <code>tokens/tokens.json</code>, exported from Figma {new Date(tokensExportedAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}. Click a token name to copy it.
+        Generated from <code>tokens/tokens.json</code>, exported from Figma {new Date(tokensExportedAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}. Copy a token name with the button beside it.
       </p>
     </>
   );
 }
-
-const leads: Record<StylePageId, string> = {
-  colors: 'Theme colors switch between Light and Dark. Components use only these tokens, never the primitives behind them. Use the theme switch to see both.',
-  typography: 'Inter for interface text, Geist Mono for code. Use a text style as one value: font: var(--type-body-md).',
-  spacing: 'Padding and gaps. Steps follow value order, from space-none to space-9xl.',
-  radius: 'Every rounded corner is drawn with 100% corner smoothing in Figma; in code, set the radius as --bland-radius and add the bland-smooth class.',
-  stroke: 'Border, icon and focus ring weights.',
-  elevation: 'Each elevation is one box-shadow: a tight ambient layer and a soft key layer. Colors switch in dark mode.',
-  motion: 'Durations and easings for every transition. UI motion stays at or under duration-lg; see docs/motion.md for the rules.',
-  breakpoints: 'Mobile first: base styles are mobile, md starts the tablet layout and xl the desktop layout. Media queries use the pixel value; the tokens are for JavaScript.',
-  sizing: 'Component dimensions: heights, slots, widths and icon sizes.',
-  icons: 'Bland ships no icon pack: any SVG works in an icon slot. These are Bland’s own icons, exported from the Figma Icons page, used inside components.',
-};
 
 const pages: Record<StylePageId, () => ReactElement> = {
   colors: ColorsPage,
@@ -175,7 +163,7 @@ function IconsPage() {
             <Icon size="lg">
               <Glyph />
             </Icon>
-            <figcaption>{name}</figcaption>
+            <figcaption title={name}>{name}</figcaption>
           </figure>
         ))}
       </div>

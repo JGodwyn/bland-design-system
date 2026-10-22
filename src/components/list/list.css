@@ -19,9 +19,10 @@
  * hover and pressed fills. The row fills its container: list/width (384) is Figma's frame
  * default ("Use Fill container in layouts").
  *
- * Heights: Figma fixes 1 line rows at 40 and 2 line rows at 64 (unbound) and centres the
- * content, so its space-md padding never shows there. Code pads 1 and 2 line rows space-sm
- * above and below: 8 + 24 + 8 = 40, 8 + 46 + 8 = 62. 3+ line rows hug, as in Figma.
+ * Heights: 1 line rows pad space-xs above and below, flush or not: 4 + 24 + 4 = 32, as in Figma
+ * (2026-10-22). Figma fixes 2 line rows at 64 (unbound) and centres the content, so its
+ * space-md padding never shows there; code pads them space-sm: 8 + 46 + 8 = 62. 3+ line rows
+ * hug, as in Figma.
  */
 
 .bland-list-item {
@@ -60,7 +61,7 @@
 /* ---- Lines: padding, alignment and the leading slot's size ---- */
 
 .bland-list-item[data-lines="1"] > .bland-list-item__row {
-  padding-inline: var(--space-md);
+  padding: var(--space-xs) var(--space-md);
 }
 
 /* 3+ lines: content and slots sit at the top, and the row hugs its text. */
@@ -69,12 +70,16 @@
   padding-block: var(--space-md);
 }
 
-/* Flush: no resting fill, no radius, space-sm above and below, space-2xs at the sides. */
+/* Flush: no resting fill, no radius, space-sm above and below (space-xs on 1 line rows), space-2xs at the sides. */
 .bland-list-item[data-flush] > .bland-list-item__row {
   --bland-radius: var(--rad-null);
   --_bg: transparent;
 
   padding: var(--space-sm) var(--space-2xs);
+}
+
+.bland-list-item[data-flush][data-lines="1"] > .bland-list-item__row {
+  padding-block: var(--space-xs);
 }
 
 /* A focused row paints above its neighbours, so the next row's fill never covers the ring's offset. */

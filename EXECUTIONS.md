@@ -1287,3 +1287,109 @@ not wrapped; rail contents centred (logo and account icon were off).
   re-baselined slider light/dark.
 - Bash's permission check kept failing mid-task, so runs came in bursts.
 
+## Docs site redesign from Figma, List and Modal updates (2026-10-22)
+
+- Godwin mocked the docs in Figma (section "Doc Design update", 6612:88042: Alert page, Overview, three
+  search states) and listed: segmented theme toggle, full code under the playground, props in Table, Bland
+  controls (toggle for booleans), "children" shown as "label", List 1 line padding 4, Modal radius 16, new
+  List fills, search.
+- `get_design_context` on the section came back as 2.5 MB of sparse metadata; switched to per-frame
+  screenshots and read-only `use_figma` walks for layout, styles and bindings, and exported the icons as
+  SVG strings (SunDim, Moon, Warehouse, the style page icons, ListDashes, Command, ListMagnifyingGlass,
+  ArrowUpRight, the Figma logo; Devices for Breakpoints, which the mockup lacks).
+- Drift check: 3 changed variables (List surface rest/hover/pressed, dark one step darker) and the
+  known `_Typography` meta change (still open in the tracker). Applied only the List records (result
+  saved with `metaChanged: false`). `npm run tokens`: 530 emitted.
+- Figma List: Lines=1 is 32 high, space-xs block padding (flush too); Modal: rad-lg. Applied in
+  list.css and modal.css; list spec 40 → 32.
+- Docs: new `pages.tsx` (page order, search), `icons.tsx`, `highlight.tsx`, `leads.ts`, `Search.tsx`;
+  rewrote `DocsApp`, `ComponentPage`, `Overview`, `parts`, `docs.css`. Moving `leads` out of
+  StylePage avoids an import cycle (parts → pages → StylePage → parts).
+- Browser checks on :5181 (5180 held by another docs server from this repo): theme bar truncated
+  (segments flex-basis 0, fixed with `flex: 1 0 auto`), playground border hidden under the panel (inset
+  shadow → border), props column widths ignored (Table's `max-width: 0`, specificity), a search result for
+  the current page left the dialog open (close on any result click), the query survived reopening (reset
+  on open). Dark mode, mobile (no sideways scroll), Dropdown controls driving demo and code checked.
+- Specs: docs.spec theme (system then remembered), code view, search, pager; `pickOption` helper for the
+  Dropdown controls (docs, empty-state, scroll-area specs).
+
+## Docs follow-ups: smooth contents scroll, sticky toolbar, search highlight, room (2026-10-22)
+
+- Godwin asked for: animated contents rail, sticky mode switcher and search, search resting on the first
+  item, and a less congested playground and props table.
+- Rail: `scrollIntoView({ behavior: 'smooth' })` unless reduced motion, plus `scroll-margin-top` on every
+  `[data-toc]` so sections clear the sticky bar (lands at 80px: 64 bar + space-lg).
+- Toolbar: `position: sticky` (top 0 from md, under the mobile top bar below), surface-100 fill,
+  `data-stuck` hairline from a scroll listener.
+- Search rewritten as a combobox (`aria-activedescendant`, options are the List rows' links via
+  `renderLink`); the old focus-walking arrows dropped. Spec now uses role combobox and checks the
+  highlight.
+- Room: page 960, playground as a container query (side by side at 880, stacked with two control columns
+  from 560), props table min-width 792. Checked at 1536 (side by side), 1440 (stacked) and 375.
+- Sampling `scrollY` from `javascript_tool` during a smooth scroll in the pane read a frozen value;
+  checked the end position instead.
+- docs, empty-state, scroll-area and a11y specs: 182 pass.
+
+## Docs round 3: scrollbars on scroll, toolbar fade, contents rail (2026-10-22)
+
+- Asked Godwin for the hide delay (no token fit); "use the standard and add it as a token": created
+  Motion `duration/scrollbar-hide-delay` = 1s in Figma (the first `use_figma` failed on `scopes`, which
+  TIMING variables reject, and rolled back), synced it with the drift check (records only, meta left
+  for the open Typography question): 531 tokens.
+- ScrollArea: `data-scrolling` on scroll, cleared after `tokenMs('--duration-scrollbar-hide-delay')`;
+  `data-dragging` while the thumb is held; thumb `opacity: 0` until then, `duration/md` `easing/out`.
+- Toolbar: hairline replaced by an `::after` gradient (surface-100 to transparent, fade/md), shown
+  while scrolled.
+- Contents rail: current entry = last whose top reached the toolbar bottom + space-2xl; clicks hold
+  the clicked entry until `scrollend`; variant cards (`data-toc-sub`) listed under Variants, expanded
+  while it is current. First try at the variant entries landed under the toolbar: the scroll margin
+  only covered `[data-toc]`.
+- The Browser pane was hidden, so its screenshots came back blank; took the fade and scrollbar
+  captures with a throwaway Playwright script instead.
+- Suite 618: 617 passed, Scroll Area dark screenshot changed; rewrote all screenshots, kept Scroll
+  Area, Code snippet, Table, Text Area (thumbs gone), reverted Breadcrumb, Section tab and a dropdown
+  shot that differed only by noise (they pass untouched).
+
+## Docs round 4: captions, Tab bar, rail, Code text (2026-10-22)
+
+- Captions inside the box (Modal, Table): the Variants splitter only recognised a pg-stack written
+  inline; Modal's `Row` and Table's `Group` render it. Now plain helper components are called to
+  reach it (hook components fall back to boxing as is). A scan of every component page found all
+  cards captioned except Code snippet's hook-based Controlled example, which got a caption in the
+  story. Remaining labels inside boxes are demo content (counters, slot text, output values).
+- Tab bar navigating to Overview: the splitter rebuilt the stack as a new div, dropping the story's
+  `onClickCapture` preventDefault and its max width; it now clones the stack. Fit-content made the
+  bar tight; stacks with a max width now fill it.
+- While rewriting Variants, cut the ZoomStage code by mistake (the replace ran to the next marker);
+  restored it from the saved copy before typechecking passed.
+- Rail: variant entries removed, list max 50vh, right padding space-2xl. Playground: border-subtle
+  dots, preview 520 / 440, Reset sm. Code text: `align-items: flex-start`, copy button height =
+  the size's line height; checked by forcing a wrap (button top = code top, 24 tall on lg).
+- Suite 618: 615 passed; Code snippet screenshots re-baselined (new caption), Section tab test
+  flaky as before (18 of 18 on repeat).
+
+## Docs round 5: token tables, timed copy, rail follows (2026-10-22)
+
+- Copy: no token fitted the "standard" wait; following Godwin's earlier "use the standard and add it
+  as a token", created Motion `duration/copied-visible` = 2s in Figma and synced it (records only; 532
+  tokens). `useCopy` now clears after `tokenMs('--duration-copied-visible')`; the pointer/blur reset
+  props are gone.
+- The copy spec first used `page.clock.install()` + `runFor`; installed clocks still advance in real
+  time, so under parallel load 2s passed before the check (12 of 12 failed with 6 workers). Rewrote it
+  to measure real elapsed time; 12 of 12 pass under load.
+- Token tables on Bland's Table, `.docs-data` shared with the props tables. While removing the old
+  table CSS I cut with an anchor that came before the start and duplicated a chunk of docs.css;
+  rebuilt it from its two halves and re-cut, then checked every recent rule was present once.
+- Rail: sliding bar (an aria-hidden `<li>`, since a `<ul>` takes only list items) and keep-in-view
+  scrolling of the rail's viewport; checked on Colors (28 sections): at the page bottom the current
+  entry is in view and the bar is level with it.
+- Suite 618: 617 passed; the copy test was the one failure (fixed as above).
+
+## Docs round 6: style order, token cells, table radius, icon cards (2026-10-22)
+
+- `stylePages` reordered as Godwin listed; everything that lists style pages reads it.
+- `TokenName` is now Code text md copyable (the old click-to-copy button and its CSS removed;
+  footnote reworded); `.docs-value` Code/body-md; `.docs-data` rad-md to rad-lg.
+- Icon cards: `min-width: 0`, side padding space-md, figcaption ellipsis with a title.
+- Checked Spacing and Icons with Playwright captures (the pane is hidden); docs spec 73 pass.
+

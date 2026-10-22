@@ -125,7 +125,7 @@ export default {
       {[false, true].map((flush) => (
         <div key={String(flush)} className="pg-stack">
           <span className="pg-label">
-            {flush ? 'flush: no resting fill, no radius' : 'Default'}: 1 line 40, 2 lines, 3+ lines; rest, then disabled
+            {flush ? 'flush: no resting fill, no radius' : 'Default'}: 1 line 32, 2 lines, 3+ lines; rest, then disabled
           </span>
           <Rows>
             <ListItem flush={flush} title="The Title" />

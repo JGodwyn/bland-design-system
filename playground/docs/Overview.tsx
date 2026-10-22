@@ -1,33 +1,65 @@
-import { inCollection, stories, stylePages, tokens } from './data';
+import { CodeSnippet } from '../../src/components/code-snippet/CodeSnippet';
+import { Icon } from '../../src/components/icon/Icon';
+import { inCollection, stories, tokens } from './data';
+import { highlight } from './highlight';
+import { ArrowUpRightIcon, FigmaLogo } from './icons';
+import { componentPageList, overviewPage, PageIcon, stylePageList } from './pages';
 import { PageHeader, Section } from './parts';
 
+const FIGMA_URL = 'https://www.figma.com/design/32J76yQH71a7sENjf60RqD/Bland-Design-System';
+
+const install = `import 'bland/tokens.css';
+import 'bland/fonts.css';
+import 'bland/base.css';
+import 'bland/styles.css';
+import { Button } from 'bland';
+
+export function Example() {
+  return <Button>Save</Button>;
+}
+`;
+
 export function Overview() {
-  const themed = inCollection('Theme').length;
+  const stats = [
+    { n: tokens.length, label: 'Tokens' },
+    { n: inCollection('Theme').length, label: 'Theme colors' },
+    { n: stories.length, label: 'Components' },
+  ];
   return (
     <>
-      <PageHeader eyebrow="Overview" title="Bland design system">
+      <PageHeader title="Bland Design System" href={overviewPage.href}>
         Bland is a reusable UI kit: light and dark themes, a brand color swapped per project, Inter and Geist Mono, and components built only on tokens.
         Figma is the source of truth; everything here is generated from the code.
       </PageHeader>
-      <div className="docs-stats">
-        <div className="docs-stat">
-          <span className="docs-stat-n">{tokens.length}</span>
-          <span className="docs-stat-l">tokens</span>
-        </div>
-        <div className="docs-stat">
-          <span className="docs-stat-n">{themed}</span>
-          <span className="docs-stat-l">theme colors</span>
-        </div>
-        <div className="docs-stat">
-          <span className="docs-stat-n">{stories.length}</span>
-          <span className="docs-stat-l">components built</span>
+      <div className="docs-hero">
+        <ul className="docs-stats docs-dots bland-smooth">
+          {stats.map((s) => (
+            <li key={s.label} className="docs-stat-frame bland-smooth">
+              <span className="docs-stat bland-smooth">
+                <span className="docs-stat-n">{s.n}</span>
+                <span className="docs-stat-l">{s.label}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <div className="docs-tile-frame bland-smooth">
+          <a className="docs-tile docs-figma-link bland-focus-ring bland-smooth" href={FIGMA_URL} target="_blank" rel="noreferrer">
+            <Icon size="md">
+              <FigmaLogo />
+            </Icon>
+            <span>View Figma file</span>
+            <Icon size="md" className="docs-tile-end">
+              <ArrowUpRightIcon />
+            </Icon>
+          </a>
         </div>
       </div>
       <Section title="Styles">
-        <ul className="docs-cards">
-          {stylePages.map((p) => (
-            <li key={p.id}>
-              <a className="docs-card bland-focus-ring bland-smooth" href={`#/styles/${p.id}`}>
+        <ul className="docs-tile-frame docs-cards docs-style-cards bland-smooth">
+          {stylePageList.map((p) => (
+            <li key={p.href}>
+              <a className="docs-tile docs-style-card bland-focus-ring bland-smooth" href={p.href}>
+                <PageIcon page={p} />
                 {p.title}
               </a>
             </li>
@@ -35,24 +67,18 @@ export function Overview() {
         </ul>
       </Section>
       <Section title="Components">
-        <ul className="docs-cards">
-          {stories.map((s) => (
-            <li key={s.id}>
-              <a className="docs-card bland-focus-ring bland-smooth" href={`#/components/${s.id}`}>
-                {s.story.title}
+        <ul className="docs-tile-frame docs-cards bland-smooth">
+          {componentPageList.map((p) => (
+            <li key={p.href}>
+              <a className="docs-tile bland-focus-ring bland-smooth" href={p.href}>
+                {p.title}
               </a>
             </li>
           ))}
         </ul>
       </Section>
       <Section title="Use it in a project">
-        <pre className="docs-code">
-          <code>{`import 'bland/tokens.css';
-import 'bland/fonts.css';
-import 'bland/base.css';
-import 'bland/styles.css';
-import { Button } from 'bland';`}</code>
-        </pre>
+        <CodeSnippet code={{ tsx: install }} languages={[{ id: 'tsx', label: 'React' }]} highlight={highlight} />
       </Section>
     </>
   );

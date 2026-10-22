@@ -1,7 +1,9 @@
 /*
  * Docs site chrome. Not part of the Bland package, so it is outside the token lint, but it uses
- * Bland's tokens wherever one fits. The few raw values are page-layout widths with no token.
- * Mobile first: the sidebar is a menu below the tablet breakpoint (768, breakpoint-md).
+ * Bland's tokens and components wherever one fits. The few raw values are page-layout widths with
+ * no token. Mobile first: the sidebar is a menu below the tablet breakpoint (768, breakpoint-md);
+ * the page contents rail shows from the desktop breakpoint (1280, breakpoint-xl).
+ * Layout follows the Figma Doc site page (Doc Design update, 2026-10-22).
  */
 
 .docs {
@@ -24,18 +26,20 @@
 }
 
 .docs-brand {
-  font: var(--type-title-md);
+  font: var(--type-heading-sm);
   color: var(--text-bold);
   text-decoration: none;
   border-radius: var(--rad-sm);
 }
+.docs-topbar .docs-brand {
+  font: var(--type-title-md);
+}
 
-/* ---- Sidebar ---- */
+/* ---- Sidebar: brand, then Overview, Foundations and Components ---- */
 .docs-sidebar {
   display: none;
   flex-direction: column;
   background: var(--surface-200);
-  border-right: var(--stroke-sm) solid var(--border-subtle);
 }
 .docs[data-menu-open] .docs-sidebar {
   display: flex;
@@ -43,18 +47,20 @@
   inset: 0;
   /* Below the top bar: its button plus its padding and border. */
   top: calc(var(--control-sm) + 2 * var(--space-sm) + var(--stroke-sm));
-  z-index: 1;
+  z-index: 3;
 }
 
 .docs-sidebar-head {
   display: none;
-  align-items: baseline;
+  flex-direction: column;
   gap: var(--space-sm);
-  padding: var(--space-xl) var(--space-xl) var(--space-lg);
+  /* Figma: the brand block sits space-4xl from the top, space-lg above and below, space-xl at the sides. */
+  padding: calc(var(--space-4xl) + var(--space-lg)) var(--space-xl) var(--space-lg);
 }
-.docs-version {
+.docs-descriptor {
   font: var(--type-body-sm);
   color: var(--text-subtle);
+  text-transform: uppercase;
 }
 
 .docs-nav-scroll {
@@ -70,21 +76,30 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3xs);
 }
-.docs-nav-heading {
-  margin: var(--space-xl) var(--space-sm) var(--space-xs);
-  font: var(--type-body-sm-bold);
+/* Group headings: sidebar and search. */
+.docs-group-heading {
+  margin: var(--space-xl) 0 var(--space-sm);
+  padding: 0 var(--space-sm);
+  font: var(--type-body-sm);
   color: var(--text-subtle);
 }
+/* Rows drawn as Bland's _sidebar-item, size md. */
 .docs-nav-link {
-  display: block;
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--rad-md);
-  corner-shape: superellipse(2);
-  font: var(--type-body-md);
+  --bland-radius: var(--rad-sm); /* drawn by .bland-smooth */
+  --bland-icon-size: var(--icon-md);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: var(--sidebar-item-md);
+  padding: 0 var(--space-sm);
+  font: var(--type-body-lg);
   color: var(--text-bold);
   text-decoration: none;
+}
+.docs-nav-link .bland-icon {
+  color: var(--icon-subtle);
 }
 @media (hover: hover) and (pointer: fine) {
   .docs-nav-link:hover {
@@ -94,14 +109,101 @@
 .docs-nav-link[aria-current="page"] {
   background: var(--sidebar-surface-selected);
   color: var(--sidebar-text-selected);
-  font: var(--type-body-md-bold);
+  font: var(--type-body-lg-bold);
+}
+.docs-nav-link[aria-current="page"] .bland-icon {
+  color: var(--sidebar-icon-selected);
+}
+@media (hover: hover) and (pointer: fine) {
+  .docs-nav-link[aria-current="page"]:hover {
+    background: var(--sidebar-surface-selected-hover);
+  }
 }
 
-.docs-theme {
+/* ---- Toolbar: theme switch and search ---- */
+.docs-toolbar {
+  /* Stays at the top while the page scrolls (below the mobile top bar); content fades out under it (fade/md). */
+  position: sticky;
+  top: calc(var(--control-sm) + 2 * var(--space-sm) + var(--stroke-sm));
+  z-index: 2;
   display: flex;
-  gap: var(--space-2xs);
-  padding: var(--space-lg) var(--space-xl);
-  border-top: var(--stroke-sm) solid var(--border-subtle);
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-100);
+}
+/* The fade: the page colour thinning to nothing over fade/md below the bar, once the page has scrolled. */
+.docs-toolbar::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: var(--fade-md);
+  background: linear-gradient(var(--surface-100), transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-md) var(--easing-out);
+}
+.docs-toolbar[data-stuck]::after {
+  opacity: 1;
+}
+.docs-theme {
+  flex: none;
+  width: max-content; /* the bar fills its container; here it hugs its two segments, as in Figma */
+}
+.docs-theme .bland-segmented-bar__item {
+  flex: 1 0 auto;
+}
+.docs-search-trigger {
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+  --bland-icon-size: var(--icon-md);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.docs-search-label {
+  --bland-radius: var(--rad-md);
+
+  padding: var(--space-xs) var(--space-md);
+  background: var(--surface-200);
+  color: var(--text-subtle);
+  font: var(--type-body-lg);
+  white-space: nowrap;
+}
+@media (hover: hover) and (pointer: fine) {
+  .docs-search-trigger:hover .docs-search-label {
+    background: var(--surface-300);
+  }
+}
+/* The shortcut keys, drawn as Figma's sm stroke buttons (they are hints, not controls). */
+.docs-keys {
+  display: none;
+  gap: var(--space-xs);
+}
+.docs-key {
+  --bland-radius: var(--rad-md);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: var(--control-sm);
+  height: var(--control-sm);
+  padding: 0 var(--space-sm);
+  box-shadow: inset 0 0 0 var(--stroke-lg) var(--border-bold);
+  color: var(--text-bold);
+  font: var(--type-body-lg-bold);
 }
 
 /* ---- Main ---- */
@@ -109,24 +211,32 @@
   min-width: 0;
 }
 .docs-content {
-  max-width: 960px; /* reading width; no token */
+  box-sizing: content-box;
+  max-width: 960px; /* page width, inside the padding: room for the playground and props tables. No token. */
   margin: 0 auto;
-  padding: var(--space-2xl) var(--space-lg) var(--space-6xl);
+  padding: var(--space-2xl) var(--space-lg) var(--space-7xl);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xl);
+  gap: var(--space-5xl);
+}
+
+/* ---- Page contents rail (desktop) ---- */
+.docs-toc {
+  display: none;
 }
 
 @media (min-width: 768px) {
   .docs {
     display: grid;
     grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
   }
   .docs-topbar {
     display: none;
   }
   .docs-sidebar,
   .docs[data-menu-open] .docs-sidebar {
+    grid-row: 1 / -1;
     display: flex;
     position: sticky;
     top: 0;
@@ -135,47 +245,172 @@
   .docs-sidebar-head {
     display: flex;
   }
+  .docs-toolbar {
+    top: 0;
+    padding: var(--space-lg) var(--space-2xl);
+  }
+  .docs-keys {
+    display: flex;
+  }
   .docs-content {
-    padding: var(--space-4xl) var(--space-3xl) var(--space-7xl);
+    padding: var(--space-2xl) var(--space-2xl) var(--space-7xl);
   }
 }
 
-/* ---- Page parts ---- */
-.docs-page-header {
+@media (min-width: 1280px) {
+  .docs {
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr) var(--sidebar-width);
+  }
+  .docs-toolbar {
+    grid-column: 2 / -1;
+  }
+  .docs-main {
+    grid-column: 2;
+  }
+  .docs-toc {
+    grid-column: 3;
+    grid-row: 2;
+    display: block;
+  }
+  .docs-toc-inner {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-md);
+    box-sizing: border-box;
+    height: 100vh;
+    /* Kept clear of the window's right edge. */
+    padding: var(--space-2xl) var(--space-2xl) var(--space-2xl) var(--space-md);
+  }
+}
+.docs-toc-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: 0;
+  font: var(--type-body-md);
+  color: var(--text-subtle);
+}
+.docs-toc-scroll {
+  min-height: 0;
+  max-height: 50vh; /* about half the screen, then the list scrolls; no token */
+}
+.docs-toc-list {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 var(--space-md);
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+  /* The track the bar runs on. */
+  box-shadow: inset var(--stroke-lg) 0 0 var(--border-subtle);
 }
-.docs-eyebrow {
-  font: var(--type-body-sm-bold);
-  color: var(--text-brand);
+/* The bar marks the current entry and slides between entries (duration/md, easing/out). */
+.docs-toc-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--stroke-lg);
+  border-radius: var(--rad-rd);
+  background: var(--border-brand);
+  pointer-events: none;
+}
+.docs-toc-list[data-ready] > .docs-toc-bar {
+  transition:
+    transform var(--duration-md) var(--easing-out),
+    height var(--duration-md) var(--easing-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .docs-toc-list[data-ready] > .docs-toc-bar {
+    transition: none;
+  }
+}
+.docs-toc-link {
+  transition: color var(--duration-md) var(--easing-out);
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--rad-xs);
+  background: none;
+  color: var(--text-subtle);
+  font: var(--type-body-lg);
+  text-align: start;
+  cursor: pointer;
+}
+@media (hover: hover) and (pointer: fine) {
+  .docs-toc-link:hover {
+    color: var(--text-bold);
+  }
+}
+.docs-toc-link[aria-current] {
+  color: var(--text-bold);
+  font: var(--type-body-lg-bold);
+}
+
+/* ---- Page parts ---- */
+/* Sections land below the sticky toolbar when the contents rail scrolls to them. */
+.docs-content [data-toc] {
+  scroll-margin-top: calc(var(--control-sm) + 2 * var(--space-lg) + var(--space-lg));
+}
+.docs-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+.docs-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
 }
 .docs-page-header h1 {
+  flex: 1;
   margin: 0;
   font: var(--type-heading-md);
   text-wrap: balance;
 }
+.docs-pager {
+  display: flex;
+  gap: var(--space-lg);
+}
 .docs-lead {
-  max-width: 65ch;
+  max-width: 720px; /* Figma's article width keeps lead lines readable; no token */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2xl);
   font: var(--type-body-lg);
   color: var(--text-subtle);
+}
+.docs-import {
+  max-width: 100%;
+}
+.docs-import code {
+  white-space: pre-wrap;
+}
+@media (min-width: 768px) {
+  .docs-page-header h1 {
+    font: var(--type-heading-lg);
+  }
 }
 
 .docs-section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-xl);
 }
 /* Only the section's own heading: a descendant rule would restyle h2 titles inside component demos (Modal, Empty State). */
 .docs-section > h2 {
   margin: 0;
-  font: var(--type-title-lg);
+  font: var(--type-heading-sm);
 }
 .docs-note {
   margin: 0;
-  max-width: 65ch;
   font: var(--type-body-lg);
-  color: var(--text-subtle);
+  color: var(--text-bold);
 }
 .docs-footnote {
   margin: 0;
@@ -194,94 +429,436 @@ code,
 .docs-code {
   font-family: var(--font-family-mono);
 }
-.docs-code {
-  margin: 0;
-  padding: var(--space-md) var(--space-lg);
-  overflow-x: auto;
-  font: var(--type-code-body-sm);
-  color: var(--code-text);
-  background: var(--surface-200);
-  border-radius: var(--rad-md);
-  corner-shape: superellipse(2);
+
+/* A frame drawn as Figma's: a surface-200 card, space-md inside, around a bordered surface-100 box. */
+.docs-frame {
+  container: docs-frame / inline-size;
 }
-.docs-import {
-  align-self: flex-start;
-  max-width: 100%;
+.docs-frame,
+.docs-variant {
+  --bland-radius: var(--rad-lg);
+
+  margin: 0;
+  padding: var(--space-md);
+  background: var(--surface-200);
+  border-radius: var(--rad-lg);
+  corner-shape: superellipse(2);
 }
 
-/* ---- Tables ---- */
-.docs-table-wrap {
-  overflow-x: auto;
-  border: var(--stroke-sm) solid var(--border-subtle);
-  border-radius: var(--rad-md);
+/* Dots behind demos, every space-sm. */
+.docs-dots {
+  background-image: radial-gradient(circle, var(--border-subtle) calc(var(--stroke-sm) / 2), transparent calc(var(--stroke-sm) / 2 + var(--stroke-xs)));
+  background-size: var(--space-sm) var(--space-sm);
+}
+
+/* ---- Component pages: playground ---- */
+.docs-demo {
+  --bland-radius: var(--rad-lg);
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  overflow: hidden;
+  background: var(--surface-100);
+  border: var(--stroke-sm) solid var(--border-bold);
+  border-radius: var(--rad-lg);
   corner-shape: superellipse(2);
 }
-.docs-table {
-  width: 100%;
-  border-collapse: collapse;
-  font: var(--type-body-sm);
+/*
+ * The view's size never follows the demo, so zooming never resizes the playground: it is a fixed
+ * height (taller on desktop if the props panel beside it is), and the stage fills it out of flow.
+ * A demo bigger than the view scrolls inside it.
+ */
+.docs-demo-view {
+  position: relative;
+  min-width: 0;
+  min-height: 440px;
 }
-.docs-table th {
-  text-align: left;
-  font: var(--type-body-sm-bold);
-  color: var(--text-subtle);
+/* The canvas uses margin: auto (not justify-content) so a zoomed-in demo can scroll to every edge. */
+.docs-demo-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  padding: var(--space-lg) var(--space-lg) var(--space-4xl);
+  overflow: auto;
+  /* A demo that fills its container can size to the stage with cqi units (Code snippet). */
+  container-type: inline-size;
+  background-color: var(--surface-100);
+  background-image: radial-gradient(circle, var(--border-subtle) calc(var(--stroke-sm) / 2), transparent calc(var(--stroke-sm) / 2 + var(--stroke-xs)));
+  background-size: var(--space-sm) var(--space-sm);
+  background-attachment: local;
+}
+.docs-demo-stage[data-panning] {
+  cursor: grabbing;
+  user-select: none;
+}
+.docs-demo-canvas {
+  margin: auto;
+}
+.docs-zoom {
+  position: absolute;
+  right: var(--space-md);
+  bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+.docs-zoom-level {
+  min-width: var(--space-4xl);
+  font: var(--type-body-lg-bold);
+  font-variant-numeric: tabular-nums;
+}
+@media (min-width: 768px) {
+  .docs-demo-stage {
+    padding: var(--space-2xl) var(--space-2xl) var(--space-4xl);
+  }
+}
+
+/* The props panel: one row per prop, the Reset button at the bottom. */
+.docs-controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-xl);
+  padding: var(--space-xl);
   background: var(--surface-200);
-  padding: var(--space-sm) var(--space-md);
-  white-space: nowrap;
+  box-shadow: inset 0 var(--stroke-sm) 0 var(--border-bold);
 }
-.docs-table td {
-  padding: var(--space-sm) var(--space-md);
-  border-top: var(--stroke-sm) solid var(--border-subtle);
+/*
+ * One grid for every control, so the label column fits the longest prop name on the page
+ * (up to half the panel, then it wraps) and all controls start on the same line after it.
+ */
+.docs-controls-list {
+  display: grid;
+  grid-template-columns: fit-content(50%) minmax(0, 1fr);
+  align-content: start;
+  gap: var(--space-md) var(--space-lg);
+}
+.docs-control {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
+}
+.docs-control > :last-child {
+  min-width: 0;
+}
+.docs-control > .bland-toggle {
+  justify-self: start;
+}
+.docs-control-label {
+  font: var(--type-code-body-lg);
+  color: var(--text-subtle);
+  overflow-wrap: anywhere;
+}
+.docs-controls-list > :not(.docs-control) {
+  grid-column: 1 / -1;
+}
+.docs-control-note {
+  margin: 0;
+  font: var(--type-body-sm);
+  color: var(--text-subtle);
+}
+.docs-reset {
+  width: 100%;
+}
+/*
+ * Roomy at every width: under the preview the controls run in two columns of label and control;
+ * once the frame is wide enough they move beside it, in a 320 panel (Figma's is 200; wider keeps
+ * option names whole). No token for either width.
+ */
+@container docs-frame (min-width: 560px) {
+  .docs-controls-list {
+    grid-template-columns: fit-content(25%) minmax(0, 1fr) fit-content(25%) minmax(0, 1fr);
+    column-gap: var(--space-lg);
+  }
+  .docs-control {
+    grid-column: span 2;
+  }
+  .docs-reset {
+    width: auto;
+    align-self: flex-start;
+  }
+}
+@container docs-frame (min-width: 880px) {
+  .docs-demo {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+  .docs-demo-view {
+    min-height: 520px;
+  }
+  .docs-controls {
+    box-shadow: inset var(--stroke-sm) 0 0 var(--border-bold);
+  }
+  .docs-controls-list {
+    grid-template-columns: fit-content(50%) minmax(0, 1fr);
+  }
+  .docs-control {
+    grid-column: 1 / -1;
+  }
+  .docs-reset {
+    width: 100%;
+  }
+}
+
+/* Wraps the demo so the page can see what it renders; adds no box of its own. */
+.docs-demo-render {
+  display: contents;
+}
+
+/* ---- Component pages: variants ---- */
+.docs-variants {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+.docs-variant {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.docs-variant-box {
+  padding: var(--space-3xl) var(--space-lg);
+  overflow-x: auto;
+  background: var(--surface-100);
+  box-shadow: inset 0 0 0 var(--stroke-sm) var(--border-bold);
+  border-radius: var(--rad-lg);
+  corner-shape: superellipse(2);
+}
+/* Centred as in Figma, but never pushed past the left edge when it is wider than the box. */
+.docs-variant-box > * {
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+}
+/* A story that gives its group a max width means "this wide": fill-container components (Tab bar) get it. */
+.docs-variant-box > [style*="max-width"] {
+  width: 100%;
+}
+.docs-variant-caption {
+  font: var(--type-body-lg);
+  color: var(--text-bold);
+}
+
+/* ---- Data tables in Bland's Table: props and tokens ---- */
+.docs-data {
+  border: var(--stroke-sm) solid var(--border-subtle);
+  overflow: hidden;
+  border-radius: var(--rad-lg);
+  corner-shape: superellipse(2);
+}
+/* Columns size to their content instead of sharing the width evenly (the cells' max-width: 0). */
+.docs-data .bland-table__header,
+.docs-data .bland-table__cell { max-width: none; }
+.docs-data .bland-table__cell {
   vertical-align: top;
 }
-.docs-desc {
-  color: var(--text-subtle);
-  min-width: 220px;
+.docs-data .bland-table__cell .bland-table__inner {
+  align-items: flex-start;
+  padding-block: var(--space-sm);
 }
+/* Descriptions and long values wrap instead of ending in an ellipsis (Figma's screenshot wraps them). */
+.docs-data .bland-table__cell .bland-table__label {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.docs-data .bland-table__slot {
+  min-width: 0;
+  min-height: var(--space-none);
+}
+
+/* Props: fixed columns, Figma's widths: Prop 192, Type and Default 160, Description the rest. No token. */
+.docs-props .bland-table__table {
+  table-layout: fixed;
+  min-width: 792px; /* the fixed columns plus a 280 description; narrower, the table scrolls sideways. No token. */
+}
+.docs-props th:nth-child(1) { width: 192px; }
+.docs-props th:nth-child(2),
+.docs-props th:nth-child(3) { width: 160px; }
+.docs-props .bland-table__cell:first-child code {
+  white-space: nowrap;
+}
+
+/* Tokens: the sample hugs its drawing, token names never wrap, Use takes the rest. */
+.docs-tokens .bland-table__table {
+  min-width: 640px; /* narrower, the table scrolls sideways; no token */
+}
+.docs-tokens table[data-sample] :is(th, td):first-child {
+  width: 1%;
+  min-width: 0;
+  white-space: nowrap;
+}
+.docs-tokens :is(th, td):nth-last-child(3) .bland-table__label {
+  white-space: nowrap;
+}
+.docs-tokens :is(th, td):last-child {
+  width: 45%;
+}
+.docs-tokens td:last-child {
+  color: var(--text-subtle);
+}
+.docs-tokens .docs-figma-name {
+  display: block;
+}
+.docs-type {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+.docs-type .bland-code-text code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.docs-required {
+  color: var(--text-danger);
+  font: var(--type-body-lg);
+}
+
+/* ---- Overview ---- */
+.docs-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+.docs-stats {
+  --bland-radius: var(--rad-lg);
+
+  list-style: none;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-sm);
+  padding: var(--space-3xl) var(--space-xl);
+  background-color: var(--surface-100);
+}
+.docs-stat-frame,
+.docs-tile-frame {
+  --bland-radius: var(--rad-lg);
+
+  padding: var(--space-sm);
+  background: var(--surface-brand-light);
+}
+.docs-stat-frame {
+  padding: var(--space-md);
+}
+.docs-stat {
+  --bland-radius: var(--rad-md);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-xl) var(--space-lg);
+  background: var(--surface-100);
+  box-shadow: inset 0 0 0 var(--stroke-lg) var(--border-brand);
+}
+.docs-stat-n {
+  font: var(--type-heading-lg);
+  color: var(--text-brand);
+  font-variant-numeric: tabular-nums;
+}
+.docs-stat-l {
+  font: var(--type-body-lg);
+  color: var(--text-bold);
+}
+.docs-cards {
+  list-style: none;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-sm);
+}
+.docs-tile {
+  --bland-radius: var(--rad-md);
+  --bland-icon-size: var(--icon-md);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  height: 100%;
+  box-sizing: border-box;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-100);
+  box-shadow: inset 0 0 0 var(--stroke-xs) var(--border-brand);
+  font: var(--type-body-lg);
+  color: var(--text-bold);
+  text-decoration: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .docs-tile:hover {
+    background: var(--surface-200);
+  }
+}
+.docs-figma-link {
+  padding: var(--space-sm) var(--space-lg);
+}
+.docs-tile-end {
+  margin-left: auto;
+  color: var(--icon-brand);
+}
+.docs-style-card {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  min-height: calc(var(--control-lg) + var(--space-xl));
+}
+.docs-style-card .bland-icon {
+  color: var(--icon-subtle);
+}
+
+/* ---- Search ---- */
+.docs-search-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.docs-search-results {
+  height: 400px; /* Figma's dialog is 480 tall; the list takes what the field leaves. No token. */
+  max-height: calc(100dvh - var(--layout-margin-mobile) * 2 - var(--input-md) - var(--space-md) * 3);
+}
+.docs-search-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.docs-search-group .docs-group-heading {
+  margin-top: var(--space-sm);
+  padding: 0 var(--space-md);
+}
+.docs-search-group:first-child .docs-group-heading {
+  margin-top: var(--space-xs);
+}
+/* The highlighted result (arrow keys or the pointer): List's hover fill. */
+.docs-search-list > [data-active] > .bland-list-item__row {
+  background-color: var(--list-surface-hover);
+}
+.docs-search .bland-list-item__leading {
+  color: var(--icon-subtle);
+}
+.docs-search .bland-empty-state {
+  padding-top: var(--space-6xl);
+}
+.docs-search-empty-icon {
+  color: var(--icon-minimal);
+}
+.docs-search .bland-empty-state strong {
+  color: var(--text-bold);
+  font-weight: inherit;
+  font: var(--type-body-md-bold);
+}
+/* ---- Token names and values (style pages) ---- */
 .docs-figma-name {
   font: var(--type-body-sm);
   color: var(--text-minimal);
   margin-top: var(--space-3xs);
   white-space: nowrap;
 }
-.docs-sample-cell {
-  width: 1%;
-  white-space: nowrap;
-}
-
 .docs-token {
-  font: var(--type-code-body-sm-bold);
-  color: var(--text-bold);
-  background: none;
-  border: 0;
-  padding: 0;
-  cursor: copy;
-  text-align: left;
-  border-radius: var(--rad-xs);
   white-space: nowrap;
-}
-.docs-token:hover {
-  color: var(--text-link);
 }
 .docs-value {
-  font: var(--type-code-body-sm);
+  font: var(--type-code-body-md);
   color: var(--text-subtle);
   overflow-wrap: anywhere;
-}
-/*
- * Props tables: a prop name and its default never wrap; a type wraps only between words
- * ("sm" | "md" | "lg", a function's arguments), never inside one. The table scrolls sideways
- * when a type is longer than the column can hold.
- */
-.docs-props-table td:first-child,
-.docs-props-table td:nth-child(3) {
-  white-space: nowrap;
-}
-.docs-props-table .docs-value {
-  overflow-wrap: normal;
-}
-.docs-props-table td:nth-child(2) {
-  min-width: 140px;
 }
 .docs-values {
   display: flex;
@@ -290,14 +867,6 @@ code,
 }
 .docs-mode {
   color: var(--text-minimal);
-}
-.docs-prop {
-  font: var(--type-code-body-sm-bold);
-}
-.docs-required {
-  margin-left: var(--space-xs);
-  font: var(--type-body-sm);
-  color: var(--text-danger);
 }
 
 /* ---- Samples ---- */
@@ -410,222 +979,22 @@ code,
 }
 .docs-icon {
   margin: 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-sm);
-  padding: var(--space-lg) var(--space-sm);
+  padding: var(--space-lg) var(--space-md);
   border: var(--stroke-sm) solid var(--border-subtle);
   border-radius: var(--rad-md);
   color: var(--icon-bold);
 }
 .docs-icon figcaption {
-  font: var(--type-code-body-sm);
-  color: var(--text-subtle);
-}
-
-/* ---- Component pages ---- */
-.docs-demo {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  border: var(--stroke-sm) solid var(--border-subtle);
-  border-radius: var(--rad-lg);
-  corner-shape: superellipse(2);
+  max-width: 100%;
   overflow: hidden;
-}
-/*
- * The view's size never follows the demo, so zooming never resizes the playground: it is a fixed
- * height (taller on desktop if the props panel beside it is), and the stage fills it out of flow.
- * A demo bigger than the view scrolls inside it.
- */
-.docs-demo-view {
-  position: relative;
-  min-width: 0;
-  min-height: 320px;
-}
-/* The canvas uses margin: auto (not justify-content) so a zoomed-in demo can scroll to every edge. */
-.docs-demo-stage {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  padding: var(--space-lg) var(--space-lg) var(--space-4xl);
-  overflow: auto;
-  background: var(--surface-100);
-  /* A demo that fills its container can size to the stage with cqi units (Code snippet). */
-  container-type: inline-size;
-}
-.docs-demo-stage[data-panning] {
-  cursor: grabbing;
-  user-select: none;
-}
-.docs-demo-canvas {
-  margin: auto;
-}
-.docs-zoom {
-  position: absolute;
-  right: var(--space-md);
-  bottom: var(--space-md);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2xs);
-}
-.docs-zoom-level {
-  min-width: var(--space-4xl);
-  font-variant-numeric: tabular-nums;
-}
-.docs-control-note {
-  margin: 0;
-  font: var(--type-body-sm);
-  color: var(--text-subtle);
-}
-@media (min-width: 768px) {
-  .docs-demo-stage {
-    padding: var(--space-2xl) var(--space-2xl) var(--space-4xl);
-  }
-}
-.docs-controls {
-  /*
-   * One grid for every control, so the label column fits the longest prop name on the page
-   * (up to half the panel, then it wraps) and all controls start on the same line after it.
-   */
-  display: grid;
-  grid-template-columns: fit-content(50%) minmax(0, 1fr);
-  align-content: start;
-  gap: var(--space-sm) var(--space-lg);
-  padding: var(--space-lg);
-  background: var(--surface-200);
-  border-top: var(--stroke-sm) solid var(--border-subtle);
-}
-.docs-control {
-  display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: subgrid;
-  align-items: center;
-}
-.docs-control label {
+  white-space: nowrap;
+  text-overflow: ellipsis;
   font: var(--type-code-body-sm);
   color: var(--text-subtle);
-  overflow-wrap: anywhere;
-}
-.docs-controls > :not(.docs-control) {
-  grid-column: 1 / -1;
-}
-.docs-controls > .docs-link-button {
-  justify-self: start;
-}
-/* Native select without its arrow (Chrome pins it to the edge); the CaretDown sits at the same inset as the text. Until Bland's Dropdown replaces it. */
-.docs-select {
-  position: relative;
-  display: grid;
-  min-width: 0;
-}
-.docs-control .docs-select select {
-  appearance: none;
-  padding-right: calc(var(--space-sm) + var(--icon-sm) + var(--space-sm));
-}
-.docs-select .bland-icon {
-  position: absolute;
-  top: 50%;
-  right: var(--space-sm);
-  transform: translateY(-50%);
-  color: var(--icon-subtle);
-  pointer-events: none;
-}
-.docs-control select,
-.docs-control input[type="text"] {
-  min-width: 0;
-  height: var(--input-sm);
-  padding: 0 var(--space-sm);
-  border: var(--stroke-sm) solid var(--border-input);
-  border-radius: var(--rad-md);
-  background: var(--surface-100);
-  font: var(--type-body-sm);
-}
-.docs-control input[type="checkbox"] {
-  justify-self: start;
-  width: var(--selection-box-sm);
-  height: var(--selection-box-sm);
-  accent-color: var(--control-checked-rest);
-}
-.docs-link-button {
-  align-self: flex-start;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--text-link);
-  font: var(--type-body-sm-bold);
-  cursor: pointer;
-  border-radius: var(--rad-xs);
-}
-@media (min-width: 1024px) {
-  .docs-demo {
-    grid-template-columns: minmax(0, 1fr) 320px;
-  }
-  .docs-controls {
-    border-top: 0;
-    border-left: var(--stroke-sm) solid var(--border-subtle);
-  }
 }
 
-.docs-variants {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-}
-/* Each group a story renders (a label and its rows) gets its own bordered container. */
-.docs-variants > * {
-  padding: var(--space-xl);
-  border: var(--stroke-sm) solid var(--border-subtle);
-  border-radius: var(--rad-lg);
-  corner-shape: superellipse(2);
-  overflow-x: auto;
-}
-
-/* ---- Overview ---- */
-.docs-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-lg);
-}
-.docs-stat {
-  display: flex;
-  flex-direction: column;
-  min-width: 140px;
-  padding: var(--space-lg);
-  background: var(--surface-200);
-  border-radius: var(--rad-md);
-}
-.docs-stat-n {
-  font: var(--type-heading-sm);
-  font-variant-numeric: tabular-nums;
-}
-.docs-stat-l {
-  color: var(--text-subtle);
-}
-.docs-cards {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: var(--space-sm);
-}
-.docs-card {
-  display: block;
-  padding: var(--space-lg);
-  border: var(--stroke-sm) solid var(--border-subtle);
-  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
-  font: var(--type-body-md-bold);
-  color: var(--text-bold);
-  text-decoration: none;
-}
-@media (hover: hover) and (pointer: fine) {
-  .docs-card:hover {
-    background: var(--surface-200);
-  }
-}
-
-/* Wraps the demo so the page can see what it renders; adds no box of its own. */
-.docs-demo-render {
-  display: contents;
-}

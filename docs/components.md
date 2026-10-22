@@ -60,7 +60,7 @@ Bland's own icons live in `src/icons/` and come from the Figma Icons page: expor
 
 ## Overflow
 
-Anything that can scroll uses `<ScrollArea>` (`src/components/scroll-area/ScrollArea.tsx`). It handles the fade and the visible scrollbar together. Use `fadeSize="sm"` in compact areas (Menu). Truncated text is not overflow: give it `text-overflow: ellipsis`.
+Anything that can scroll uses `<ScrollArea>` (`src/components/scroll-area/ScrollArea.tsx`). It handles the fade and the scrollbar together; the scrollbar shows only while the area scrolls. Use `fadeSize="sm"` in compact areas (Menu). Truncated text is not overflow: give it `text-overflow: ellipsis`.
 
 ## Behaviour
 

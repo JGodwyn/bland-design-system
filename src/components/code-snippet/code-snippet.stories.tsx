@@ -270,7 +270,10 @@ export default {
           </div>
         </Frame>
       </div>
-      <Controlled />
+      <div className="pg-stack">
+        <span className="pg-label">Controlled: the page holds the language and expanded state; the line under it reports them</span>
+        <Controlled />
+      </div>
       <div className="pg-stack">
         <span className="pg-label">Code text: sm, md and lg in body-sm, -md and -lg text, then with copy</span>
         {sizes.map((size) => (

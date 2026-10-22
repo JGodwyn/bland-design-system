@@ -754,6 +754,11 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   gap, filled rows run together in dark mode. That gap is the story's, not
   the component's; a project picks its own gap on its `<ul>`.
 
+- **1 line rows are 32 (Figma, 2026-10-22):** `space-xs` above and below,
+  flush or not (4 + 24 + 4); supersedes the 40 above. Dark mode fills moved
+  one step darker in Figma the same day (`List/surface-rest` Neutral900,
+  hover 800, pressed 700), synced as tokens.
+
 ### Empty State (2026-10-19)
 - `import { EmptyState } from 'bland'`, folder `empty-state/`. Figma: set
   `Empty-state` (864:4114, Size sm/lg) and the private `_empty-illustration`
@@ -1151,6 +1156,8 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   the same path; none when opened from the keyboard or open from the start;
   opacity only under reduced motion. Content stays mounted until the exit
   has played and remounts on each open (a form starts fresh).
+
+- **Corners are `rad-lg` (16) (Figma, 2026-10-22),** was `rad-md`.
 
 ### Tabs: Section tab, Pill tab, File tab, Segmented bar, Tab bar (2026-10-19)
 - `import { SectionTabs, PillTabs, FileTabs, SegmentedBar, TabBar } from 'bland'`,
@@ -1911,3 +1918,121 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   separate cases. Screenshots (`#/raw/<id>`) are unaffected.
 - The docs chrome lives in `playground/`, outside the Bland package and the
   lint, but uses Bland's tokens and components wherever one fits.
+
+### Docs site redesign (2026-10-22, Figma "Doc Design update", node 6612:88042)
+
+- **Layout:** sidebar (sidebar/width) | page (720 reading width, inside
+  space-2xl padding) | page contents rail (sidebar/width, from
+  breakpoint-xl). A toolbar over the page holds the theme switch (left) and
+  the search trigger (right). Mobile keeps the top bar with a Menu.
+- **Sidebar:** brand (heading-sm "Bland", body-sm uppercase "Design
+  system"), then Overview, Foundations and Components; rows drawn as
+  `_sidebar-item` md with a Phosphor icon for Overview and each style page
+  (Breakpoints, absent from the mockup, uses Devices). Docs-only icons live
+  in `playground/docs/icons.tsx`, exported from the Figma Icons page.
+- **Theme switch is a SegmentedBar, Light / Dark** (Figma). No System
+  option: until one is picked the page follows `prefers-color-scheme` (no
+  `data-theme`) and the bar shows the system's choice; a pick is
+  remembered per browser. Replaces System / Light / Dark buttons.
+- **Page header:** heading-lg title with stroke sm Icon Buttons to the
+  previous and next page in sidebar order (`playground/docs/pages.tsx` is
+  the one list for sidebar, pager and search); lead body-lg text-subtle;
+  the import line is a copyable Code text lg.
+- **Playground controls are Bland components:** Dropdown (sm, basic) for
+  options, Toggle for booleans, Text Input (sm) for text, a stroke xs
+  Reset button, in a surface-200 panel. `children` is labelled `label`
+  (Figma's word). The panel is 240 wide (Figma 200; 240 keeps option names
+  readable). The stage has Figma's dot grid (border-bold dots every
+  space-sm). Zoom buttons are stroke sm Icon Buttons.
+- **Code view under the playground** (as shadcn): a Code snippet with a
+  whole file to copy, the imports of every Bland name the JSX uses and an
+  `Example` component rendering the current props; long tags put one prop
+  per line. A small regex highlighter (`playground/docs/highlight.tsx`)
+  emits `data-token` spans, since Bland ships no highlighter.
+- **Variants:** each story group is Figma's variant card: surface-200 frame,
+  the rows centred in a bordered surface-100 box, the group's label under
+  it as the caption. Stories are unchanged (the page splits each pg-stack).
+- **Props tables use Bland's Table** (md): Prop 192, Type and Default 160,
+  Description the rest; names, types and defaults are Code text lg,
+  options one chip each, Required in text-danger; descriptions wrap
+  (overrides the cell's one-line ellipsis in docs CSS).
+- **Page contents rail:** every `Section` (and the header, as Installation
+  or Introduction) is listed; the section being read is bold. Buttons, not
+  links, because the router owns the hash.
+- **Search (⌘K / Ctrl+K, or the toolbar trigger):** a Modal (md, no title,
+  named "Search Bland") holding a Search Input and 1 line List rows grouped
+  Foundations / Components (title matches), then Other results (page
+  descriptions, component props, token names and uses, with the text that
+  matched). Every word must match. Arrow keys walk the results, Enter in
+  the field opens the first. Nothing found is an Empty State with
+  ListMagnifyingGlass. The results list is 400 tall (Figma's dialog is 480).
+- **Overview:** stat cards (surface-brand-light frames, border-brand
+  cards, brand numbers) on the dot grid, a View Figma file link, Styles
+  and Components as tile grids, and the install snippet as a Code snippet.
+- **Follow-ups (Godwin, 2026-10-22, same day):**
+  - The theme switch and search stay at the top (sticky toolbar, under the
+    mobile top bar); a border-subtle hairline shows once the page has
+    scrolled under it.
+  - The contents rail glides to a section (native smooth scroll, a jump
+    under reduced motion); sections stop space-lg under the toolbar.
+  - Search is a combobox: focus stays in the field, the first result
+    (Colors when empty) is highlighted on opening and after each keystroke,
+    arrows move the highlight (List's hover fill), Enter opens it, the
+    pointer moves it too.
+  - More room: the page is 960 wide (leads stay at 720). The playground is
+    a container: beside the preview in a 320 panel once the frame is 880
+    wide, otherwise under a full-width preview in two columns of label and
+    control. Preview 400 tall beside the panel, 360 stacked; controls
+    space-xl padding, space-md between rows. The props table keeps its
+    columns and a 280 description, and scrolls sideways when narrower.
+- **Second round (Godwin, 2026-10-22):**
+  - **Scrollbars show only while scrolling, everywhere** (ScrollArea, so
+    every component and the docs): the thumb appears on scroll, stays while
+    dragged or under the pointer, and fades out over duration/md once
+    scrolling has stopped for `duration/scrollbar-hide-delay` (1000, the
+    macOS overlay scrollbar standard; added to Figma's Motion collection,
+    Godwin's call). The edge fade is unchanged. CLAUDE.md "Overflow" and
+    the Figma `_scrollbar` description updated.
+  - The sticky toolbar has no hairline; once the page scrolls, the page
+    colour fades out over fade/md below it.
+  - Contents rail: an entry is current once its top reaches the toolbar
+    (was a third of the way down, so short sections such as Installation
+    lost to the next); a clicked entry stays current while the page glides.
+    Variants expands to one entry per variant card (its caption, one line
+    with an ellipsis) while Variants or one of them is current.
+- **Third round (Godwin, 2026-10-22):**
+  - The contents rail lists sections only; the variant entries are gone
+    (cards sit close together, so the entries added nothing). The rail
+    list is at most half the window tall, then scrolls, and keeps
+    space-2xl from the right edge.
+  - Playground: softer dots (border-subtle), a taller preview (520 beside
+    the panel, 440 stacked), Reset is a Button sm.
+  - Variant captions always sit under the box: story helper components
+    (Modal's Row, Table's Group) are called to reach their pg-stack, and
+    the stack keeps its own props (max width, the click handler that stops
+    Tab bar links navigating). A stack with a max width fills it.
+  - **Code text:** when the code wraps, the copy button stays on the first
+    line (top aligned, one line of the code's text style tall).
+- **Fourth round (Godwin, 2026-10-22):**
+  - **Copy feedback is timed:** Code snippet and Code text show the Check
+    and announce Copied for `duration/copied-visible` (2000, the common
+    standard; new Figma Motion token), wherever the pointer goes, then the
+    Copy icon returns. Supersedes "until the pointer or focus leaves". A
+    second copy restarts the wait.
+  - Style page token tables use Bland's Table (md), as the props tables:
+    shared `.docs-data` styles (border, wrapping, top-aligned cells), the
+    sample column hugging its drawing, token names on one line, Use in
+    text-subtle.
+  - Contents rail: a brand bar on a border-subtle track slides to the
+    current entry, and the rail's list scrolls itself to keep that entry in
+    view (both duration/md easing/out; at once under reduced motion; no
+    animation for the first placement on a page). Entry colours ease too.
+- **Fifth round (Godwin, 2026-10-22):**
+  - Style pages run Colors, Typography, Spacing, Icons, Sizing,
+    Breakpoints, Elevation, Motion, Corner radius, Stroke (sidebar, pager,
+    search and overview follow `stylePages`).
+  - Token tables: names are Code text md with its copy button (copies the
+    name); values are Code/body-md. Data table containers are rad-lg.
+  - Icons page: cards pad space-md at the sides; long names end in an
+    ellipsis (full name in the tooltip title).
+

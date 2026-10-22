@@ -169,7 +169,7 @@ export function CodeSnippet({
   const lines = text.replace(/\n$/, '').split('\n').length;
 
   const [isExpanded, setExpanded] = useControlled(expanded, defaultExpanded, onExpandedChange);
-  const { copied, copy, resetProps, status } = useCopy(copiedLabel, onCopied);
+  const { copied, copy, status } = useCopy(copiedLabel, onCopied);
 
   // The toggle only shows when the code is taller than the collapsed height.
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -267,7 +267,6 @@ export function CodeSnippet({
               icon={copied ? <CheckIcon /> : <CopyIcon />}
               aria-label={copyLabel}
               onClick={() => copy(text)}
-              {...resetProps}
             />
           )}
           {copyable && status}

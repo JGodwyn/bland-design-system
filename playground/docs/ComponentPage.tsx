@@ -1,32 +1,47 @@
-// A component's docs page: live demo with controls, every variant (the story), and props tables.
-import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react';
+// A component's docs page: live demo with controls and its code, every variant (the story), and props tables.
+import {
+  Children,
+  cloneElement,
+  Fragment,
+  isValidElement,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type PointerEvent,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 import { Button } from '../../src/components/button/Button';
 import { IconButton } from '../../src/components/button/IconButton';
-import { Icon } from '../../src/components/icon/Icon';
-import { CaretDownIcon, MinusIcon, PlusIcon } from '../../src/icons';
+import { CodeSnippet } from '../../src/components/code-snippet/CodeSnippet';
+import { CodeText } from '../../src/components/code-snippet/CodeText';
+import { Dropdown } from '../../src/components/dropdown/Dropdown';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../../src/components/table/Table';
+import { TextInput } from '../../src/components/text-input/TextInput';
+import { Toggle } from '../../src/components/toggle/Toggle';
+import { MinusIcon, PlusIcon } from '../../src/icons';
 import type { Control, Story } from '../story';
 import { componentDocs, type PropDoc } from './data';
+import { highlight } from './highlight';
+import { storyDescription } from './pages';
 import { PageHeader, Section } from './parts';
 
 type Args = Record<string, unknown>;
 
-export function ComponentPage({ story }: { story: Story }) {
-  const primary = story.components?.[0] ?? story.demo?.component;
-  const description = story.description ?? (primary ? componentDocs[primary]?.description : undefined);
+export function ComponentPage({ id, story }: { id: string; story: Story }) {
   const names = story.components ?? (story.demo ? [story.demo.component] : []);
   return (
     <>
-      <PageHeader eyebrow="Components" title={story.title}>
-        {description}
+      <PageHeader title={story.title} href={`#/components/${id}`}>
+        {storyDescription(id)}
+        {names.length > 0 && (
+          <CodeText size="lg" copyable className="docs-import">{`import { ${names.join(', ')} } from 'bland';`}</CodeText>
+        )}
       </PageHeader>
-      {names.length > 0 && (
-        <pre className="docs-code docs-import">
-          <code>{`import { ${names.join(', ')} } from 'bland';`}</code>
-        </pre>
-      )}
       {story.demo && <Demo key={story.title} demo={story.demo} />}
-      <Section title="Variants" note="Every state the component has. Hover and pressed show when you interact.">
-        <div className="docs-variants">{story.render()}</div>
+      <Section id="variants" title="Variants">
+        <Variants>{story.render()}</Variants>
       </Section>
       {names.map((name) => (
         <PropsTable key={name} name={name} />
@@ -34,6 +49,9 @@ export function ComponentPage({ story }: { story: Story }) {
     </>
   );
 }
+
+/** The demo's label for a prop: `children` reads as `label`, as Figma names the text. */
+const controlLabel = (name: string) => (name === 'children' ? 'label' : name);
 
 function Demo({ demo }: { demo: NonNullable<Story['demo']> }) {
   const [args, setArgs] = useState<Args>(demo.args);
@@ -52,68 +70,119 @@ function Demo({ demo }: { demo: NonNullable<Story['demo']> }) {
   }, [args]);
 
   return (
-    <Section title="Playground">
-      <div className="docs-demo">
-        <ZoomStage focused={focused} height={demo.height}>
-          <div ref={rendered} className="docs-demo-render">
-            {demo.render(args)}
-          </div>
-        </ZoomStage>
-        <form className="docs-controls" onSubmit={(e) => e.preventDefault()} aria-label="Props">
-          {controls.map(({ name, control }) => {
-            const id = `ctl-${name}`;
-            const value = args[name];
-            return (
-              <div key={name} className="docs-control">
-                <label htmlFor={id}>{name}</label>
-                {control.kind === 'select' && (
-                  <span className="docs-select">
-                    <select id={id} className="bland-focus-ring" value={String(value)} onChange={(e) => set(name, parseOption(e.target.value, control.options))}>
-                      {control.options.map((o) => (
-                        <option key={String(o)} value={String(o)}>
-                          {String(o)}
-                        </option>
-                      ))}
-                    </select>
-                    <Icon size="sm">
-                      <CaretDownIcon />
-                    </Icon>
-                  </span>
-                )}
-                {control.kind === 'boolean' && (
-                  <input id={id} type="checkbox" className="bland-focus-ring" checked={Boolean(value)} onChange={(e) => set(name, e.target.checked)} />
-                )}
-                {control.kind === 'text' && (
-                  <input id={id} type="text" className="bland-focus-ring" value={String(value ?? '')} onChange={(e) => set(name, e.target.value)} />
-                )}
-              </div>
-            );
-          })}
-          {focusable && (
-            <>
-              <div className="docs-control">
-                <label htmlFor="ctl-focused">focused</label>
-                <input id="ctl-focused" type="checkbox" className="bland-focus-ring" checked={focused} onChange={(e) => setFocused(e.target.checked)} />
-              </div>
-              <p className="docs-control-note">focused previews the keyboard focus ring; in code it is :focus-visible, not a prop.</p>
-            </>
-          )}
-          <button
-            type="button"
-            className="docs-link-button bland-focus-ring"
-            onClick={() => {
-              setArgs(demo.args);
-              setFocused(false);
-            }}
-          >
-            Reset
-          </button>
-        </form>
+    <Section id="playground" title="Playground">
+      <div className="docs-frame">
+        <div className="docs-demo">
+          <ZoomStage focused={focused} height={demo.height}>
+            <div ref={rendered} className="docs-demo-render">
+              {demo.render(args)}
+            </div>
+          </ZoomStage>
+          <form className="docs-controls" onSubmit={(e) => e.preventDefault()} aria-label="Props">
+            <div className="docs-controls-list">
+              {controls.map(({ name, control }) => (
+                <ControlRow key={name} name={name} control={control} value={args[name]} onChange={(v) => set(name, v)} />
+              ))}
+              {focusable && (
+                <>
+                  <ControlRow name="focused" control={{ kind: 'boolean' }} value={focused} onChange={(v) => setFocused(Boolean(v))} />
+                  <p className="docs-control-note">focused previews the keyboard focus ring; in code it is :focus-visible, not a prop.</p>
+                </>
+              )}
+            </div>
+            <Button
+              size="sm"
+              type="stroke"
+              className="docs-reset"
+              onClick={() => {
+                setArgs(demo.args);
+                setFocused(false);
+              }}
+            >
+              Reset
+            </Button>
+          </form>
+        </div>
       </div>
-      <pre className="docs-code">
-        <code>{snippet(demo.component, demo.code ? demo.code(args) : args, doc?.props ?? [])}</code>
-      </pre>
+      <CodeSnippet
+        className="docs-example-code"
+        code={{ tsx: example(demo.component, demo.code ? demo.code(args) : args, doc?.props ?? []) }}
+        languages={[{ id: 'tsx', label: 'React' }]}
+        highlight={highlight}
+      />
     </Section>
+  );
+}
+
+/** One prop's control: a Dropdown for options, a Toggle for booleans, a TextInput for text. */
+function ControlRow({ name, control, value, onChange }: { name: string; control: Control; value: unknown; onChange: (value: unknown) => void }) {
+  const id = `ctl-${name}`;
+  const label = controlLabel(name);
+  return (
+    <div className="docs-control">
+      {control.kind === 'select' ? (
+        <span id={`${id}-label`} className="docs-control-label">
+          {label}
+        </span>
+      ) : (
+        <label htmlFor={id} className="docs-control-label">
+          {label}
+        </label>
+      )}
+      {control.kind === 'select' && (
+        <Dropdown
+          id={id}
+          size="sm"
+          aria-labelledby={`${id}-label`}
+          items={control.options.map((o) => ({ id: String(o), label: String(o) }))}
+          value={String(value)}
+          onValueChange={(v: string | null) => v !== null && onChange(parseOption(v, control.options))}
+        />
+      )}
+      {control.kind === 'boolean' && <Toggle id={id} checked={Boolean(value)} onCheckedChange={onChange} />}
+      {control.kind === 'text' && <TextInput id={id} size="sm" value={String(value ?? '')} onChange={(e) => onChange(e.target.value)} />}
+    </div>
+  );
+}
+
+/**
+ * A story group as rendered: a pg-stack whose first child is its pg-label. Stories often wrap that in a small
+ * helper component (Modal's Row, Table's Group); those are plain functions of their props, so they are called
+ * here to reach the stack. One that uses hooks cannot be called outside render and is boxed as it is.
+ */
+function resolveGroup(node: ReactNode, depth = 0): ReactElement<{ className?: string; children?: ReactNode }> | undefined {
+  if (!isValidElement<{ className?: string; children?: ReactNode }>(node)) return undefined;
+  if (typeof node.type === 'string') return node.props.className === 'pg-stack' ? node : undefined;
+  if (typeof node.type !== 'function' || depth > 2) return undefined;
+  try {
+    return resolveGroup((node.type as (props: object) => ReactNode)(node.props), depth + 1);
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * The story's groups, each drawn as Figma's variant card: the rows in a bordered box, the group's label
+ * under it as the caption. The stack keeps its own props (a max width, a click handler that stops links
+ * navigating). Anything else is boxed as it is.
+ */
+function Variants({ children }: { children: ReactNode }) {
+  const top = isValidElement<{ children?: ReactNode }>(children) && children.type === Fragment ? children.props.children : children;
+  return (
+    <div className="docs-variants">
+      {Children.toArray(top).map((group, i) => {
+        const stack = resolveGroup(group);
+        const parts = stack ? Children.toArray(stack.props.children) : [];
+        const first = parts[0] as ReactElement<{ className?: string; children?: ReactNode }> | undefined;
+        const caption = isValidElement(first) && first.props.className === 'pg-label' ? first : undefined;
+        return (
+          <figure key={i} className="docs-variant">
+            <div className="docs-variant-box">{stack && caption ? cloneElement(stack, {}, ...parts.slice(1)) : group}</div>
+            {caption && <figcaption className="docs-variant-caption">{caption.props.children}</figcaption>}
+          </figure>
+        );
+      })}
+    </div>
   );
 }
 
@@ -260,11 +329,11 @@ function ZoomStage({ children, focused, height }: { children: ReactNode; focused
         </div>
       </div>
       <div className="docs-zoom" role="group" aria-label="Zoom">
-        <IconButton size="sm" type="secondary" icon={<MinusIcon />} aria-label="Zoom out" title="Zoom out (-)" onClick={() => step(-1)} disabled={zoom <= ZOOM_MIN} />
+        <IconButton size="sm" type="stroke" icon={<MinusIcon />} aria-label="Zoom out" title="Zoom out (-)" onClick={() => step(-1)} disabled={zoom <= ZOOM_MIN} />
         <Button size="sm" type="ghost" aria-label="Reset zoom" title="Reset zoom and position (0)" onClick={reset} className="docs-zoom-level">
           {Math.round(zoom * 100)}%
         </Button>
-        <IconButton size="sm" type="secondary" icon={<PlusIcon />} aria-label="Zoom in" title="Zoom in (+)" onClick={() => step(1)} disabled={zoom >= ZOOM_MAX} />
+        <IconButton size="sm" type="stroke" icon={<PlusIcon />} aria-label="Zoom in" title="Zoom in (+)" onClick={() => step(1)} disabled={zoom >= ZOOM_MAX} />
       </div>
     </div>
   );
@@ -295,8 +364,8 @@ function parseOption(raw: string, options: (string | boolean)[]) {
   return options.find((o) => String(o) === raw) ?? raw;
 }
 
-/** JSX for the current args, leaving out props at their default. Values named like icons render as elements. */
-function snippet(component: string, args: Args, props: PropDoc[]) {
+/** The current args as JSX attributes and children, leaving out props at their default. Values named like icons render as elements. */
+function jsx(args: Args, props: PropDoc[]) {
   const attrs: string[] = [];
   let children = '';
   for (const [name, value] of Object.entries(args)) {
@@ -315,48 +384,78 @@ function snippet(component: string, args: Args, props: PropDoc[]) {
     else if (typeof value === 'string') attrs.push(`${name}="${value}"`);
     else attrs.push(`${name}={${JSON.stringify(value)}}`);
   }
+  return { attrs, children };
+}
+
+const LINE = 72;
+
+/**
+ * A whole file to copy, as shadcn shows it: the import of every Bland name the JSX uses, and a
+ * component that renders the demo with the current props. Long tags put one attribute per line.
+ */
+function example(component: string, args: Args, props: PropDoc[]) {
+  const { attrs, children } = jsx(args, props);
   const open = [component, ...attrs].join(' ');
-  return children ? `<${open}>${children}</${component}>` : `<${open} />`;
+  const oneLine = children ? `<${open}>${children}</${component}>` : `<${open} />`;
+  let body: string;
+  if (oneLine.length + 9 <= LINE) body = `  return ${oneLine};`;
+  else {
+    const tag =
+      `<${open}>`.length + 4 <= LINE
+        ? [`    <${open}${children ? '>' : ' />'}`]
+        : [`    <${component}`, ...attrs.map((a) => `      ${a}`), children ? '    >' : '    />'];
+    body = ['  return (', ...tag, ...(children ? [`      ${children}`, `    </${component}>`] : []), '  );'].join('\n');
+  }
+  const names = [...new Set([component, ...[...body.matchAll(/<([A-Z]\w*)/g)].map((m) => m[1]!)])];
+  return `import { ${names.join(', ')} } from 'bland';\n\nexport function Example() {\n${body}\n}\n`;
 }
 
 function PropsTable({ name }: { name: string }) {
   const doc = componentDocs[name];
+  const id = `props-${name}`;
   if (!doc) {
     return (
-      <Section title={`${name} props`}>
+      <Section id={id} title={`${name} props`}>
         <p className="docs-note">Props are generated when the docs start. Run npm run docs.</p>
       </Section>
     );
   }
   return (
-    <Section title={`${name} props`} note={<>Native {name === 'ScrollArea' ? 'div' : 'element'} attributes also pass through. Source: <code>{doc.file}</code></>}>
-      <div className="docs-table-wrap">
-        <table className="docs-table docs-props-table">
-          <thead>
-            <tr>
-              <th scope="col">Prop</th>
-              <th scope="col">Type</th>
-              <th scope="col">Default</th>
-              <th scope="col">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {doc.props.map((p) => (
-              <tr key={p.name}>
-                <td>
-                  <code className="docs-prop">{p.name}</code>
-                  {p.required && <span className="docs-required">required</span>}
-                </td>
-                <td>
-                  <code className="docs-value">{p.options ? p.options.map((o) => `"${o}"`).join(' | ') : p.type}</code>
-                </td>
-                <td>{p.default !== undefined ? <code className="docs-value">{p.default}</code> : <span className="docs-muted">–</span>}</td>
-                <td className="docs-desc">{p.description}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <Section
+      id={id}
+      title={`${name} props`}
+      note={
+        <>
+          Native {name === 'ScrollArea' ? 'div' : 'element'} attributes also pass through. Source: <CodeText size="lg">{doc.file}</CodeText>
+        </>
+      }
+    >
+      <Table size="md" className="docs-data docs-props" aria-label={`${name} props`}>
+        <TableHead>
+          <TableRow>
+            <TableHeaderCell>Prop</TableHeaderCell>
+            <TableHeaderCell>Type</TableHeaderCell>
+            <TableHeaderCell>Default</TableHeaderCell>
+            <TableHeaderCell>Description</TableHeaderCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {doc.props.map((p) => (
+            <TableRow key={p.name}>
+              <TableCell trailing={p.required ? <span className="docs-required">Required</span> : undefined}>
+                <CodeText size="lg">{p.name}</CodeText>
+              </TableCell>
+              <TableCell>
+                <span className="docs-type">
+                  {p.options ? p.options.map((o) => <CodeText key={o} size="lg">{`"${o}"`}</CodeText>) : <CodeText size="lg">{p.type}</CodeText>}
+                </span>
+              </TableCell>
+              <TableCell>{p.default !== undefined ? <CodeText size="lg">{p.default}</CodeText> : <span className="docs-muted">–</span>}</TableCell>
+              <TableCell>{p.description}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </Section>
   );
 }

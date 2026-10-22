@@ -42,7 +42,7 @@ export function CodeText({
   ...rest
 }: CodeTextProps) {
   const codeRef = useRef<HTMLElement>(null);
-  const { copied, copy, resetProps, status } = useCopy(copiedLabel, onCopied);
+  const { copied, copy, status } = useCopy(copiedLabel, onCopied);
 
   return (
     <span {...rest} className={`bland-code-text bland-smooth${className ? ` ${className}` : ''}`} data-size={size}>
@@ -56,7 +56,6 @@ export function CodeText({
             className="bland-code-text__copy bland-focus-ring bland-smooth"
             aria-label={copyLabel}
             onClick={() => copy(codeRef.current?.textContent ?? '')}
-            {...resetProps}
           >
             <Icon>{copied ? <CheckIcon /> : <CopyIcon />}</Icon>
           </button>

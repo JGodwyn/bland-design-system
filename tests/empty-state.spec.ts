@@ -1,6 +1,6 @@
 // Behaviour of Empty State: structure, heading level, the illustration slot, actions and focus, Figma's sizes.
 import { expect, test, type Locator } from '@playwright/test';
-import { openStory } from './stories';
+import { openStory, pickOption } from './stories';
 
 const style = (el: Locator, prop: string) => el.evaluate((e, p) => getComputedStyle(e).getPropertyValue(p), prop);
 
@@ -70,7 +70,7 @@ test('the docs offer "focused" only while actions render', async ({ page }) => {
   await page.goto('/#/components/empty-state');
   const focused = page.locator('#ctl-focused');
   await expect(focused).toBeVisible();
-  await page.getByLabel('actions').selectOption('none');
+  await pickOption(page, 'actions', 'none');
   await expect(page.locator('.docs-demo-stage')).toBeVisible();
   await expect(focused).toHaveCount(0);
 });

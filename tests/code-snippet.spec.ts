@@ -70,11 +70,15 @@ test('one language is a label, not a menu', async ({ page }) => {
 test('copy copies the shown code and announces Copied', async ({ page }) => {
   const snippet = page.getByTestId('switcher-tabs');
   const copy = snippet.getByRole('button', { name: 'Copy code' });
+  const copiedAt = Date.now();
   await copy.click();
   expect(await clipboard(page)).toBe('# Python\nprint("hello")\n');
   await expect(snippet.getByRole('status')).toHaveText('Copied');
+  // It stays for duration/copied-visible (2s) wherever the pointer goes, then the Copy icon comes back.
   await page.getByTestId('plain').hover();
-  await expect(snippet.getByRole('status')).toHaveText('');
+  await expect(snippet.getByRole('status')).toHaveText('Copied');
+  await expect(snippet.getByRole('status')).toHaveText('', { timeout: 5000 });
+  expect(Date.now() - copiedAt).toBeGreaterThanOrEqual(2000);
 });
 
 test('long lines scroll sideways and the scrolling area is a Tab stop', async ({ page }) => {

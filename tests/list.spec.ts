@@ -98,7 +98,7 @@ test('keyboard focus shows the 2px ring on button rows', async ({ page }) => {
 
 test('row heights and leading slot sizes follow Lines', async ({ page }) => {
   const firstGroup = page.locator('ul').first().locator('.bland-list-item');
-  expect((await firstGroup.nth(0).boundingBox())!.height).toBe(40);
+  expect((await firstGroup.nth(0).boundingBox())!.height).toBe(32);
   expect((await firstGroup.nth(1).boundingBox())!.height).toBe(62);
   const leading = page.locator('.bland-list-item__leading');
   const sizes = await leading.evaluateAll((els) => els.slice(0, 3).map((e) => e.getBoundingClientRect().width));

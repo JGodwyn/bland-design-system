@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useVisuallyHidden } from 'react-aria';
+import { tokenMs } from '../overlay/floating';
 
 /**
  * Copy to the clipboard, shared by Code snippet and Code text. After a copy the button shows a Check and a
- * polite status region says `copiedLabel` (Figma: announce "Copied" with aria-live). Both go back when the
- * pointer leaves the button or it loses focus, so no timer (and no duration token) is needed.
+ * polite status region says `copiedLabel` (Figma: announce "Copied" with aria-live). Both stay for
+ * `duration/copied-visible` (2s), wherever the pointer is, then the Copy icon comes back (Godwin, 2026-10-22).
+ * Another copy in that time starts the wait again.
  */
 export function useCopy(copiedLabel: string, onCopied?: (text: string) => void) {
   const [copied, setCopied] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const { visuallyHiddenProps } = useVisuallyHidden();
+  useEffect(() => () => clearTimeout(timer.current), []);
 
   const copy = async (text: string) => {
     try {
@@ -18,15 +22,14 @@ export function useCopy(copiedLabel: string, onCopied?: (text: string) => void) 
       return;
     }
     setCopied(true);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setCopied(false), tokenMs('--duration-copied-visible'));
     onCopied?.(text);
   };
-  const reset = () => setCopied(false);
 
   return {
     copied,
     copy,
-    /** Spread on the copy button: the Check goes back to Copy when the pointer or focus leaves it. */
-    resetProps: { onPointerLeave: reset, onBlur: reset },
     /** The live region; render it always, so the announcement is read when its text appears. */
     status: (
       <span {...visuallyHiddenProps} role="status">

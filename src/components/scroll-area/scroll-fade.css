@@ -8,7 +8,7 @@
  *   data-fade-axis="x"                                              horizontal
  *   data-fade-size="sm"                                             fade/sm instead of fade/md
  *
- * Pair it with the visible scrollbar (Scrollbar/thumb, scrollbar/width).
+ * Pair it with the scrollbar (Scrollbar/thumb, scrollbar/width), which shows while the area scrolls.
  */
 .bland-scroll-fade {
   --bland-fade-length: var(--fade-md);

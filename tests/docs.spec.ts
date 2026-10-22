@@ -1,6 +1,7 @@
-// The docs site: every page opens without errors, the theme switch works, demo controls drive the demo.
+// The docs site: every page opens without errors, the theme switch works, demo controls drive the demo,
+// the code view shows a whole file, and the search finds pages.
 import { expect, test, type Page } from '@playwright/test';
-import { storyIds } from './stories';
+import { pickOption, storyIds } from './stories';
 
 const stylePages = ['colors', 'typography', 'spacing', 'radius', 'stroke', 'elevation', 'motion', 'breakpoints', 'sizing', 'icons'];
 
@@ -21,32 +22,85 @@ for (const path of ['', ...stylePages.map((p) => `styles/${p}`), ...storyIds.map
   });
 }
 
-test('the theme switch sets and clears data-theme', async ({ page }) => {
+test('the theme switch follows the system until one is picked, then remembers it', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto('/#/styles/colors');
   const html = page.locator('html');
-  await page.getByRole('group', { name: 'Theme' }).getByRole('button', { name: 'Dark' }).click();
-  await expect(html).toHaveAttribute('data-theme', 'dark');
-  await page.reload();
-  await expect(html).toHaveAttribute('data-theme', 'dark');
-  await page.getByRole('group', { name: 'Theme' }).getByRole('button', { name: 'System' }).click();
+  const theme = page.getByRole('radiogroup', { name: 'Theme' });
   await expect(html).not.toHaveAttribute('data-theme');
+  await expect(theme.getByRole('radio', { name: 'Dark' })).toBeChecked();
+  await theme.getByRole('radio', { name: 'Light' }).check({ force: true }); // the radio is visually hidden under its label
+  await expect(html).toHaveAttribute('data-theme', 'light');
+  await page.reload();
+  await expect(html).toHaveAttribute('data-theme', 'light');
+  await expect(theme.getByRole('radio', { name: 'Light' })).toBeChecked();
 });
 
 test('demo controls change the component and the code snippet', async ({ page }) => {
   await page.goto('/#/components/button');
   const demo = page.locator('.docs-demo-stage .bland-button');
   await expect(demo).toHaveAttribute('data-emotion', 'brand');
-  await page.getByLabel('emotion').selectOption('danger');
+  await pickOption(page, 'emotion', 'danger');
   await expect(demo).toHaveAttribute('data-emotion', 'danger');
-  await expect(page.locator('.docs-code').last()).toContainText('emotion="danger"');
-  await page.getByLabel('children').fill('Delete file');
+  await expect(page.locator('.docs-example-code')).toContainText('emotion="danger"');
+  await page.getByLabel('label', { exact: true }).fill('Delete file');
   await expect(demo).toContainText('Delete file');
+});
+
+test('the code view shows a whole file: the imports and a component', async ({ page }) => {
+  await page.goto('/#/components/button');
+  const code = page.locator('.docs-example-code code');
+  await expect(code).toContainText("import { Button, PlusIcon } from 'bland';");
+  await expect(code).toContainText('export function Example() {');
+  await expect(code).toContainText('iconStart={<PlusIcon />}');
+});
+
+test('search opens with the shortcut, finds pages and other mentions, and goes to a result', async ({ page }) => {
+  await page.goto('/#/components/button');
+  await page.keyboard.press('ControlOrMeta+k');
+  const dialog = page.getByRole('dialog', { name: 'Search Bland' });
+  await expect(dialog).toBeVisible();
+  const field = dialog.getByRole('combobox', { name: 'Search Bland' });
+  // It opens resting on the first result, Colors; the arrows move the highlight, focus stays in the field.
+  await expect(field).toBeFocused();
+  await expect(dialog.getByRole('option', { selected: true })).toHaveText('Colors');
+  await field.press('ArrowDown');
+  await expect(dialog.getByRole('option', { selected: true })).toHaveText('Typography');
+  await expect(field).toBeFocused();
+  await field.fill('numeric');
+  await expect(dialog.getByRole('option', { name: 'Numeric Input Field', exact: true })).toBeVisible();
+  await field.fill('surface-100');
+  await expect(dialog.getByText('Other results')).toBeVisible();
+  await field.fill('nothing matches this');
+  await expect(dialog.getByText('Nothing found')).toBeVisible();
+  await field.fill('numeric');
+  await field.press('Enter');
+  await expect(page).toHaveURL(/#\/components\/numeric-input-field$/);
+  await expect(dialog).toBeHidden();
+});
+
+test('the previous and next buttons walk the sidebar order', async ({ page }) => {
+  await page.goto('/#/components/alert');
+  await page.getByRole('button', { name: 'Next: Avatar' }).click();
+  await expect(page.locator('.docs-page-header h1')).toHaveText('Avatar');
+  await page.getByRole('button', { name: 'Previous: Alert' }).click();
+  await expect(page.locator('.docs-page-header h1')).toHaveText('Alert');
+});
+
+test('the toolbar stays at the top, and the contents rail scrolls a section to just under it', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/#/components/button');
+  const toolbar = page.locator('.docs-toolbar');
+  await page.getByRole('navigation', { name: 'On this page' }).getByRole('button', { name: 'Button props', exact: true }).click();
+  await expect(toolbar).toHaveAttribute('data-stuck');
+  await expect.poll(async () => Math.round((await page.locator('#props-Button').boundingBox())!.y)).toBe(80);
+  expect((await toolbar.boundingBox())!.y).toBe(0);
 });
 
 test('every component page shows a props table with rows', async ({ page }) => {
   for (const id of storyIds) {
     await page.goto(`/#/components/${id}`);
-    await expect(page.locator('.docs-table tbody tr').first()).toBeVisible();
+    await expect(page.locator('.docs-props tbody tr').first()).toBeVisible();
   }
 });
 
@@ -134,11 +188,11 @@ test('zooming never changes the size of the playground', async ({ page }) => {
 test('the Avatar demo builds its slot content from the controls', async ({ page }) => {
   await page.goto('/#/components/avatar');
   const stage = page.getByTestId('demo-stage');
-  const code = page.locator('.docs-code code').last();
+  const code = page.locator('.docs-example-code code');
   await expect(stage.locator('[data-slot="top"]')).toHaveText('3');
   await page.locator('#ctl-topCount').fill('12');
   await expect(stage.locator('[data-slot="top"]')).toHaveText('12');
-  await page.locator('#ctl-bottomSlot').selectOption('none');
+  await pickOption(page, 'bottomSlot', 'none');
   await expect(stage.locator('[data-slot="bottom"]')).toHaveCount(0);
   await expect(code).toContainText('topSlot={<Indicator ring size="lg" emotion="danger">12</Indicator>}');
   await expect(code).not.toContainText('bottomSlot');

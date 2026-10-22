@@ -108,6 +108,15 @@ built only when `npm run docs` starts. → After adding a component, touch
 `playground/docs/data.ts` and run `npm run props` (or restart the docs
 server) before looking or testing.
 
+- **`get_design_context` on a Figma section returns megabytes of sparse metadata** (2.5 MB for the 8 frame
+  docs section, saved to a file, flagged sparse) → the node was a section of whole pages → for page mockups,
+  take `get_screenshot` of each frame, then a read-only `use_figma` script that walks a frame and returns
+  layout, padding, radius, text style and bound variable names per node (skip dot patterns and other repeats).
+
+- **`variable.scopes = …` throws "Cannot set scopes on this variable type" on a TIMING variable** → scopes
+  exist only for some types → leave TIMING (Motion) variables at their default `ALL_SCOPES`, as the
+  existing delays are; a failed `use_figma` rolls the whole script back, so recreate rather than patch.
+
 ## Fonts
 
 **Fontsource *variable* packages register a different family name**
@@ -367,6 +376,16 @@ the Sidebar's motion there with `requestAnimationFrame` got two frames in
 a second. → Measure animations in Playwright (headless frames run
 normally), not in the pane.
 
+- **A `width` on a Bland Table header cell does nothing** → basic cells set `max-width: 0` at
+  `.bland-table__header[data-structure]` specificity (0,2,0), and `:is(th, td)` under a class is only (0,1,1)
+  → override with `.x .bland-table__header, .x .bland-table__cell { max-width: none }`, then set widths.
+- **`width: max-content` on a Segmented bar still truncates a label** → segments are `flex: 1 1 0`, so the
+  bar splits its intrinsic width equally and the wider (bold, selected) label loses → when the bar should
+  hug its segments, give the items `flex: 1 0 auto` too.
+- **An inset box-shadow "border" on a container vanishes behind its children** → children with a
+  background paint over the parent's inset shadow → for a frame around filled panels use a real border
+  (with `overflow: hidden` for the corners).
+
 ## Tooling
 
 **Playwright's mouse misses points below the viewport.** A Slider spec
@@ -509,6 +528,11 @@ itself (`getByRole('radio')`).
 `exact: true` whenever one accessible name is a prefix of another (numbered
 items, "Page 1" / "Page 10").
 
+- **A Playwright test on `page.clock.install()` + `runFor` fails under parallel load** → an installed clock
+  keeps advancing in real time between steps, so a 2s timer can expire before `runFor` → to test a
+  timer, either `pauseAt` the clock before the action or assert the real elapsed time with a generous
+  `toHaveText` timeout.
+
 ## Working with parallel sessions
 
 **Two sessions share this folder and commit on `main`.** A `git add -A` from one
@@ -578,3 +602,10 @@ wait a second, before trusting the screenshot.
 **`form_input` on a React-controlled checkbox flips the DOM, not React's
 state.** The docs "focused" toggle looked on but did nothing; the next click
 turned it off. → Click React checkboxes with `computer` instead.
+
+- **Screenshots lag one step behind a change** (typing into a dialog's field, a theme click) → the pane
+  captured before the next paint → `wait` a second before the screenshot, or check state with
+  `javascript_tool` first.
+
+- **Pane screenshots come back blank white** → the Browser pane is hidden (`tabs_context` says so) → read
+  state with `javascript_tool`, and take visual checks with a short Playwright script against the dev server.
