@@ -2035,4 +2035,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
     name); values are Code/body-md. Data table containers are rad-lg.
   - Icons page: cards pad space-md at the sides; long names end in an
     ellipsis (full name in the tooltip title).
+- **Contents rail has no scrollbar (Godwin, 2026-10-23):** its list scrolls
+  with the edge fade alone (`scrollbar={false}`, as the Sidebar's list); it
+  scrolls itself to keep the current entry in view.
 

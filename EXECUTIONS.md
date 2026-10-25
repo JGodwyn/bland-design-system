@@ -1393,3 +1393,8 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Icon cards: `min-width: 0`, side padding space-md, figcaption ellipsis with a title.
 - Checked Spacing and Icons with Playwright captures (the pane is hidden); docs spec 73 pass.
 
+## Contents rail without a scrollbar (2026-10-23)
+
+- Godwin asked to remove the rail's scrollbar: `scrollbar={false}` on its ScrollArea; the fade and
+  the keep-in-view scrolling stay.
+

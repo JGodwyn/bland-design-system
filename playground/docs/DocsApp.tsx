@@ -252,7 +252,7 @@ function PageContents({ route }: { route: string }) {
           </Icon>
           Content
         </h2>
-        <ScrollArea className="docs-toc-scroll" fadeSize="sm">
+        <ScrollArea className="docs-toc-scroll" fadeSize="sm" scrollbar={false}>
           <ul ref={list} className="docs-toc-list" key={route}>
             <li ref={bar} className="docs-toc-bar" aria-hidden="true" />
             {items.map((item) => (
