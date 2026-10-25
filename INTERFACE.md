@@ -1930,6 +1930,24 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - The docs chrome lives in `playground/`, outside the Bland package and the
   lint, but uses Bland's tokens and components wherever one fits.
 
+### Logo (2026-10-25)
+
+- **The wordmark is live text** in the text style of its size (lg
+  Heading/heading-md, sm Title/title-md), the same as Figma's text layer, so it
+  follows the tokens and themes. Figma's description says code should name the
+  product with alt text; the visible text does that, so there is no SVG or alt.
+- **`children` replaces the wordmark (code only)**, default "Bland". Figma's
+  text is fixed, but a client project needs its own product name next to its
+  mark. Figma only offers the mark slot.
+- **The mark is decorative** (`aria-hidden`) and sits in the logo/mark-*
+  square; an `img` or `svg` inside keeps its own aspect ratio up to that size.
+  On a brand fill the project supplies its white version; Bland doesn't recolor it.
+- **On-color goes on `surface-brand-strong`.** It stays #0062ff in both themes
+  (5.0:1 with white); `surface-brand` lightens to #659cff in dark, where white is
+  2.7:1 and axe fails it. Found by the dark a11y check on the story.
+- **`href` makes it the home link**, rendered through `renderLink` as TabBar and
+  Breadcrumb do, with the focus ring at rad-sm. No hover, as in Figma.
+
 ### Docs site redesign (2026-10-22, Figma "Doc Design update", node 6612:88042)
 
 - **Layout:** sidebar (sidebar/width) | page (720 reading width, inside

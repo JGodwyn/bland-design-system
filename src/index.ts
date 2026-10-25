@@ -245,3 +245,10 @@ export {
   type ChatMessageBarLabels,
   type ChatMessageBarReply,
 } from './components/chat-message-bar/ChatMessageBar';
+export {
+  Logo,
+  type LogoProps,
+  type LogoSize,
+  type LogoColor,
+  type LogoLinkProps,
+} from './components/logo/Logo';

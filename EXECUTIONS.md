@@ -1429,3 +1429,16 @@ not wrapped; rail contents centred (logo and account icon were off).
   per-style tokens. Fixtures updated; also fixed an old fixture (300ms now has a token, the Sidebar's close
   delay), now 350ms. test:lint 4/4, lint:css, typecheck clean; no `var(--…)` left pointing at a removed token.
 
+## Logo (2026-10-25)
+
+- Read the Logo set (Brand elements page, `14:211`) in one `use_figma` dump: Size lg/sm, Color default/on-color,
+  `👀 Mark` + `🧩 Mark` slot (logo/mark-lg 40 / -sm 24), gap space-sm, wordmark text "Bland" in
+  Heading/heading-md or Title/title-md, Text/text-bold or text-on-color. No hover, no tokens of its own beyond
+  the mark sizes.
+- Built `src/components/logo/` (Logo.tsx, logo.css, story). Measured in the browser: lg 93 x 40 (Figma 93 x 40),
+  sm 46 x 24 (Figma 47, sub-pixel), marks 40 and 24, gap 8.
+- Story: the first project mark (brand square) vanished on the on-color brand fill; the story now gives that
+  example a white version, as a project would.
+- Suite: 622 of 623; axe failed the dark story: the on-color example sat on surface-brand, which is #659cff in
+  dark (white 2.7:1). surface-brand-strong stays #0062ff (5.0:1); the story uses it and the docs say so.
+

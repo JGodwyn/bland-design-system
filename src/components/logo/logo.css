@@ -1,0 +1,58 @@
+/*
+ * Logo (Figma: Brand elements page, set "Logo").
+ *
+ *   <span class="bland-logo" data-size="lg" data-color="default">          (or <a … bland-focus-ring> with href)
+ *     <span class="bland-logo__mark" aria-hidden>…</span>                  (only with mark)
+ *     <span class="bland-logo__wordmark">Bland</span>
+ *   </span>
+ *
+ * From Figma: a row centred on its cross axis, space-sm between mark and wordmark, no padding. lg: wordmark
+ * Heading/heading-md, mark logo/mark-lg (40, the wordmark's height); sm: Title/title-md, logo/mark-sm (24).
+ * Color default: Text/text-bold; on-color: Text/text-on-color (white in both modes). No hover in Figma.
+ */
+
+.bland-logo {
+  --_type: var(--type-heading-md);
+  --_spacing: var(--type-heading-md-letter-spacing);
+  --_mark: var(--logo-mark-lg);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--text-bold);
+  font: var(--_type);
+  letter-spacing: var(--_spacing);
+  white-space: nowrap;
+}
+
+.bland-logo[data-size="sm"] {
+  --_type: var(--type-title-md);
+  --_spacing: var(--type-title-md-letter-spacing);
+  --_mark: var(--logo-mark-sm);
+}
+
+.bland-logo[data-color="on-color"] {
+  color: var(--text-on-color);
+}
+
+.bland-logo--link {
+  --bland-radius: var(--rad-sm); /* drawn by .bland-smooth: the focus ring's corners */
+
+  text-decoration: none;
+}
+
+/* The project's mark fills the square, keeping its own aspect ratio. */
+.bland-logo__mark {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--_mark);
+  height: var(--_mark);
+}
+
+.bland-logo__mark > :is(img, svg) {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+}
