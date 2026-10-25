@@ -101,7 +101,8 @@ function ColorsPage() {
 }
 
 function TypographyPage() {
-  const styles = inCollection('Text styles');
+  const styles = inCollection('Text styles').filter((t) => t.type === 'FONT');
+  const parts = inCollection('Text styles').filter((t) => t.type !== 'FONT');
   return (
     <>
       <Section title="Text styles">
@@ -119,8 +120,8 @@ function TypographyPage() {
           ))}
         </div>
       </Section>
-      <Section title="Type scale" note="The parts the text styles are built from. Reach for these only when a component needs one property alone.">
-        <TokenTable items={inCollection('Typography')} />
+      <Section title="Line height and letter spacing" note="Each text style's line height and letter spacing on their own. The font shorthand can't set letter spacing, so set it beside the style; use a line height to size something by lines of text. The raw type scale is a primitive in Figma and is not emitted.">
+        <TokenTable items={parts} />
       </Section>
     </>
   );

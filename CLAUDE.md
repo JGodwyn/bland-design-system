@@ -71,7 +71,7 @@ They merge with git's `union` strategy (`.gitattributes`): append, never restruc
 
 ## Token architecture
 
-Three layers. **Components bind only to Theme or scale tokens, never primitives.** 624 variables in 12 collections (as of 2026-10-20), plus 15 elevation styles and 23 text styles. Primitives are not emitted to CSS at all, so a component cannot reach them.
+Three layers. **Components bind only to Theme or scale tokens, never primitives.** 628 variables in 12 collections (as of 2026-10-25), plus 15 elevation styles and 23 text styles. Primitives are not emitted to CSS at all, so a component cannot reach them.
 
 | Collection | Layer | Modes | Holds |
 | --- | --- | --- | --- |
@@ -82,7 +82,7 @@ Three layers. **Components bind only to Theme or scale tokens, never primitives.
 | `Spacing` | Scale | 1 | `space-none` 0 – `space-9xl` 256, `Layout/margin-desktop` 152, `Layout/margin-mobile` 24 |
 | `Corner Radius` | Scale | 1 | `rad-null` 0, `rad-xs` 2, `rad-sm` 4, `rad-md` 8, `rad-lg` 16, `rad-xl` 24, `rad-rd` full |
 | `Stroke` | Scale | 1 | `stroke-none` 0, `stroke-xs` 0.5, `stroke-sm` 1 (borders), `stroke-md` 1.5 (icons), `stroke-lg` 2 (focus), `stroke-xl` 4 |
-| `Typography` | Scale | 1 | `family/`, `weight/`, `size/`, `line-height/`, `letter-spacing/normal` (0) |
+| `_Typography` | Primitive, hidden | 1 | `family/`, `weight/`, `size/`, `line-height/`, `letter-spacing/normal` (0). Hidden 2026-10-25: type reaches code only through text styles |
 | `Effects` | Scale | 1 | `elevation/{near,mid,far}/{ambient,key}-{y,blur,spread}`, `elevation/x` |
 | `Sizing` | Scale | 1 | `control/*`, `icon/*`, `input/*`, `avatar/*`, `table/*`, `fade/*`, `scrollbar/width`, `logo/mark-*`, … |
 | `Motion` | Scale | 1 | `duration/xs` 125, `sm` 160, `md` 200, `lg` 250, `xl` 400 (Toast), `2xl` 500 (Sidebar, sheets), `spin` 800 (one turn of a loading spinner), `typing` 1200 (one wave of a typing bubble's dots, looping), `toast-visible` 5000 (how long a Toast stays on screen, not an animation), `tooltip-delay` 500 and `tooltip-close-delay` 100 (a Tooltip's hover delays, not animations), `sidebar-peek-delay` 200 and `sidebar-peek-close-delay` 300 (a minimized Sidebar's hover delays), `scrollbar-hide-delay` 1000 (how long a scrollbar stays after scrolling stops) and `copied-visible` 2000 (how long a copy button shows Copied), both added 2026-10-22; `easing/out`, `in-out`, `drawer`, `ease`, `linear` |
@@ -100,7 +100,7 @@ Implemented in `scripts/build-tokens.ts`; CSS naming and the sync steps are in `
 - **Do not export `Fade/*-clear`** (Figma-only drawing aids).
 - Export every variable's description alongside its value.
 - Elevation: 15 styles `Elevation/{neutral,brand,danger,success,warning}/{near,mid,far}`, each an ambient + key layer. Geometry from `Effects`, color from `Shadow/{family}-{ambient,key}`. In code each is **one `box-shadow` variable** whose color switches in dark mode.
-- Text styles: Display, Heading, Title, Body (incl. `-bold`, `-underline`), `Code/*` in Geist Mono. `weight/semibold` (Inter "Semi Bold") and `weight/mono-semibold` (Geist "SemiBold") are both real: the families spell the style differently.
+- Text styles: Display, Heading, Title, Body (incl. `-bold`, `-underline`), `Code/*` in Geist Mono. Each is a `font` shorthand (`--type-body-md`) plus `--type-body-md-line-height` and `--type-body-md-letter-spacing`; set the letter spacing beside the `font`. No raw `--font-*`, `--line-height-*` or `--letter-spacing-*` tokens. `weight/semibold` (Inter "Semi Bold") and `weight/mono-semibold` (Geist "SemiBold") are both real: the families spell the style differently.
 - Naming: size steps follow value order (`xs` < `sm` < `md` < `lg`). Variant values lowercase; property names capitalized.
 
 ## Decisions code must follow

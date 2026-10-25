@@ -37,7 +37,7 @@
   background-color: var(--_bg);
   color: var(--text-subtle);
   font: var(--type-body-lg);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
   text-align: start;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;

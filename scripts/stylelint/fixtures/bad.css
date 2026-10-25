@@ -11,9 +11,11 @@
   background-color: #0062ff; /* expect: var(--surface-brand) */
   color: #15181d; /* expect: var(--icon-bold) */
   width: 2.5rem; /* expect: 40px at a 16px root | var(--control-md) */
-  font-size: 14px; /* expect: var(--font-size-sm) */
-  font-weight: 500; /* expect: var(--font-weight-medium) */
-  font-family: "Inter", sans-serif; /* expect: var(--font-family-sans) */
+  font-size: 14px; /* expect: var(--type-body-md) | var(--type-code-body-md) */
+  font-weight: 500; /* expect: var(--type-body-md-bold) */
+  font-family: "Inter", sans-serif; /* expect: var(--type-body-md) */
+  font-family: "Geist Mono", monospace; /* expect: var(--type-code-body-md) */
+  line-height: 24px; /* expect: var(--type-body-lg-line-height) */
   font: 400 14px/20px Inter, sans-serif; /* expect: var(--type-body-md) */
   box-shadow: 0 2px 4px -1px rgb(0 0 0 / 6%), 0 4px 8px -2px rgb(0 0 0 / 10%); /* expect: var(--elevation-neutral-mid) */
   outline-color: white; /* expect: var(--border-inverse) */
@@ -37,7 +39,7 @@
   animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1); /* expect: var(--easing-drawer) */
   animation-timing-function: linear; /* expect: var(--easing-linear) */
   animation-timing-function: ease; /* expect: var(--easing-ease) */
-  transition-delay: 300ms; /* expect: no Motion token is 300ms | var(--duration-lg) | var(--duration-xl) */
+  transition-delay: 350ms; /* expect: no Motion token is 350ms | var(--duration-xl) */
   transition-property: all; /* expect: Name the exact properties */
   --enter: 125ms; /* expect: var(--duration-xs) */
 }

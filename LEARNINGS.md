@@ -68,6 +68,19 @@ variable records, set `metaChanged` to false (and drop `meta`) in the saved
 result: `--apply` then keeps the repo's collections and styles. Say in the
 commit that the checksum will differ until the rest is settled.
 
+**Hiding a Figma collection removes its CSS.** `hiddenFromPublishing` is how
+the build tells a primitive, so hiding `Typography` (to keep it out of
+library files) dropped every raw type token. → Before hiding a collection in
+Figma, list what components read from it and give them a non-primitive
+source first (for type: the per-style `--type-*-line-height` and
+`-letter-spacing`, 2026-10-25).
+
+**When only the metadata differs, skip the 17 KB drift script.** If Figma's
+`checksum.js` equals the repo's, the variables are in sync; patch the
+collection or style record in `00.json` and compare an FNV hash of
+`JSON.stringify(meta)` from Figma with the same hash of the local meta.
+Cheaper than pasting `check.js` through `use_figma`.
+
 **The Figma MCP has a per-seat call limit.** Mid-read, `use_figma` on the
 plugin connector returned "You've reached the Figma MCP tool call limit for your
 View seat", and Framelink answered 403 "Token expired". → Read a component in

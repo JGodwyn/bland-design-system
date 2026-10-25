@@ -22,7 +22,7 @@
   max-width: 100%;
   color: var(--text-bold);
   font: var(--type-body-md);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-md-letter-spacing);
   vertical-align: top;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;

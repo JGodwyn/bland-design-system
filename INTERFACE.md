@@ -35,6 +35,16 @@ when), `docs/components.md` (how to build one).
   Fontsource (`bland/fonts.css`): Inter 400, 500, 600 and Geist Mono 400, 600
   only, because those are the weights the text styles use.
 - Components set type with the composite: `font: var(--type-body-md)`.
+- **Type only through text styles (Godwin, 2026-10-25).** Figma's raw type
+  scale (`_Typography`: families, weights, sizes, line heights, letter
+  spacing) is hidden from publishing like the color and unit primitives, so
+  library users see only text styles. The usual design system setup. Code
+  follows: no `--font-*`, `--line-height-*` or `--letter-spacing-*` tokens.
+  Each text style instead emits its two loose parts:
+  `--type-<style>-letter-spacing` (the `font` shorthand can't set it; set it
+  beside the style) and `--type-<style>-line-height` (to size something by
+  lines, as Text Area's rows and Code text's copy button). A root without its
+  own `font` sets the letter spacing of its main style (body-lg).
 
 ### Corners and focus
 - Every rounded element gets `bland-smooth` (`corner-shape: superellipse(2)`).

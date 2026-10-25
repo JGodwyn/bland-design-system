@@ -83,7 +83,7 @@
   min-width: var(--space-none);
   padding-inline: var(--_pad);
   font: var(--type-body-lg);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
   white-space: nowrap;
   cursor: pointer;
   user-select: none;

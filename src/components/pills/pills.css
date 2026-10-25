@@ -41,7 +41,7 @@
   /* Figma's inside stroke: drawn inside the box, so it adds no size. */
   box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--_border);
   font: var(--type-body-lg);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
   white-space: nowrap;
   cursor: pointer;
   user-select: none;

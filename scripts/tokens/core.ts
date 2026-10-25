@@ -17,6 +17,7 @@ export type TextStyle = {
   fontStyle?: string;
   fontFamily?: string;
   lineHeight?: string;
+  letterSpacing?: string;
 };
 export type Meta = { fileKey: string; collections: Collection[]; effectStyles: EffectStyle[]; textStyles: TextStyle[] };
 
@@ -128,12 +129,7 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
       .toLowerCase();
 
   // Figma name -> CSS custom property name (without the leading --).
-  function cssName(name: string, collection: string): string {
-    if (collection === 'Typography') {
-      const [group, step] = name.split('/');
-      if (group === 'line-height' || group === 'letter-spacing') return `${group}-${step}`;
-      return `font-${group}-${step}`;
-    }
+  function cssName(name: string): string {
     // "Surface/surface-100" -> "surface-100", "Button/brand-primary-rest" -> "button-brand-primary-rest"
     return name
       .split('/')
@@ -187,7 +183,7 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     const aliasDark = themed ? aliasName(id, 'dark') : undefined;
     tokens.push({
       name,
-      css: `--${cssName(name, collection.name)}`,
+      css: `--${cssName(name)}`,
       collection: collection.name,
       type,
       description: decode(description),
@@ -224,6 +220,8 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
   }
 
   // Text styles: a `font` shorthand per style. Underline variants also need text-decoration: underline.
+  // The raw type scale (_Typography) is hidden like the other primitives, so each style also carries
+  // the two parts the shorthand can't set or a component may need alone: line height and letter spacing.
   for (const style of meta.textStyles) {
     const val = (id: string | undefined, field: string) => {
       if (!id) throw new Error(`${style.name}: ${field} is not bound to a variable.`);
@@ -231,21 +229,37 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     };
     const weight = FONT_WEIGHTS[String(val(style.fontStyle, 'fontStyle'))];
     const family = String(val(style.fontFamily, 'fontFamily'));
-    const font = `${weight} ${val(style.fontSize, 'fontSize')}px/${val(style.lineHeight, 'lineHeight')}px ${FONT_STACKS[family] ?? `"${family}"`}`;
+    const lineHeight = `${val(style.lineHeight, 'lineHeight')}px`;
+    const font = `${weight} ${val(style.fontSize, 'fontSize')}px/${lineHeight} ${FONT_STACKS[family] ?? `"${family}"`}`;
     const underline = style.textDecoration === 'UNDERLINE';
-    tokens.push({
-      name: style.name,
-      css: `--type-${kebab(style.name.split('/').slice(1).join('-'))}`,
-      collection: 'Text styles',
-      type: 'FONT',
-      description: decode(style.description) + (underline ? ' Pair with text-decoration: underline.' : ''),
-      light: font,
-    });
-  }
-
-  // Code/* text styles share step names with Body/*, so prefix them to stay unique.
-  for (const t of tokens) {
-    if (t.collection === 'Text styles' && t.name.startsWith('Code/')) t.css = t.css.replace('--type-', '--type-code-');
+    // Code/* text styles share step names with Body/*, so they get their own prefix.
+    const css = `--type-${style.name.startsWith('Code/') ? 'code-' : ''}${kebab(style.name.split('/').slice(1).join('-'))}`;
+    tokens.push(
+      {
+        name: style.name,
+        css,
+        collection: 'Text styles',
+        type: 'FONT',
+        description: decode(style.description) + (underline ? ' Pair with text-decoration: underline.' : ''),
+        light: font,
+      },
+      {
+        name: `${style.name}/line-height`,
+        css: `${css}-line-height`,
+        collection: 'Text styles',
+        type: 'FLOAT',
+        description: `Line height of ${style.name}, for sizing by lines of that text.`,
+        light: lineHeight,
+      },
+      {
+        name: `${style.name}/letter-spacing`,
+        css: `${css}-letter-spacing`,
+        collection: 'Text styles',
+        type: 'FLOAT',
+        description: `Letter spacing of ${style.name}. The font shorthand can't set it, so set it beside font: var(${css}).`,
+        light: `${val(style.letterSpacing, 'letterSpacing')}px`,
+      },
+    );
   }
 
   // ---------- checks ----------
@@ -257,7 +271,7 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     seenCss.set(t.css, t.name);
   }
 
-  const order = ['Theme', 'Spacing', 'Corner Radius', 'Stroke', 'Typography', 'Text styles', 'Effects', 'Effect styles', 'Sizing', 'Motion', 'Breakpoints'];
+  const order = ['Theme', 'Spacing', 'Corner Radius', 'Stroke', 'Text styles', 'Effects', 'Effect styles', 'Sizing', 'Motion', 'Breakpoints'];
   tokens.sort((a, b) => order.indexOf(a.collection) - order.indexOf(b.collection));
 
   return { tokens, skipped, order };

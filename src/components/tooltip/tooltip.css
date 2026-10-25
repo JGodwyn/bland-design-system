@@ -79,7 +79,7 @@
 .bland-tooltip__text {
   color: var(--tooltip-text);
   font: var(--type-body-md);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-md-letter-spacing);
   overflow-wrap: break-word;
 }
 

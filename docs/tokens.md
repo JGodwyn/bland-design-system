@@ -47,19 +47,18 @@ Not set up yet: running the check on a schedule. It needs the Figma MCP, so it w
 
 ## What the build does
 
-- **Primitives are not emitted.** `_Core Colors`, `_Functional Colors` and `_Units` are hidden collections. Every exported token resolves through them to a final value.
+- **Primitives are not emitted.** `_Core Colors`, `_Functional Colors`, `_Units` and `_Typography` are hidden collections. Every exported token resolves through them to a final value.
 - **Alias chains resolve to values**, per mode. `tokens.json` keeps the first alias hop (`aliasOf`) so you can see which primitive a token points at.
 - **Alpha primitives** (`{color: alias, opacity: N}`) resolve to the source color at exactly N%, written as `rgb(r g b / N%)`.
 - **`Fade/*-clear` is skipped** (Figma-only drawing aids). The build lists them under `skipped` in `tokens.json`.
 - **Elevation styles** become one `box-shadow` value each, ambient layer first, then key. The colors come from `Shadow/*` Theme tokens, so each elevation token is redefined in Dark.
-- **Text styles** become a `font` shorthand value each (`weight size/line-height family`). The `-underline` styles also need `text-decoration: underline`; their description says so.
+- **Text styles** become a `font` shorthand value each (`weight size/line-height family`), plus `--type-<style>-line-height` and `--type-<style>-letter-spacing` (the shorthand can't carry letter spacing, so components set it beside the `font`). The `-underline` styles also need `text-decoration: underline`; their description says so.
 - **Font weights** map from Figma style names to numbers: Regular 400, Medium 500, Semi Bold / SemiBold 600.
 - **Font families** get fallback stacks: Inter falls back to `system-ui, sans-serif`, Geist Mono to `ui-monospace, monospace`.
 - All dimensions are in `px`.
 - **Durations** (Figma `TIMING`, stored in seconds as float32, so 0.16 arrives as 0.1599999964) become whole milliseconds: `--duration-sm: 160ms`.
 - **Easings** (Figma `EASING`) become `cubic-bezier()` with coordinates rounded to 3 decimals, and `LINEAR` becomes `linear`. Any other easing type fails the build.
 - **Breakpoints** are emitted as `--breakpoint-*` for JS (`matchMedia`, Floating UI). CSS media queries cannot read `var()`, so `bland/use-tokens` reads the values from `tokens.json` and allows only those in `@media` (see `lint.md`).
-- **Text styles bind letter spacing** to `letter-spacing/normal` (0). The `font` shorthand cannot carry it, and 0 is the default, so the `--type-*` composites leave it out.
 
 ## CSS names
 
@@ -70,18 +69,16 @@ Not set up yet: running the check on a schedule. It needs the Figma MCP, so it w
 | `Date/Calendar-item/surface-hover` | `--date-calendar-item-surface-hover` | Lowercased, any depth |
 | `space-md`, `rad-md`, `stroke-md` | `--space-md`, `--rad-md`, `--stroke-md` | Scale tokens keep their names |
 | `control/sm`, `icon/md` | `--control-sm`, `--icon-md` | Sizing |
-| `family/sans`, `weight/medium`, `size/md` | `--font-family-sans`, `--font-weight-medium`, `--font-size-md` | Typography gets a `font-` prefix |
-| `line-height/md` | `--line-height-md` | |
 | `elevation/mid/key-y` | `--elevation-mid-key-y` | Effects geometry |
 | `Elevation/neutral/mid` (style) | `--elevation-neutral-mid` | Full `box-shadow` |
 | `Body/body-md` (style) | `--type-body-md` | Use as `font: var(--type-body-md)` |
 | `Code/body-md` (style) | `--type-code-body-md` | |
-| `letter-spacing/normal` | `--letter-spacing-normal` | Typography, like `line-height` |
+| `Body/body-md` line height, letter spacing | `--type-body-md-line-height`, `--type-body-md-letter-spacing` | From the style's bindings |
 | `duration/md` | `--duration-md` | Motion |
 | `easing/in-out` | `--easing-in-out` | Motion |
 | `breakpoint/md` | `--breakpoint-md` | Breakpoints |
 
-Prefer the composite tokens in components: `font: var(--type-body-md)` and `box-shadow: var(--elevation-neutral-mid)`. Reach for the parts (`--font-size-md`, `--elevation-mid-key-y`) only when a component needs one property alone.
+Prefer the composite tokens in components: `font: var(--type-body-md)` and `box-shadow: var(--elevation-neutral-mid)`. Reach for the parts (`--type-body-md-line-height`, `--elevation-mid-key-y`) only when a component needs one property alone. Families, weights and sizes have no tokens of their own: pick the text style.
 
 ## Light and dark
 
@@ -94,7 +91,11 @@ This supports both an explicit switch and the system preference. Which one the p
 
 ## Collections
 
-Twelve collections; the table in `CLAUDE.md` lists what each holds. Emitted: `Theme` (Light and Dark), `Spacing`, `Corner Radius`, `Stroke`, `Typography`, `Effects`, `Sizing`, `Motion`, `Breakpoints`, plus the elevation and text styles. Hidden and never emitted: `_Core Colors`, `_Functional Colors`, `_Units`.
+Twelve collections; the table in `CLAUDE.md` lists what each holds. Emitted: `Theme` (Light and Dark), `Spacing`, `Corner Radius`, `Stroke`, `Effects`, `Sizing`, `Motion`, `Breakpoints`, plus the elevation and text styles. Hidden and never emitted: `_Core Colors`, `_Functional Colors`, `_Units`, `_Typography`.
+
+## Sync of 2026-10-25 (`_Typography` hidden)
+
+Godwin hid the Typography collection from publishing (renamed `_Typography`) so files using the library show only text styles. Kept, as the standard setup. The variables were already in sync (628, `a4d83579`, equal in Figma and the repo); only `00.json`'s collection record changed, checked by hashing the meta in Figma and locally (`94b32fe7`). The build drops the 28 `--font-*`, `--line-height-*` and `--letter-spacing-normal` tokens and adds a line height and letter spacing per text style (46); the `--type-*` composites are unchanged. 550 tokens emitted. Components moved onto the per-style tokens in the same commit.
 
 ## Sync of 2026-10-20 (Sidebar delays)
 

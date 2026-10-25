@@ -38,7 +38,7 @@
   overflow: hidden;
   border-radius: var(--rad-rd);
   font: var(--type-body-md-bold);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-md-bold-letter-spacing);
   white-space: nowrap;
   user-select: none;
 }

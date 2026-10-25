@@ -57,7 +57,7 @@
   background-color: var(--_fill);
   color: var(--_text);
   font: var(--type-body-lg);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
   white-space: nowrap;
   cursor: pointer;
   user-select: none;

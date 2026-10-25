@@ -427,7 +427,7 @@
 
 code,
 .docs-code {
-  font-family: var(--font-family-mono);
+  font: var(--type-code-body-md);
 }
 
 /* A frame drawn as Figma's: a surface-200 card, space-md inside, around a bordered surface-100 box. */

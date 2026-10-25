@@ -35,7 +35,7 @@
   box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--_border);
   color: var(--_text);
   font: var(--type-body-sm);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-sm-letter-spacing);
   white-space: nowrap;
   vertical-align: middle;
 }

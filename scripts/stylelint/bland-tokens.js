@@ -31,8 +31,6 @@ const LENGTH_TOKENS = TOKENS.filter((t) => t.type === 'FLOAT' && pxOf(t.light) !
 const COLOR_TOKENS = TOKENS.filter((t) => t.type === 'COLOR')
 const FONT_TOKENS = TOKENS.filter((t) => t.type === 'FONT')
 const SHADOW_TOKENS = TOKENS.filter((t) => t.type === 'SHADOW')
-const WEIGHT_TOKENS = TOKENS.filter((t) => t.css.startsWith('--font-weight-'))
-const FAMILY_TOKENS = TOKENS.filter((t) => t.css.startsWith('--font-family-'))
 const msOf = (value) => (/^[\d.]+ms$/.test(value) ? Number.parseFloat(value) : null)
 const DURATION_TOKENS = TOKENS.filter((t) => t.css.startsWith('--duration-')).sort((a, b) => msOf(a.light) - msOf(b.light))
 const EASING_TOKENS = TOKENS.filter((t) => t.css.startsWith('--easing-'))
@@ -45,9 +43,9 @@ const SCALES = {
   radius: { label: 'Corner Radius', test: (t) => t.collection === 'Corner Radius' },
   stroke: { label: 'Stroke', test: (t) => t.collection === 'Stroke' },
   sizing: { label: 'Sizing', test: (t) => t.collection === 'Sizing' },
-  fontSize: { label: 'font size', test: (t) => t.css.startsWith('--font-size-') },
-  lineHeight: { label: 'line height', test: (t) => t.css.startsWith('--line-height-') },
-  letterSpacing: { label: 'letter spacing', test: (t) => t.css.startsWith('--letter-spacing-') },
+  // The raw type scale is a hidden primitive in Figma, so line height and letter spacing come per text style.
+  lineHeight: { label: 'text style line height', test: (t) => t.css.endsWith('-line-height') },
+  letterSpacing: { label: 'text style letter spacing', test: (t) => t.css.endsWith('-letter-spacing') },
 }
 
 // Semantic color groups, offered before component groups (Button/, Badge/, …).
@@ -62,7 +60,6 @@ function scalesFor(prop) {
   if (/^(border|outline)(-(top|right|bottom|left|block|inline)(-(start|end))?)?$/.test(prop)) return ['stroke']
   if (/^(padding|margin|scroll-padding|scroll-margin|inset)(-|$)|^(gap|row-gap|column-gap|top|right|bottom|left)$/.test(prop)) return ['spacing']
   if (/^(min-|max-)?(width|height|block-size|inline-size)$|^flex(-basis)?$/.test(prop)) return ['sizing', 'spacing']
-  if (prop === 'font-size') return ['fontSize']
   if (prop === 'line-height') return ['lineHeight']
   if (prop === 'letter-spacing') return ['letterSpacing']
   if (/^(transform|translate)$/.test(prop)) return ['spacing']
@@ -239,19 +236,26 @@ function suggestShadow(raw, value) {
   return `${q(raw)} is hardcoded and matches no elevation style. Use var(--elevation-{neutral,brand,danger,success,warning}-{near,mid,far}), e.g. var(--elevation-neutral-mid). ${ASK}`
 }
 
+// Families, weights and sizes are the hidden type scale in Figma: they reach components only through text styles.
+const TYPE_ONLY = 'Bland sets type only through text styles (the raw type scale is not emitted).'
+
 function suggestFamily(raw) {
   const mono = /mono|courier|consol/i.test(raw)
-  const pick = FAMILY_TOKENS.filter((t) => t.css.endsWith(mono ? '-mono' : '-sans'))
-  return `${q(raw)} is hardcoded. Use ${listTokens(pick.length ? pick : FAMILY_TOKENS)} or set font: var(--type-…) instead.`
+  const example = mono ? 'var(--type-code-body-md)' : 'var(--type-body-md)'
+  return `${q(raw)} is hardcoded. ${TYPE_ONLY} Set font: ${example} or another ${mono ? 'Code' : 'text'} style instead.`
 }
 
 function suggestWeight(raw) {
   const n = WEIGHT_KEYWORDS[raw.toLowerCase()] ?? Number(raw)
-  const exact = WEIGHT_TOKENS.filter((t) => Number(t.light) === n)
-  if (exact.length > 0) {
-    return `${q(raw)} is hardcoded. Use ${end(listTokens(exact))} Inter and Geist Mono name 600 differently, so pick -semibold for sans and -mono-semibold for code.`
-  }
-  return `${q(raw)} is hardcoded and no weight token is ${n}. Bland weights: ${WEIGHT_TOKENS.map((t) => `${v(t)} (${t.light})`).join(', ')}. ${ASK}`
+  const same = FONT_TOKENS.filter((t) => t.light.startsWith(`${n} `))
+  if (same.length > 0) return `${q(raw)} is hardcoded. ${TYPE_ONLY} Text styles of weight ${n}: ${listTokens(same, 'text styles')}. Use font: var(--type-…).`
+  return `${q(raw)} is hardcoded and no text style has weight ${n}. ${TYPE_ONLY} ${ASK}`
+}
+
+function suggestFontSize(raw, px) {
+  const same = FONT_TOKENS.filter((t) => t.light.includes(` ${px}px/`))
+  if (same.length > 0) return `${q(raw)} is hardcoded. ${TYPE_ONLY} Text styles of ${px}px: ${listTokens(same, 'text styles')}. Use font: var(--type-…).`
+  return `${q(raw)} is hardcoded and no text style is ${px}px. ${TYPE_ONLY} ${ASK}`
 }
 
 function suggestDuration(raw, ms) {
@@ -374,6 +378,8 @@ const ruleFunction = (primary) => (root, result) => {
         const unit = u.unit.toLowerCase()
         if (prop === 'font-weight' && unit === '' && number !== 0) {
           flag(suggestWeight(word), node)
+        } else if (prop === 'font-size' && LENGTH_UNITS.has(unit) && number !== 0) {
+          flag(suggestFontSize(word, toPx(number, unit)), node)
         } else if (TIME_UNITS[unit] && number !== 0) {
           flag(suggestDuration(word, Math.round(number * TIME_UNITS[unit])), node)
         } else if ((unit === 'em' && EM_PROPS.has(prop)) || (unit === 'ch' && CH_PROPS.has(prop))) {

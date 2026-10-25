@@ -12,7 +12,7 @@
   background: var(--button-brand-primary-rest);
   color: var(--text-on-color);
   font: var(--type-body-md-bold);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-md-bold-letter-spacing);
   box-shadow: var(--elevation-neutral-near);
   z-index: 1;
   line-height: 1;
@@ -43,7 +43,7 @@
 
 .label {
   font-family: inherit;
-  font-weight: var(--font-weight-medium);
+  font: var(--type-body-md-bold);
   margin-inline-start: calc(var(--space-xs) * -1);
   max-width: 60ch;
   text-overflow: ellipsis;

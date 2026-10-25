@@ -32,6 +32,7 @@
   --_cell: var(--control-xs);
   --_width: var(--calendar-width-sm);
   --_type: var(--type-body-md);
+  --_spacing: var(--type-body-md-letter-spacing);
   --_type-bold: var(--type-body-md-bold);
   --_weekday-type: var(--type-body-sm);
 
@@ -48,13 +49,14 @@
     var(--elevation-neutral-mid);
   color: var(--text-bold);
   font: var(--_type);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--_spacing);
 }
 
 .bland-calendar[data-size="md"] {
   --_cell: var(--control-sm);
   --_width: var(--calendar-width-md);
   --_type: var(--type-body-lg);
+  --_spacing: var(--type-body-lg-letter-spacing);
   --_type-bold: var(--type-body-lg-bold);
   --_weekday-type: var(--type-body-md);
 }
@@ -63,6 +65,7 @@
   --_cell: var(--control-md);
   --_width: var(--calendar-width-lg);
   --_type: var(--type-body-lg);
+  --_spacing: var(--type-body-lg-letter-spacing);
   --_type-bold: var(--type-body-lg-bold);
   --_weekday-type: var(--type-body-md);
 }

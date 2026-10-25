@@ -104,7 +104,7 @@
   background-color: var(--_surface);
   color: var(--_content);
   font: var(--type-body-lg);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
 }
 
 /* Image, video and document bubbles take the full width. */

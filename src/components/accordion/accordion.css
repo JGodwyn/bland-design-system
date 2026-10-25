@@ -35,7 +35,7 @@
   background-color: var(--surface-200);
   color: var(--text-bold);
   font: var(--type-body-lg);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
   list-style: none;
   cursor: pointer;
   user-select: none;
@@ -95,7 +95,7 @@
   padding: var(--space-md);
   color: var(--text-bold);
   font: var(--type-body-lg);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
 }
 
 /* ---- Flush: no fill, no side padding; content padded space-xs above and below ---- */

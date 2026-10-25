@@ -30,7 +30,7 @@
   background-color: var(--_bg);
   color: var(--_text);
   font: var(--type-body-sm);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-sm-letter-spacing);
   white-space: nowrap;
   vertical-align: middle;
 }

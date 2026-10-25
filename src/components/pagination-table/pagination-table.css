@@ -29,7 +29,7 @@
 .bland-pagination-table__pages {
   color: var(--text-bold);
   font: var(--type-body-md);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-md-letter-spacing);
 }
 
 .bland-pagination-table__summary {

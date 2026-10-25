@@ -34,7 +34,7 @@
   gap: var(--space-xs);
   min-width: var(--space-none);
   font: var(--type-body-lg);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
 }
 
 .bland-text-input__label {

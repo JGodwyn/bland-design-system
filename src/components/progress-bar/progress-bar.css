@@ -29,7 +29,7 @@
   width: var(--progress-width);
   max-width: 100%;
   color: var(--text-bold);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
 }
 
 /* ---- Status: fill, helper and icon colors ---- */

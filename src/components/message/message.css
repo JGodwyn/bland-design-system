@@ -24,7 +24,7 @@
   align-items: flex-start;
   gap: var(--space-sm);
   min-width: var(--space-none);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
   overflow-wrap: break-word;
 }
 

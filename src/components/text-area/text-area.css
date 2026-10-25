@@ -27,7 +27,7 @@
   gap: var(--space-xs);
   min-width: var(--space-none);
   font: var(--type-body-lg);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
 }
 
 .bland-text-area__label {
@@ -42,8 +42,8 @@
   display: flex;
   flex-direction: column;
   /* rows lines of body-lg plus the space-sm padding above and below; at least one line when resized. */
-  height: calc(var(--_rows) * var(--line-height-md) + var(--space-sm) * 2);
-  min-height: calc(var(--line-height-md) + var(--space-sm) * 2);
+  height: calc(var(--_rows) * var(--type-body-lg-line-height) + var(--space-sm) * 2);
+  min-height: calc(var(--type-body-lg-line-height) + var(--space-sm) * 2);
   background-color: var(--_fill);
   /* Figma's inside stroke, drawn inside the box so it adds no size. */
   box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--_border);

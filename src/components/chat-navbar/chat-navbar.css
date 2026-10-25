@@ -56,13 +56,13 @@
 .bland-chat-navbar__name {
   color: var(--text-bold);
   font: var(--type-body-lg-bold);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-bold-letter-spacing);
 }
 
 .bland-chat-navbar__description {
   color: var(--text-subtle);
   font: var(--type-body-sm);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-sm-letter-spacing);
 }
 
 .bland-chat-navbar__actions {

@@ -26,7 +26,7 @@
   box-sizing: border-box;
   width: 100%;
   font: var(--type-body-lg);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
 }
 
 /* The reply panel and the field, stacked space-xs apart, beside the send button. */

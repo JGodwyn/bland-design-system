@@ -31,6 +31,7 @@
   --_count: var(--sidebar-count-sm);
   --_count-pad: var(--space-2xs);
   --_count-type: var(--type-body-sm-bold);
+  --_count-spacing: var(--type-body-sm-bold-letter-spacing);
   --_rail: calc(var(--_item) + var(--space-sm) * 2);
   --_list-pad: var(--space-lg);
   --_icon-x: var(--_pad);
@@ -59,6 +60,7 @@
   --_count: var(--sidebar-count-lg);
   --_count-pad: var(--space-xs);
   --_count-type: var(--type-body-md-bold);
+  --_count-spacing: var(--type-body-md-bold-letter-spacing);
   --bland-icon-size: var(--icon-md);
 }
 
@@ -68,6 +70,7 @@
   --_count: var(--sidebar-count-xl);
   --_count-pad: var(--space-xs);
   --_count-type: var(--type-body-md-bold);
+  --_count-spacing: var(--type-body-md-bold-letter-spacing);
   --bland-icon-size: var(--icon-md);
 }
 
@@ -269,7 +272,7 @@
   background-color: var(--_bg);
   color: var(--_text);
   font: var(--type-body-lg);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
   text-align: start;
   text-decoration: none;
   cursor: pointer;
@@ -361,7 +364,7 @@
   background-color: var(--_count-bg);
   color: var(--_count-text);
   font: var(--_count-type);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--_count-spacing);
   transition: background-color var(--duration-xs) var(--easing-out);
 }
 

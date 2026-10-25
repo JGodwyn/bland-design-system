@@ -33,7 +33,7 @@
 .bland-date-range-picker__helper {
   color: var(--text-subtle);
   font: var(--type-body-sm);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-sm-letter-spacing);
   overflow-wrap: break-word;
 }
 

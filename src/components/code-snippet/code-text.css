@@ -18,7 +18,7 @@
   --bland-radius: var(--rad-sm);
   --bland-icon-size: var(--icon-xs);
   --_pad: var(--space-xs);
-  --_line: var(--line-height-md);
+  --_line: var(--type-code-body-lg-line-height);
 
   display: inline-flex;
   align-items: flex-start;
@@ -31,10 +31,10 @@
 
 .bland-code-text[data-size="sm"] {
   --_pad: var(--space-2xs);
-  --_line: var(--line-height-xs);
+  --_line: var(--type-code-body-sm-line-height);
 }
 .bland-code-text[data-size="md"] {
-  --_line: var(--line-height-sm);
+  --_line: var(--type-code-body-md-line-height);
 }
 .bland-code-text[data-size="lg"] {
   --bland-icon-size: var(--icon-sm);

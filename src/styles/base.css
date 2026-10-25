@@ -19,7 +19,7 @@ html {
 body {
   margin: 0;
   font: var(--type-body-md);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-md-letter-spacing);
   color: var(--text-bold);
   background: var(--surface-100);
   -webkit-font-smoothing: antialiased;

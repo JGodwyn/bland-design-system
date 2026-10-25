@@ -52,7 +52,7 @@
   margin: var(--space-none);
   color: var(--text-bold);
   font: var(--type-body-lg-bold);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-bold-letter-spacing);
   overflow-wrap: anywhere;
 }
 
@@ -63,7 +63,7 @@
 .bland-empty-state__description {
   color: var(--text-subtle);
   font: var(--type-body-md);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-md-letter-spacing);
   overflow-wrap: anywhere;
 }
 

@@ -57,7 +57,7 @@
   padding-inline: var(--space-sm);
   background-color: var(--_fill);
   font: var(--type-body-lg);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
   white-space: nowrap;
   transition:
     background-color var(--duration-xs) var(--easing-ease),

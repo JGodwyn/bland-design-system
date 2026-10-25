@@ -57,7 +57,7 @@
   background-color: var(--_bg);
   color: var(--_text);
   font: var(--type-body-md);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-md-letter-spacing);
   font-variant-numeric: tabular-nums;
   text-decoration: none;
   white-space: nowrap;

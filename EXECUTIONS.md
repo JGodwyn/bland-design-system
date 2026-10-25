@@ -1409,3 +1409,23 @@ not wrapped; rail contents centred (logo and account icon were off).
 - The local checksum (a4d83579) will not equal Figma's until the `_Typography` rename is settled.
 - Screenshot tests stayed green (under the per-pixel threshold); re-baselined the 12 stories that show Buttons with
   `--update-snapshots=all`; 13 PNGs changed. Computed values checked in the browser. Suite 618 pass.
+
+## `_Typography` kept hidden: type only through text styles (2026-10-25)
+
+- Godwin hid Typography from publishing so library files stop showing font sizes; asked for the standard,
+  which is exactly that (raw type scale private, text styles public). Kept.
+- Figma: checksum 628 / `a4d83579` = repo, so no variable drift. Instead of pasting the 17 KB `check.js`,
+  read the meta in one `use_figma` call, patched the one collection record in `00.json` and compared meta
+  hashes (`94b32fe7` both).
+- Build: per-style `--type-*-line-height` and `--type-*-letter-spacing` (46), the 28 raw tokens gone,
+  composites unchanged (diffed). Folded the `Code/` prefix into the name so descriptions point at
+  `--type-code-*`. 550 tokens.
+- Components: 35 letter-spacing lines paired with the `font` in the same rule by script; 7 roots without a
+  `font` (Sidebar count and Calendar use a private `--_spacing` beside their `--_type`; Progress bar,
+  Message, Progress wizard, Table, File upload take body-lg). Text Area and Code text line heights moved
+  to body-lg / code-body-* line heights. base.css and the docs site too (Typography page lists the parts;
+  inline `code` uses Code/body-md).
+- Lint: size, weight and family point to text styles; line height and letter spacing scales are the
+  per-style tokens. Fixtures updated; also fixed an old fixture (300ms now has a token, the Sidebar's close
+  delay), now 350ms. test:lint 4/4, lint:css, typecheck clean; no `var(--…)` left pointing at a removed token.
+

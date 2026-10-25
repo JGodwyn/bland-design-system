@@ -22,7 +22,7 @@
   margin: var(--space-none);
   padding: var(--space-none);
   list-style: none;
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
 }
 
 /* ---- Step: one per progress/step-width, shrinking to share a narrow row ---- */

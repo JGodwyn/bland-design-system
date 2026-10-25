@@ -40,7 +40,7 @@
   background-color: var(--_bg);
   color: var(--_text);
   font: var(--type-body-lg-bold);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-bold-letter-spacing);
   white-space: nowrap;
   user-select: none;
   touch-action: manipulation;

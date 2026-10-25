@@ -52,7 +52,7 @@
   padding-inline: var(--space-xs);
   color: var(--_text);
   font: var(--type-body-sm);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-sm-letter-spacing);
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
 }

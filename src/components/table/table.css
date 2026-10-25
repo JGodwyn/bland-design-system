@@ -58,7 +58,7 @@
   color: var(--_text);
   text-align: start;
   vertical-align: middle;
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
 }
 
 /*

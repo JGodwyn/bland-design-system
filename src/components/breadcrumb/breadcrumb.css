@@ -51,7 +51,7 @@
   border: none;
   background-color: transparent;
   font: var(--type-body-lg);
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: var(--type-body-lg-letter-spacing);
   white-space: nowrap;
 }
 
