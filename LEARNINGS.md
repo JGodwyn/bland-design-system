@@ -388,6 +388,8 @@ normally), not in the pane.
 
 ## Tooling
 
+**A screenshot test passes through a small color change.** Retuning the Button disabled and dark secondary fills (#a8b0be to #c4cad4, #00113d to #001b55) left all 98 screenshot tests green: each pixel's change is under Playwright's per-pixel color threshold, so the baselines silently kept the old colors. → After a token-only color change, re-baseline the stories that use those tokens with `--update-snapshots=all` (plain `--update-snapshots` only rewrites failing ones), and check the computed value in the browser rather than trusting a passing run.
+
 **Playwright's mouse misses points below the viewport.** A Slider spec
 clicked a track 1352px down a 768px page and nothing happened (`boundingBox`
 gives page coordinates, `page.mouse` acts on the viewport). → Call

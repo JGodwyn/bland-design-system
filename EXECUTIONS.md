@@ -1398,3 +1398,14 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Godwin asked to remove the rail's scrollbar: `scrollbar={false}` on its ScrollArea; the fade and
   the keep-in-view scrolling stay.
 
+
+## Button disabled and dark secondary fills from Figma (2026-10-25)
+
+- Godwin retuned the Button disabled fills (both themes) and brand secondary rest/hover/pressed (dark) in Figma.
+- `npm run tokens:drift` -> check.js through `use_figma` -> 11 Button variables changed, plus `metaChanged`: the
+  Typography collection is now `_Typography` and hidden in Figma, which `--apply` would turn into 28 removed type
+  tokens. Set `metaChanged` false and dropped `meta` in result-0.json (LEARNINGS, "A drift check can carry an
+  unrelated Figma change"), so only the 11 records applied. `npm run tokens`: the CSS diff is exactly those tokens.
+- The local checksum (a4d83579) will not equal Figma's until the `_Typography` rename is settled.
+- Screenshot tests stayed green (under the per-pixel threshold); re-baselined the 12 stories that show Buttons with
+  `--update-snapshots=all`; 13 PNGs changed. Computed values checked in the browser. Suite 618 pass.

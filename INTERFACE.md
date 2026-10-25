@@ -130,6 +130,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   Amber 1100/1000), barely off the #0a0c10 page. They moved one step
   lighter in Figma: hover Brand900, Green1000, Red1000, Amber1000; pressed
   Brand800, Green900, Red900, Amber900. Light mode is unchanged.
+- Retuned in Figma 2026-10-25 (Godwin): every `Button/*-disabled` fill is lighter in light (#c4cad4, was #a8b0be) and darker in dark (#2b313b, was #576275), so disabled reads as receded in both themes; brand secondary rest, hover and pressed each moved one step brighter in dark only (#001b55, #002873, #003a9e). Token-only change, no CSS.
 
 ### Indicator (2026-10-18)
 - `import { Indicator } from 'bland'`. Props: `size` sm/md/lg/xl/2xl (default
