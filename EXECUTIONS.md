@@ -1442,3 +1442,26 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Suite: 622 of 623; axe failed the dark story: the on-color example sat on surface-brand, which is #659cff in
   dark (white 2.7:1). surface-brand-strong stays #0062ff (5.0:1); the story uses it and the docs say so.
 
+## Brand override per project (2026-10-26)
+
+- Godwin: a project brings 13 brand colors, set at the root, cascading to everything; a tool for edge cases.
+  Defaults agreed: 13 hex values at `:root`, a check that warns, a generator from one color.
+- Mapped the tokens: 54 Theme tokens alias a Brand step in some mode (plus the 2 brand shadows through
+  `Brand/Alpha/a12/24/40`, all of Brand600). Bland already has 13 steps (0 to 1000); CLAUDE.md said 12.
+- Build: `brandRef` follows each alias chain to a Brand step; tokens get `cssValue` (`var(--brand-N)`, alphas
+  `color-mix(in srgb, … N%, transparent)`), elevation styles too. Brand steps emitted in their own `:root`
+  block (a `[data-theme="light"]` subtree would otherwise reset a project's override). 563 tokens; resolved
+  values unchanged.
+- Lint: `var(--brand-*)` rejected in components with the Theme tokens built on that step, ranked by the
+  property's role; brand steps left out of color suggestions. The existing "suggestions never name
+  primitives" test caught my first message, which quoted the primitive; reworded.
+- Tool (`scripts/brand/`): OKLCH generator anchored at 600 (rebuilds Bland's blue to within 1/255), 35
+  curated pairings, misses that Bland's own brand shares and this brand doesn't worsen listed apart.
+  Suggestions first moved tints (100, 200 to near white) for tint-on-solid misses: misses now belong to the
+  solid step. Yellow's fix flattened 600 to 800 into one color: added an order repair (moved steps may go
+  further their own way, never back) and up to four rounds; the new test caught a second flattening before
+  that rule. Ten sample brands now pass after `--fix`; near-black reads best with `--at 950`.
+- Found in Bland itself: link on surface-200 is 4.47:1, the hovered selected calendar day in dark 3.75:1.
+- Docs site: Brand section first on Colors; search sends brand tokens there. Verified in the browser: an
+  orange override at `:root` recolours Buttons (light) and the Calendar range and selection (dark).
+

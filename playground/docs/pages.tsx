@@ -70,8 +70,8 @@ export const PageIcon = ({ page }: { page: DocsPage }) =>
 
 /** Which style page shows a token's collection. */
 const tokenPage: Record<string, StylePageId> = {
+  Brand: 'colors',
   Theme: 'colors',
-  Typography: 'typography',
   'Text styles': 'typography',
   Spacing: 'spacing',
   'Corner Radius': 'radius',

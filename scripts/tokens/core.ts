@@ -30,6 +30,11 @@ export type Token = {
   light: string;
   dark?: string;
   aliasOf?: { light?: string; dark?: string };
+  /**
+   * The CSS value per mode when it differs from the resolved one: tokens that follow the brand point at the
+   * --brand-* steps, so a project's brand override cascades. `light` and `dark` stay the resolved colors.
+   */
+  cssValue?: { light?: string; dark?: string };
 };
 
 export type Export = { meta: Meta; exportedAt: string; raw: RawVariable[] };
@@ -112,6 +117,23 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     return `cubic-bezier(${r(x1)}, ${r(y1)}, ${r(x2)}, ${r(y2)})`;
   }
 
+  // The brand scale is the one primitive emitted (--brand-0 … --brand-1000), so projects can override it at
+  // :root. Anything whose alias chain ends in a Brand step points at it; an alpha step becomes a color-mix.
+  const brandStep = (name: string) => /^Brand\/Brand(\d+)$/.exec(name)?.[1];
+  function brandRef(id: string, mode: Mode): string | undefined {
+    const v = variables.get(id);
+    if (!v) return undefined;
+    const step = brandStep(v[1]);
+    if (step !== undefined) return `var(--brand-${step})`;
+    const value = v[5][modeId(collections.get(v[2])!, mode)];
+    if (typeof value === 'string' && value.startsWith('@')) return brandRef(value.slice(1), mode);
+    if (typeof value === 'object' && '@' in value && !value['@'].startsWith('#')) {
+      const inner = brandRef(value['@'], mode);
+      return inner && `color-mix(in srgb, ${inner} ${value.o}%, transparent)`;
+    }
+    return undefined;
+  }
+
   function aliasName(id: string, mode: Mode): string | undefined {
     const v = variables.get(id)!;
     const value = v[5][modeId(collections.get(v[2])!, mode)];
@@ -171,6 +193,18 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
   for (const v of raw) {
     const [id, name, collectionId, type, description] = v;
     const collection = collections.get(collectionId)!;
+    const step = brandStep(name);
+    if (step !== undefined) {
+      tokens.push({
+        name,
+        css: `--brand-${step}`,
+        collection: 'Brand',
+        type,
+        description: decode(description) || `Brand step ${step}. Override it per project at :root; every brand-colored token follows.`,
+        light: cssValue(resolveRaw(id, 'light'), type, name),
+      });
+      continue;
+    }
     if (collection.hidden) continue;
     if (skip(name)) {
       skipped.push(name);
@@ -181,6 +215,8 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     const dark = themed ? cssValue(resolveRaw(id, 'dark'), type, name) : undefined;
     const aliasLight = aliasName(id, 'light');
     const aliasDark = themed ? aliasName(id, 'dark') : undefined;
+    const refLight = type === 'COLOR' ? brandRef(id, 'light') : undefined;
+    const refDark = themed && type === 'COLOR' ? brandRef(id, 'dark') : undefined;
     tokens.push({
       name,
       css: `--${cssName(name)}`,
@@ -190,6 +226,7 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
       light,
       ...(dark !== undefined && { dark }),
       ...((aliasLight || aliasDark) && { aliasOf: { light: aliasLight, ...(aliasDark && { dark: aliasDark }) } }),
+      ...((refLight || refDark) && { cssValue: { ...(refLight && { light: refLight }), ...(refDark && { dark: refDark }) } }),
     });
   }
 
@@ -199,15 +236,17 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     return resolveRaw(id, mode);
   };
   for (const style of meta.effectStyles) {
-    const shadow = (mode: Mode) =>
+    const shadow = (mode: Mode, refs = false) =>
       style.layers
         .filter((l) => l.type === 'DROP_SHADOW')
         .map((l) => {
           const px = (f: keyof EffectLayer) => `${byId(l[f], mode, style.name, f)}px`;
-          const color = formatColor(hexToRgba(String(byId(l.color, mode, style.name, 'color'))));
+          const resolved = formatColor(hexToRgba(String(byId(l.color, mode, style.name, 'color'))));
+          const color = (refs && l.color && brandRef(l.color, mode)) || resolved;
           return `${px('offsetX')} ${px('offsetY')} ${px('radius')} ${px('spread')} ${color}`;
         })
         .join(', ');
+    const [refLight, refDark] = [shadow('light', true), shadow('dark', true)];
     tokens.push({
       name: style.name,
       css: `--${kebab(style.name)}`,
@@ -216,6 +255,7 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
       description: decode(style.description),
       light: shadow('light'),
       dark: shadow('dark'),
+      ...(refLight !== shadow('light') && { cssValue: { light: refLight, dark: refDark } }),
     });
   }
 
@@ -271,7 +311,7 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     seenCss.set(t.css, t.name);
   }
 
-  const order = ['Theme', 'Spacing', 'Corner Radius', 'Stroke', 'Text styles', 'Effects', 'Effect styles', 'Sizing', 'Motion', 'Breakpoints'];
+  const order = ['Brand', 'Theme', 'Spacing', 'Corner Radius', 'Stroke', 'Text styles', 'Effects', 'Effect styles', 'Sizing', 'Motion', 'Breakpoints'];
   tokens.sort((a, b) => order.indexOf(a.collection) - order.indexOf(b.collection));
 
   return { tokens, skipped, order };

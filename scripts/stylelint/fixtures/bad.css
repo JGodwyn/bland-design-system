@@ -23,6 +23,7 @@
   height: var(--control-sm, 32px); /* expect: var(--control-sm) */
   --local-gap: 24px; /* expect: var(--space-xl) */
   background: color-mix(in srgb, var(--surface-brand) 50%, transparent); /* expect: hardcoded color */
+  border-color: var(--brand-600); /* expect: Brand step 600 is a primitive | var(--border-brand) */
 }
 
 .units {

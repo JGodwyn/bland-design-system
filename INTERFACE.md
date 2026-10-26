@@ -30,6 +30,21 @@ when), `docs/components.md` (how to build one).
   when no `data-theme="light"` is set. Apps can use either; which one products
   use is still an open question in `CLAUDE.md`.
 
+### Brand override (Godwin, 2026-10-26)
+- One package; a project brings its brand by overriding the 13 `--brand-*`
+  steps at `:root` in a stylesheet after Bland's. The 57 tokens whose Figma
+  alias ends in a brand step hold `var(--brand-N)` (alphas a `color-mix`), in
+  both themes, so the override cascades. The brand steps sit in their own
+  `:root` block, outside `[data-theme="light"]`, so a light-themed subtree
+  can't reset a project's override.
+- The brand scale is the only primitive emitted, and only for the override;
+  the lint rejects `var(--brand-*)` in components and names the Theme tokens
+  built on that step.
+- `npm run brand` (`docs/brand.md`): a generator that makes 13 steps from
+  one color in the shape of Bland's OKLCH scale (the color on 600, `--at` to
+  move it), and a contrast check of the 35 brand pairings that warns, never
+  blocks, with suggested steps and `--fix`.
+
 ### Type
 - Inter for interface text, Geist Mono for code, self-hosted through
   Fontsource (`bland/fonts.css`): Inter 400, 500, 600 and Geist Mono 400, 600

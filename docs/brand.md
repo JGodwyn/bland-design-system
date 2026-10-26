@@ -1,0 +1,64 @@
+# Brand override
+
+Bland ships with a blue brand. A project brings its own by overriding the 13 brand steps at `:root`; every brand-colored token follows, in light and dark. Decided 2026-10-26 (Godwin): one package, a brand override file per project.
+
+## How it works
+
+- `tokens.css` emits the brand scale alone in its own `:root` block: `--brand-0`, `--brand-50`, `--brand-100` … `--brand-950`, `--brand-1000` (13 steps, the Figma `Brand/*` primitives).
+- Every token whose Figma alias chain ends in a brand step points at it instead of holding a value: `--button-brand-primary-rest: var(--brand-600)`, and in dark `--text-link: var(--brand-300)`. The three brand alpha steps become `color-mix(in srgb, var(--brand-600) 12%, transparent)`, so the brand shadows follow too. 57 tokens in all; `tokens.json` lists the reference under `cssValue` and keeps the resolved color in `light` / `dark`.
+- Dark mode points at different steps, as Figma does (solids two steps lighter, tints become deep tones), so one set of 13 covers both themes.
+- The other primitives (neutrals, red, green, amber, purple, units, type) stay hidden. Components never use `--brand-*`: the lint rejects it and names the Theme tokens built on that step.
+
+## Using it in a project
+
+Load a stylesheet after Bland's tokens:
+
+```css
+/* brand.css */
+:root {
+  --brand-0: #ffffff;
+  --brand-50: #fff5f2;
+  /* … all 13 … */
+  --brand-1000: #2d0700;
+}
+```
+
+Override at `:root`, not on a nested element: the brand-colored tokens are computed where `tokens.css` defines them (`:root` and `[data-theme]`), and they read the brand steps from there. Step 0 is white in Bland's scale; keep it white unless the brand needs otherwise.
+
+## The tool: `npm run brand`
+
+```bash
+npm run brand -- generate "#ff5a1f"                 # 13 steps from one color, then the check
+npm run brand -- generate "#ff5a1f" --fix --out brand.css
+npm run brand -- check brand.css                    # check a project's override (CSS or JSON)
+npm run brand -- check brand.css --fix --out fixed.css
+```
+
+**Generate** builds a scale in the shape of Bland's own, which was made in OKLCH: the color lands exactly on step 600 (the step primary fills use), lighter steps spread its lightness up to white, darker ones down to Bland's darkest, chroma follows Bland's curve scaled to the color's, and the hue stays the color's. Generating from Bland's blue rebuilds Bland's scale. Use `--at <step>` for a color that belongs elsewhere: a near-black brand reads best at `--at 950`, a pale one at `--at 200`.
+
+**Check** tests the 35 brand pairings Bland draws, in both themes: text at 4.5:1 (button labels on brand fills, links, brand text, selected sidebar rows, sent chat bubbles, calendar days, badge and indicator labels) and icons, borders, fills and the focus ring at 3:1. Each miss names the pairing, its ratio and the step to move (`darken 600`). The pairings are listed in `scripts/brand/core.ts` (`PAIRS`); add one when a new component draws on the brand.
+
+**Warn, never block** (Godwin's default): the check exits 1 when something misses, and a brand may keep a miss on purpose, as Bland keeps its white success labels.
+
+**Suggestions and `--fix`**: for each step behind a miss, the nearest color with the same hue and chroma, lightness moved until its pairings pass. A miss between a tint and a solid step is the solid step's to fix, so the light end isn't washed out. The rest of the scale is then kept in order (each step darker than the one before), and the rounds repeat until the check passes. Expect `--fix` to darken 600 for bright brands (orange, green, cyan, yellow): white labels need it. Yellow becomes a dark gold, which is the honest answer for white text on yellow; a project that wants yellow fills needs dark labels, which Bland doesn't do today.
+
+**Bland's own near-misses** are listed apart when the brand makes them no worse: a link on a surface-200 panel (4.47:1) and the hovered selected calendar day in dark (3.75:1).
+
+## Edge cases
+
+| Brand | What happens | What to do |
+| --- | --- | --- |
+| Bright (orange, green, cyan) | White labels on 600 miss 4.5:1 | `--fix`, or pick a deeper 600 with the brand team |
+| Yellow, lime | Fills, focus ring, toggles miss in light | `--fix` turns 600 to dark gold; or keep the miss knowingly |
+| Near-black | Dark mode loses brand text and focus ring | `--at 950`, then check |
+| Red or close to it | Brand and danger look alike | No contrast issue; a design question for the project |
+| Brand step 0 not white | Nothing in Bland uses it today | Keep it white |
+
+## Files
+
+| Path | What |
+| --- | --- |
+| `scripts/brand.ts` | The command |
+| `scripts/brand/core.ts` | Generator, file parsing, pairings, check, suggestions |
+| `scripts/brand/brand.test.ts` | Tests (`npm run test:brand`) |
+| `scripts/tokens/core.ts` | `brandRef`: which tokens point at which step |

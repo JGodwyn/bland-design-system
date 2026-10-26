@@ -91,6 +91,17 @@ function ColorsPage() {
   const ordered = [...groups.filter(([g]) => semantic.includes(g)).sort((a, b) => semantic.indexOf(a[0]) - semantic.indexOf(b[0])), ...groups.filter(([g]) => !semantic.includes(g))];
   return (
     <>
+      <Section
+        title="Brand"
+        note={
+          <>
+            The 13 brand steps every brand-colored token is built on, in both themes. A project brings its own by overriding them at <code>:root</code> in a stylesheet loaded after Bland’s;
+            components never use them directly. <code>npm run brand</code> makes a starting set from one color and checks the contrast (docs/brand.md).
+          </>
+        }
+      >
+        <TokenTable items={inCollection('Brand')} sampleLabel="Color" sample={(t) => <span className="docs-swatch bland-smooth" style={{ background: v(t) }} />} />
+      </Section>
       {ordered.map(([group, items], i) => (
         <Section key={group} title={group} note={i === semantic.length ? 'Component colors follow. Each component has its own tokens so it can change without touching the others.' : undefined}>
           <TokenTable items={items} sampleLabel="Color" sample={(t) => <span className="docs-swatch bland-smooth" style={{ background: v(t) }} />} />

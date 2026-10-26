@@ -47,7 +47,7 @@ Not set up yet: running the check on a schedule. It needs the Figma MCP, so it w
 
 ## What the build does
 
-- **Primitives are not emitted.** `_Core Colors`, `_Functional Colors`, `_Units` and `_Typography` are hidden collections. Every exported token resolves through them to a final value.
+- **Primitives are not emitted, except the brand scale.** `_Core Colors`, `_Functional Colors`, `_Units` and `_Typography` are hidden collections. The 13 `Brand/BrandN` steps are emitted as `--brand-N` in a `:root` block of their own, and every token whose alias chain ends in one holds `var(--brand-N)` (alpha steps a `color-mix`), so a project's override cascades (`brand.md`). Every exported token resolves through them to a final value.
 - **Alias chains resolve to values**, per mode. `tokens.json` keeps the first alias hop (`aliasOf`) so you can see which primitive a token points at.
 - **Alpha primitives** (`{color: alias, opacity: N}`) resolve to the source color at exactly N%, written as `rgb(r g b / N%)`.
 - **`Fade/*-clear` is skipped** (Figma-only drawing aids). The build lists them under `skipped` in `tokens.json`.

@@ -624,3 +624,18 @@ turned it off. → Click React checkboxes with `computer` instead.
 
 - **Pane screenshots come back blank white** → the Browser pane is hidden (`tabs_context` says so) → read
   state with `javascript_tool`, and take visual checks with a short Playwright script against the dev server.
+
+**A custom property is resolved where it is defined, not where it is used.**
+`--button-brand-primary-rest: var(--brand-600)` is computed on `:root` and on
+each `[data-theme]` element, from the `--brand-600` those elements see. So a
+brand override works at `:root` (or on the `[data-theme]` element), but one
+set on a nested element would not reach tokens already computed above it. →
+Document overrides at `:root`; keep brand steps out of the `[data-theme]`
+blocks so a themed subtree inherits them instead of resetting them.
+
+**A screenshot right after a style change can show the old colors.** Buttons
+transition `background-color` (duration/xs), so a capture taken straight after
+injecting a brand override showed blue buttons while every computed value was
+already orange. → Read computed values to verify, or wait out the transition
+before a screenshot.
+

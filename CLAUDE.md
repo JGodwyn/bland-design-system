@@ -2,7 +2,7 @@
 
 Bland is Godwin's personal design system: a Figma UI kit reused across client projects, being turned into code with a token pipeline and (later) a docs site. Figma is finished; this repo is the code side.
 
-- Light and dark themes. A per-project brand color: edit the 12 `Brand/*` steps and everything follows.
+- Light and dark themes. A per-project brand color: a project overrides the 13 `--brand-*` steps at `:root` and everything brand-colored follows (`docs/brand.md`).
 - Inter for UI text, Geist Mono for code, Phosphor icons, 100% corner smoothing on every rounded corner.
 - One-person system (Godwin plus Claude). Keep process light: no review flow, no client-facing docs yet.
 
@@ -10,7 +10,7 @@ Bland is Godwin's personal design system: a Figma UI kit reused across client pr
 
 ```
 CLAUDE.md                 rules (this file)
-docs/                     long-form notes: components.md (how to build one), tokens.md, lint.md, motion.md
+docs/                     long-form notes: components.md (how to build one), tokens.md, brand.md, lint.md, motion.md
 tokens/figma/raw/         raw Figma export, verified by checksum (generated)
 tokens/tokens.json        resolved tokens with descriptions (generated)
 src/tokens/tokens.css     CSS custom properties, shipped as bland/tokens.css (generated)
@@ -27,6 +27,7 @@ scripts/stylelint/        bland/use-tokens lint rule, fixtures and test
 
 - `npm run tokens`: regenerate `tokens.json` and `tokens.css` from the raw export.
 - `npm run tokens:checksum`: hash of the raw export; must equal `scripts/figma/checksum.js` run in Figma.
+- `npm run brand`: the brand override tool: `generate "#hex"` makes 13 steps from one color, `check brand.css` tests the brand pairings (warns, never blocks), `--fix` applies suggested steps (`docs/brand.md`). `npm run test:brand` runs its tests.
 - `npm run tokens:drift`: drift check against Figma, variable by variable, with the CSS tokens each change reaches; `-- --apply` takes the Figma version. Two steps around one `use_figma` call (`docs/tokens.md`, "Drift check"). `npm run test:drift` runs its tests.
 - `npm run build`: tokens, Vite library build, `dist/tokens.css`, type declarations.
 - `npm run typecheck`.
@@ -71,7 +72,7 @@ They merge with git's `union` strategy (`.gitattributes`): append, never restruc
 
 ## Token architecture
 
-Three layers. **Components bind only to Theme or scale tokens, never primitives.** 628 variables in 12 collections (as of 2026-10-25), plus 15 elevation styles and 23 text styles. Primitives are not emitted to CSS at all, so a component cannot reach them.
+Three layers. **Components bind only to Theme or scale tokens, never primitives.** 628 variables in 12 collections (as of 2026-10-25), plus 15 elevation styles and 23 text styles. Primitives are not emitted to CSS, except the 13 brand steps (`--brand-*`), which exist only for a project's brand override; the lint keeps components off them.
 
 | Collection | Layer | Modes | Holds |
 | --- | --- | --- | --- |
@@ -217,7 +218,6 @@ In order; tokens come before components.
 
 - Dark mode switch: root class/attribute, system preference, or both? The generated CSS currently supports both (`data-theme` wins over `prefers-color-scheme`).
 - Docs site hosting: where, if anywhere, to deploy `npm run docs` as a static site.
-- Brand swap per client: one package with a brand override file, or a build per client? Today the build resolves primitives to values, so a brand swap means editing `Brand/*` in Figma (or a client copy) and re-running the sync. A runtime override would need Theme tokens emitted as `var()` references to brand primitives instead.
 
 ## Pending context to merge into `docs/`
 
