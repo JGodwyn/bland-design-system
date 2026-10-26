@@ -213,3 +213,31 @@ export const PaletteIcon = (p: P) => (
     </g>
   </svg>
 );
+
+/** Figma: ArrowClockwise (Brand theme page, 6773:21912). The brand color's Reset. Drawn on Figma's 20 grid. */
+export const ArrowClockwiseIcon = (p: P) => (
+  <svg {...stroked} viewBox="0 0 20 20" {...p}>
+    <path d="M14.375 8.125H18.125V4.375" />
+    <path d="M14.7188 15C13.736 15.9274 12.5017 16.5446 11.1701 16.7745C9.83858 17.0044 8.4688 16.8368 7.23195 16.2927C5.9951 15.7485 4.94602 14.852 4.21579 13.715C3.48555 12.5781 3.10656 11.2512 3.12614 9.90004C3.14573 8.54893 3.56304 7.23355 4.32592 6.11825C5.0888 5.00295 6.16343 4.13719 7.41554 3.62914C8.66765 3.1211 10.0417 2.99329 11.366 3.26169C12.6904 3.5301 13.9062 4.18281 14.8617 5.13828L18.125 8.125" />
+  </svg>
+);
+
+/** Figma: CopySimple (Brand theme page, 6773:21918). Copies a swatch's hex. */
+export const CopySimpleIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M3.75 6.75H17.25V20.25H3.75V6.75Z" />
+    <path d="M6.75 3.75H20.25V17.25" />
+  </svg>
+);
+
+/** Figma: Knob (Brand theme page, 6773:22105). The color picker's handles: a white ring the color shows through. */
+export const KnobMark = (p: P) => (
+  <svg viewBox="0 0 29 29" fill="none" aria-hidden="true" {...p}>
+    <path
+      d="M14.5 0.5C22.232 0.5 28.5 6.76801 28.5 14.5C28.5 22.232 22.232 28.5 14.5 28.5C6.76801 28.5 0.5 22.232 0.5 14.5C0.5 6.76801 6.76801 0.5 14.5 0.5ZM14.5 8.5C11.1863 8.5 8.5 11.1863 8.5 14.5C8.5 17.8137 11.1863 20.5 14.5 20.5C17.8137 20.5 20.5 17.8137 20.5 14.5C20.5 11.1863 17.8137 8.5 14.5 8.5Z"
+      fill="white"
+      stroke="black"
+      strokeOpacity="0.2"
+    />
+  </svg>
+);

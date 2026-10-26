@@ -78,12 +78,21 @@ export function fromOklch(color: Oklch): string {
 // ---------- generator ----------
 
 /**
+ * The step a color belongs on: the one whose lightness in Bland's scale is closest to the color's (step 0, white,
+ * excluded). Bland's blue lands on 600, a bright orange on 400, a yellow on 200, a near-black on 1000.
+ */
+export function placeStep(hex: string): Step {
+  const l = toOklch(hex).l;
+  return STEPS.filter((s) => s !== '0').reduce((a, b) => (Math.abs(toOklch(blandScale[b]).l - l) < Math.abs(toOklch(blandScale[a]).l - l) ? b : a));
+}
+
+/**
  * Builds 13 steps around one color, in the shape of Bland's own scale (made in OKLCH): the color lands exactly on
- * `at` (default 600, the step primary fills use), lighter steps spread its lightness up to white and darker steps
+ * `at` (default the step its lightness belongs on, `placeStep`), lighter steps spread its lightness up to white and darker steps
  * down to Bland's darkest, chroma follows Bland's curve scaled to the color's, and the hue stays the color's.
  * Step 0 is always white. A starting point: tune the steps by hand, then run the check.
  */
-export function generate(hex: string, at: Step = '600'): Scale {
+export function generate(hex: string, at: Step = placeStep(hex)): Scale {
   const input = toOklch(hex);
   const ref = Object.fromEntries(STEPS.map((s) => [s, toOklch(blandScale[s])])) as Record<Step, Oklch>;
   const anchor = ref[at];
@@ -349,13 +358,15 @@ const inherited = (f: Finding) => f.baseline < f.min && f.ratio >= f.baseline - 
  * says) that clears every pairing it is in, with the other steps as they are. One step at a time: run the check
  * again after taking them.
  */
-export function suggest(scale: Scale, neutrals: Scale = blandNeutrals): Partial<Scale> {
-  const misses = check(scale, neutrals).filter((f) => !inherited(f));
+export function suggest(scale: Scale, neutrals: Scale = blandNeutrals, keep?: Step): Partial<Scale> {
+  // `keep` (the step holding the project's own color) never moves; a miss only it could fix stays a miss.
+  const misses = check(scale, neutrals).filter((f) => !inherited(f) && f.steps.some((s) => s !== keep));
   // A miss between a tint (below 400) and a solid step is the solid step's to fix: moving the tint would wash out
   // the light end of the scale. Between two of a kind, the darker step.
   const owner = (f: Finding) => {
-    const solid = f.steps.filter((s) => Number(s) >= 400);
-    return (solid.length ? solid : f.steps).sort((a, b) => Number(b) - Number(a))[0]!;
+    const free = f.steps.filter((s) => s !== keep);
+    const solid = free.filter((s) => Number(s) >= 400);
+    return (solid.length ? solid : free).sort((a, b) => Number(b) - Number(a))[0]!;
   };
   const out: Partial<Scale> = {};
   for (const step of new Set(misses.map(owner))) {
@@ -382,7 +393,7 @@ export function suggest(scale: Scale, neutrals: Scale = blandNeutrals): Partial<
  * original gap. Steps after a darkened one are pushed darker, steps before a lightened one lighter, which only adds
  * contrast to the pairings they are in.
  */
-function keepOrder(scale: Scale, original: Scale, moved: Partial<Scale>): Scale {
+function keepOrder(scale: Scale, original: Scale, moved: Partial<Scale>, keep?: Step): Scale {
   // A moved step may go further the way it moved (that only adds contrast), never back.
   const darkened = (s: Step) => moved[s] !== undefined && toOklch(moved[s]!).l < toOklch(original[s]).l;
   const lightened = (s: Step) => moved[s] !== undefined && !darkened(s);
@@ -390,28 +401,32 @@ function keepOrder(scale: Scale, original: Scale, moved: Partial<Scale>): Scale 
   const gap = (i: number) => Math.max(0.01, (toOklch(original[STEPS[i - 1]!]).l - toOklch(original[STEPS[i]!]).l) / 2);
   // Darker steps give way downward, lighter ones upward.
   for (let i = 1; i < STEPS.length; i++) {
-    if (!lightened(STEPS[i]!) && L[i]!.l > L[i - 1]!.l - gap(i)) L[i] = { ...L[i]!, l: Math.max(0.05, L[i - 1]!.l - gap(i)) };
+    if (STEPS[i] !== keep && !lightened(STEPS[i]!) && L[i]!.l > L[i - 1]!.l - gap(i)) L[i] = { ...L[i]!, l: Math.max(0.05, L[i - 1]!.l - gap(i)) };
   }
   for (let i = STEPS.length - 2; i >= 1; i--) {
-    if (!darkened(STEPS[i]!) && L[i]!.l < L[i + 1]!.l + gap(i + 1)) L[i] = { ...L[i]!, l: Math.min(0.99, L[i + 1]!.l + gap(i + 1)) };
+    if (STEPS[i] !== keep && !darkened(STEPS[i]!) && L[i]!.l < L[i + 1]!.l + gap(i + 1)) L[i] = { ...L[i]!, l: Math.min(0.99, L[i + 1]!.l + gap(i + 1)) };
   }
   return Object.fromEntries(
     STEPS.map((s, i) => [s, s === '0' || toOklch(scale[s]).l === L[i]!.l ? scale[s] : fromOklch(L[i]!)]),
   ) as Scale;
 }
 
-/** The suggested steps, applied and kept in order, repeated (up to four rounds) until the check passes. */
-export function fixScale(scale: Scale, neutrals: Scale = blandNeutrals): Scale {
+/**
+ * The suggested steps, applied and kept in order, repeated (up to four rounds) until the check passes. `keep` pins
+ * one step (the project's own color, so it stays exactly as entered): misses only it could fix are left.
+ */
+export function fixScale(scale: Scale, neutrals: Scale = blandNeutrals, keep?: Step): Scale {
   let current = scale;
   for (let round = 0; round < 4; round++) {
-    if (check(current, neutrals).every(inherited)) break;
-    const moved = suggest(current, neutrals);
-    current = keepOrder({ ...current, ...moved }, scale, moved);
+    if (check(current, neutrals).every((f) => inherited(f) || f.steps.every((s) => s === keep))) break;
+    const moved = suggest(current, neutrals, keep);
+    if (Object.keys(moved).length === 0) break;
+    current = keepOrder({ ...current, ...moved }, scale, moved, keep);
   }
   return current;
 }
 
-export function report(scale: Scale, neutrals: Scale = blandNeutrals): { text: string; failures: number; fixes: Partial<Scale> } {
+export function report(scale: Scale, neutrals: Scale = blandNeutrals, keep?: Step): { text: string; failures: number; fixes: Partial<Scale> } {
   const findings = check(scale, neutrals);
   const real = findings.filter((f) => !inherited(f));
   const known = findings.filter(inherited);
@@ -420,12 +435,15 @@ export function report(scale: Scale, neutrals: Scale = blandNeutrals): { text: s
   for (const f of real) {
     lines.push(`  ✗ ${f.mode.padEnd(5)} ${f.ratio.toFixed(2)}:1, needs ${f.min}:1  ${f.where} (${f.fg} on ${f.bg}). ${f.advice}.`);
   }
-  const all = real.length ? fixScale(scale, neutrals) : scale;
+  const all = real.length ? fixScale(scale, neutrals, keep) : scale;
   const fixes = Object.fromEntries(STEPS.filter((s) => all[s] !== scale[s]).map((s) => [s, all[s]])) as Partial<Scale>;
   const fixed = Object.entries(fixes);
   if (fixed.length) {
     lines.push('Suggested steps (same hue, lightness moved until the pairings pass, the scale kept in order; --fix applies them):');
     for (const [step, hex] of fixed) lines.push(`  ${step.padStart(4)}: ${scale[step as Step]} → ${hex}`);
+  }
+  if (keep && real.some((f) => f.steps.every((s) => s === keep))) {
+    lines.push(`Step ${keep} is the color you entered and stays as it is: a miss only it can fix is yours to keep, or pick another color.`);
   }
   if (known.length) {
     lines.push('Below the minimum with Bland’s own brand too, and no worse here:');

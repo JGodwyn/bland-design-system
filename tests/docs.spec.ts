@@ -208,45 +208,58 @@ test('the demo zoom keys leave date and time segments alone (0 types a zero)', a
   await expect(year).toHaveText('2026');
 });
 
-test('the brand page makes a scale from a color with tinted or gray neutrals, fixes its contrast, applies it to every page and resets', async ({ page }) => {
+test('the brand page makes a scale from a picked color with tinted or gray neutrals, fixes its contrast, applies it to every page and resets', async ({ page }) => {
   await page.goto('/#/brand');
   const html = page.locator('html');
-  const brand600 = () => html.evaluate((el) => el.style.getPropertyValue('--brand-600'));
-  const apply = page.getByRole('button', { name: 'Apply to the site' });
+  const brand = (step: string) => html.evaluate((el, s) => el.style.getPropertyValue(`--brand-${s}`), step);
+  const apply = page.getByRole('button', { name: 'Apply to site' });
   await expect(apply).toBeDisabled(); // Bland's own blue: nothing to apply
 
-  await page.getByRole('textbox', { name: 'Brand color', exact: true }).fill('#ff5a1f');
-  await expect(page.locator('.docs-brand-scale').first()).toContainText('#ff5a1f');
-  await expect(page.getByRole('table', { name: 'Pairings below their minimum' })).toContainText('Button primary label');
+  // The swatch opens the picker; a typed hex lands on the step its lightness belongs on (orange: 400).
+  await page.getByRole('button', { name: /^Brand color #0062FF/ }).click();
+  await page.getByRole('textbox', { name: 'Hex color' }).fill('#ff5a1f');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: /^Brand color #FF5A1F/ })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Brand steps' })).toContainText('400#ff5a1f');
+  await expect(page.getByRole('table', { name: 'Pairings below their minimum' })).toContainText('Progress fill');
+  // The only miss is the entered color's own: the fix may not move it.
+  await expect(page.getByRole('table', { name: 'Pairings below their minimum' })).toContainText('Step 400 is your color');
+  await expect(page.getByRole('button', { name: 'Fix contrast' })).toBeDisabled();
 
+  await page.getByRole('button', { name: /^Brand color/ }).click();
+  await page.getByRole('textbox', { name: 'Hex color' }).fill('#ffcc00');
+  await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Fix contrast' }).click();
-  await expect(page.getByText(/All \d+ brand pairings pass/)).toBeVisible();
-  await page.getByRole('button', { name: 'Apply to the site' }).click();
-  await expect(page.getByRole('button', { name: 'Applied to the site' })).toBeDisabled();
-  const applied = await brand600();
+  await expect(page.getByText(/pairings miss their minimum/)).toHaveCount(0);
+  await apply.click();
+  await expect(page.getByRole('button', { name: 'Applied to site' })).toBeDisabled();
+  expect(await brand('200')).toBe('#ffcc00');
+  const applied = await brand('600');
   expect(applied).toMatch(/^#[0-9a-f]{6}$/);
-  expect(applied).not.toBe('#0062ff');
 
-  // The neutrals lean toward the orange by default; Pure gray takes the hue out.
+  // The neutrals lean toward the brand by default; Pure gray takes the hue out.
   const neutral600 = () => html.evaluate((el) => el.style.getPropertyValue('--neutral-600'));
   const tinted = await neutral600();
   expect(tinted).toMatch(/^#[0-9a-f]{6}$/);
   expect(tinted).not.toBe('#576275');
   await page.getByRole('radio', { name: 'Pure gray' }).check({ force: true }); // the radio covers its label, as in the theme switch
-  await page.getByRole('button', { name: 'Apply to the site' }).click();
+  await page.getByRole('button', { name: 'Apply to site' }).click();
   const gray = await neutral600();
   expect(gray.slice(1, 3)).toBe(gray.slice(3, 5));
   expect(gray.slice(3, 5)).toBe(gray.slice(5, 7));
 
+  // It carries to other pages and survives a reload.
   await page.goto('/#/components/button');
-  expect(await brand600()).toBe(applied);
+  await page.reload();
+  expect(await brand('600')).toBe(applied);
   expect(await neutral600()).toBe(gray);
   const fill = await page.locator('.docs-content .bland-button[data-emotion="brand"][data-type="primary"]').first().evaluate((el) => getComputedStyle(el).getPropertyValue('--_bg').trim());
   expect(fill).toBe(applied);
 
   await page.goto('/#/brand');
+  await expect(page.getByRole('button', { name: /^Brand color #FFCC00/ })).toBeVisible();
   await page.getByRole('button', { name: 'Reset to Bland' }).click();
-  expect(await brand600()).toBe('');
+  expect(await brand('600')).toBe('');
   expect(await neutral600()).toBe('');
 });
 

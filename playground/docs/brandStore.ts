@@ -4,21 +4,21 @@
 import { useSyncExternalStore } from 'react';
 import { blandNeutrals, STEPS, type Scale } from '../../scripts/brand/core';
 
-/** A project's colors: its brand steps and the neutral steps that go with them. */
-export type Palette = { brand: Scale; neutrals: Scale };
+/** A project's colors: its brand steps, the neutral steps that go with them, and the color they were made from. */
+export type Palette = { brand: Scale; neutrals: Scale; color?: string };
 
 const KEY = 'bland-docs-brand';
 const listeners = new Set<() => void>();
-let applied: Palette | null = read();
-
 const isScale = (s: unknown): s is Scale => !!s && STEPS.every((step) => typeof (s as Scale)[step] === 'string');
+// After isScale: read() uses it, and a const read before its line throws (caught, so the brand was silently lost).
+let applied: Palette | null = read();
 
 function read(): Palette | null {
   try {
     const raw = sessionStorage.getItem(KEY);
     const saved = raw ? (JSON.parse(raw) as Partial<Palette>) : null;
     if (!saved || !isScale(saved.brand)) return null;
-    return { brand: saved.brand, neutrals: isScale(saved.neutrals) ? saved.neutrals : blandNeutrals };
+    return { brand: saved.brand, neutrals: isScale(saved.neutrals) ? saved.neutrals : blandNeutrals, color: typeof saved.color === 'string' ? saved.color : undefined };
   } catch {
     return null;
   }

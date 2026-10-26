@@ -55,7 +55,14 @@ Neutrals are optional in the file: set all 13 or none. Override at `:root`, not 
 
 ## The Brand theme page (docs site)
 
-`npm run docs`, then **Brand theme** under Overview (`#/brand`): the same tool in the browser. Type a hex or use the color picker, pick which step the color becomes (**Your color becomes step**, 600 by default) and the neutrals (Tinted, Subtle, Pure gray), and the page shows both scales next to Bland's, the contrast check (with **Fix contrast**), a live preview of brand-colored components in light and dark, and the CSS to copy. **Apply to the site** sets the steps on `<html>`, so every docs page shows the brand until **Reset to Bland** on this page (kept for the visit in sessionStorage). The page imports `scripts/brand/core.ts`, so it never disagrees with the command.
+`npm run docs`, then **Brand theme** under Overview (`#/brand`; Figma 6773:21840): the same tool in the browser.
+
+- **Brand color:** tap the big swatch to open a color picker (saturation and brightness area, hue slider, hex field); the swatch shows your color exactly, with a copy button. Under it, the 13 steps it makes (your color on its own step) and the contrast check as Banners (misses as a table). **Reset** puts the color back to Bland's blue.
+- **Neutral color:** Tinted, Subtle or Pure gray, the 400 neutral as a big swatch, and the 13 neutral steps.
+- **Preview** in light and dark, and **Use in a project** with the CSS to copy.
+- A bar floats at the bottom: **Reset to Bland** (everything, including the site), **Fix contrast** (moves the other steps, never yours) and **Apply to site**, which sets the steps on `<html>` so every docs page shows the brand. It is kept for the visit in sessionStorage with the color it was made from, and survives a reload.
+
+The page imports `scripts/brand/core.ts`, so it never disagrees with the command.
 
 ## The tool: `npm run brand`
 
@@ -67,13 +74,13 @@ npm run brand -- check brand.css                    # check a project's override
 npm run brand -- check brand.css --fix --out fixed.css
 ```
 
-**Generate** builds a scale in the shape of Bland's own, which was made in OKLCH: the color lands exactly on step 600 (the step primary fills use), lighter steps spread its lightness up to white, darker ones down to Bland's darkest, chroma follows Bland's curve scaled to the color's, and the hue stays the color's. Generating from Bland's blue rebuilds Bland's scale. Use `--at <step>` for a color that belongs elsewhere: a near-black brand reads best at `--at 950`, a pale one at `--at 200`.
+**Generate** builds a scale in the shape of Bland's own, which was made in OKLCH. **The color lands exactly, unchanged, on the step its lightness belongs on** (`placeStep`: the Bland step closest in OKLCH lightness; decided 2026-10-26, Godwin: you never pick a step). Bland's blue lands on 600, a bright orange on 400, a green on 500, a yellow on 200, a near-black on 1000. Lighter steps spread its lightness up to white, darker ones down to Bland's darkest, chroma follows Bland's curve scaled to the color's, and the hue stays the color's. Generating from Bland's blue rebuilds Bland's scale. `--at <step>` still forces a step on the command line.
 
 **Check** tests the 35 brand pairings Bland draws, in both themes: text at 4.5:1 (button labels on brand fills, links, brand text, selected sidebar rows, sent chat bubbles, calendar days, badge and indicator labels) and icons, borders, fills and the focus ring at 3:1. Each miss names the pairing, its ratio and the step to move (`darken 600`). The pairings are listed in `scripts/brand/core.ts` (`PAIRS`); add one when a new component draws on the brand.
 
 **Warn, never block** (Godwin's default): the check exits 1 when something misses, and a brand may keep a miss on purpose, as Bland keeps its white success labels.
 
-**Suggestions and `--fix`**: for each step behind a miss, the nearest color with the same hue and chroma, lightness moved until its pairings pass. A miss between a tint and a solid step is the solid step's to fix, so the light end isn't washed out. The rest of the scale is then kept in order (each step darker than the one before), and the rounds repeat until the check passes. Expect `--fix` to darken 600 for bright brands (orange, green, cyan, yellow): white labels need it. Yellow becomes a dark gold, which is the honest answer for white text on yellow; a project that wants yellow fills needs dark labels, which Bland doesn't do today.
+**Suggestions and `--fix`**: the step holding the color you entered never moves (generate pins it; so does the page's Fix contrast). A miss only that step could fix stays listed, as yours to keep or to answer with another color. For each other step behind a miss, the nearest color with the same hue and chroma, lightness moved until its pairings pass. A miss between a tint and a solid step is the solid step's to fix, so the light end isn't washed out. The rest of the scale is then kept in order (each step darker than the one before), and the rounds repeat until the check passes. Bright brands land on a light step (orange 400, yellow 200), so 600, the primary fill, already comes out deep enough for white labels: a yellow's 600 is a dark gold, which is the honest answer for white text on yellow; a project that wants yellow fills needs dark labels, which Bland doesn't do today.
 
 **Bland's own near-misses** are listed apart when the brand makes them no worse: a link on a surface-200 panel (4.47:1) and the hovered selected calendar day in dark (3.75:1).
 
@@ -83,7 +90,7 @@ npm run brand -- check brand.css --fix --out fixed.css
 | --- | --- | --- |
 | Bright (orange, green, cyan) | White labels on 600 miss 4.5:1 | `--fix`, or pick a deeper 600 with the brand team |
 | Yellow, lime | Fills, focus ring, toggles miss in light | `--fix` turns 600 to dark gold; or keep the miss knowingly |
-| Near-black | Dark mode loses brand text and focus ring | `--at 950`, then check |
+| Near-black | Lands on 1000; the lighter steps carry its hue | Check, then keep or adjust |
 | Red or close to it | Brand and danger look alike | No contrast issue; a design question for the project |
 | Brand step 0 not white | Nothing in Bland uses it today | Keep it white |
 

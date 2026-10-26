@@ -649,3 +649,8 @@ text waited 30s ("input intercepts pointer events"). → In tests, check the
 radio: `getByRole('radio', { name }).check({ force: true })`, as the theme
 switch test does.
 
+
+## Docs site: module order and popover anchors (2026-10-26)
+
+- **Symptom:** an applied brand vanished on reload. **Cause:** `let applied = read()` sat above `const isScale = …`; read() hit the temporal dead zone, the try swallowed the ReferenceError. **Rule:** module-level calls go below every const they reach; a catch-all `try` around storage reads hides this, so test reloads, not only navigation.
+- **Symptom:** a Popover opened with no content (and focus fell to the body) on its first open after a load. **Cause:** `reference={ref.current}` read during render, null on the earlier render. **Rule:** give Popover its anchor through state (`const [el, setEl] = useState(null)` + `ref={setEl}`), as the components do.

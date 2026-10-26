@@ -1006,66 +1006,91 @@ code,
 }
 
 
-/* ---- Brand theme page ---- */
-.docs-brand-form .bland-dropdown {
-  width: auto; /* fills its grid cell, as the Text Input beside it */
-}
-.docs-brand-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--space-9xl)), 1fr));
+/* ---- Brand theme page (Figma 6773:21840) ---- */
+/* Its sections sit closer than other pages': title-lg headings, space-lg apart. */
+.docs-brand-section {
   gap: var(--space-lg);
-  align-items: start;
 }
-/* The native color picker in the Text Input's leading slot: a swatch the size of an icon. */
-.docs-color-picker {
-  --bland-radius: var(--rad-xs);
+.docs-brand-section > h2,
+.docs-brand-section > .docs-section-heading > h2 {
+  font: var(--type-title-lg);
+}
+.docs-section-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.docs-section-heading > h2 {
+  flex: 1;
+  margin: var(--space-none);
+}
+/* The card around a big swatch: brand-light for the brand color you tap, surface-200 for the neutral. */
+.docs-brand-card {
+  --bland-radius: var(--rad-lg);
 
-  width: var(--icon-lg);
-  height: var(--icon-lg);
-  padding: var(--space-none);
-  border: none;
-  border-radius: var(--rad-xs);
-  background: none;
-  cursor: pointer;
-}
-.docs-color-picker::-webkit-color-swatch-wrapper {
-  padding: var(--space-none);
-}
-.docs-color-picker::-webkit-color-swatch {
-  border: var(--stroke-sm) solid var(--border-subtle);
-  border-radius: var(--rad-xs);
-}
-.docs-brand-tint {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-xs);
-  margin-top: var(--space-xl);
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  background: var(--surface-200);
 }
-.docs-brand-tint .bland-segmented-bar {
-  width: min(100%, calc(var(--space-9xl) * 1.5)); /* it fills its container; give it room for three labels */
+.docs-brand-card-brand {
+  background: var(--surface-brand-light);
 }
-.docs-brand-tint-label {
-  font: var(--type-body-lg);
+.docs-brand-card-label {
+  padding-inline: var(--space-md);
+  font: var(--type-body-md);
+  color: var(--text-subtle);
+}
+/* The color itself fills it (inline); the hex is white on dark colors and the light theme's bold text on light ones. */
+.docs-brand-swatch {
+  --bland-radius: var(--rad-lg);
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-xl) var(--space-lg);
+  color: var(--text-on-color);
+}
+.docs-brand-swatch[data-ink="dark"] {
   color: var(--text-bold);
 }
-.docs-brand-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-  margin-top: var(--space-xl);
+.docs-brand-hex,
+.docs-brand-pick {
+  font: var(--type-heading-md);
 }
-.docs-brand-scale {
-  margin: var(--space-none) var(--space-none) var(--space-lg);
+/* The hex is the button, and its press area covers the whole swatch (the copy button sits above it). */
+.docs-brand-pick {
+  --bland-radius: var(--rad-sm);
+
+  padding: var(--space-none);
+  border: none;
+  border-radius: var(--rad-sm);
+  background: none;
+  color: inherit;
+  cursor: pointer;
 }
-.docs-brand-scale figcaption {
-  font: var(--type-body-md-bold);
-  margin-bottom: var(--space-xs);
+.docs-brand-pick::after {
+  content: "";
+  position: absolute;
+  inset: var(--space-none);
 }
+.docs-brand-copy {
+  position: relative; /* above the pick button's press area */
+  display: inline-flex;
+  padding: var(--space-none);
+  border: none;
+  border-radius: var(--rad-sm);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+/* 13 steps, each space-6xl wide; the row scrolls sideways where it doesn't fit. */
 .docs-brand-scale ol {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--control-lg), 1fr));
-  gap: var(--space-xs);
+  display: flex;
+  gap: var(--space-sm);
   margin: var(--space-none);
   padding: var(--space-none);
   list-style: none;
@@ -1073,23 +1098,138 @@ code,
 .docs-brand-scale li {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3xs);
-  min-width: var(--space-none);
+  gap: var(--space-2xs);
+  flex: none;
+  width: var(--space-6xl);
 }
 .docs-brand-chip {
   --bland-radius: var(--rad-md);
 
   display: block;
-  height: var(--control-lg);
-  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-subtle);
+  height: var(--space-4xl);
+}
+.docs-brand-step,
+.docs-brand-step-hex {
+  padding-inline: var(--space-2xs);
 }
 .docs-brand-step {
-  font: var(--type-body-sm-bold);
+  font: var(--type-body-md-bold);
+  color: var(--text-bold);
 }
-.docs-brand-scale .docs-value {
-  font: var(--type-code-body-sm);
-  overflow: hidden;
-  text-overflow: ellipsis;
+.docs-brand-step-hex {
+  font: var(--type-body-sm);
+  color: var(--text-subtle);
+}
+.docs-brand-tint {
+  width: min(100%, calc(var(--space-9xl) + var(--space-2xl)));
+}
+/* The actions float at the bottom of the window while the page scrolls under them. */
+.docs-brand-bar {
+  --bland-radius: var(--rad-lg);
+
+  position: sticky;
+  bottom: var(--space-lg);
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-top: var(--space-2xl);
+  padding: var(--space-sm);
+  background: var(--surface-inverse);
+  box-shadow: var(--elevation-neutral-far);
+}
+.docs-brand-bar-start {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* The color picker (Figma 6773:22102), in the shared popover under the swatch. */
+.docs-picker {
+  --bland-radius: var(--rad-lg);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  width: var(--space-9xl);
+  padding: var(--space-lg);
+  background: var(--surface-100);
+  box-shadow:
+    inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-xs) var(--border-subtle),
+    var(--elevation-neutral-far);
+}
+/* Saturation left to right, brightness bottom to top, over the hue set inline. */
+.docs-picker-area {
+  --bland-radius: var(--rad-lg);
+
+  position: relative;
+  height: calc(var(--space-7xl) + var(--space-lg));
+  background-image: linear-gradient(to top, black, transparent), linear-gradient(to right, white, transparent);
+  cursor: crosshair;
+  touch-action: none;
+}
+.docs-picker-knob,
+.docs-picker-hue::-webkit-slider-thumb {
+  width: calc(var(--space-xl) + var(--space-xs));
+  height: calc(var(--space-xl) + var(--space-xs));
+}
+.docs-picker-knob {
+  position: absolute;
+  translate: -50% -50%;
+  pointer-events: none;
+}
+.docs-picker-hue {
+  height: var(--space-md);
+  margin: var(--space-none);
+  border-radius: var(--rad-rd);
+  background: linear-gradient(to right, hsl(0 100% 50%), hsl(60 100% 50%), hsl(120 100% 50%), hsl(180 100% 50%), hsl(240 100% 50%), hsl(300 100% 50%), hsl(360 100% 50%));
+  appearance: none;
+  cursor: pointer;
+}
+/* The thumb is Figma's knob: a white ring the hue (the input's color) shows through. */
+.docs-picker-hue::-webkit-slider-thumb {
+  box-sizing: border-box;
+  border: var(--space-sm) solid white;
+  border-radius: var(--rad-rd);
+  background: currentColor;
+  box-shadow: var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) rgb(0 0 0 / 0.2);
+  appearance: none;
+}
+.docs-picker-hue:focus-visible {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--stroke-lg);
+}
+.docs-picker-field {
+  --bland-radius: var(--rad-lg);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  height: var(--control-sm);
+  padding-inline: var(--space-md) var(--space-xs);
+  background: var(--surface-200);
+}
+.docs-picker-field:focus-within {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--stroke-lg);
+}
+.docs-picker-field input {
+  flex: 1;
+  min-width: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  outline: none;
+  background: none;
+  font: var(--type-body-lg);
+  color: var(--text-bold);
+}
+.docs-picker-swatch {
+  flex: none;
+  width: var(--icon-lg);
+  height: var(--icon-lg);
+  border-radius: var(--rad-rd);
 }
 .docs-brand-previews {
   display: grid;
