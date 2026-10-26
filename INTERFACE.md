@@ -2094,3 +2094,5 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   with the edge fade alone (`scrollbar={false}`, as the Sidebar's list); it
   scrolls itself to keep the current entry in view.
 
+
+- **Docs site, brand reset (2026-10-26, Godwin):** one reset, **Reset to Bland** on the Brand theme page; no toolbar button. The anchor field reads **Your color becomes step**.

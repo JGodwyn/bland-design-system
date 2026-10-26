@@ -244,9 +244,9 @@ test('the brand page makes a scale from a color with tinted or gray neutrals, fi
   const fill = await page.locator('.docs-content .bland-button[data-emotion="brand"][data-type="primary"]').first().evaluate((el) => getComputedStyle(el).getPropertyValue('--_bg').trim());
   expect(fill).toBe(applied);
 
-  await page.getByRole('button', { name: 'Reset brand' }).click();
+  await page.goto('/#/brand');
+  await page.getByRole('button', { name: 'Reset to Bland' }).click();
   expect(await brand600()).toBe('');
   expect(await neutral600()).toBe('');
-  await expect(page.getByRole('button', { name: 'Reset brand' })).toHaveCount(0);
 });
 

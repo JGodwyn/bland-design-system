@@ -21,7 +21,7 @@ How `generateNeutrals` makes them:
 - **Strength:** the curve times three factors. How colorful the brand is: none below OKLCH chroma 0.02, all of it from 0.12, so gray and near-black brands get gray. The hue: 1 for blues and violets, about 0.45 to 0.7 for reds, oranges, yellows and greens, because equal chroma reads about 1.6x stronger there and Tailwind, Radix and Material all hold warm grays back. The tint: 1, 0.5 or 0. Never more than a fifth of the chroma sRGB holds at that step.
 - **Contrast:** each step keeps the WCAG luminance of Bland's step (its lightness is searched to match), so every neutral-on-neutral contrast stays Bland's whatever the brand, within hex rounding.
 - **Bland's blue** at full tint gives Figma's neutrals exactly.
-- **Shadows and overlays** are `color-mix`es of `--neutral-1000`, which the curve keeps pure black, as in Figma; so they follow the neutrals but stay black in practice.
+- **Shadows and overlays** are `color-mix`es of `--neutral-1000`, which the curve keeps pure black, as in Figma; so they follow the neutrals but stay black in practice. Kept that way on purpose (Godwin 2026-10-26): the brand elevations already carry the brand color.
 
 | Brand | Neutral 600 | Chroma | Hue |
 | --- | --- | --- | --- |
@@ -55,7 +55,7 @@ Neutrals are optional in the file: set all 13 or none. Override at `:root`, not 
 
 ## The Brand theme page (docs site)
 
-`npm run docs`, then **Brand theme** under Overview (`#/brand`): the same tool in the browser. Type a hex or use the color picker, pick the step it sits on and the neutrals (Tinted, Subtle, Pure gray), and the page shows both scales next to Bland's, the contrast check (with **Fix contrast**), a live preview of brand-colored components in light and dark, and the CSS to copy. **Apply to the site** sets the steps on `<html>`, so every docs page shows the brand until **Reset to Bland** or the toolbar's **Reset brand** (kept for the visit in sessionStorage). The page imports `scripts/brand/core.ts`, so it never disagrees with the command.
+`npm run docs`, then **Brand theme** under Overview (`#/brand`): the same tool in the browser. Type a hex or use the color picker, pick which step the color becomes (**Your color becomes step**, 600 by default) and the neutrals (Tinted, Subtle, Pure gray), and the page shows both scales next to Bland's, the contrast check (with **Fix contrast**), a live preview of brand-colored components in light and dark, and the CSS to copy. **Apply to the site** sets the steps on `<html>`, so every docs page shows the brand until **Reset to Bland** on this page (kept for the visit in sessionStorage). The page imports `scripts/brand/core.ts`, so it never disagrees with the command.
 
 ## The tool: `npm run brand`
 

@@ -9,7 +9,7 @@ import { ComponentPage } from './ComponentPage';
 import { stories, type DocsPage, type StylePageId } from './data';
 import { CommandIcon, ListDashesIcon, MoonIcon, SunDimIcon } from './icons';
 import { BrandPage } from './BrandPage';
-import { setAppliedBrand, useAppliedBrand } from './brandStore';
+import './brandStore'; // paints an applied brand on load, on every page
 import { brandPage, componentPageList, overviewPage, PageIcon, stylePageList } from './pages';
 import { isApple, SearchDialog } from './Search';
 import { Overview } from './Overview';
@@ -59,7 +59,6 @@ export type DocsRoute = { kind: 'overview' } | { kind: 'brand' } | { kind: 'styl
 
 export function DocsApp({ route }: { route: DocsRoute }) {
   const [theme, setTheme] = useTheme();
-  const appliedBrand = useAppliedBrand();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -146,11 +145,6 @@ export function DocsApp({ route }: { route: DocsRoute }) {
           value={theme}
           onValueChange={(id) => setTheme(id as Theme)}
         />
-        {appliedBrand && (
-          <Button size="sm" type="stroke" className="docs-brand-reset" onClick={() => setAppliedBrand(null)}>
-            Reset brand
-          </Button>
-        )}
         <button type="button" className="docs-search-trigger bland-focus-ring bland-smooth" onClick={() => setSearchOpen(true)} aria-keyshortcuts={isApple ? 'Meta+K' : 'Control+K'}>
           <span className="docs-search-label bland-smooth">Search Bland</span>
           <span className="docs-keys" aria-hidden="true">

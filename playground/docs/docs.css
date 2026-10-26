@@ -901,7 +901,7 @@ code,
 
 .docs-elevations {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--space-9xl)), 1fr)); /* wide enough for the longest name */
   gap: var(--space-xl);
   padding: var(--space-lg);
   background: var(--surface-200);
@@ -915,6 +915,13 @@ code,
   padding: var(--space-md);
   background: var(--surface-100);
   --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+}
+.docs-elevation figcaption {
+  min-width: 0;
+}
+.docs-elevation .docs-token {
+  white-space: normal; /* wraps inside the card on a narrow screen instead of spilling out */
+  overflow-wrap: anywhere;
 }
 
 .docs-type-list {
@@ -1000,9 +1007,6 @@ code,
 
 
 /* ---- Brand theme page ---- */
-.docs-brand-reset {
-  margin-inline-end: auto;
-}
 .docs-brand-form .bland-dropdown {
   width: auto; /* fills its grid cell, as the Text Input beside it */
 }

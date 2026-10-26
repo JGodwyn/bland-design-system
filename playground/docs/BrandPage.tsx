@@ -123,8 +123,8 @@ export function BrandPage() {
             }
           />
           <Dropdown
-            label="Color sits on step"
-            helperText="600 is the step primary fills use. Very dark or light brands sit better lower or higher."
+            label="Your color becomes step"
+            helperText="Where your color lands among the 13 steps; the others are built around it. 600 is the primary button fill. Pick a higher step for a very dark color, a lower one for a pale one."
             items={anchorItems}
             value={at}
             onValueChange={(id) => {

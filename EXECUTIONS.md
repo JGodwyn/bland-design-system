@@ -1506,3 +1506,10 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Shadows: they follow `--neutral-1000`, which stays pure black (Bland's curve, as Figma), so they don't tint
   in practice. Raised with Godwin.
 
+
+## Brand page follow-ups and elevation names (2026-10-26)
+
+- Godwin: shadows keep pure black neutral-1000 (the brand elevations already carry the brand); noted in docs/brand.md.
+- Removed the toolbar's Reset brand button (and `.docs-brand-reset`); Reset to Bland on the Brand theme page is the one reset. DocsApp imports `brandStore` for its side effect so an applied brand still paints on load. The brand spec now resets from the page.
+- "Color sits on step" was unclear: renamed **Your color becomes step**, helper says the other steps are built around it, 600 is the primary button fill, higher for dark colors, lower for pale ones.
+- Elevation page: token names spilled out of their cards (nowrap names in a 180px column). Columns now start at space-9xl and a name wraps inside its card if it still can't fit; checked at 1440, the pane and 375.
