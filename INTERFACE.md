@@ -44,6 +44,10 @@ when), `docs/components.md` (how to build one).
   one color in the shape of Bland's OKLCH scale (the color on 600, `--at` to
   move it), and a contrast check of the 35 brand pairings that warns, never
   blocks, with suggested steps and `--fix`.
+- **Brand theme page on the docs site** (`#/brand`, under Overview, Godwin
+  2026-10-26): the tool in the browser, with Apply to the site (steps on
+  `<html>`, kept per visit) and Reset; previews set `data-theme` and the steps
+  on their own element, so they show a brand before it is applied.
 
 ### Type
 - Inter for interface text, Geist Mono for code, self-hosted through

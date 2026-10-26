@@ -7,6 +7,7 @@ import {
   ArrowsOutCardinalIcon,
   CornersOutIcon,
   DevicesIcon,
+  PaletteIcon,
   RectangleDashedIcon,
   RulerIcon,
   ShapesIcon,
@@ -46,6 +47,13 @@ export const overviewPage: DocsPage = {
   description: 'Bland is a reusable UI kit: light and dark themes, a brand color swapped per project, Inter and Geist Mono, and components built only on tokens.',
   icon: WarehouseIcon,
 };
+export const brandPage: DocsPage = {
+  href: '#/brand',
+  title: 'Brand theme',
+  kind: 'brand',
+  description: 'Make a project’s 13 brand steps from one color, check their contrast, preview them in both themes and apply them across this site.',
+  icon: PaletteIcon,
+};
 export const stylePageList: DocsPage[] = stylePages.map((p) => ({
   href: `#/styles/${p.id}`,
   title: p.title,
@@ -59,7 +67,7 @@ export const componentPageList: DocsPage[] = stories.map((s) => ({
   kind: 'component',
   description: storyDescription(s.id),
 }));
-export const docsPages = [overviewPage, ...stylePageList, ...componentPageList];
+export const docsPages = [overviewPage, brandPage, ...stylePageList, ...componentPageList];
 
 export const PageIcon = ({ page }: { page: DocsPage }) =>
   page.icon ? (

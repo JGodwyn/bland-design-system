@@ -53,4 +53,4 @@ export const stylePages = [
 export type StylePageId = (typeof stylePages)[number]['id'];
 
 /** A page of the docs, in sidebar order: what the previous and next buttons and the search walk through. */
-export type DocsPage = { href: string; title: string; kind: 'overview' | 'style' | 'component'; description: string; icon?: ComponentType };
+export type DocsPage = { href: string; title: string; kind: 'overview' | 'brand' | 'style' | 'component'; description: string; icon?: ComponentType };

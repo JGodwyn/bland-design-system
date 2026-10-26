@@ -998,3 +998,114 @@ code,
   color: var(--text-subtle);
 }
 
+
+/* ---- Brand theme page ---- */
+.docs-brand-reset {
+  margin-inline-end: auto;
+}
+.docs-brand-form .bland-dropdown {
+  width: auto; /* fills its grid cell, as the Text Input beside it */
+}
+.docs-brand-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--space-9xl)), 1fr));
+  gap: var(--space-lg);
+  align-items: start;
+}
+/* The native color picker in the Text Input's leading slot: a swatch the size of an icon. */
+.docs-color-picker {
+  --bland-radius: var(--rad-xs);
+
+  width: var(--icon-lg);
+  height: var(--icon-lg);
+  padding: var(--space-none);
+  border: none;
+  border-radius: var(--rad-xs);
+  background: none;
+  cursor: pointer;
+}
+.docs-color-picker::-webkit-color-swatch-wrapper {
+  padding: var(--space-none);
+}
+.docs-color-picker::-webkit-color-swatch {
+  border: var(--stroke-sm) solid var(--border-subtle);
+  border-radius: var(--rad-xs);
+}
+.docs-brand-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-xl);
+}
+.docs-brand-scale {
+  margin: var(--space-none) var(--space-none) var(--space-lg);
+}
+.docs-brand-scale figcaption {
+  font: var(--type-body-md-bold);
+  margin-bottom: var(--space-xs);
+}
+.docs-brand-scale ol {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--control-lg), 1fr));
+  gap: var(--space-xs);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  list-style: none;
+}
+.docs-brand-scale li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  min-width: var(--space-none);
+}
+.docs-brand-chip {
+  --bland-radius: var(--rad-md);
+
+  display: block;
+  height: var(--control-lg);
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-subtle);
+}
+.docs-brand-step {
+  font: var(--type-body-sm-bold);
+}
+.docs-brand-scale .docs-value {
+  font: var(--type-code-body-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.docs-brand-previews {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--space-9xl) * 1.5)), 1fr));
+  gap: var(--space-lg);
+}
+/* Each preview sets its own data-theme and brand steps, so the tokens inside are computed from them. */
+.docs-brand-preview {
+  --bland-radius: var(--rad-lg);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  background: var(--surface-100);
+  color: var(--text-bold);
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-subtle);
+}
+.docs-brand-preview-label {
+  font: var(--type-body-sm-bold);
+  color: var(--text-subtle);
+}
+.docs-brand-sample {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+.docs-brand-sample-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+}
+.docs-brand-link {
+  font: var(--type-body-lg);
+  color: var(--text-link);
+}

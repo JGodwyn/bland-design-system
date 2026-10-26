@@ -12,7 +12,7 @@ function collectErrors(page: Page) {
   return errors;
 }
 
-for (const path of ['', ...stylePages.map((p) => `styles/${p}`), ...storyIds.map((id) => `components/${id}`)]) {
+for (const path of ['', 'brand', ...stylePages.map((p) => `styles/${p}`), ...storyIds.map((id) => `components/${id}`)]) {
   test(`docs page /${path} opens without errors`, async ({ page }) => {
     const errors = collectErrors(page);
     await page.goto(`/#/${path}`);
@@ -207,3 +207,33 @@ test('the demo zoom keys leave date and time segments alone (0 types a zero)', a
   await page.keyboard.type('2026');
   await expect(year).toHaveText('2026');
 });
+
+test('the brand page makes a scale from a color, fixes its contrast, applies it to every page and resets', async ({ page }) => {
+  await page.goto('/#/brand');
+  const html = page.locator('html');
+  const brand600 = () => html.evaluate((el) => el.style.getPropertyValue('--brand-600'));
+  const apply = page.getByRole('button', { name: 'Apply to the site' });
+  await expect(apply).toBeDisabled(); // Bland's own blue: nothing to apply
+
+  await page.getByRole('textbox', { name: 'Brand color', exact: true }).fill('#ff5a1f');
+  await expect(page.locator('.docs-brand-scale').first()).toContainText('#ff5a1f');
+  await expect(page.getByRole('table', { name: 'Pairings below their minimum' })).toContainText('Button primary label');
+
+  await page.getByRole('button', { name: 'Fix contrast' }).click();
+  await expect(page.getByText(/All \d+ brand pairings pass/)).toBeVisible();
+  await page.getByRole('button', { name: 'Apply to the site' }).click();
+  await expect(page.getByRole('button', { name: 'Applied to the site' })).toBeDisabled();
+  const applied = await brand600();
+  expect(applied).toMatch(/^#[0-9a-f]{6}$/);
+  expect(applied).not.toBe('#0062ff');
+
+  await page.goto('/#/components/button');
+  expect(await brand600()).toBe(applied);
+  const fill = await page.locator('.docs-content .bland-button[data-emotion="brand"][data-type="primary"]').first().evaluate((el) => getComputedStyle(el).getPropertyValue('--_bg').trim());
+  expect(fill).toBe(applied);
+
+  await page.getByRole('button', { name: 'Reset brand' }).click();
+  expect(await brand600()).toBe('');
+  await expect(page.getByRole('button', { name: 'Reset brand' })).toHaveCount(0);
+});
+

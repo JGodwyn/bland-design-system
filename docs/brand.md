@@ -25,6 +25,10 @@ Load a stylesheet after Bland's tokens:
 
 Override at `:root`, not on a nested element: the brand-colored tokens are computed where `tokens.css` defines them (`:root` and `[data-theme]`), and they read the brand steps from there. Step 0 is white in Bland's scale; keep it white unless the brand needs otherwise.
 
+## The Brand theme page (docs site)
+
+`npm run docs`, then **Brand theme** under Overview (`#/brand`): the same tool in the browser. Type a hex or use the color picker, pick the step it sits on, and the page shows the 13 steps next to Bland's, the contrast check (with **Fix contrast**), a live preview of brand-colored components in light and dark, and the CSS to copy. **Apply to the site** sets the steps on `<html>`, so every docs page shows the brand until **Reset to Bland** or the toolbar's **Reset brand** (kept for the visit in sessionStorage). The page imports `scripts/brand/core.ts`, so it never disagrees with the command.
+
 ## The tool: `npm run brand`
 
 ```bash

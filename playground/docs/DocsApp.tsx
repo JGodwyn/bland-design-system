@@ -8,7 +8,9 @@ import { SegmentedBar } from '../../src/components/segmented-bar/SegmentedBar';
 import { ComponentPage } from './ComponentPage';
 import { stories, type DocsPage, type StylePageId } from './data';
 import { CommandIcon, ListDashesIcon, MoonIcon, SunDimIcon } from './icons';
-import { componentPageList, overviewPage, PageIcon, stylePageList } from './pages';
+import { BrandPage } from './BrandPage';
+import { setAppliedBrand, useAppliedBrand } from './brandStore';
+import { brandPage, componentPageList, overviewPage, PageIcon, stylePageList } from './pages';
 import { isApple, SearchDialog } from './Search';
 import { Overview } from './Overview';
 import { StylePage } from './StylePage';
@@ -53,10 +55,11 @@ function useTheme() {
   return [picked ?? system, setPicked] as const;
 }
 
-export type DocsRoute = { kind: 'overview' } | { kind: 'style'; id: StylePageId } | { kind: 'component'; id: string };
+export type DocsRoute = { kind: 'overview' } | { kind: 'brand' } | { kind: 'style'; id: StylePageId } | { kind: 'component'; id: string };
 
 export function DocsApp({ route }: { route: DocsRoute }) {
   const [theme, setTheme] = useTheme();
+  const appliedBrand = useAppliedBrand();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -87,7 +90,7 @@ export function DocsApp({ route }: { route: DocsRoute }) {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  const current = route.kind === 'overview' ? '#/' : route.kind === 'style' ? `#/styles/${route.id}` : `#/components/${route.id}`;
+  const current = route.kind === 'overview' ? '#/' : route.kind === 'brand' ? brandPage.href : route.kind === 'style' ? `#/styles/${route.id}` : `#/components/${route.id}`;
   const link = (page: DocsPage) => (
     <li key={page.href}>
       <a href={page.href} className="docs-nav-link bland-focus-ring bland-smooth" aria-current={page.href === current ? 'page' : undefined}>
@@ -119,7 +122,10 @@ export function DocsApp({ route }: { route: DocsRoute }) {
         </div>
         <ScrollArea className="docs-nav-scroll" fadeSize="sm">
           <nav aria-label="Docs">
-            <ul className="docs-nav">{link(overviewPage)}</ul>
+            <ul className="docs-nav">
+              {link(overviewPage)}
+              {link(brandPage)}
+            </ul>
             <h2 className="docs-group-heading">Foundations</h2>
             <ul className="docs-nav">{stylePageList.map(link)}</ul>
             <h2 className="docs-group-heading">Components</h2>
@@ -140,6 +146,11 @@ export function DocsApp({ route }: { route: DocsRoute }) {
           value={theme}
           onValueChange={(id) => setTheme(id as Theme)}
         />
+        {appliedBrand && (
+          <Button size="sm" type="stroke" className="docs-brand-reset" onClick={() => setAppliedBrand(null)}>
+            Reset brand
+          </Button>
+        )}
         <button type="button" className="docs-search-trigger bland-focus-ring bland-smooth" onClick={() => setSearchOpen(true)} aria-keyshortcuts={isApple ? 'Meta+K' : 'Control+K'}>
           <span className="docs-search-label bland-smooth">Search Bland</span>
           <span className="docs-keys" aria-hidden="true">
@@ -160,6 +171,7 @@ export function DocsApp({ route }: { route: DocsRoute }) {
       <main className="docs-main">
         <div className="docs-content">
           {route.kind === 'overview' && <Overview />}
+          {route.kind === 'brand' && <BrandPage />}
           {route.kind === 'style' && <StylePage id={route.id} />}
           {route.kind === 'component' && (story ? <ComponentPage id={route.id} story={story} /> : <p>No component called “{route.id}”.</p>)}
         </div>

@@ -1465,3 +1465,21 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Docs site: Brand section first on Colors; search sends brand tokens there. Verified in the browser: an
   orange override at `:root` recolours Buttons (light) and the Calendar range and selection (dark).
 
+## Brand theme page on the docs site (2026-10-26)
+
+- Godwin: the tool as a page under Overview: enter or pick a color, generate, apply across the site, reset.
+- `scripts/brand/core.ts` now imports `tokens.json` instead of reading it with `fs`, so the docs site runs the
+  same generator and check. Palette icon exported from the Figma Icons page (6080:106150).
+- `#/brand` route, sidebar entry under Overview, search and prev/next order. `brandStore.ts` sets the steps on
+  `<html>` (sessionStorage for the visit); a Reset brand button shows in the toolbar while one is applied.
+- Page: Text Input with the native color picker in its leading slot, a Dropdown for the step, Apply / Fix
+  contrast / Reset to Bland, the scale beside Bland's, the findings in a Table, previews in both themes (each
+  sets `data-theme` and the steps on itself), and the CSS in a Code snippet.
+- Browser checks: the lead's inline code broke onto its own line (the lead is a flex column), wrapped it in a
+  `<p>`. Bland's blue regenerated 1/255 off, so the page didn't recognise it as Bland's: it now uses Bland's
+  scale for that input. Apply was enabled for Bland's own scale; disabled. Dropdown hugged 256 beside a full
+  width field; made it fill. Phone width: no horizontal scroll. A screenshot after Reset still showed an
+  orange button: the background-color transition again (computed value was blue).
+- Spec in `tests/docs.spec.ts`: generate, fix, apply, follow to another page, reset from the toolbar; the page
+  is in the open-without-errors list too.
+

@@ -1,17 +1,14 @@
 // Brand override tooling: generate a 13-step brand scale from one color, read a project's override file, and check
-// the color pairings that depend on the brand. Used by scripts/brand.ts (npm run brand) and its tests. See
-// docs/brand.md.
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-
+// the color pairings that depend on the brand. Used by scripts/brand.ts (npm run brand), its tests and the docs
+// site's Brand theme page, so it stays free of Node APIs. See docs/brand.md.
+import tokensFile from '../../tokens/tokens.json';
 import type { Token } from '../tokens/core';
 
 export const STEPS = ['0', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950', '1000'] as const;
 export type Step = (typeof STEPS)[number];
 export type Scale = Record<Step, string>;
 
-const root = resolve(import.meta.dirname, '../..');
-export const tokens: Token[] = JSON.parse(readFileSync(resolve(root, 'tokens/tokens.json'), 'utf8')).tokens;
+export const tokens = tokensFile.tokens as Token[];
 
 /** Bland's own brand scale, from the tokens. */
 export const blandScale = Object.fromEntries(STEPS.map((s) => [s, tokens.find((t) => t.css === `--brand-${s}`)!.light])) as Scale;

@@ -21,6 +21,7 @@ function parseHash(): Route {
   if (section === 'raw') return { kind: 'raw', id, theme: new URLSearchParams(query).get('theme') === 'dark' ? 'dark' : 'light' };
   if (section === 'styles' && stylePages.some((p) => p.id === id)) return { kind: 'style', id: id as StylePageId };
   if (section === 'components' && id) return { kind: 'component', id };
+  if (section === 'brand') return { kind: 'brand' };
   return { kind: 'overview' };
 }
 
