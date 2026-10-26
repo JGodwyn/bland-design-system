@@ -12,6 +12,8 @@ export const tokens = tokensFile.tokens as Token[];
 
 /** Bland's own brand scale, from the tokens. */
 export const blandScale = Object.fromEntries(STEPS.map((s) => [s, tokens.find((t) => t.css === `--brand-${s}`)!.light])) as Scale;
+/** Bland's own neutral scale (Figma's, tinted toward Bland's blue), from the tokens. */
+export const blandNeutrals = Object.fromEntries(STEPS.map((s) => [s, tokens.find((t) => t.css === `--neutral-${s}`)!.light])) as Scale;
 
 // ---------- color math (sRGB hex <-> OKLCH) ----------
 
@@ -111,6 +113,85 @@ export function generate(hex: string, at: Step = '600'): Scale {
   return out;
 }
 
+// ---------- neutrals ----------
+
+/** How strongly the neutrals lean toward the brand: full is Bland's own amount, none is pure gray. */
+export type Tint = 'full' | 'subtle' | 'none';
+export const TINTS: Tint[] = ['full', 'subtle', 'none'];
+const TINT_STRENGTH: Record<Tint, number> = { full: 1, subtle: 0.5, none: 0 };
+
+/**
+ * How much of the tint a hue takes. Equal OKLCH chroma reads about 1.6x stronger on yellow and red than on blue,
+ * and shipped palettes (Tailwind, Radix, Material) hold warm and yellow grays back, so these are fitted to them
+ * (docs/brand.md, reports/Brand tinted neutral scales.md). Blue, Bland's own, takes all of it.
+ */
+const HUE_FACTORS: [number, number][] = [
+  [0, 0.7], [30, 0.65], [60, 0.5], [90, 0.45], [120, 0.45], [160, 0.55], [200, 0.75], [230, 0.95], [260, 1], [290, 1], [320, 0.85], [360, 0.7],
+];
+export function hueFactor(h: number): number {
+  const hue = ((h % 360) + 360) % 360;
+  for (let i = 1; i < HUE_FACTORS.length; i++) {
+    const [h1, f1] = HUE_FACTORS[i]!;
+    const [h0, f0] = HUE_FACTORS[i - 1]!;
+    if (hue <= h1) return f0 + ((hue - h0) / (h1 - h0)) * (f1 - f0);
+  }
+  return HUE_FACTORS[0]![1];
+}
+
+/** The most chroma sRGB holds at this lightness and hue. */
+function maxChroma(l: number, h: number): number {
+  const fits = (c: number) => oklchToLinear({ l, c, h }).every((v) => v >= -1e-4 && v <= 1 + 1e-4);
+  let lo = 0;
+  let hi = 0.4;
+  for (let i = 0; i < 24; i++) {
+    const mid = (lo + hi) / 2;
+    if (fits(mid)) lo = mid;
+    else hi = mid;
+  }
+  return lo;
+}
+
+/** The color at this chroma and hue whose WCAG luminance equals `y` (lightness searched; it only rises with L). */
+function atLuminance(y: number, c: number, h: number): string {
+  if (c === 0) {
+    // A gray straight from its luminance: exact at white and black, where an OKLCH round trip drifts by one.
+    const v = Math.round(Math.min(1, Math.max(0, fromLinear(y))) * 255).toString(16).padStart(2, '0');
+    return `#${v}${v}${v}`;
+  }
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 30; i++) {
+    const mid = (lo + hi) / 2;
+    if (luminance(fromOklch({ l: mid, c, h })) < y) lo = mid;
+    else hi = mid;
+  }
+  return fromOklch({ l: (lo + hi) / 2, c, h });
+}
+
+/**
+ * The 13 neutral steps leaning toward a brand, as Bland's own grays lean toward its blue. Each step takes Bland's
+ * chroma curve (none at white and black, the most at 600), scaled by how colorful the brand is (none below
+ * OKLCH chroma 0.02, all of it from 0.12), by the hue (warm and yellow hues take less) and by the tint; it sits at
+ * the brand's hue, under a fifth of the chroma sRGB holds there. Each keeps the WCAG luminance of Bland's step,
+ * so every neutral-on-neutral contrast stays Bland's. `none` is pure gray. Bland's own blue at full tint gives
+ * Bland's neutrals exactly (Figma's values).
+ */
+export function generateNeutrals(brand: Scale, tint: Tint = 'full'): Scale {
+  if (tint === 'full' && STEPS.every((s) => brand[s] === blandScale[s])) return { ...blandNeutrals };
+  const source = STEPS.map((s) => toOklch(brand[s])).reduce((a, b) => (b.c > a.c ? b : a));
+  const ref = STEPS.map((s) => toOklch(blandNeutrals[s]));
+  const peak = Math.max(...ref.map((r) => r.c));
+  const strength = Math.min(1, Math.max(0, (source.c - 0.02) / 0.1)) * hueFactor(source.h) * TINT_STRENGTH[tint];
+  return Object.fromEntries(
+    STEPS.map((s, i) => {
+      const r = ref[i]!;
+      const y = luminance(blandNeutrals[s]);
+      const c = strength === 0 || r.c < 1e-4 ? 0 : Math.min(r.c * strength, 0.2 * maxChroma(r.l, source.h));
+      return [s, atLuminance(y, peak === 0 ? 0 : c, source.h)];
+    }),
+  ) as Scale;
+}
+
 // ---------- reading an override file ----------
 
 /**
@@ -121,7 +202,7 @@ export function parseScale(text: string): Scale {
   const found: Partial<Record<string, string>> = {};
   const trimmed = text.trim();
   if (trimmed.startsWith('{')) {
-    for (const [k, v] of Object.entries(JSON.parse(trimmed) as Record<string, string>)) found[k.replace(/^--brand-/, '')] = v;
+    for (const [k, v] of Object.entries(JSON.parse(trimmed) as Record<string, string>)) if (!k.startsWith('--neutral-')) found[k.replace(/^--brand-/, '')] = v;
   } else {
     for (const m of text.matchAll(/--brand-(\d+)\s*:\s*([^;}\s]+)/g)) found[m[1]!] = m[2]!;
   }
@@ -130,8 +211,25 @@ export function parseScale(text: string): Scale {
   return Object.fromEntries(STEPS.map((s) => [s, `#${parseHex(found[s]!).map((v) => Math.round(v * 255).toString(16).padStart(2, '0')).join('')}`])) as Scale;
 }
 
-export function toCss(scale: Scale, note = ''): string {
-  return `/* Brand override for Bland${note ? `: ${note}` : ''}. Load after bland/tokens.css. */\n:root {\n${STEPS.map((s) => `  --brand-${s}: ${scale[s]};`).join('\n')}\n}\n`;
+export function toCss(scale: Scale, note = '', neutrals?: Scale): string {
+  const lines = STEPS.map((s) => `  --brand-${s}: ${scale[s]};`);
+  if (neutrals) lines.push('', ...STEPS.map((s) => `  --neutral-${s}: ${neutrals[s]};`));
+  return `/* Brand override for Bland${note ? `: ${note}` : ''}. Load after bland/tokens.css. */\n:root {\n${lines.join('\n')}\n}\n`;
+}
+
+/** The 13 neutral steps from an override file, or undefined when it sets none (Bland's neutrals then stay). */
+export function parseNeutrals(text: string): Scale | undefined {
+  const found: Partial<Record<string, string>> = {};
+  const trimmed = text.trim();
+  if (trimmed.startsWith('{')) {
+    for (const [k, v] of Object.entries(JSON.parse(trimmed) as Record<string, string>)) if (k.startsWith('--neutral-')) found[k.slice('--neutral-'.length)] = v;
+  } else {
+    for (const m of text.matchAll(/--neutral-(\d+)\s*:\s*([^;}\s]+)/g)) found[m[1]!] = m[2]!;
+  }
+  if (Object.keys(found).length === 0) return undefined;
+  const missing = STEPS.filter((s) => !found[s]);
+  if (missing.length) throw new Error(`The override sets some neutral steps but not ${missing.join(', ')}. Set all 13, or none.`);
+  return Object.fromEntries(STEPS.map((s) => [s, `#${parseHex(found[s]!).map((v) => Math.round(v * 255).toString(16).padStart(2, '0')).join('')}`])) as Scale;
 }
 
 // ---------- contrast check ----------
@@ -149,13 +247,17 @@ export const contrast = (a: string, b: string) => {
 
 const byCss = new Map(tokens.map((t) => [t.css, t]));
 
-/** A token's color in a mode with the given brand scale, and the brand step it comes from (if any). */
-export function colorOf(css: string, mode: Mode, scale: Scale): { hex: string; step?: Step } {
+/**
+ * A token's color in a mode with the given brand and neutral scales, and the brand step it comes from (if any;
+ * only brand steps are moved by the fixes).
+ */
+export function colorOf(css: string, mode: Mode, scale: Scale, neutrals: Scale = blandNeutrals): { hex: string; step?: Step } {
   const t = byCss.get(css);
   if (!t) throw new Error(`Unknown token ${css}.`);
   const ref = mode === 'dark' ? (t.dark !== undefined ? t.cssValue?.dark : t.cssValue?.light) : t.cssValue?.light;
-  const step = ref && /^var\(--brand-(\d+)\)$/.exec(ref)?.[1];
-  if (step) return { hex: scale[step as Step], step: step as Step };
+  const m = ref && /^var\(--(brand|neutral)-(\d+)\)$/.exec(ref);
+  if (m?.[1] === 'brand') return { hex: scale[m[2] as Step], step: m[2] as Step };
+  if (m?.[1] === 'neutral') return { hex: neutrals[m[2] as Step] };
   return { hex: mode === 'dark' ? (t.dark ?? t.light) : t.light };
 }
 
@@ -210,15 +312,15 @@ export type Finding = Pair & {
 };
 
 /** Every pairing below its minimum with this scale, in both modes. */
-export function check(scale: Scale): Finding[] {
+export function check(scale: Scale, neutrals: Scale = blandNeutrals): Finding[] {
   const out: Finding[] = [];
   for (const mode of ['light', 'dark'] as const) {
     for (const pair of PAIRS) {
-      const fg = colorOf(pair.fg, mode, scale);
-      const bg = colorOf(pair.bg, mode, scale);
+      const fg = colorOf(pair.fg, mode, scale, neutrals);
+      const bg = colorOf(pair.bg, mode, scale, neutrals);
       const ratio = contrast(fg.hex, bg.hex);
       if (ratio >= pair.min) continue;
-      const base = contrast(colorOf(pair.fg, mode, blandScale).hex, colorOf(pair.bg, mode, blandScale).hex);
+      const base = contrast(colorOf(pair.fg, mode, blandScale, blandNeutrals).hex, colorOf(pair.bg, mode, blandScale, blandNeutrals).hex);
       const moves = [fg, bg]
         .map((side, i) => {
           if (!side.step) return undefined;
@@ -247,8 +349,8 @@ const inherited = (f: Finding) => f.baseline < f.min && f.ratio >= f.baseline - 
  * says) that clears every pairing it is in, with the other steps as they are. One step at a time: run the check
  * again after taking them.
  */
-export function suggest(scale: Scale): Partial<Scale> {
-  const misses = check(scale).filter((f) => !inherited(f));
+export function suggest(scale: Scale, neutrals: Scale = blandNeutrals): Partial<Scale> {
+  const misses = check(scale, neutrals).filter((f) => !inherited(f));
   // A miss between a tint (below 400) and a solid step is the solid step's to fix: moving the tint would wash out
   // the light end of the scale. Between two of a kind, the darker step.
   const owner = (f: Finding) => {
@@ -257,10 +359,10 @@ export function suggest(scale: Scale): Partial<Scale> {
   };
   const out: Partial<Scale> = {};
   for (const step of new Set(misses.map(owner))) {
-    const pairs = PAIRS.filter((p) => ['light', 'dark'].some((m) => [p.fg, p.bg].some((css) => colorOf(css, m as Mode, scale).step === step)));
+    const pairs = PAIRS.filter((p) => ['light', 'dark'].some((m) => [p.fg, p.bg].some((css) => colorOf(css, m as Mode, scale, neutrals).step === step)));
     const passes = (hex: string) => {
       const trial = { ...scale, [step]: hex };
-      return check(trial).filter((f) => !inherited(f) && pairs.includes(PAIRS.find((p) => p.fg === f.fg && p.bg === f.bg)!) && f.steps.includes(step)).length === 0;
+      return check(trial, neutrals).filter((f) => !inherited(f) && pairs.includes(PAIRS.find((p) => p.fg === f.fg && p.bg === f.bg)!) && f.steps.includes(step)).length === 0;
     };
     const base = toOklch(scale[step]);
     const lighten = misses.some((f) => owner(f) === step && f.advice.includes(`lighten ${step}`));
@@ -299,18 +401,18 @@ function keepOrder(scale: Scale, original: Scale, moved: Partial<Scale>): Scale 
 }
 
 /** The suggested steps, applied and kept in order, repeated (up to four rounds) until the check passes. */
-export function fixScale(scale: Scale): Scale {
+export function fixScale(scale: Scale, neutrals: Scale = blandNeutrals): Scale {
   let current = scale;
   for (let round = 0; round < 4; round++) {
-    if (check(current).every(inherited)) break;
-    const moved = suggest(current);
+    if (check(current, neutrals).every(inherited)) break;
+    const moved = suggest(current, neutrals);
     current = keepOrder({ ...current, ...moved }, scale, moved);
   }
   return current;
 }
 
-export function report(scale: Scale): { text: string; failures: number; fixes: Partial<Scale> } {
-  const findings = check(scale);
+export function report(scale: Scale, neutrals: Scale = blandNeutrals): { text: string; failures: number; fixes: Partial<Scale> } {
+  const findings = check(scale, neutrals);
   const real = findings.filter((f) => !inherited(f));
   const known = findings.filter(inherited);
   const lines = [`Brand check: ${PAIRS.length} brand pairings in light and dark.`];
@@ -318,7 +420,7 @@ export function report(scale: Scale): { text: string; failures: number; fixes: P
   for (const f of real) {
     lines.push(`  ✗ ${f.mode.padEnd(5)} ${f.ratio.toFixed(2)}:1, needs ${f.min}:1  ${f.where} (${f.fg} on ${f.bg}). ${f.advice}.`);
   }
-  const all = real.length ? fixScale(scale) : scale;
+  const all = real.length ? fixScale(scale, neutrals) : scale;
   const fixes = Object.fromEntries(STEPS.filter((s) => all[s] !== scale[s]).map((s) => [s, all[s]])) as Partial<Scale>;
   const fixed = Object.entries(fixes);
   if (fixed.length) {

@@ -2,7 +2,7 @@
 
 Bland is Godwin's personal design system: a Figma UI kit reused across client projects, being turned into code with a token pipeline and (later) a docs site. Figma is finished; this repo is the code side.
 
-- Light and dark themes. A per-project brand color: a project overrides the 13 `--brand-*` steps at `:root` and everything brand-colored follows (`docs/brand.md`).
+- Light and dark themes. A per-project brand color: a project overrides the 13 `--brand-*` steps (and the 13 `--neutral-*`, tinted toward its brand or pure gray) at `:root` and everything follows (`docs/brand.md`).
 - Inter for UI text, Geist Mono for code, Phosphor icons, 100% corner smoothing on every rounded corner.
 - One-person system (Godwin plus Claude). Keep process light: no review flow, no client-facing docs yet.
 
@@ -27,7 +27,7 @@ scripts/stylelint/        bland/use-tokens lint rule, fixtures and test
 
 - `npm run tokens`: regenerate `tokens.json` and `tokens.css` from the raw export.
 - `npm run tokens:checksum`: hash of the raw export; must equal `scripts/figma/checksum.js` run in Figma.
-- `npm run brand`: the brand override tool: `generate "#hex"` makes 13 steps from one color, `check brand.css` tests the brand pairings (warns, never blocks), `--fix` applies suggested steps (`docs/brand.md`). `npm run test:brand` runs its tests.
+- `npm run brand`: the brand override tool: `generate "#hex"` makes 13 brand steps from one color and 13 neutral steps leaning toward it (`--neutrals full|subtle|none`), `check brand.css` tests the brand pairings (warns, never blocks), `--fix` applies suggested steps (`docs/brand.md`). `npm run test:brand` runs its tests.
 - `npm run tokens:drift`: drift check against Figma, variable by variable, with the CSS tokens each change reaches; `-- --apply` takes the Figma version. Two steps around one `use_figma` call (`docs/tokens.md`, "Drift check"). `npm run test:drift` runs its tests.
 - `npm run build`: tokens, Vite library build, `dist/tokens.css`, type declarations.
 - `npm run typecheck`.
@@ -72,7 +72,7 @@ They merge with git's `union` strategy (`.gitattributes`): append, never restruc
 
 ## Token architecture
 
-Three layers. **Components bind only to Theme or scale tokens, never primitives.** 628 variables in 12 collections (as of 2026-10-25), plus 15 elevation styles and 23 text styles. Primitives are not emitted to CSS, except the 13 brand steps (`--brand-*`), which exist only for a project's brand override; the lint keeps components off them.
+Three layers. **Components bind only to Theme or scale tokens, never primitives.** 628 variables in 12 collections (as of 2026-10-25), plus 15 elevation styles and 23 text styles. Primitives are not emitted to CSS, except the 13 brand and 13 neutral steps (`--brand-*`, `--neutral-*`), which exist only for a project's brand override; the lint keeps components off them.
 
 | Collection | Layer | Modes | Holds |
 | --- | --- | --- | --- |

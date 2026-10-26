@@ -28,8 +28,9 @@ const group = (t) => t.name.split('/')[0]
 const pxOf = (value) => (/^-?[\d.]+px$/.test(value) ? Number.parseFloat(value) : null)
 
 const LENGTH_TOKENS = TOKENS.filter((t) => t.type === 'FLOAT' && pxOf(t.light) !== null)
-// The brand scale is emitted only so projects can override it; components read the Theme tokens built on it.
-const COLOR_TOKENS = TOKENS.filter((t) => t.type === 'COLOR' && t.collection !== 'Brand')
+// The brand and neutral scales are emitted only so projects can override them; components read the Theme
+// tokens built on them.
+const COLOR_TOKENS = TOKENS.filter((t) => t.type === 'COLOR' && t.collection !== 'Brand' && t.collection !== 'Neutral')
 const FONT_TOKENS = TOKENS.filter((t) => t.type === 'FONT')
 const SHADOW_TOKENS = TOKENS.filter((t) => t.type === 'SHADOW')
 const msOf = (value) => (/^[\d.]+ms$/.test(value) ? Number.parseFloat(value) : null)
@@ -253,12 +254,13 @@ function suggestWeight(raw) {
   return `${q(raw)} is hardcoded and no text style has weight ${n}. ${TYPE_ONLY} ${ASK}`
 }
 
-function suggestBrand(prop, name) {
+function suggestPrimitive(prop, name) {
   const preferred = colorGroupFor(prop)
   const rank = (t) => (group(t) === preferred ? 0 : SEMANTIC_GROUPS.includes(group(t)) ? 1 : 2)
   const uses = COLOR_TOKENS.filter((t) => t.cssValue && Object.values(t.cssValue).includes(`var(${name})`)).sort((a, b) => rank(a) - rank(b))
   const hint = uses.length > 0 ? ` Theme tokens built on it: ${listTokens(uses, 'Theme tokens')}.` : ''
-  return `Brand step ${name.slice('--brand-'.length)} is a primitive, emitted only for a project's brand override. Components use Theme tokens, which follow the brand in both modes.${hint}`
+  const [, scale, step] = /^--(brand|neutral)-(\d+)$/.exec(name)
+  return `${scale === 'brand' ? 'Brand' : 'Neutral'} step ${step} is a primitive, emitted only for a project's brand override. Components use Theme tokens, which follow the brand in both modes.${hint}`
 }
 
 function suggestFontSize(raw, px) {
@@ -355,7 +357,7 @@ const ruleFunction = (primary) => (root, result) => {
           const fn = node.value.toLowerCase()
           if (fn === 'var') {
             const name = node.nodes[0]?.value ?? ''
-            if (/^--brand-\d+$/.test(name)) flag(suggestBrand(prop, name), node)
+            if (/^--(brand|neutral)-\d+$/.test(name)) flag(suggestPrimitive(prop, name), node)
             // var(--x, fallback): the fallback is a hardcoded value too.
             const comma = node.nodes.findIndex((n) => n.type === 'div' && n.value === ',')
             if (comma !== -1) check(node.nodes.slice(comma + 1), flag)

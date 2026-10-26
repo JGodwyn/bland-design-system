@@ -117,18 +117,22 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     return `cubic-bezier(${r(x1)}, ${r(y1)}, ${r(x2)}, ${r(y2)})`;
   }
 
-  // The brand scale is the one primitive emitted (--brand-0 … --brand-1000), so projects can override it at
-  // :root. Anything whose alias chain ends in a Brand step points at it; an alpha step becomes a color-mix.
-  const brandStep = (name: string) => /^Brand\/Brand(\d+)$/.exec(name)?.[1];
-  function brandRef(id: string, mode: Mode): string | undefined {
+  // The brand and neutral scales are the primitives emitted (--brand-0 … --brand-1000, --neutral-0 …
+  // --neutral-1000), so a project can override them at :root (its brand, and its neutrals tinted toward it).
+  // Anything whose alias chain ends in one of their steps points at it; an alpha step becomes a color-mix.
+  const overridable = (name: string) => {
+    const m = /^(Brand|Neutral)\/\1(\d+)$/.exec(name);
+    return m ? { scale: m[1] as 'Brand' | 'Neutral', step: m[2]!, css: `--${m[1]!.toLowerCase()}-${m[2]}` } : undefined;
+  };
+  function primitiveRef(id: string, mode: Mode): string | undefined {
     const v = variables.get(id);
     if (!v) return undefined;
-    const step = brandStep(v[1]);
-    if (step !== undefined) return `var(--brand-${step})`;
+    const own = overridable(v[1]);
+    if (own) return `var(${own.css})`;
     const value = v[5][modeId(collections.get(v[2])!, mode)];
-    if (typeof value === 'string' && value.startsWith('@')) return brandRef(value.slice(1), mode);
+    if (typeof value === 'string' && value.startsWith('@')) return primitiveRef(value.slice(1), mode);
     if (typeof value === 'object' && '@' in value && !value['@'].startsWith('#')) {
-      const inner = brandRef(value['@'], mode);
+      const inner = primitiveRef(value['@'], mode);
       return inner && `color-mix(in srgb, ${inner} ${value.o}%, transparent)`;
     }
     return undefined;
@@ -193,14 +197,15 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
   for (const v of raw) {
     const [id, name, collectionId, type, description] = v;
     const collection = collections.get(collectionId)!;
-    const step = brandStep(name);
-    if (step !== undefined) {
+    const own = overridable(name);
+    if (own) {
+      const what = own.scale === 'Brand' ? 'brand-colored token' : 'neutral token (text, borders, surfaces)';
       tokens.push({
         name,
-        css: `--brand-${step}`,
-        collection: 'Brand',
+        css: own.css,
+        collection: own.scale,
         type,
-        description: decode(description) || `Brand step ${step}. Override it per project at :root; every brand-colored token follows.`,
+        description: decode(description) || `${own.scale} step ${own.step}. Override it per project at :root; every ${what} follows.`,
         light: cssValue(resolveRaw(id, 'light'), type, name),
       });
       continue;
@@ -215,8 +220,8 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     const dark = themed ? cssValue(resolveRaw(id, 'dark'), type, name) : undefined;
     const aliasLight = aliasName(id, 'light');
     const aliasDark = themed ? aliasName(id, 'dark') : undefined;
-    const refLight = type === 'COLOR' ? brandRef(id, 'light') : undefined;
-    const refDark = themed && type === 'COLOR' ? brandRef(id, 'dark') : undefined;
+    const refLight = type === 'COLOR' ? primitiveRef(id, 'light') : undefined;
+    const refDark = themed && type === 'COLOR' ? primitiveRef(id, 'dark') : undefined;
     tokens.push({
       name,
       css: `--${cssName(name)}`,
@@ -242,7 +247,7 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
         .map((l) => {
           const px = (f: keyof EffectLayer) => `${byId(l[f], mode, style.name, f)}px`;
           const resolved = formatColor(hexToRgba(String(byId(l.color, mode, style.name, 'color'))));
-          const color = (refs && l.color && brandRef(l.color, mode)) || resolved;
+          const color = (refs && l.color && primitiveRef(l.color, mode)) || resolved;
           return `${px('offsetX')} ${px('offsetY')} ${px('radius')} ${px('spread')} ${color}`;
         })
         .join(', ');
@@ -311,7 +316,7 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     seenCss.set(t.css, t.name);
   }
 
-  const order = ['Brand', 'Theme', 'Spacing', 'Corner Radius', 'Stroke', 'Text styles', 'Effects', 'Effect styles', 'Sizing', 'Motion', 'Breakpoints'];
+  const order = ['Brand', 'Neutral', 'Theme', 'Spacing', 'Corner Radius', 'Stroke', 'Text styles', 'Effects', 'Effect styles', 'Sizing', 'Motion', 'Breakpoints'];
   tokens.sort((a, b) => order.indexOf(a.collection) - order.indexOf(b.collection));
 
   return { tokens, skipped, order };

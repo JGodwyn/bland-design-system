@@ -1,18 +1,24 @@
-// The brand applied to the whole docs site from the Brand theme page: the 13 --brand-* steps set on <html>,
-// where tokens.css computes the brand-colored tokens, so every page follows. Kept for the visit
-// (sessionStorage) so reloading a page keeps it; Reset removes it.
+// The brand applied to the whole docs site from the Brand theme page: the 13 --brand-* and 13 --neutral-* steps
+// set on <html>, where tokens.css computes the brand-colored and neutral tokens, so every page follows. Kept for
+// the visit (sessionStorage) so reloading a page keeps it; Reset removes it.
 import { useSyncExternalStore } from 'react';
-import { STEPS, type Scale } from '../../scripts/brand/core';
+import { blandNeutrals, STEPS, type Scale } from '../../scripts/brand/core';
+
+/** A project's colors: its brand steps and the neutral steps that go with them. */
+export type Palette = { brand: Scale; neutrals: Scale };
 
 const KEY = 'bland-docs-brand';
 const listeners = new Set<() => void>();
-let applied: Scale | null = read();
+let applied: Palette | null = read();
 
-function read(): Scale | null {
+const isScale = (s: unknown): s is Scale => !!s && STEPS.every((step) => typeof (s as Scale)[step] === 'string');
+
+function read(): Palette | null {
   try {
     const raw = sessionStorage.getItem(KEY);
-    const scale = raw ? (JSON.parse(raw) as Scale) : null;
-    return scale && STEPS.every((s) => typeof scale[s] === 'string') ? scale : null;
+    const saved = raw ? (JSON.parse(raw) as Partial<Palette>) : null;
+    if (!saved || !isScale(saved.brand)) return null;
+    return { brand: saved.brand, neutrals: isScale(saved.neutrals) ? saved.neutrals : blandNeutrals };
   } catch {
     return null;
   }
@@ -21,15 +27,17 @@ function read(): Scale | null {
 function paint() {
   const root = document.documentElement.style;
   for (const s of STEPS) {
-    if (applied) root.setProperty(`--brand-${s}`, applied[s]);
-    else root.removeProperty(`--brand-${s}`);
+    for (const [name, scale] of [['brand', applied?.brand], ['neutral', applied?.neutrals]] as const) {
+      if (scale) root.setProperty(`--${name}-${s}`, scale[s]);
+      else root.removeProperty(`--${name}-${s}`);
+    }
   }
 }
 
-export function setAppliedBrand(scale: Scale | null) {
-  applied = scale;
+export function setAppliedBrand(palette: Palette | null) {
+  applied = palette;
   try {
-    if (scale) sessionStorage.setItem(KEY, JSON.stringify(scale));
+    if (palette) sessionStorage.setItem(KEY, JSON.stringify(palette));
     else sessionStorage.removeItem(KEY);
   } catch {
     /* Private mode: it lasts until the page reloads. */
@@ -51,5 +59,6 @@ export function useAppliedBrand() {
   );
 }
 
-/** The scale as inline custom properties, for a preview that shows a brand before it is applied. */
-export const brandStyle = (scale: Scale) => Object.fromEntries(STEPS.map((s) => [`--brand-${s}`, scale[s]]));
+/** The palette as inline custom properties, for a preview that shows it before it is applied. */
+export const paletteStyle = ({ brand, neutrals }: Palette) =>
+  Object.fromEntries(STEPS.flatMap((s) => [[`--brand-${s}`, brand[s]], [`--neutral-${s}`, neutrals[s]]]));

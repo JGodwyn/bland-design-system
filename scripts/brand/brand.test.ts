@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { blandScale, check, contrast, fixScale, generate, parseScale, STEPS, toCss, toOklch } from './core';
+import { blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, parseScale, STEPS, toCss, toOklch } from './core';
 
 const close = (a: string, b: string) => toOklch(a).l - toOklch(b).l;
 
@@ -38,3 +38,45 @@ test('override files parse from CSS and JSON, and need all 13 steps', () => {
   assert.deepEqual(parseScale(JSON.stringify(Object.fromEntries(STEPS.map((s) => [`--brand-${s}`, scale[s]])))), scale);
   assert.throws(() => parseScale('{"600": "#7c3aed"}'), /missing steps 0, 50/);
 });
+
+const peak = (n: Record<string, string>) => Math.max(...STEPS.map((s) => toOklch(n[s]!).c));
+
+test('neutrals from Bland’s blue at full tint are Bland’s own, exactly', () => {
+  assert.deepEqual(generateNeutrals(blandScale), blandNeutrals);
+});
+
+test('neutrals keep Bland’s contrast at every step, whatever the brand and tint', () => {
+  for (const hex of ['#ff5a1f', '#ffcc00', '#16a34a', '#7c3aed', '#e11d48', '#06b6d4']) {
+    for (const tint of ['full', 'subtle', 'none'] as const) {
+      const n = generateNeutrals(generate(hex), tint);
+      // Within 1.5%: hex rounding near black moves the ratio against white by about 0.1.
+      for (const s of STEPS) {
+        const [got, want] = [contrast(n[s], '#ffffff'), contrast(blandNeutrals[s], '#ffffff')];
+        assert.ok(Math.abs(got - want) / want < 0.015, `${hex} ${tint} step ${s}: ${got.toFixed(3)} vs ${want.toFixed(3)}`);
+      }
+      assert.equal(n['0'], '#ffffff');
+      assert.equal(n['1000'], '#000000');
+    }
+  }
+});
+
+test('neutrals lean to the brand hue, less for warm hues, half at subtle, none for gray brands or pure gray', () => {
+  const purple = generateNeutrals(generate('#7c3aed'));
+  assert.ok(Math.abs(toOklch(purple['600']).h - toOklch('#7c3aed').h) < 3);
+  assert.ok(peak(generateNeutrals(generate('#ffcc00'))) < peak(purple) * 0.6);
+  const subtle = peak(generateNeutrals(generate('#7c3aed'), 'subtle'));
+  assert.ok(subtle > peak(purple) * 0.4 && subtle < peak(purple) * 0.6);
+  assert.ok(peak(generateNeutrals(generate('#7c3aed'), 'none')) < 0.002);
+  assert.ok(peak(generateNeutrals(generate('#777777'))) < 0.002);
+});
+
+test('an override file carries its neutrals, and one without them leaves Bland’s', () => {
+  const brand = generate('#16a34a');
+  const neutrals = generateNeutrals(brand);
+  const css = toCss(brand, '', neutrals);
+  assert.deepEqual(parseScale(css), brand);
+  assert.deepEqual(parseNeutrals(css), neutrals);
+  assert.equal(parseNeutrals(toCss(brand)), undefined);
+  assert.throws(() => parseNeutrals('--neutral-600: #616161;'), /Set all 13, or none/);
+});
+

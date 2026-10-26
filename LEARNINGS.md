@@ -639,3 +639,13 @@ injecting a brand override showed blue buttons while every computed value was
 already orange. → Read computed values to verify, or wait out the transition
 before a screenshot.
 
+**A white converted to OKLCH comes back with chroma 1e-8, not 0.** Bland's
+Neutral0 `#ffffff` read as a tiny chroma, so the neutral generator tinted it
+and white became `#fffffe`. → Treat chroma under 1e-4 as gray, and build grays
+straight from luminance, not through an OKLCH round trip.
+
+**A SegmentedBar's radio covers its label.** Playwright's click on the label
+text waited 30s ("input intercepts pointer events"). → In tests, check the
+radio: `getByRole('radio', { name }).check({ force: true })`, as the theme
+switch test does.
+

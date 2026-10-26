@@ -1483,3 +1483,26 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Spec in `tests/docs.spec.ts`: generate, fix, apply, follow to another page, reset from the toolbar; the page
   is in the open-without-errors list too.
 
+## Neutrals tinted toward the brand (2026-10-26)
+
+- Godwin asked for generated neutrals to lean toward the brand as Bland's lean toward its blue; deep research
+  first (`reports/Brand tinted neutral scales.md`, notes in `research_notes/`). Decisions: Tinted / Subtle /
+  Pure gray per project; exact brand hue; dark brands get whatever the method gives; transparent neutrals and
+  shadows follow the neutrals; client neutrals code only.
+- Build: `--neutral-*` emitted beside `--brand-*` in the primitives `:root` block (`overridable` covers both);
+  107 tokens now reference them, including every transparent neutral, shadow and backdrop through
+  `--neutral-1000`. Lint rejects `--neutral-*` in components (fixture added).
+- Generator: research's curve and hue factors, with one change: hold each step's WCAG luminance (search L)
+  instead of its OKLCH lightness, so every neutral-on-neutral contrast stays Bland's. Bland's blue at full
+  gives Figma's neutrals exactly. Seven sample brands: neutral 600 on white 6.11 to 6.19 (Bland 6.16).
+  Snags: white came back `#fffffe` (reference chroma 1e-8 at white), fixed by a threshold and grays straight
+  from luminance; the contrast test's absolute tolerance failed near black on hex rounding, now relative.
+- Check and fixes take the neutrals (neutral-backed pairs such as secondary button labels use them); override
+  files carry neutrals (optional, all 13 or none); `--neutrals` flag on generate and check.
+- Brand theme page: Neutrals switch (Tinted, Subtle, Pure gray), neutral rows beside Bland's, previews and
+  Apply carry both scales. Verified in the browser: orange gives warm grays and a warm dark surface; Pure
+  gray applies gray neutrals site-wide; Reset clears both. The page spec's click on the switch label hung
+  (radio covers it); it checks the radio now.
+- Shadows: they follow `--neutral-1000`, which stays pure black (Bland's curve, as Figma), so they don't tint
+  in practice. Raised with Godwin.
+

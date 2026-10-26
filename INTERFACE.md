@@ -44,6 +44,13 @@ when), `docs/components.md` (how to build one).
   one color in the shape of Bland's OKLCH scale (the color on 600, `--at` to
   move it), and a contrast check of the 35 brand pairings that warns, never
   blocks, with suggested steps and `--fix`.
+- **Neutrals lean toward the brand** (Godwin, 2026-10-26): the 13 neutral
+  steps are emitted and overridable like the brand's; the generator makes
+  them from the brand (Bland's chroma curve, the brand's hue, less for warm
+  hues, none for gray brands) at Tinted, Subtle or Pure gray, holding each
+  step's luminance so neutral contrast stays Bland's. Transparent neutrals
+  and neutral shadows follow `--neutral-1000` (pure black). Client neutrals
+  are code only; Figma keeps Bland's. Method in `docs/brand.md`.
 - **Brand theme page on the docs site** (`#/brand`, under Overview, Godwin
   2026-10-26): the tool in the browser, with Apply to the site (steps on
   `<html>`, kept per visit) and Reset; previews set `data-theme` and the steps

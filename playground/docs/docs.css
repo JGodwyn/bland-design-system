@@ -1031,6 +1031,20 @@ code,
   border: var(--stroke-sm) solid var(--border-subtle);
   border-radius: var(--rad-xs);
 }
+.docs-brand-tint {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  margin-top: var(--space-xl);
+}
+.docs-brand-tint .bland-segmented-bar {
+  width: min(100%, calc(var(--space-9xl) * 1.5)); /* it fills its container; give it room for three labels */
+}
+.docs-brand-tint-label {
+  font: var(--type-body-lg);
+  color: var(--text-bold);
+}
 .docs-brand-actions {
   display: flex;
   flex-wrap: wrap;
