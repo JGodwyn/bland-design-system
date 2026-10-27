@@ -239,8 +239,13 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   const picker = page.getByRole('dialog', { name: 'Pick a brand color' });
   await picker.getByRole('button', { name: 'Color format: HEX' }).click();
   await page.getByRole('menuitemradio', { name: 'HSL' }).click();
-  await expect(picker.getByRole('textbox', { name: 'HSL color' })).toHaveValue('15.8 100% 56.1%');
-  await picker.getByRole('textbox', { name: 'HSL color' }).fill('48 100% 50%');
+  // One field per number, so values can't run together; units sit beside them.
+  const hsl = picker.getByRole('group', { name: 'HSL color' });
+  await expect(hsl.getByRole('textbox', { name: 'Hue' })).toHaveValue('15.8');
+  await expect(hsl.getByRole('textbox', { name: 'Saturation' })).toHaveValue('100');
+  await expect(hsl.getByRole('textbox', { name: 'Lightness' })).toHaveValue('56.1');
+  await hsl.getByRole('textbox', { name: 'Lightness' }).fill('50');
+  await hsl.getByRole('textbox', { name: 'Hue' }).fill('48');
   await expect(page.getByRole('button', { name: /^Brand color #FFCC00/ })).toBeVisible();
   await picker.getByRole('button', { name: 'Color format: HSL' }).click();
   await page.getByRole('menuitemradio', { name: 'HEX' }).click();

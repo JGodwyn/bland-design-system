@@ -91,3 +91,44 @@ export function parseColor(text: string, format: ColorFormat): string | undefine
   return fromOklch({ l: clamp(l), c: Math.max(0, b.endsWith('%') ? (num(b) / 100) * 0.4 : num(b)), h: ((num(c) % 360) + 360) % 360 });
 }
 
+
+// ---------- channels: one field per number (RGB, HSL, OKLCH) ----------
+
+/** One number of a format: its field's name, range, decimals shown and unit, and how far an arrow key moves it. */
+export type Channel = { id: string; label: string; min: number; max: number; places: number; unit?: string; step: number };
+export const CHANNELS: Record<Exclude<ColorFormat, 'hex'>, Channel[]> = {
+  rgb: [
+    { id: 'r', label: 'Red', min: 0, max: 255, places: 0, step: 1 },
+    { id: 'g', label: 'Green', min: 0, max: 255, places: 0, step: 1 },
+    { id: 'b', label: 'Blue', min: 0, max: 255, places: 0, step: 1 },
+  ],
+  hsl: [
+    { id: 'h', label: 'Hue', min: 0, max: 360, places: 1, unit: '°', step: 1 },
+    { id: 's', label: 'Saturation', min: 0, max: 100, places: 1, unit: '%', step: 1 },
+    { id: 'l', label: 'Lightness', min: 0, max: 100, places: 1, unit: '%', step: 1 },
+  ],
+  oklch: [
+    { id: 'l', label: 'Lightness', min: 0, max: 100, places: 1, unit: '%', step: 1 },
+    { id: 'c', label: 'Chroma', min: 0, max: 0.4, places: 3, step: 0.005 },
+    { id: 'h', label: 'Hue', min: 0, max: 360, places: 0, unit: '°', step: 1 },
+  ],
+};
+
+/** The color's numbers in a format, rounded as their fields show them. */
+export function channelsOf(hex: string, format: Exclude<ColorFormat, 'hex'>): number[] {
+  if (format === 'oklch') {
+    const { l, c, h } = toOklch(hex);
+    return [round(l * 100, 1), round(c, 3), c < 1e-4 ? 0 : round(h) % 360];
+  }
+  return formatColor(hex, format)
+    .split(' ')
+    .map((p) => parseFloat(p));
+}
+
+/** The hex for a format's numbers (each clamped to its range first). */
+export function fromChannels(values: number[], format: Exclude<ColorFormat, 'hex'>): string {
+  const [a, b, c] = values.map((v, i) => clamp(v, CHANNELS[format][i]!.min, CHANNELS[format][i]!.max)) as [number, number, number];
+  if (format === 'rgb') return fromRgb([a, b, c]);
+  if (format === 'hsl') return hslToHex(a % 360, b / 100, c / 100);
+  return fromOklch({ l: a / 100, c: b, h: c % 360 });
+}

@@ -1413,7 +1413,7 @@ code,
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  width: calc(var(--space-9xl) + var(--space-2xl)); /* Figma's 256 plus room for an OKLCH value beside the format */
+  width: calc(var(--space-9xl) + var(--space-7xl) * 0.75); /* Figma's 256 plus room for three number fields beside the format */
   padding: var(--space-lg);
   background: var(--surface-100);
   box-shadow:
@@ -1466,12 +1466,12 @@ code,
 
   display: flex;
   align-items: center;
-  gap: var(--space-md); /* room between the format and the value */
+  gap: var(--space-sm); /* room between the format and the value */
   height: var(--control-sm);
   padding-inline: var(--space-none) var(--space-xs);
   background: var(--surface-200);
 }
-/* The ring is the value's: the format button draws its own. */
+/* The ring is the value's: the format button draws its own, and each number field its own. */
 .docs-picker-field:has(> input:focus) {
   outline: var(--stroke-lg) solid var(--border-focused);
   outline-offset: var(--stroke-lg);
@@ -1489,7 +1489,7 @@ code,
   border-radius: var(--rad-sm);
   box-shadow: inset calc(var(--stroke-sm) * -1) var(--space-none) var(--space-none) var(--border-bold); /* a divider before the value */
   background: none;
-  font: var(--type-body-sm-bold);
+  font: var(--type-body-lg-bold);
   color: var(--text-subtle);
   cursor: pointer;
 }
@@ -1513,6 +1513,42 @@ code,
   background: none;
   font: var(--type-body-lg);
   color: var(--text-bold);
+}
+/* RGB, HSL, OKLCH: one field per number, split by the same divider as the format's; each rings itself (inside the
+   gray, so the ring isn't cut by its neighbours). The unit sits after the number, not part of it. */
+.docs-picker-channels {
+  display: flex;
+  flex: 1;
+  align-self: stretch;
+  min-width: var(--space-none);
+}
+.docs-picker-channel {
+  --bland-radius: var(--rad-sm);
+
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--space-2xs);
+  min-width: var(--space-none);
+  padding-inline: var(--space-sm);
+  border-radius: var(--rad-sm);
+  cursor: text;
+}
+.docs-picker-channels input {
+  flex: 0 1 auto;
+  width: auto; /* as wide as its number (its size attribute, or field-sizing), so the unit follows it */
+  field-sizing: content;
+}
+.docs-picker-channel + .docs-picker-channel {
+  box-shadow: inset var(--stroke-sm) var(--space-none) var(--space-none) var(--border-bold);
+}
+.docs-picker-channel:has(input:focus) {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: calc(var(--stroke-lg) * -1);
+}
+.docs-picker-unit {
+  font: var(--type-body-lg);
+  color: var(--text-subtle);
 }
 .docs-picker-swatch {
   flex: none;

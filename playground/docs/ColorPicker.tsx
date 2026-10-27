@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } fr
 import { Icon } from '../../src/components/icon/Icon';
 import { Menu } from '../../src/components/menu/Menu';
 import { CaretDownIcon } from '../../src/icons';
-import { clamp, FORMAT_KEY, FORMATS, formatColor, normalHex, parseColor, toHex, toHsv, type ColorFormat, type Hsv } from './colorFormats';
+import { channelsOf, CHANNELS, clamp, FORMAT_KEY, FORMATS, formatColor, fromChannels, normalHex, parseColor, toHex, toHsv, type ColorFormat, type Hsv } from './colorFormats';
 import { KnobMark } from './icons';
 
 function savedFormat(): ColorFormat {
@@ -124,20 +124,85 @@ export function ColorPicker({ value, onChange, onDraggingChange }: { value: stri
             </Icon>
           </button>
         </Menu>
-        <input
-          aria-label={`${FORMATS.find((f) => f.id === format)!.label} color`}
-          value={text}
-          spellCheck={false}
-          autoComplete="off"
-          onChange={(e) => {
-            setText(e.target.value);
-            const hex = parseColor(e.target.value, format);
-            if (hex) onChange(hex);
-          }}
-          onBlur={() => setText(formatColor(value, format))}
-        />
+        {format === 'hex' ? (
+          <input
+            aria-label="HEX color"
+            value={text}
+            spellCheck={false}
+            autoComplete="off"
+            onChange={(e) => {
+              setText(e.target.value);
+              const hex = parseColor(e.target.value, format);
+              if (hex) onChange(hex);
+            }}
+            onBlur={() => setText(formatColor(value, format))}
+          />
+        ) : (
+          <Channels key={format} format={format} value={value} onChange={onChange} />
+        )}
         <span className="docs-picker-swatch" style={{ background: value }} aria-hidden="true" />
       </div>
     </div>
   );
 }
+
+/**
+ * RGB, HSL and OKLCH as one field per number, so a value can't run into the next one. Each field keeps what is
+ * typed while it reads as a number, clamps to its range, and tidies on blur; arrow keys step it (Shift: ten steps).
+ * Pasting a whole color (CSS, a hex or the three numbers) into any of them takes the lot.
+ */
+function Channels({ format, value, onChange }: { format: Exclude<ColorFormat, 'hex'>; value: string; onChange: (hex: string) => void }) {
+  const channels = CHANNELS[format];
+  const show = (n: number, i: number) => String(Number(n.toFixed(channels[i]!.places)));
+  const [texts, setTexts] = useState(() => channelsOf(value, format).map(show));
+  const editing = useRef<number | null>(null);
+  useEffect(() => {
+    const fresh = channelsOf(value, format);
+    // The field being typed in keeps its text; the others follow the color.
+    setTexts((t) => fresh.map((n, i) => (i === editing.current ? t[i]! : show(n, i))));
+  }, [value, format]);
+
+  const commit = (i: number, text: string) => {
+    const next = texts.map((t, j) => (j === i ? text : t));
+    setTexts(next);
+    const numbers = next.map((t) => parseFloat(t));
+    if (numbers.every((n) => Number.isFinite(n))) onChange(fromChannels(numbers, format));
+  };
+  return (
+    <div className="docs-picker-channels" role="group" aria-label={`${FORMATS.find((f) => f.id === format)!.label} color`}>
+      {channels.map((ch, i) => (
+        <label key={ch.id} className="docs-picker-channel">
+          <input
+            aria-label={ch.label}
+            value={texts[i]}
+            size={Math.max(texts[i]!.length, 1)}
+            inputMode="decimal"
+            spellCheck={false}
+            autoComplete="off"
+            onFocus={() => (editing.current = i)}
+            onBlur={() => {
+              editing.current = null;
+              setTexts(channelsOf(value, format).map(show));
+            }}
+            onPaste={(e) => {
+              const pasted = parseColor(e.clipboardData.getData('text'), format);
+              if (!pasted || !/[\s,#(]/.test(e.clipboardData.getData('text').trim())) return;
+              e.preventDefault();
+              editing.current = null;
+              onChange(pasted);
+            }}
+            onChange={(e) => commit(i, e.target.value.replace(/[^\d.]/g, ''))}
+            onKeyDown={(e) => {
+              if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+              e.preventDefault();
+              const by = ch.step * (e.shiftKey ? 10 : 1) * (e.key === 'ArrowUp' ? 1 : -1);
+              commit(i, show(clamp((parseFloat(texts[i]!) || 0) + by, ch.min, ch.max), i));
+            }}
+          />
+          {ch.unit && <span className="docs-picker-unit" aria-hidden="true">{ch.unit}</span>}
+        </label>
+      ))}
+    </div>
+  );
+}
+
