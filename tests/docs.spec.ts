@@ -215,7 +215,7 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   const apply = page.getByRole('button', { name: 'Apply to site' });
   await expect(apply).toBeDisabled(); // Bland's own blue: nothing to reset or apply
   await expect(page.getByRole('button', { name: 'Reset', exact: true })).toBeDisabled();
-  await expect(page.getByText('Below the minimum with Bland’s own brand')).toHaveCount(0);
+  await expect(page.getByText('Contrast checks out')).toBeVisible();
 
   // The swatch opens the picker; a typed hex lands on the step its lightness belongs on (orange: 400).
   await page.getByRole('button', { name: /^Brand color #0062FF/ }).click();
@@ -240,10 +240,21 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   await expect(page.getByRole('button', { name: /^Brand color #FFCC00/ })).toBeVisible();
   await picker.getByRole('button', { name: 'Color format: HSL' }).click();
   await page.getByRole('menuitemradio', { name: 'HEX' }).click();
+  // Dragging in the picker hides the contrast result until the pointer is released.
+  const result = page.locator('.docs-brand-contrast');
+  const area = (await picker.getByRole('slider', { name: 'Saturation and brightness' }).boundingBox())!;
+  await page.mouse.move(area.x + area.width * 0.9, area.y + area.height * 0.1);
+  await page.mouse.down();
+  await page.mouse.move(area.x + area.width * 0.95, area.y + area.height * 0.05, { steps: 4 });
+  await expect(result).toHaveAttribute('data-hidden', 'true');
+  await page.mouse.up();
+  await expect(result).not.toHaveAttribute('data-hidden');
+  await picker.getByRole('textbox', { name: 'HEX color' }).fill('#ffcc00');
   await page.keyboard.press('Escape');
   await expect(picker).toBeHidden();
   await page.getByRole('button', { name: 'Fix contrast' }).click();
-  await expect(page.getByText(/pairings miss their minimum/)).toHaveCount(0);
+  await expect(page.getByText('Contrast checks out')).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Brand color #FFCC00/ })).toBeVisible(); // the fix never changes the entered color
   await apply.click();
   await expect(page.getByRole('button', { name: 'Applied to site' })).toBeDisabled();
   expect(await brand('200')).toBe('#ffcc00');

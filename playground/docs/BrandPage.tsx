@@ -63,9 +63,13 @@ export function BrandPage() {
   const [input, setInput] = useState(applied?.color ?? blandScale['600']);
   const [tint, setTint] = useState<Tint>('full');
   const [fixed, setFixed] = useState<Scale | null>(null);
-  const [picking, setPicking] = useState<{ instant: boolean } | null>(null);
-  // The anchor in state, not a ref read during render: the popover needs it on the render that opens it.
+  const [picking, setPicking] = useState<{ instant: boolean; x: number; y: number } | null>(null);
+  // While a pointer drags in the picker the contrast message hides, and comes back once it is released.
+  const [dragging, setDragging] = useState(false);
+  // The picker opens at the point tapped (a zero-size anchor there), or under the hex from the keyboard. The anchor
+  // is in state, not a ref read during render: the popover needs it on the render that opens it.
   const [hero, setHero] = useState<HTMLDivElement | null>(null);
+  const [anchor, setAnchor] = useState<HTMLSpanElement | null>(null);
   const pick = useRef<HTMLButtonElement>(null);
 
   // Bland's own blue is Bland's scale exactly (generating it again lands within 1/255).
@@ -76,7 +80,6 @@ export function BrandPage() {
   const palette = useMemo(() => ({ brand: scale, neutrals, color: input }), [scale, neutrals, input]);
   const findings = useMemo(() => check(scale, neutrals), [scale, neutrals]);
   const misses = findings.filter((f) => !inherited(f));
-  const known = findings.filter(inherited);
   const isBland = same(blandScale, scale) && same(blandNeutrals, neutrals);
   const isApplied = samePalette(applied, palette);
   // The step holding the color you entered: the fix never moves it, so your color stays exactly yours.
@@ -121,6 +124,7 @@ export function BrandPage() {
             Tap to change
           </span>
           <Swatch color={input} ref={setHero}>
+            <span ref={setAnchor} className="docs-brand-anchor" style={{ left: picking?.x ?? 0, top: picking?.y ?? 0 }} aria-hidden="true" />
             <button
               ref={pick}
               type="button"
@@ -128,26 +132,36 @@ export function BrandPage() {
               aria-label={`Brand color ${input.toUpperCase()}, change it`}
               aria-expanded={!!picking}
               aria-haspopup="dialog"
-              onClick={(e: MouseEvent) => setPicking(picking ? null : { instant: e.detail === 0 })}
+              onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                if (picking || !hero) return setPicking(null);
+                const box = hero.getBoundingClientRect();
+                const button = e.currentTarget;
+                const keyboard = e.detail === 0;
+                setPicking({
+                  instant: keyboard,
+                  x: keyboard ? button.offsetLeft : e.clientX - box.left,
+                  y: keyboard ? button.offsetTop + button.offsetHeight : e.clientY - box.top,
+                });
+              }}
             >
               {input.toUpperCase()}
             </button>
           </Swatch>
           <Popover
             open={!!picking}
-            reference={hero}
-            placement="bottom-end"
+            reference={anchor}
+            placement="bottom"
             instant={picking?.instant ?? true}
             onClose={() => setPicking(null)}
             returnFocus={pick}
             role="dialog"
             aria-label="Pick a brand color"
           >
-            <ColorPicker value={input} onChange={edit} />
+            <ColorPicker value={input} onChange={edit} onDraggingChange={setDragging} />
           </Popover>
         </div>
         <ScaleRow label="Brand steps" scale={scale} />
-        <Contrast misses={misses} known={known} keep={keep} base={isBlandColor && !fixed} canFix={!same(fixedScale, scale)} onFix={() => setFixed(fixedScale)} />
+        <Contrast misses={misses} keep={keep} hidden={dragging} canFix={!same(fixedScale, scale)} onFix={() => setFixed(fixedScale)} />
       </Section>
 
       <Section title="Neutral color" className="docs-brand-section">
@@ -217,43 +231,48 @@ function ScaleRow({ label, scale }: { label: string; scale: Scale }) {
   );
 }
 
-/** `base`: Bland's own blue, whose near-misses are Bland's, not a project's to act on, so they go unmentioned. */
-function Contrast({ misses, known, keep, base, canFix, onFix }: { misses: Finding[]; known: Finding[]; keep?: Step; base: boolean; canFix: boolean; onFix: () => void }) {
+/**
+ * The contrast check. Misses Bland's own brand shares (and this brand makes no worse) count as passing: they are
+ * Bland's to fix, not a project's. While `hidden` (a drag in the picker) it fades out; each new result eases in.
+ */
+function Contrast({ misses, keep, hidden, canFix, onFix }: { misses: Finding[]; keep?: Step; hidden: boolean; canFix: boolean; onFix: () => void }) {
   const [open, setOpen] = useState(false);
   const breakdown = useId();
-  const knownText = !base && known.length > 0 ? `Below the minimum with Bland’s own brand too, and no worse here: ${known.map((f) => `${f.where} (${f.mode}, ${f.ratio.toFixed(2)}:1)`).join('; ')}.` : '';
-  if (misses.length === 0 && base) return null;
-  if (misses.length === 0)
-    return (
-      <Banner status={knownText ? 'info' : 'success'} colored>
-        {knownText || `All ${PAIRS.length} brand pairings pass in light and dark.`}
-      </Banner>
-    );
+  const result = misses.length === 0 ? 'ok' : `miss-${misses.length}`;
   return (
-    <>
-      <Banner
-        status="warning"
-        colored
-        orientation="vertical"
-        title="Contrast warning"
-        actions={
-          <>
-            <Button size="sm" disabled={!canFix} onClick={onFix}>
-              Fix contrast
-            </Button>
-            <Button size="sm" type="stroke" aria-expanded={open} aria-controls={breakdown} onClick={() => setOpen(!open)}>
-              {open ? 'Hide breakdown' : 'Show breakdown'}
-            </Button>
-          </>
-        }
-      >
-        {misses.length} of {PAIRS.length * 2} pairings miss their minimum. Fix contrast moves the steps named, or keep a miss on purpose.
-      </Banner>
-      <div id={breakdown} hidden={!open} className="docs-brand-breakdown">
-        <Findings items={misses} keep={keep} />
-        {knownText && <Banner status="info">{knownText}</Banner>}
+    <div className="docs-brand-contrast" data-hidden={hidden || undefined} aria-hidden={hidden || undefined}>
+      <div key={result} className="docs-brand-contrast-result">
+        {misses.length === 0 ? (
+          <Banner status="success" colored>
+            Contrast checks out
+          </Banner>
+        ) : (
+          <Banner
+            status="warning"
+            colored
+            orientation="vertical"
+            title="Contrast warning"
+            actions={
+              <>
+                <Button size="sm" disabled={!canFix} onClick={onFix}>
+                  Fix contrast
+                </Button>
+                <Button size="sm" type="stroke" aria-expanded={open} aria-controls={breakdown} onClick={() => setOpen(!open)}>
+                  {open ? 'Hide breakdown' : 'Show breakdown'}
+                </Button>
+              </>
+            }
+          >
+            {misses.length} of {PAIRS.length * 2} pairings miss their minimum. Fix contrast moves the steps named, or keep a miss on purpose.
+          </Banner>
+        )}
       </div>
-    </>
+      {misses.length > 0 && (
+        <div id={breakdown} hidden={!open}>
+          <Findings items={misses} keep={keep} />
+        </div>
+      )}
+    </div>
   );
 }
 

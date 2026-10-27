@@ -16,7 +16,7 @@ function savedFormat(): ColorFormat {
   }
 }
 
-export function ColorPicker({ value, onChange }: { value: string; onChange: (hex: string) => void }) {
+export function ColorPicker({ value, onChange, onDraggingChange }: { value: string; onChange: (hex: string) => void; onDraggingChange?: (dragging: boolean) => void }) {
   // The hue lives here too: a gray or black has none of its own, and the slider should not jump to red.
   const [hsv, setHsv] = useState(() => toHsv(value));
   // The field's format, kept for the next visit (a per-viewer convenience).
@@ -58,6 +58,19 @@ export function ColorPicker({ value, onChange }: { value: string; onChange: (hex
     set({ ...hsv, s: clamp(hsv.s + m[0]), v: clamp(hsv.v + m[1]) });
   };
 
+  // A pointer drag in the area or on the hue: true from press to release, wherever the pointer is let go.
+  const startDrag = () => {
+    onDraggingChange?.(true);
+    const end = () => {
+      onDraggingChange?.(false);
+      window.removeEventListener('pointerup', end);
+      window.removeEventListener('pointercancel', end);
+    };
+    window.addEventListener('pointerup', end);
+    window.addEventListener('pointercancel', end);
+  };
+  useEffect(() => () => onDraggingChange?.(false), [onDraggingChange]);
+
   const pct = (n: number) => `${Math.round(n * 100)}%`;
   const hue = `hsl(${hsv.h} 100% 50%)`;
   return (
@@ -76,6 +89,7 @@ export function ColorPicker({ value, onChange }: { value: string; onChange: (hex
         onKeyDown={onAreaKey}
         onPointerDown={(e) => {
           e.currentTarget.setPointerCapture(e.pointerId);
+          startDrag();
           fromPointer(e);
         }}
         onPointerMove={(e) => e.currentTarget.hasPointerCapture(e.pointerId) && fromPointer(e)}
@@ -90,12 +104,14 @@ export function ColorPicker({ value, onChange }: { value: string; onChange: (hex
         max={359}
         value={Math.round(hsv.h)}
         style={{ color: hue }}
+        onPointerDown={startDrag}
         onChange={(e) => set({ ...hsv, h: Number(e.target.value) })}
       />
       <div className="docs-picker-field bland-smooth">
         <Menu
           items={FORMATS}
           size="sm"
+          className="docs-picker-format-menu"
           selectionMode="single"
           selectedKeys={[format]}
           onSelectionChange={(ids) => ids[0] && setFormat(ids[0] as ColorFormat)}

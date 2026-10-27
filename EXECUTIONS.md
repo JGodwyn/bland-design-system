@@ -1577,3 +1577,11 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Figma 6773:21840 updated: the floating bar is gone. Reset (stroke sm, no icon; now resets everything, including the site) and Apply to site (primary sm) sit in the Brand color heading. The contrast warning is a Banner `colored` vertical warning titled Contrast warning with Fix contrast (primary) and Show breakdown (stroke, `aria-expanded`, toggles the misses table and the inherited note). The Figma Banner gained `Colored=true/false` variants (6781:24241…); code's Banner already had `colored` (status light surface + status border, info uses brand), so no component change.
 - Removed the bar's CSS and its hidden/rise motion, and the ArrowClockwise docs icon (unused now).
 - Test selectors: the contents rail's "Brand color" link also matches `/^Brand color/` at desktop widths; the spec uses `/^Brand color #/`.
+
+## Brand page: calmer contrast result, picker at the tap, format field (2026-10-27)
+
+- Godwin: hide the contrast banner while sliding in the picker and show it on release; animate changes subtly. ColorPicker reports `onDraggingChange` (pointerdown on the area or hue until a window pointerup/cancel); the result fades out (opacity, duration/md) while dragging and each new result is keyed and eases in (opacity + space-xs rise, duration/md easing/out; opacity only under reduced motion).
+- Godwin asked what "Below the minimum with Bland's own brand too, and no worse here" meant (pairings Bland's own blue already misses, which this brand doesn't make worse) and preferred a plain "Contrast checks out". The page now counts those as passing and drops the note everywhere, including the breakdown; the command still prints them.
+- Fix contrast never changes the entered color (its step is pinned since 21d7f8f); the spec now asserts it.
+- The picker opens where the swatch was tapped: a zero-size anchor span at the press point (or under the hex for keyboard presses), placement bottom.
+- Format field: the trigger is body-sm-bold, full field height and flush with the field's left edge, space-md before the value; its menu is as wide as its labels (`docs-picker-format-menu`), lines up with the field and sits space-xs further down. The field's ring shows only for the value input.
