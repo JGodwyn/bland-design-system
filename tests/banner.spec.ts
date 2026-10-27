@@ -49,11 +49,34 @@ test('vertical banners put the actions under the text; horizontal ones keep them
   const text = (await vertical.locator('.bland-message__text').boundingBox())!;
   const actions = (await vertical.locator('.bland-message__actions').boundingBox())!;
   expect(actions.y - (text.y + text.height)).toBe(8); // space-sm (Figma; Notification keeps space-lg)
-  expect(actions.height).toBe(40);
+  expect(actions.height).toBe(32); // Buttons default to sm
 
   const horizontal = page.locator('.bland-banner', { hasText: 'A new version is available' }).first();
   const line = (await horizontal.locator('.bland-message__content').boundingBox())!;
   const inline = (await horizontal.locator('.bland-message__actions').boundingBox())!;
   expect(inline.x).toBeGreaterThanOrEqual(line.x + line.width);
-  expect(inline.height).toBe(24);
+  expect(inline.height).toBe(32);
+});
+
+test("Buttons in the actions default to sm; a Button's own size wins", async ({ page }) => {
+  const sizes = await page
+    .locator('.bland-banner .bland-message__actions .bland-button:not(:has-text("Own size"))')
+    .evaluateAll((els) => els.map((e) => e.getAttribute('data-size')));
+  expect(sizes.length).toBeGreaterThan(0);
+  expect(new Set(sizes)).toEqual(new Set(['sm']));
+  await expect(page.getByRole('button', { name: 'Own size' })).toHaveAttribute('data-size', 'xs');
+  // Elsewhere the default is still md, and the close button keeps xs.
+  await expect(page.locator('.bland-banner .bland-message__close').first()).toHaveAttribute('data-size', 'xs');
+});
+
+test('on a horizontal banner the first line centres on its sm Buttons', async ({ page }) => {
+  const banner = page.locator('.bland-banner', { hasText: 'A new version is available' }).first();
+  const mid = async (sel: string) => {
+    const b = (await banner.locator(sel).first().boundingBox())!;
+    return b.y + b.height / 2;
+  };
+  const button = await mid('.bland-message__actions .bland-button');
+  expect(Math.abs((await mid('.bland-message__description')) - button)).toBeLessThanOrEqual(0.5);
+  expect(Math.abs((await mid('.bland-message__icon')) - button)).toBeLessThanOrEqual(0.5);
+  expect(Math.abs((await mid('.bland-message__close')) - button)).toBeLessThanOrEqual(0.5);
 });

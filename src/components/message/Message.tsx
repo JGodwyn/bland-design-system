@@ -2,6 +2,7 @@
 // Banner / Notification layout. Internal: not exported from the package.
 import type { ReactNode } from 'react';
 import { CheckCircleIcon, InfoIcon, WarningCircleIcon, WarningOctagonIcon, XIcon } from '../../icons';
+import { ButtonSizeContext, type ButtonSize } from '../button/Button';
 import { IconButton } from '../button/IconButton';
 import { Icon } from '../icon/Icon';
 import './message.css';
@@ -41,6 +42,8 @@ export interface MessageLayoutProps {
   actions?: ReactNode;
   onClose?: () => void;
   closeLabel: string;
+  /** Default size of the Buttons in `actions` (a button's own `size` wins). */
+  actionSize?: ButtonSize;
 }
 
 /**
@@ -48,11 +51,16 @@ export interface MessageLayoutProps {
  * Horizontal: one row, actions inline after the text. Vertical: title row over the description,
  * actions under the text.
  */
-export function MessageLayout({ status, orientation, icon, title, description, timestamp, actions, onClose, closeLabel }: MessageLayoutProps) {
+export function MessageLayout({ status, orientation, icon, title, description, timestamp, actions, onClose, closeLabel, actionSize }: MessageLayoutProps) {
   const vertical = orientation === 'vertical';
   const hasHeader = title != null || (vertical && timestamp != null);
   const stamp = timestamp != null ? <span className="bland-message__timestamp">{timestamp}</span> : null;
-  const actionRow = actions != null ? <div className="bland-message__actions">{actions}</div> : null;
+  const actionRow =
+    actions != null ? (
+      <div className="bland-message__actions">
+        <ButtonSizeContext.Provider value={actionSize}>{actions}</ButtonSizeContext.Provider>
+      </div>
+    ) : null;
 
   return (
     <>

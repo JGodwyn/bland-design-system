@@ -20,6 +20,7 @@
 .bland-message {
   --bland-icon-size: var(--icon-md);
   --_actions-gap: var(--space-lg); /* text to actions on vertical; Banner sets its own */
+  --_line-offset: var(--space-none); /* moves the first line down to centre on taller inline actions */
 
   display: flex;
   align-items: flex-start;
@@ -71,7 +72,7 @@
 
 /* Figma's icon-wrap: space-2xs above the 20px icon centres it on the first 24px line of text. */
 .bland-message__icon {
-  margin-block-start: var(--space-2xs);
+  margin-block-start: calc(var(--space-2xs) + var(--_line-offset));
   color: var(--_s-icon);
 }
 
@@ -81,6 +82,7 @@
   align-items: flex-start;
   gap: var(--space-sm);
   min-width: var(--space-none);
+  margin-block-start: var(--_line-offset);
 }
 
 .bland-message[data-orientation="vertical"] .bland-message__content {
@@ -97,9 +99,10 @@
   min-width: var(--space-none);
 }
 
+/* First-line alignment (docs/components.md): a wrapping title keeps the timestamp on its first line. */
 .bland-message__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-sm);
 }
 
@@ -115,8 +118,10 @@
   font: var(--type-body-lg);
 }
 
+/* body-sm (16) beside a body-lg line (24): down half the difference, so it centres on the first line. */
 .bland-message__timestamp {
   flex: none;
+  margin-block-start: calc((var(--type-body-lg-line-height) - var(--type-body-sm-line-height)) / 2);
   color: var(--text-subtle);
   font: var(--type-body-sm);
   white-space: nowrap;
@@ -134,4 +139,24 @@
 .bland-message .bland-button.bland-message__close {
   --bland-icon-size: var(--icon-md);
   --_icon: var(--icon-subtle);
+
+  margin-block-start: var(--_line-offset);
+}
+
+/*
+ * First-line alignment (docs/components.md): inline Buttons taller than the first line of text
+ * (sm 32, md 40, lg 56 against 24) move the icon, text and close down by half the difference, so a
+ * one-line message is centred and a wrapping one stays at the top. xs (24) needs no offset.
+ * Ordered by size: with mixed sizes the tallest button wins.
+ */
+.bland-message[data-orientation="horizontal"]:has(> .bland-message__actions .bland-button[data-size="sm"]) {
+  --_line-offset: calc((var(--control-sm) - var(--type-body-lg-line-height)) / 2);
+}
+
+.bland-message[data-orientation="horizontal"]:has(> .bland-message__actions .bland-button[data-size="md"]) {
+  --_line-offset: calc((var(--control-md) - var(--type-body-lg-line-height)) / 2);
+}
+
+.bland-message[data-orientation="horizontal"]:has(> .bland-message__actions .bland-button[data-size="lg"]) {
+  --_line-offset: calc((var(--control-lg) - var(--type-body-lg-line-height)) / 2);
 }

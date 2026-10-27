@@ -1546,3 +1546,17 @@ not wrapped; rail contents centred (logo and account icon were off).
   `--_actions-gap` (space-lg) that Banner sets to space-sm. Story shows
   colored horizontal and vertical; specs check the tints, no shadow, and the
   8 vs 16 gaps. Banner baselines re-taken and looked at.
+- Follow-up (Godwin): Banner's action Buttons default to sm in both
+  orientations. `ButtonSizeContext` in Button.tsx (Button and Icon Button
+  use their own size, else the context's, else md); MessageLayout provides
+  `actionSize`, Banner passes sm. The 32px buttons left the 24px first line
+  4px high, so a `--_line-offset` (only while the actions hold an sm Button)
+  moves icon, text and close down to centre on them. Notification and Figma
+  unchanged. Banner baselines re-taken; spec checks the default, an own size
+  winning and the centring.
+- Follow-up (Godwin): **first-line alignment** made a convention
+  (CLAUDE.md, docs/components.md CSS, INTERFACE.md §2). In `message/` the
+  offset now covers sm, md and lg inline Buttons (xs needs none), and the
+  timestamp centres on the first line (horizontal) and stays on a wrapping
+  title's first line (header was `align-items: center`). Story: a vertical
+  notification with a wrapping title; spec checks both timestamp cases.

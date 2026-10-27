@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, MouseEvent, ReactNode } from 'react';
+import { createContext, useContext, type ButtonHTMLAttributes, type MouseEvent, type ReactNode } from 'react';
 import { SpinnerIcon } from '../../icons';
 import { Icon } from '../icon/Icon';
 import './button.css';
@@ -7,9 +7,21 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 export type ButtonEmotion = 'brand' | 'success' | 'danger' | 'warning';
 export type ButtonType = 'primary' | 'secondary' | 'ghost' | 'stroke';
 
+/**
+ * A default size for the Buttons and Icon Buttons inside it, for components whose action slot
+ * has a set button size (Banner's actions are sm). A button's own `size` always wins.
+ */
+export const ButtonSizeContext = createContext<ButtonSize | undefined>(undefined);
+
+/** The button's size: its own, else the nearest ButtonSizeContext, else md. */
+export function useButtonSize(size: ButtonSize | undefined): ButtonSize {
+  const fromContext = useContext(ButtonSizeContext); // always called: hooks can't be conditional
+  return size ?? fromContext ?? 'md';
+}
+
 /** Props shared by Button and IconButton. */
 export interface ButtonBaseProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-  /** Figma `Size`. lg 56, md 40, sm 32, xs 24 (dense desktop UI only, below the comfortable touch target). */
+  /** Figma `Size`. lg 56, md 40, sm 32, xs 24 (dense desktop UI only, below the comfortable touch target). Default md, or the size a component sets for its action slot (Banner: sm). */
   size?: ButtonSize;
   /** Figma `Emotion`: brand for most actions, danger for destructive ones. */
   emotion?: ButtonEmotion;
@@ -56,7 +68,7 @@ export function guardLoading(loading: boolean, onClick: ButtonProps['onClick']) 
 /** Triggers an action. Figma: Buttons page, set "Button". */
 export function Button({
   children,
-  size = 'md',
+  size: sizeProp,
   emotion = 'brand',
   type = 'primary',
   htmlType = 'button',
@@ -67,6 +79,7 @@ export function Button({
   onClick,
   ...rest
 }: ButtonProps) {
+  const size = useButtonSize(sizeProp);
   const loadingSide = loading === true ? 'start' : loading || null;
   const slot = (side: 'start' | 'end', icon: ReactNode) =>
     loadingSide === side ? <ButtonSpinner /> : icon ? <Icon className="bland-button__icon">{icon}</Icon> : null;

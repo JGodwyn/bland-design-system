@@ -47,3 +47,17 @@ test('the vertical timestamp sits beside the title; the close button is named an
   await close.focus();
   await expect(close).toBeFocused();
 });
+
+test('timestamps centre on the first line of text, also when the title wraps', async ({ page }) => {
+  const mid = (b: { y: number; height: number }) => b.y + b.height / 2;
+  const horizontal = page.locator('.bland-notification[data-orientation="horizontal"]', { hasText: 'File deleted' }).first();
+  const line = (await horizontal.locator('.bland-message__description').boundingBox())!;
+  const time = (await horizontal.locator('.bland-message__timestamp').boundingBox())!;
+  expect(Math.abs(mid(time) - mid(line))).toBeLessThanOrEqual(0.5);
+
+  const wrapped = page.locator('.bland-notification', { hasText: 'long enough to wrap' });
+  const title = (await wrapped.locator('.bland-message__title').boundingBox())!;
+  expect(title.height).toBeGreaterThan(24); // two lines
+  const stamp = (await wrapped.locator('.bland-message__timestamp').boundingBox())!;
+  expect(Math.abs(mid(stamp) - (title.y + 12))).toBeLessThanOrEqual(0.5); // centre of the first 24px line
+});

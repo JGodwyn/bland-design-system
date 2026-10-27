@@ -16,7 +16,7 @@ export interface BannerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title
   title?: ReactNode;
   /** Figma `✏️ Description` (`👀 Description` off = no children). */
   children?: ReactNode;
-  /** Figma `👀 Btn` / `👀 Btn (2nd)`: one or two Buttons, size xs on horizontal banners, md on vertical ones (primary, then secondary). */
+  /** Figma `👀 Btn` / `👀 Btn (2nd)`: one or two Buttons (primary, then secondary). They default to size sm in both orientations; a Button's own `size` wins. */
   actions?: ReactNode;
   /** Figma `👀 Close`: shows a close button that calls this. The banner never hides itself. */
   onClose?: () => void;
@@ -60,6 +60,7 @@ export function Banner({
         actions={actions}
         onClose={onClose}
         closeLabel={closeLabel}
+        actionSize="sm"
       />
     </div>
   );

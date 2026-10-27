@@ -112,6 +112,14 @@ when), `docs/components.md` (how to build one).
 - **Slots and instance swaps are React nodes**: `children`, `iconStart`,
   `iconEnd`, `icon`, `leading`, `trailing`.
 - Remaining native props spread onto the root; `className` is accepted.
+- **First-line alignment** (Godwin 2026-10-27, from Banner): in a row of
+  text and other items, a one-line text is centred with them and a wrapping
+  one keeps them at the top, on its first line. Rows use
+  `align-items: flex-start` and offset the shorter side by half the height
+  difference (icon, timestamp, or the text itself when buttons are taller);
+  `align-items: center` only where the text can never wrap. Applied so far in
+  `message/` (Alert, Banner, Toast, Notification); other components are to be
+  checked against it.
 
 ## 3. Icons (decided 2026-10-17)
 
@@ -157,6 +165,9 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Loading puts the spinner in place of the icon on that side, keeps the label
   and colors, sets `aria-busy`, and ignores clicks until it ends.
 - Icon Button requires `aria-label`; loading swaps its icon for the spinner.
+- **`ButtonSizeContext`** (2026-10-27, for Banner): a component whose action
+  slot has a set button size provides it; Button and Icon Button take their
+  own `size`, else the context's, else md. Internal, not exported.
 - CSS pattern every component copies: emotion and type blocks set private
   custom properties, and one rule per state reads them.
 
@@ -521,7 +532,15 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
     `onClose` (Figma `👀 Close`), `orientation` horizontal (default) /
     vertical. On vertical the actions sit `space-sm` under the text (Godwin
     2026-10-27, tighter than Notification's `space-lg`); message.css reads it
-    from a private `--_actions-gap` that Banner sets. Figma's `banner/width` (384) is only its
+    from a private `--_actions-gap` that Banner sets.
+    **Action Buttons default to sm** in both orientations (Godwin
+    2026-10-27; Figma draws xs horizontal, md vertical): Banner passes
+    `actionSize="sm"` and MessageLayout wraps `actions` in
+    `ButtonSizeContext`, so a Button without a `size` takes sm and one with a
+    `size` keeps it. On horizontal banners sm Buttons (32) are taller than the
+    first line (24), so the icon, text and close move down half the
+    difference (`--_line-offset`, set only while the actions hold an sm
+    Button) and centre on them. Figma's `banner/width` (384) is only its
     default frame: the description says to fill the container, so in code it
     is a block spanning its container.
   - Toast: strong fill `surface-{status}-strong`, white content

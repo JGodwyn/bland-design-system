@@ -96,6 +96,9 @@ export default {
           <Notification status="info" icon={false} colored={false}>
             Without the icon or close button
           </Notification>
+          <Notification status="warning" orientation="vertical" title="A title long enough to wrap onto a second line" timestamp={stamp} onClose={() => {}}>
+            The timestamp stays on the title's first line
+          </Notification>
         </div>
       </div>
 

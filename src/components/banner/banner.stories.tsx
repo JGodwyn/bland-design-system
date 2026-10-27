@@ -5,17 +5,12 @@ import { Banner, type BannerOrientation, type BannerStatus } from './Banner';
 
 const statuses: BannerStatus[] = ['info', 'danger', 'success', 'warning'];
 
-/** Figma's actions: a primary Button, then a secondary one; xs on horizontal banners, md on vertical ones. */
-function actionsFor(orientation: BannerOrientation, count: number) {
-  const size = orientation === 'vertical' ? 'md' : 'xs';
+/** A primary Button, then a secondary one. No size: Banner's actions default to sm. */
+function actionsFor(_orientation: BannerOrientation, count: number) {
   return count === 0 ? undefined : (
     <>
-      <Button size={size}>Update</Button>
-      {count > 1 && (
-        <Button size={size} type="secondary">
-          Later
-        </Button>
-      )}
+      <Button>Update</Button>
+      {count > 1 && <Button type="secondary">Later</Button>}
     </>
   );
 }
@@ -97,7 +92,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Actions (xs inline when horizontal, md below when vertical) and close</span>
+        <span className="pg-label">Actions (Buttons default to sm: inline when horizontal, below when vertical) and close</span>
         <Banner status="info" actions={actionsFor('horizontal', 2)} onClose={() => {}}>
           A new version is available
         </Banner>
@@ -108,6 +103,9 @@ export default {
           We could not charge your card. Update your payment details to keep your plan.
         </Banner>
         <Banner status="success" orientation="vertical" title="Title only" icon={false} onClose={() => {}} />
+        <Banner status="warning" actions={<Button size="xs">Own size</Button>}>
+          A Button's own size still wins
+        </Banner>
       </div>
 
       <div className="pg-stack">

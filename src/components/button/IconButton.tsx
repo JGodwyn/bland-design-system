@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Icon } from '../icon/Icon';
-import { ButtonSpinner, guardLoading, type ButtonBaseProps } from './Button';
+import { ButtonSpinner, guardLoading, useButtonSize, type ButtonBaseProps } from './Button';
 import './button.css';
 
 export interface IconButtonProps extends ButtonBaseProps {
@@ -15,7 +15,7 @@ export interface IconButtonProps extends ButtonBaseProps {
 /** A square button with one icon and no label. Figma: Buttons page, set "Icon Button". */
 export function IconButton({
   icon,
-  size = 'md',
+  size: sizeProp,
   emotion = 'brand',
   type = 'primary',
   htmlType = 'button',
@@ -24,6 +24,7 @@ export function IconButton({
   onClick,
   ...rest
 }: IconButtonProps) {
+  const size = useButtonSize(sizeProp);
   return (
     <button
       {...rest}
