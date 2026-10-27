@@ -1667,3 +1667,7 @@ not wrapped; rail contents centred (logo and account icon were off).
 
 - Godwin asked for the open chat's selected option on the playground, with the Messaging tokens added in Figma. Figma already had them; synced and built the CSS, then found another session had done the same on main (fee44e3, Batch 2). Rebuilt this branch on main keeping only what main lacked: a Selected section in the story (receiver and sender), labels that name the fill, and a spec that checks the fill, the hover fill and the selection moving. Old commit kept as backup/selected-4079a51.
 - Chat list item screenshots re-baselined (the new section); specs pass on a worktree server (5191).
+
+## Typography page: large samples cut off (2026-10-27)
+
+- Godwin: text from Heading lg up looks cut off at the bottom. `.docs-type-sample` had `overflow: hidden` for its ellipsis; scrollHeight exceeded clientHeight by 2 to 6px from Heading lg up (descenders below tight line boxes). Now `overflow-x: clip` with `overflow-y: visible`. Checked in the browser pane on a 5181 server; docs specs pass.

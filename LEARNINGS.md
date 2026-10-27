@@ -674,3 +674,5 @@ beats `strictPort`'s config value), then delete it.
 - Symptom: a description's `aria-current="page"` read back as `&amp;amp;…quot;`, worse after every edit.
 - Cause: `node.description` returns HTML-escaped text; assigning that string back escapes it again.
 - Rule: to edit a description, decode the entities and write `descriptionMarkdown`, not `description`.
+
+**`overflow: hidden` for an ellipsis clips descenders of tight display type.** The Typography page cut off the bottom of Heading lg and up: their line heights (48 on 43px, 88 on 83px) leave Inter's descenders 2 to 6px below the line box. → For a one-line ellipsis on large type, `overflow-x: clip; overflow-y: visible` (clip doesn't force the other axis to scroll, and text-overflow still works).

@@ -936,8 +936,10 @@ code,
   padding: var(--space-lg) 0;
   border-bottom: var(--stroke-sm) solid var(--border-subtle);
 }
+/* Clip sideways only: from Heading lg up the line height is tight and descenders hang below the line box. */
 .docs-type-sample {
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
