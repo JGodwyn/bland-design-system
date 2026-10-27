@@ -1487,7 +1487,7 @@ code,
   padding: var(--space-none) var(--space-sm) var(--space-none) var(--space-md);
   border: none;
   border-radius: var(--rad-sm);
-  box-shadow: inset calc(var(--stroke-sm) * -1) var(--space-none) var(--space-none) var(--border-bold); /* a divider before the value */
+  position: relative;
   background: none;
   font: var(--type-body-lg-bold);
   color: var(--text-subtle);
@@ -1496,7 +1496,7 @@ code,
 /* Its menu: as wide as its labels, lined up with the field's left edge, a little below it. */
 .docs-picker-format-menu {
   width: max-content;
-  min-width: calc(var(--space-6xl) + var(--space-xl));
+  min-width: var(--space-7xl);
   translate: 0 var(--space-xs);
 }
 @media (hover: hover) and (pointer: fine) {
@@ -1540,7 +1540,29 @@ code,
   field-sizing: content;
 }
 .docs-picker-channel + .docs-picker-channel {
-  box-shadow: inset var(--stroke-sm) var(--space-none) var(--space-none) var(--border-bold);
+  position: relative;
+}
+/* Dividers: straight lines, space-sm in from the field's top and bottom. Drawn apart from the rounded boxes (whose
+   inset shadow bent at their corners and read as cut off). */
+.docs-picker-format::after,
+.docs-picker-channel + .docs-picker-channel::before {
+  content: "";
+  position: absolute;
+  inset-block: var(--space-sm);
+  width: var(--stroke-sm);
+  background: var(--border-bold);
+  pointer-events: none;
+}
+.docs-picker-format::after {
+  right: var(--space-none);
+}
+.docs-picker-channel + .docs-picker-channel::before {
+  left: var(--space-none);
+}
+/* While a field rings itself, the lines beside it step aside. */
+.docs-picker-channel:has(input:focus)::before,
+.docs-picker-channel:has(input:focus) + .docs-picker-channel::before {
+  opacity: 0;
 }
 .docs-picker-channel:has(input:focus) {
   outline: var(--stroke-lg) solid var(--border-focused);

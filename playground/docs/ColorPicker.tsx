@@ -110,7 +110,7 @@ export function ColorPicker({ value, onChange, onDraggingChange }: { value: stri
       <div className="docs-picker-field bland-smooth">
         <Menu
           items={FORMATS}
-          size="sm"
+          size="md"
           className="docs-picker-format-menu"
           selectionMode="single"
           selectedKeys={[format]}
