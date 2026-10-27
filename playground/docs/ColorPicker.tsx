@@ -1,44 +1,43 @@
 // The Brand theme page's color picker (Figma 6773:22102): a saturation and brightness area, a hue slider and the
 // hex, in one panel. Docs site only. The gradients are the color space itself, so they are computed, not tokens.
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { Icon } from '../../src/components/icon/Icon';
+import { Menu } from '../../src/components/menu/Menu';
+import { CaretDownIcon } from '../../src/icons';
+import { clamp, FORMAT_KEY, FORMATS, formatColor, normalHex, parseColor, toHex, toHsv, type ColorFormat, type Hsv } from './colorFormats';
 import { KnobMark } from './icons';
 
-type Hsv = { h: number; s: number; v: number };
-
-const clamp = (n: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, n));
-const isHex = (s: string) => /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.test(s.trim());
-
-function toHex({ h, s, v }: Hsv): string {
-  const f = (n: number) => {
-    const k = (n + h / 60) % 6;
-    return v - v * s * Math.max(0, Math.min(k, 4 - k, 1));
-  };
-  return `#${[f(5), f(3), f(1)].map((c) => Math.round(c * 255).toString(16).padStart(2, '0')).join('')}`;
+function savedFormat(): ColorFormat {
+  try {
+    const f = localStorage.getItem(FORMAT_KEY);
+    return FORMATS.some((x) => x.id === f) ? (f as ColorFormat) : 'hex';
+  } catch {
+    return 'hex';
+  }
 }
-
-function toHsv(hex: string): Hsv {
-  let t = hex.trim().replace('#', '');
-  if (t.length === 3) t = [...t].map((c) => c + c).join('');
-  const [r, g, b] = [0, 2, 4].map((i) => parseInt(t.slice(i, i + 2), 16) / 255) as [number, number, number];
-  const max = Math.max(r, g, b);
-  const d = max - Math.min(r, g, b);
-  const h = d === 0 ? 0 : max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
-  return { h: (h * 60 + 360) % 360, s: max === 0 ? 0 : d / max, v: max };
-}
-
-/** Normalises a typed or picked hex to lowercase #rrggbb. */
-export const normalHex = (s: string) => toHex(toHsv(s));
 
 export function ColorPicker({ value, onChange }: { value: string; onChange: (hex: string) => void }) {
   // The hue lives here too: a gray or black has none of its own, and the slider should not jump to red.
   const [hsv, setHsv] = useState(() => toHsv(value));
-  const [text, setText] = useState(value);
+  // The field's format, kept for the next visit (a per-viewer convenience).
+  const [format, setFormatState] = useState(savedFormat);
+  const [text, setText] = useState(() => formatColor(value, format));
+  const setFormat = (f: ColorFormat) => {
+    setFormatState(f);
+    setText(formatColor(value, f));
+    try {
+      localStorage.setItem(FORMAT_KEY, f);
+    } catch {
+      /* Not kept: it starts at HEX next time. */
+    }
+  };
   const area = useRef<HTMLDivElement>(null);
   // Focus starts on the area when the picker opens (React's autoFocus only reaches form controls).
   useEffect(() => area.current?.focus({ preventScroll: true }), []);
   useEffect(() => {
     if (toHex(hsv) !== normalHex(value)) setHsv(toHsv(value));
-    setText(value);
+    // Keep what is being typed while it reads as this color (so "0.7 0.2 40" isn't reflowed mid-edit).
+    setText((t) => (parseColor(t, format) === normalHex(value) ? t : formatColor(value, format)));
   }, [value]);
 
   const set = (next: Hsv) => {
@@ -94,16 +93,32 @@ export function ColorPicker({ value, onChange }: { value: string; onChange: (hex
         onChange={(e) => set({ ...hsv, h: Number(e.target.value) })}
       />
       <div className="docs-picker-field bland-smooth">
+        <Menu
+          items={FORMATS}
+          size="sm"
+          selectionMode="single"
+          selectedKeys={[format]}
+          onSelectionChange={(ids) => ids[0] && setFormat(ids[0] as ColorFormat)}
+          aria-label="Color format"
+        >
+          <button type="button" className="docs-picker-format bland-focus-ring" aria-label={`Color format: ${FORMATS.find((f) => f.id === format)!.label}`}>
+            {FORMATS.find((f) => f.id === format)!.label}
+            <Icon size="xs">
+              <CaretDownIcon />
+            </Icon>
+          </button>
+        </Menu>
         <input
-          aria-label="Hex color"
+          aria-label={`${FORMATS.find((f) => f.id === format)!.label} color`}
           value={text}
           spellCheck={false}
           autoComplete="off"
           onChange={(e) => {
             setText(e.target.value);
-            if (isHex(e.target.value)) onChange(normalHex(e.target.value));
+            const hex = parseColor(e.target.value, format);
+            if (hex) onChange(hex);
           }}
-          onBlur={() => setText(value)}
+          onBlur={() => setText(formatColor(value, format))}
         />
         <span className="docs-picker-swatch" style={{ background: value }} aria-hidden="true" />
       </div>

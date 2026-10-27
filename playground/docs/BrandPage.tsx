@@ -40,7 +40,8 @@ import {
   type Tint,
 } from '../../scripts/brand/core';
 import { paletteStyle, setAppliedBrand, useAppliedBrand, type Palette } from './brandStore';
-import { ColorPicker, normalHex } from './ColorPicker';
+import { normalHex } from './colorFormats';
+import { ColorPicker } from './ColorPicker';
 import { highlight } from './highlight';
 import { ArrowClockwiseIcon, CopySimpleIcon } from './icons';
 import { brandPage } from './pages';

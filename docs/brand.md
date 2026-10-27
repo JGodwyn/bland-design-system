@@ -57,7 +57,7 @@ Neutrals are optional in the file: set all 13 or none. Override at `:root`, not 
 
 `npm run docs`, then **Brand theme** under Overview (`#/brand`; Figma 6773:21840): the same tool in the browser.
 
-- **Brand color:** tap the big swatch to open a color picker (saturation and brightness area, hue slider, hex field); the swatch shows your color exactly, with a copy button. Under it, the 13 steps it makes (your color on its own step) and the contrast check as Banners (misses as a table). **Reset** puts the color back to Bland's blue.
+- **Brand color:** tap the big swatch to open a color picker (saturation and brightness area, hue slider, and a field that reads and writes HEX, RGB, HSL or OKLCH: pick the format from its menu, kept for your next visit; paste CSS like `rgb(255 90 31)` or `oklch(68% 0.21 38)` in any format); the swatch shows your color exactly, with a copy button. Under it, the 13 steps it makes (your color on its own step) and the contrast check as Banners (misses as a table). **Reset** puts the color back to Bland's blue.
 - **Neutral color:** Tinted, Subtle or Pure gray, the 400 neutral as a big swatch, and the 13 neutral steps.
 - **Preview** in light and dark, and **Use in a project** with the CSS to copy.
 - A bar floats at the bottom: **Reset to Bland** (everything, including the site), **Fix contrast** (moves the other steps, never yours) and **Apply to site**, which sets the steps on `<html>` so every docs page shows the brand. It is kept for the visit in sessionStorage with the color it was made from, and survives a reload.

@@ -218,7 +218,7 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
 
   // The swatch opens the picker; a typed hex lands on the step its lightness belongs on (orange: 400).
   await page.getByRole('button', { name: /^Brand color #0062FF/ }).click();
-  await page.getByRole('textbox', { name: 'Hex color' }).fill('#ff5a1f');
+  await page.getByRole('textbox', { name: 'HEX color' }).fill('#ff5a1f');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('button', { name: /^Brand color #FF5A1F/ })).toBeVisible();
   await expect(page.getByRole('group', { name: 'Brand steps' })).toContainText('400#ff5a1f');
@@ -227,9 +227,18 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   await expect(page.getByRole('table', { name: 'Pairings below their minimum' })).toContainText('Step 400 is your color');
   await expect(page.getByRole('button', { name: 'Fix contrast' })).toBeDisabled();
 
+  // The field switches format (kept for the next visit) and reads what is typed in it.
   await page.getByRole('button', { name: /^Brand color/ }).click();
-  await page.getByRole('textbox', { name: 'Hex color' }).fill('#ffcc00');
+  const picker = page.getByRole('dialog', { name: 'Pick a brand color' });
+  await picker.getByRole('button', { name: 'Color format: HEX' }).click();
+  await page.getByRole('menuitemradio', { name: 'HSL' }).click();
+  await expect(picker.getByRole('textbox', { name: 'HSL color' })).toHaveValue('15.8 100% 56.1%');
+  await picker.getByRole('textbox', { name: 'HSL color' }).fill('48 100% 50%');
+  await expect(page.getByRole('button', { name: /^Brand color #FFCC00/ })).toBeVisible();
+  await picker.getByRole('button', { name: 'Color format: HSL' }).click();
+  await page.getByRole('menuitemradio', { name: 'HEX' }).click();
   await page.keyboard.press('Escape');
+  await expect(picker).toBeHidden();
   await page.getByRole('button', { name: 'Fix contrast' }).click();
   await expect(page.getByText(/pairings miss their minimum/)).toHaveCount(0);
   await apply.click();

@@ -1181,7 +1181,7 @@ code,
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  width: var(--space-9xl);
+  width: calc(var(--space-9xl) + var(--space-2xl)); /* Figma's 256 plus room for an OKLCH value beside the format */
   padding: var(--space-lg);
   background: var(--surface-100);
   box-shadow:
@@ -1242,6 +1242,27 @@ code,
 .docs-picker-field:focus-within {
   outline: var(--stroke-lg) solid var(--border-focused);
   outline-offset: var(--stroke-lg);
+}
+.docs-picker-format {
+  --bland-radius: var(--rad-sm);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-none) var(--space-sm) var(--space-none) var(--space-none);
+  border: none;
+  border-radius: var(--rad-sm);
+  box-shadow: inset calc(var(--stroke-sm) * -1) var(--space-none) var(--space-none) var(--border-bold); /* a divider before the value */
+  background: none;
+  font: var(--type-body-md-bold);
+  color: var(--text-subtle);
+  cursor: pointer;
+}
+@media (hover: hover) and (pointer: fine) {
+  .docs-picker-format:hover {
+    color: var(--text-bold);
+  }
 }
 .docs-picker-field input {
   flex: 1;
