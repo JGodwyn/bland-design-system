@@ -161,8 +161,8 @@ export function BrandPage() {
           </Popover>
         </div>
         <ScaleRow label="Brand steps" scale={scale} />
-        {/* Bland's own palette has nothing to report; a project's palette shows its result. */}
-        {!(isBland && misses.length === 0) && <Contrast misses={misses} keep={keep} hidden={dragging} canFix={!same(fixedScale, scale)} onFix={() => setFixed(fixedScale)} />}
+        {/* Bland's own palette has nothing to report (hidden, so it leaves with its exit); a project's palette shows its result. */}
+        <Contrast misses={misses} keep={keep} hidden={dragging || (isBland && misses.length === 0)} canFix={!same(fixedScale, scale)} onFix={() => setFixed(fixedScale)} />
       </Section>
 
       <Section title="Neutral color" className="docs-brand-section">
@@ -234,15 +234,20 @@ function ScaleRow({ label, scale }: { label: string; scale: Scale }) {
 
 /**
  * The contrast check. Misses Bland's own brand shares (and this brand makes no worse) count as passing: they are
- * Bland's to fix, not a project's. While `hidden` (a drag in the picker) it is out of the layout; when it comes
- * back, and on each new result, it eases in.
+ * Bland's to fix, not a project's. Hidden (a drag in the picker, or Bland's own palette) it fades and folds away,
+ * leaving the layout; it unfolds back in, and each new result eases in.
  */
-function Contrast({ misses, keep, hidden, canFix, onFix }: { misses: Finding[]; keep?: Step; hidden: boolean; canFix: boolean; onFix: () => void }) {
+function Contrast({ misses: current, keep, hidden, canFix, onFix }: { misses: Finding[]; keep?: Step; hidden: boolean; canFix: boolean; onFix: () => void }) {
   const [open, setOpen] = useState(false);
   const breakdown = useId();
+  // While hidden it keeps showing the last result, so the exit plays out on what was there, not on a new result.
+  const shown = useRef(current);
+  if (!hidden) shown.current = current;
+  const misses = shown.current;
   const result = misses.length === 0 ? 'ok' : `miss-${misses.length}`;
   return (
     <div className="docs-brand-contrast" hidden={hidden}>
+      <div className="docs-brand-contrast-inner">
       <div key={result} className="docs-brand-contrast-result">
         {misses.length === 0 ? (
           <Banner status="success" colored>
@@ -274,6 +279,7 @@ function Contrast({ misses, keep, hidden, canFix, onFix }: { misses: Finding[]; 
           <Findings items={misses} keep={keep} />
         </div>
       )}
+      </div>
     </div>
   );
 }

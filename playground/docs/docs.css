@@ -1136,15 +1136,45 @@ code,
   height: var(--space-none);
   pointer-events: none;
 }
-/* The contrast result leaves the layout while the picker is dragged; it eases back in (the result's animation
-   replays when display returns), as each new result does. */
+/* The contrast result fades and folds away when hidden (a drag in the picker, Bland's own palette), then leaves
+   the layout; it unfolds back in the same way. The fold is the grid row going from 1fr to 0fr; the negative
+   margin folds the section's gap above it too. */
 .docs-brand-contrast {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    opacity var(--duration-md) var(--easing-out),
+    grid-template-rows var(--duration-md) var(--easing-out),
+    margin-top var(--duration-md) var(--easing-out),
+    display var(--duration-md) allow-discrete;
 }
 .docs-brand-contrast[hidden] {
   display: none;
+  grid-template-rows: 0fr;
+  margin-top: calc(var(--space-lg) * -1);
+  opacity: 0;
+}
+@starting-style {
+  .docs-brand-contrast:not([hidden]) {
+    grid-template-rows: 0fr;
+    margin-top: calc(var(--space-lg) * -1);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .docs-brand-contrast {
+    transition:
+      opacity var(--duration-md) var(--easing-out),
+      display var(--duration-md) allow-discrete;
+  }
+}
+.docs-brand-contrast-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  min-height: var(--space-none);
+  overflow: clip;
+  overflow-clip-margin: var(--stroke-lg); /* the buttons' focus rings */
 }
 .docs-brand-contrast-result {
   animation: docs-brand-result var(--duration-md) var(--easing-out);

@@ -1590,3 +1590,8 @@ not wrapped; rail contents centred (logo and account icon were off).
 
 - Godwin: after Reset to Bland, no "Contrast checks out". Bland's own palette (brand and neutrals) shows no result unless it has real misses.
 - Godwin: the hidden result still took its space while scrubbing. It now uses `hidden` (display none) while a pointer drags in the picker, so the page closes up; on release the result's ease-in animation replays as display returns (checked in Playwright: running from opacity 0).
+
+## Brand page: the contrast result's exit (2026-10-27)
+
+- Godwin: animate the banner's exit too. It now stays mounted and is `hidden` both while dragging and on Bland's own palette, so both leave the same way: opacity and a fold (grid row 1fr to 0fr) plus a negative margin that folds the section's gap, duration/md easing/out, then display none (`allow-discrete`); entering unfolds the same path (`@starting-style`). Reduced motion keeps the fade only. While hidden it keeps its last result, so the exit plays on what was shown.
+- Dead end: `height: auto` to 0 with `interpolate-size: allow-keywords` on the element didn't animate in Chromium 156 (height held at 132 until display none), though `CSS.supports` said yes. The grid-rows fold works; measured in Playwright: out in ~160 ms, in ~160 ms.
