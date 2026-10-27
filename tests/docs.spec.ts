@@ -282,8 +282,11 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
 
   await page.goto('/#/brand');
   await expect(page.getByRole('button', { name: /^Brand color #FFCC00/ })).toBeVisible();
-  // Extra colors: up to three, named, with their steps and light/dark roles in the CSS; Reset clears them.
+  // Extra colors (their own tab): up to three, named, with their steps and light/dark roles in the CSS; Reset clears them.
   await page.goto('/#/brand');
+  const tab = (name: string) => page.getByRole('tab', { name });
+  await tab('Extra colors').click();
+  await expect(page.getByText('No colors added')).toBeVisible();
   const add = page.getByRole('button', { name: 'Add color' });
   for (let i = 0; i < 3; i++) await add.click();
   await expect(add).toBeDisabled();
@@ -291,22 +294,28 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   await names.first().fill('surface');
   await expect(page.getByText('Bland already uses --surface-…; pick another name.')).toBeVisible();
   await names.first().fill('chart');
+  // Its roles show the value for the page's theme (light here: surface is step 600).
+  await expect(page.getByRole('list', { name: 'Roles of chart' })).toContainText(/--chart-surface\s*#7c3aed/, { useInnerText: true });
+  await tab('How to use').click();
   const css = page.locator('#use-in-a-project pre');
   await expect(css).toContainText('--chart-600: #7c3aed;');
   await expect(css).toContainText('--chart-surface: var(--chart-400);');
-  await page.getByRole('button', { name: 'Remove' }).last().click();
+  await tab('Extra colors').click();
+  await page.getByRole('button', { name: /^Remove/ }).last().click();
   await expect(add).toBeEnabled();
 
+  await tab('Brand colors').click();
   await page.getByRole('button', { name: 'Reset', exact: true }).click();
-  await expect(page.getByRole('textbox', { name: 'Name' })).toHaveCount(0);
-  await expect(page.locator('.docs-brand-contrast').first()).toBeHidden();
+  await expect(page.locator('.docs-brand-contrast')).toBeHidden();
   expect(await brand('600')).toBe('');
   expect(await neutral600()).toBe('');
   await expect(page.getByRole('button', { name: 'Reset', exact: true })).toBeDisabled();
+  await tab('Extra colors').click();
+  await expect(page.getByRole('textbox', { name: 'Name' })).toHaveCount(0);
   // An extra on Bland's own brand shows its own result, never one for the brand.
   await add.click();
-  await expect(page.locator('.docs-brand-contrast')).toHaveCount(2);
-  await expect(page.locator('.docs-brand-contrast').first()).toBeHidden();
-  await expect(page.locator('.docs-brand-contrast').last()).toBeVisible();
+  await expect(page.locator('.docs-brand-contrast')).toBeVisible();
+  await tab('Brand colors').click();
+  await expect(page.locator('.docs-brand-contrast')).toBeHidden();
 });
 

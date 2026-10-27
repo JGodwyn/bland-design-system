@@ -45,9 +45,9 @@ export function PageHeader({ title, href, children }: { title: string; href: str
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 /** A titled section, listed in the page contents rail under its title. */
-export function Section({ id, title, children, note, action, className }: { id?: string; title: string; children: ReactNode; note?: ReactNode; action?: ReactNode; className?: string }) {
+export function Section({ id, title, children, note, action, className, toc = true }: { id?: string; title: string; children: ReactNode; note?: ReactNode; action?: ReactNode; className?: string; toc?: boolean }) {
   return (
-    <section className={`docs-section${className ? ` ${className}` : ''}`} id={id ?? slug(title)} data-toc={title}>
+    <section className={`docs-section${className ? ` ${className}` : ''}`} id={id ?? slug(title)} data-toc={toc ? title : undefined}>
       {action ? (
         <div className="docs-section-heading">
           <h2>{title}</h2>

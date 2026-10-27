@@ -1024,18 +1024,40 @@ code,
   flex: 1;
   margin: var(--space-none);
 }
-/* The card around a big swatch: brand-light for the brand color you tap, surface-200 for the neutral. */
+/* Figma 6806:6170: the colors sit in three tabs (Brand colors, Extra colors, How to use), the preview under them.
+   The tab row and its panel are space-xl apart; the panel's sections space-5xl. */
+.docs-brand-tabs > .bland-section-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+.docs-brand-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5xl);
+}
+/* The card around a big swatch: brand-light for a color you tap (its contrast result sits inside, space-sm under
+   the swatch), surface-200 for the neutral. */
 .docs-brand-card {
   --bland-radius: var(--rad-lg);
+  --docs-fold-gap: var(--space-sm);
 
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
   padding: var(--space-sm);
+  background: var(--surface-brand-light);
+}
+.docs-brand-card-neutral {
   background: var(--surface-200);
 }
-.docs-brand-card-brand {
-  background: var(--surface-brand-light);
+/* The breakdown on the card's tint: the page surface, edged, rounded like the banner above it. */
+.docs-brand-card .docs-data {
+  --bland-radius: var(--rad-md);
+
+  border-radius: var(--rad-md);
+  background: var(--surface-100);
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-subtle);
 }
 .docs-brand-card-label {
   padding-inline: var(--space-md);
@@ -1129,6 +1151,20 @@ code,
   gap: var(--space-sm);
 }
 
+/* No extra colors yet: Figma's empty state, space-4xl above and below. */
+.docs-brand-empty {
+  padding-block: var(--space-4xl);
+}
+/* Its one button hugs its label, centred (Figma), rather than stretching across the page. */
+.docs-brand-empty .bland-empty-state__actions {
+  align-items: center;
+}
+.docs-brand-empty-icon {
+  width: var(--space-3xl);
+  height: var(--space-3xl);
+  color: var(--icon-minimal);
+  stroke-width: var(--stroke-md);
+}
 /* Extra colors: each a block of its own, ruled off from the one before. */
 .docs-brand-extra {
   display: flex;
@@ -1141,47 +1177,96 @@ code,
 }
 .docs-brand-extra-head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-md);
 }
-.docs-brand-extra-head .bland-text-input {
-  width: min(100%, var(--space-9xl));
+/* The name is the block's title (title-md), a field you type into in place; the pencil says so. */
+.docs-brand-extra-name {
+  --bland-radius: var(--rad-sm);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: var(--space-none);
+  border-radius: var(--rad-sm);
+  color: var(--icon-subtle);
+  cursor: text;
 }
-.docs-brand-extra-head .bland-button {
-  margin-top: var(--space-xl); /* level with the field, under its label */
+.docs-brand-extra-name:has(input:focus-visible) {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--stroke-lg);
 }
+.docs-brand-extra-name input {
+  min-width: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  background: none;
+  font: var(--type-title-md);
+  letter-spacing: var(--type-title-md-letter-spacing);
+  color: var(--text-bold);
+  field-sizing: content;
+}
+.docs-brand-extra-name input:focus {
+  outline: none;
+}
+.docs-brand-extra-name input[aria-invalid] {
+  color: var(--text-danger);
+}
+.docs-brand-extra-error {
+  margin: var(--space-none);
+  margin-top: calc(var(--space-sm) * -1);
+  font: var(--type-body-md);
+  color: var(--text-danger);
+}
+/* Its six roles, side by side: each shows the value for the mode the page is in (Figma 6806:9008). */
 .docs-brand-roles {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--space-9xl) * 0.75)), 1fr));
-  gap: var(--space-sm) var(--space-lg);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--space-7xl) * 0.75)), 1fr));
+  gap: var(--space-sm);
   margin: var(--space-none);
   padding: var(--space-none);
   list-style: none;
 }
 .docs-brand-roles li {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  column-gap: var(--space-sm);
-}
-.docs-brand-role-chips {
-  --bland-radius: var(--rad-sm);
+  --docs-role: var(--docs-role-light);
 
   display: flex;
-  grid-row: span 2;
-  overflow: hidden;
-  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-subtle);
+  flex-direction: column;
+  gap: var(--space-2xs);
+  min-width: var(--space-none);
 }
-/* Light value, then dark. */
-.docs-brand-role-chip {
-  width: var(--icon-lg);
-  height: var(--space-3xl);
+.docs-brand-roles .docs-brand-chip {
+  background: var(--docs-role);
 }
 .docs-brand-role-name {
-  font: var(--type-code-body-sm);
+  padding-inline: var(--space-2xs);
+  font: var(--type-body-md-bold);
   color: var(--text-bold);
   overflow-wrap: anywhere;
+}
+.docs-brand-roles [data-mode="dark"] {
+  display: none;
+}
+:root[data-theme="dark"] .docs-brand-roles li {
+  --docs-role: var(--docs-role-dark);
+}
+:root[data-theme="dark"] .docs-brand-roles [data-mode="light"] {
+  display: none;
+}
+:root[data-theme="dark"] .docs-brand-roles [data-mode="dark"] {
+  display: inline;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .docs-brand-roles li {
+    --docs-role: var(--docs-role-dark);
+  }
+  :root:not([data-theme="light"]) .docs-brand-roles [data-mode="light"] {
+    display: none;
+  }
+  :root:not([data-theme="light"]) .docs-brand-roles [data-mode="dark"] {
+    display: inline;
+  }
 }
 .docs-brand-extra-sample {
   display: inline-flex;
@@ -1226,12 +1311,12 @@ code,
 .docs-fold[hidden] {
   display: none;
   grid-template-rows: 0fr;
-  margin-top: calc(var(--space-lg) * -1);
+  margin-top: calc(var(--docs-fold-gap, var(--space-lg)) * -1);
 }
 .docs-fold-inner {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--docs-fold-gap, var(--space-lg));
   min-height: var(--space-none);
   overflow: clip;
   overflow-clip-margin: var(--stroke-lg); /* focus rings */
@@ -1249,7 +1334,7 @@ code,
 @starting-style {
   .docs-fold:not([hidden]) {
     grid-template-rows: 0fr;
-    margin-top: calc(var(--space-lg) * -1);
+    margin-top: calc(var(--docs-fold-gap, var(--space-lg)) * -1);
   }
   .docs-fold:not([hidden]) > .docs-fold-inner {
     opacity: 0;

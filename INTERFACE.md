@@ -2155,3 +2155,10 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 
 - `docs/agent-skill.md` collects what a project's agent must know to use Bland, as we go; the end-of-project skill is written from it (Godwin 2026-10-27).
 - Brand theme page: the brand's contrast result hides on Bland's own brand whatever the extras; each extra's result counts its own pairings (12), not the brand's 70.
+
+## Brand theme page: tabs, contrast inside the card (2026-10-27, Figma 6806:6170 / 7199 / 8283)
+
+- The tools sit in Section tabs: Brand colors (brand + neutral), Extra colors, How to use (the CSS). Preview stays under the tabs. The table of contents shows one "Colors" entry for the tab block (`Section toc={false}` inside it).
+- The contrast result (banner, and the breakdown table on surface-100) sits inside the color's brand-light card, space-sm under the swatch; `--docs-fold-gap` lets the fold use the card's gap.
+- Extra colors: primary Add color in the heading; an Empty State (Swatches icon, "No colors added", Add a color) when there are none. Each extra's header is its name as an in-place field (title-md, pencil) with a danger stroke Icon Button to remove it; a bad name shows its error under it. Every color card uses surface-brand-light, as Figma draws it (an extra's card is not tinted with the extra).
+- Roles row: six equal columns, each the role's token and its value for the page's theme only; switching the theme switches them (Figma annotation on 6806:9008). Both values are set inline and CSS picks one.

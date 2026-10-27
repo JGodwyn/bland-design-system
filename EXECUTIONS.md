@@ -1629,3 +1629,10 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Bug: adding an extra on Bland's brand showed "Contrast checks out" under Brand color. `isBland` (used to hide the brand result) also required no extras. Split into `brandIsBland` for the brand result; `isBland` still drives Reset. The spec now adds an extra after Reset and checks the brand result stays hidden.
 - Same pass: an extra's warning said "n of 70 pairings"; Contrast takes a `total` (extras 12).
 - Started `docs/agent-skill.md` (setup, colors and roles, CSS rules, components, open points); CLAUDE.md points at it. docs/brand.md says plainly that steps are fixed and roles switch.
+
+## Brand theme page from Figma 6806:6170, 6806:7199, 6806:8283 (2026-10-27)
+
+- Read the three frames (sparse at page level; got the extra header, banner and roles row in detail). Figma's breakdown table holds placeholder prop rows; the code keeps the real findings table.
+- Restructured BrandPage into SectionTabs panels; ColorCard takes children for the contrast result; new PencilSimpleLine icon; Section got `toc`.
+- The browser pane was hidden, so the fold never ran there; screenshots taken with a throwaway Playwright spec (deleted). Fixed the empty state's action stretching full width (centred, hugging).
+- Spec updated for the tabs; brand-related tests pass.

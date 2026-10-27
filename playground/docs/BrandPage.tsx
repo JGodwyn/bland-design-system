@@ -2,13 +2,15 @@
 // makes (the color lands on the step its lightness belongs on) and the 13 neutral steps tinted toward it (or pure
 // gray), check them, preview them on components in both themes, apply them to the whole site, or go back to
 // Bland's blue.
-import { useEffect, useId, useMemo, useRef, useState, type ChangeEvent, type HTMLAttributes, type MouseEvent, type ReactNode, type Ref } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type ChangeEvent, type CSSProperties, type HTMLAttributes, type MouseEvent, type ReactNode, type Ref } from 'react';
 import { Badge } from '../../src/components/badge/Badge';
 import { Banner } from '../../src/components/banner/Banner';
 import { Button } from '../../src/components/button/Button';
+import { IconButton } from '../../src/components/button/IconButton';
 import { Checkbox } from '../../src/components/checkbox/Checkbox';
 import { useCopy } from '../../src/components/code-snippet/copy';
 import { CodeSnippet } from '../../src/components/code-snippet/CodeSnippet';
+import { EmptyState } from '../../src/components/empty-state/EmptyState';
 import { Icon } from '../../src/components/icon/Icon';
 import { Indicator } from '../../src/components/indicator/Indicator';
 import { Popover } from '../../src/components/overlay/Popover';
@@ -22,7 +24,6 @@ import { SegmentedBar } from '../../src/components/segmented-bar/SegmentedBar';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../../src/components/table/Table';
 import { Toggle } from '../../src/components/toggle/Toggle';
 import { CheckIcon, PlusIcon, TrashIcon } from '../../src/icons';
-import { TextInput } from '../../src/components/text-input/TextInput';
 import {
   blandNeutrals,
   blandScale,
@@ -49,7 +50,7 @@ import { paletteStyle, setAppliedBrand, useAppliedBrand, type Palette } from './
 import { normalHex } from './colorFormats';
 import { ColorPicker } from './ColorPicker';
 import { highlight } from './highlight';
-import { CopySimpleIcon } from './icons';
+import { CopySimpleIcon, PencilSimpleLineIcon, SwatchesIcon } from './icons';
 import { brandPage } from './pages';
 import { PageHeader, Section } from './parts';
 
@@ -70,6 +71,7 @@ export function BrandPage() {
   // While a pointer drags in the picker the contrast message hides, and comes back once it is released.
   const [dragging, setDragging] = useState(false);
   const [extras, setExtras] = useState<ExtraState[]>(savedExtras);
+  const [tab, setTab] = useState('brand');
   useEffect(() => saveExtras(extras), [extras]);
 
   // Bland's own blue is Bland's scale exactly (generating it again lands within 1/255).
@@ -117,61 +119,117 @@ export function BrandPage() {
         </p>
       </PageHeader>
 
-      <Section
-        title="Brand color"
-        className="docs-brand-section"
-        action={
-          <div className="docs-section-actions">
-            <Button size="sm" type="stroke" disabled={isBland && !applied} onClick={resetAll}>
-              Reset
-            </Button>
-            <Button size="sm" disabled={isApplied || (isBland && !applied)} onClick={() => setAppliedBrand(palette)}>
-              {isApplied ? 'Applied to site' : 'Apply to site'}
-            </Button>
-          </div>
-        }
-      >
-        <ColorCard label="Brand color" pickerLabel="Pick a brand color" color={input} onChange={edit} onDraggingChange={setDragging} className="docs-brand-card-brand" />
-        <ScaleRow label="Brand steps" scale={scale} />
-        {/* Bland's own palette has nothing to report (hidden, so it leaves with its exit); a project's palette shows its result. */}
-        <Contrast misses={misses} keep={keep} hidden={dragging || (brandIsBland && misses.length === 0)} canFix={!same(fixedScale, scale)} onFix={() => setFixed(fixedScale)} />
-      </Section>
-
-      <Section title="Neutral color" className="docs-brand-section">
-        <SegmentedBar className="docs-brand-tint" aria-label="Neutrals" name="brand-tint" items={tintItems} value={tint} onValueChange={(id) => setTint(id as Tint)} />
-        <div className="docs-brand-card bland-smooth">
-          <Swatch color={neutrals['400']}>
-            <span className="docs-brand-hex">{neutrals['400'].toUpperCase()}</span>
-          </Swatch>
-        </div>
-        <ScaleRow label="Neutral steps" scale={neutrals} />
-      </Section>
-
-      <Section
-        title="Extra colors"
-        className="docs-brand-section"
-        action={
-          <Button size="sm" type="stroke" iconStart={<PlusIcon />} disabled={extras.length >= MAX_EXTRAS} onClick={addExtra}>
-            Add color
-          </Button>
-        }
-      >
-        <p className="docs-note">
-          Colors beside the brand, up to {MAX_EXTRAS}, for charts, illustrations or a part of your own UI. Bland’s components don’t use them; your code does, through
-          their roles, which switch in light and dark like the brand’s.
-        </p>
-        {extraScales.map((x) => (
-          <ExtraColor
-            key={x.id}
-            extra={x}
-            scale={x.scale}
-            error={x.error}
-            neutrals={neutrals}
-            onChange={(patch) => updateExtra(x.id, patch)}
-            onRemove={() => setExtras((all) => all.filter((o) => o.id !== x.id))}
-          />
-        ))}
-      </Section>
+      {/* Figma 6806:6170: the tools sit in three tabs; the preview stays under them, whichever is open. */}
+      <section className="docs-section docs-brand-tabs" id="colors" data-toc="Colors" aria-label="Colors">
+        <SectionTabs
+          aria-label="Brand theme"
+          value={tab}
+          onValueChange={setTab}
+          items={[
+            {
+              id: 'brand',
+              label: 'Brand colors',
+              panel: (
+                <div className="docs-brand-panel">
+                  <Section
+                    title="Brand color"
+                    toc={false}
+                    className="docs-brand-section"
+                    action={
+                      <div className="docs-section-actions">
+                        <Button size="sm" type="stroke" disabled={isBland && !applied} onClick={resetAll}>
+                          Reset
+                        </Button>
+                        <Button size="sm" disabled={isApplied || (isBland && !applied)} onClick={() => setAppliedBrand(palette)}>
+                          {isApplied ? 'Applied to site' : 'Apply to site'}
+                        </Button>
+                      </div>
+                    }
+                  >
+                    <ColorCard label="Brand color" pickerLabel="Pick a brand color" color={input} onChange={edit} onDraggingChange={setDragging}>
+                      {/* Bland's own palette has nothing to report (hidden, so it leaves with its exit); a project's palette shows its result. */}
+                      <Contrast misses={misses} keep={keep} hidden={dragging || (brandIsBland && misses.length === 0)} canFix={!same(fixedScale, scale)} onFix={() => setFixed(fixedScale)} />
+                    </ColorCard>
+                    <ScaleRow label="Brand steps" scale={scale} />
+                  </Section>
+                  <Section title="Neutral color" toc={false} className="docs-brand-section">
+                    <SegmentedBar className="docs-brand-tint" aria-label="Neutrals" name="brand-tint" items={tintItems} value={tint} onValueChange={(id) => setTint(id as Tint)} />
+                    <div className="docs-brand-card docs-brand-card-neutral bland-smooth">
+                      <Swatch color={neutrals['400']}>
+                        <span className="docs-brand-hex">{neutrals['400'].toUpperCase()}</span>
+                      </Swatch>
+                    </div>
+                    <ScaleRow label="Neutral steps" scale={neutrals} />
+                  </Section>
+                </div>
+              ),
+            },
+            {
+              id: 'extras',
+              label: 'Extra colors',
+              panel: (
+                <Section
+                  title="Extra colors"
+                  toc={false}
+                  className="docs-brand-section"
+                  action={
+                    <Button size="sm" iconStart={<PlusIcon />} disabled={extras.length >= MAX_EXTRAS} onClick={addExtra}>
+                      Add color
+                    </Button>
+                  }
+                >
+                  <p className="docs-note">
+                    Colors beside the brand, up to {MAX_EXTRAS}, for charts, illustrations or a part of your own UI. Bland’s components don’t use them; your code does, through
+                    their roles, which switch in light and dark like the brand’s.
+                  </p>
+                  {extras.length === 0 && (
+                    <EmptyState
+                      className="docs-brand-empty"
+                      title="No colors added"
+                      titleAs="h3"
+                      description={`You can add up to ${MAX_EXTRAS} extra colors`}
+                      illustration={<SwatchesIcon className="docs-brand-empty-icon" aria-hidden="true" />}
+                      actions={
+                        <Button size="sm" type="stroke" onClick={addExtra}>
+                          Add a color
+                        </Button>
+                      }
+                    />
+                  )}
+                  {extraScales.map((x) => (
+                    <ExtraColor
+                      key={x.id}
+                      extra={x}
+                      scale={x.scale}
+                      error={x.error}
+                      neutrals={neutrals}
+                      onChange={(patch) => updateExtra(x.id, patch)}
+                      onRemove={() => setExtras((all) => all.filter((o) => o.id !== x.id))}
+                    />
+                  ))}
+                </Section>
+              ),
+            },
+            {
+              id: 'use',
+              label: 'How to use',
+              panel: (
+                <Section title="Use in a project" toc={false} className="docs-brand-section">
+                  <p className="docs-note">
+                    Load it after Bland’s tokens. It overrides the brand and neutral steps at :root, and every brand-colored and neutral token follows in both themes. Extra colors
+                    add their steps and their roles (<code>--name-surface</code>, <code>--name-text</code> and so on), which your own CSS uses.
+                  </p>
+                  <CodeSnippet
+                    code={{ css: toCss(scale, isBland ? 'Bland’s own blue' : `made from ${input}, neutrals ${tint === 'none' ? 'pure gray' : `${tint} tint`}`, neutrals, validExtras) }}
+                    languages={[{ id: 'css', label: 'CSS' }]}
+                    highlight={highlight}
+                  />
+                </Section>
+              ),
+            },
+          ]}
+        />
+      </section>
 
       <Section title="Preview" className="docs-brand-section">
         <p className="docs-note">This brand on components, before it is applied. Apply to site to see it on every page.</p>
@@ -186,17 +244,6 @@ export function BrandPage() {
         </div>
       </Section>
 
-      <Section title="Use in a project" className="docs-brand-section">
-        <p className="docs-note">
-          Load it after Bland’s tokens. It overrides the brand and neutral steps at :root, and every brand-colored and neutral token follows in both themes. Extra colors add
-          their steps and their roles (<code>--name-surface</code>, <code>--name-text</code> and so on), which your own CSS uses.
-        </p>
-        <CodeSnippet
-          code={{ css: toCss(scale, isBland ? 'Bland’s own blue' : `made from ${input}, neutrals ${tint === 'none' ? 'pure gray' : `${tint} tint`}`, neutrals, validExtras) }}
-          languages={[{ id: 'css', label: 'CSS' }]}
-          highlight={highlight}
-        />
-      </Section>
 
     </>
   );
@@ -226,7 +273,8 @@ function saveExtras(extras: ExtraState[]) {
 }
 
 /**
- * A color you tap to change (Figma 6773:21840's brand card): the swatch, its hex and a copy button. The picker opens
+ * A color you tap to change (Figma 6806:6170's brand card): the swatch, its hex, a copy button, and its contrast
+ * result under them. The picker opens
  * where it was tapped (a zero-size anchor there), or under the hex from the keyboard. The anchor is in state, not a
  * ref read during render: the popover needs it on the render that opens it.
  */
@@ -236,21 +284,22 @@ function ColorCard({
   color,
   onChange,
   onDraggingChange,
-  className,
+  children,
 }: {
   label: string;
   pickerLabel: string;
   color: string;
   onChange: (hex: string) => void;
   onDraggingChange: (dragging: boolean) => void;
-  className?: string;
+  /** Under the swatch, inside the card: its contrast result (Figma 6806:8805). */
+  children?: ReactNode;
 }) {
   const [picking, setPicking] = useState<{ instant: boolean; x: number; y: number } | null>(null);
   const [hero, setHero] = useState<HTMLDivElement | null>(null);
   const [anchor, setAnchor] = useState<HTMLSpanElement | null>(null);
   const pick = useRef<HTMLButtonElement>(null);
   return (
-    <div className={`docs-brand-card bland-smooth${className ? ` ${className}` : ''}`}>
+    <div className="docs-brand-card bland-smooth">
       <span className="docs-brand-card-label" aria-hidden="true">
         Tap to change
       </span>
@@ -290,6 +339,7 @@ function ColorCard({
       >
         <ColorPicker value={color} onChange={onChange} onDraggingChange={onDraggingChange} />
       </Popover>
+      {children}
     </div>
   );
 }
@@ -315,43 +365,60 @@ function ExtraColor({
   const misses = useMemo(() => check(scale, neutrals, EXTRA_PAIRS).filter((f) => !inherited(f)), [scale, neutrals]);
   const fixed = useMemo(() => (misses.length ? fixScale(scale, neutrals, keep, EXTRA_PAIRS) : scale), [misses.length, scale, neutrals, keep]);
   const label = error ? 'Extra color' : `Extra color ${extra.name}`;
+  const errorId = useId();
   return (
     <div className="docs-brand-extra">
       <div className="docs-brand-extra-head">
-        <TextInput
-          label="Name"
-          value={extra.name}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => onChange({ name: e.target.value.trim().toLowerCase() })}
-          status={error ? 'danger' : 'default'}
-          helperText={error ?? `Its tokens start with --${extra.name}-.`}
-          spellCheck={false}
-          autoComplete="off"
-        />
-        <Button size="sm" type="ghost" iconStart={<TrashIcon />} onClick={onRemove}>
-          Remove
-        </Button>
+        {/* The name is its heading, edited in place (Figma 6806:8801: the name with a pencil). */}
+        <label className="docs-brand-extra-name">
+          <input
+            aria-label="Name"
+            value={extra.name}
+            size={Math.max(extra.name.length, 1)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => onChange({ name: e.target.value.trim().toLowerCase() })}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? errorId : undefined}
+            spellCheck={false}
+            autoComplete="off"
+          />
+          <Icon size="md" className="docs-brand-extra-pencil">
+            <PencilSimpleLineIcon />
+          </Icon>
+        </label>
+        <IconButton size="sm" type="stroke" emotion="danger" icon={<TrashIcon />} aria-label={`Remove ${error ? 'this color' : extra.name}`} onClick={onRemove} />
       </div>
-      <ColorCard label={label} pickerLabel={`Pick a color for ${error ? 'this extra color' : extra.name}`} color={extra.color} onChange={(hex) => onChange({ color: normalHex(hex), fixed: null })} onDraggingChange={setDragging} />
+      {error && (
+        <p id={errorId} className="docs-brand-extra-error">
+          {error}
+        </p>
+      )}
+      <ColorCard label={label} pickerLabel={`Pick a color for ${error ? 'this extra color' : extra.name}`} color={extra.color} onChange={(hex) => onChange({ color: normalHex(hex), fixed: null })} onDraggingChange={setDragging}>
+        <Contrast misses={misses} keep={keep} hidden={dragging} total={EXTRA_PAIRS.length * 2} canFix={!same(fixed, scale)} onFix={() => onChange({ fixed })} />
+      </ColorCard>
       <ScaleRow label={`${label} steps`} scale={scale} />
       <RoleRow name={error ? 'name' : extra.name} scale={scale} />
-      <Contrast misses={misses} keep={keep} hidden={dragging} total={EXTRA_PAIRS.length * 2} canFix={!same(fixed, scale)} onFix={() => onChange({ fixed })} />
     </div>
   );
 }
 
-/** An extra color's roles: each one's color in light and dark, and the token a project uses. */
+/**
+ * An extra color's roles: the token a project uses and its color in the mode the page is in; switch the theme and
+ * they switch (Figma 6806:9008's note). Both values are set, and CSS picks the one for the page's theme.
+ */
 function RoleRow({ name, scale }: { name: string; scale: Scale }) {
   return (
     <ul className="docs-brand-roles" aria-label={`Roles of ${name}`}>
       {EXTRA_ROLES.map((r) => (
-        <li key={r.role} title={r.about}>
-          <span className="docs-brand-role-chips bland-smooth">
-            <span className="docs-brand-role-chip" style={{ background: scale[r.light] }} />
-            <span className="docs-brand-role-chip" style={{ background: scale[r.dark] }} />
+        <li key={r.role} title={r.about} style={{ '--docs-role-light': scale[r.light], '--docs-role-dark': scale[r.dark] } as CSSProperties}>
+          <span className="docs-brand-chip bland-smooth" />
+          <span className="docs-brand-role-name">
+            --{name}-{r.role}
           </span>
-          <code className="docs-brand-role-name">--{name}-{r.role}</code>
-          <span className="docs-brand-step-hex">
-            {r.light} light, {r.dark} dark
+          <span className="docs-brand-step-hex" data-mode="light">
+            {scale[r.light]}
+          </span>
+          <span className="docs-brand-step-hex" data-mode="dark">
+            {scale[r.dark]}
           </span>
         </li>
       ))}
