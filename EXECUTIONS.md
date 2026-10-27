@@ -1643,3 +1643,4 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Preview is left out on the Extra colors tab while there are no extras (Figma 6806:7199).
 - Breakdown table: `.docs-data` set a plain rad-lg with superellipse, which reads square; inside the card it now uses .bland-smooth (doubled radius), like the swatch.
 - Follow-up: extra cards tinted with their own surface-light (light/dark through the same CSS-var switch as the roles row); extras intro row from Godwin's screenshot; name title-lg. Checked light, dark and 375 wide in Playwright screenshots.
+- Follow-up: no rule between extras, space-5xl apart; intro to first color space-3xl; names shown lowercase as typed (capitalize dropped: the name is the token).

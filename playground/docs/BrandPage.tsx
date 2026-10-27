@@ -169,7 +169,7 @@ export function BrandPage() {
               id: 'extras',
               label: 'Extra colors',
               panel: (
-                <div className="docs-section docs-brand-section">
+                <div className="docs-section docs-brand-section docs-brand-extras">
                   {/* No heading: the tab names it. The note and Add color share the row, the note's first line level with the button. */}
                   <div className="docs-brand-extras-intro">
                     <p className="docs-note">
@@ -194,6 +194,8 @@ export function BrandPage() {
                       }
                     />
                   )}
+                  {extras.length > 0 && (
+                  <div className="docs-brand-extras-list">
                   {extraScales.map((x) => (
                     <ExtraColor
                       key={x.id}
@@ -205,6 +207,8 @@ export function BrandPage() {
                       onRemove={() => setExtras((all) => all.filter((o) => o.id !== x.id))}
                     />
                   ))}
+                  </div>
+                  )}
                 </div>
               ),
             },

@@ -1200,15 +1200,20 @@ code,
   color: var(--icon-minimal);
   stroke-width: var(--stroke-md);
 }
-/* Extra colors: each a block of its own, ruled off from the one before. */
+/* Extra colors: the intro row, then the colors space-3xl under it, each a block of its own space-5xl apart (the
+   gap between the Brand colors tab's sections), no rule between them. */
+.docs-brand-extras {
+  gap: var(--space-3xl);
+}
+.docs-brand-extras-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5xl);
+}
 .docs-brand-extra {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-}
-.docs-brand-extra + .docs-brand-extra {
-  padding-top: var(--space-xl);
-  box-shadow: inset var(--space-none) var(--stroke-sm) var(--space-none) var(--space-none) var(--border-subtle);
 }
 .docs-brand-extra-head {
   display: flex;
@@ -1240,7 +1245,6 @@ code,
   font: var(--type-title-lg);
   letter-spacing: var(--type-title-lg-letter-spacing);
   color: var(--text-bold);
-  text-transform: capitalize; /* shown as a title; the token name stays lowercase */
   field-sizing: content;
 }
 .docs-brand-extra-name input:focus {
