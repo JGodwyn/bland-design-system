@@ -82,9 +82,10 @@ export function BrandPage() {
   const palette = useMemo(() => ({ brand: scale, neutrals, color: input }), [scale, neutrals, input]);
   const findings = useMemo(() => check(scale, neutrals), [scale, neutrals]);
   const misses = findings.filter((f) => !inherited(f));
-  // The brand alone is Bland's: its contrast result has nothing to say. Extras don't count here, they have their own.
-  const brandIsBland = same(blandScale, scale) && same(blandNeutrals, neutrals);
-  const isBland = brandIsBland && extras.length === 0;
+  // The brand steps are Bland's: its contrast result has nothing to say, whatever the neutral tint (the neutrals keep
+  // Bland's contrast) or the extras (they have their own result).
+  const brandIsBland = same(blandScale, scale);
+  const isBland = brandIsBland && same(blandNeutrals, neutrals) && extras.length === 0;
   const isApplied = samePalette(applied, palette);
   // The step holding the color you entered: the fix never moves it, so your color stays exactly yours.
   const keep = isBlandColor ? undefined : placeStep(input);
@@ -231,6 +232,8 @@ export function BrandPage() {
         />
       </section>
 
+      {/* Nothing of an extra's to preview until one is added (Figma 6806:7199 has no preview). */}
+      {!(tab === 'extras' && validExtras.length === 0) && (
       <Section title="Preview" className="docs-brand-section">
         <p className="docs-note">This brand on components, before it is applied. Apply to site to see it on every page.</p>
         <div className="docs-brand-previews">
@@ -243,6 +246,7 @@ export function BrandPage() {
           ))}
         </div>
       </Section>
+      )}
 
 
     </>
@@ -536,7 +540,7 @@ function Contrast({ misses: current, keep, hidden, total = PAIRS.length * 2, can
 
 function Findings({ items, keep }: { items: Finding[]; keep?: Step }) {
   return (
-    <Table size="md" className="docs-data" aria-label="Pairings below their minimum">
+    <Table size="md" className="docs-data bland-smooth" aria-label="Pairings below their minimum">
       <TableHead>
         <TableRow>
           <TableHeaderCell>Theme</TableHeaderCell>

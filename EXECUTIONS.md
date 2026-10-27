@@ -1636,3 +1636,9 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Restructured BrandPage into SectionTabs panels; ColorCard takes children for the contrast result; new PencilSimpleLine icon; Section got `toc`.
 - The browser pane was hidden, so the fold never ran there; screenshots taken with a throwaway Playwright spec (deleted). Fixed the empty state's action stretching full width (centred, hugging).
 - Spec updated for the tabs; brand-related tests pass.
+
+## Brand page fixes: tint change, empty preview, table rounding (2026-10-27)
+
+- Switching the neutral tint on Bland's brand showed "Contrast checks out": the brand result hid only when the neutrals were Bland's too. It now hides whenever the brand steps are Bland's (the neutrals keep Bland's contrast). Spec switches to Pure gray and back.
+- Preview is left out on the Extra colors tab while there are no extras (Figma 6806:7199).
+- Breakdown table: `.docs-data` set a plain rad-lg with superellipse, which reads square; inside the card it now uses .bland-smooth (doubled radius), like the swatch.

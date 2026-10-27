@@ -216,6 +216,10 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   await expect(apply).toBeDisabled(); // Bland's own blue: nothing to reset or apply
   await expect(page.getByRole('button', { name: 'Reset', exact: true })).toBeDisabled();
   await expect(page.locator('.docs-brand-contrast')).toBeHidden(); // nothing to report on Bland's own palette
+  // Changing only the neutral tint leaves the brand Bland's: still nothing to report.
+  await page.getByRole('radio', { name: 'Pure gray' }).check({ force: true });
+  await expect(page.locator('.docs-brand-contrast')).toBeHidden();
+  await page.getByRole('radio', { name: 'Tinted' }).check({ force: true });
 
   // The swatch opens the picker; a typed hex lands on the step its lightness belongs on (orange: 400).
   await page.getByRole('button', { name: /^Brand color #0062FF/ }).click();
@@ -287,6 +291,7 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   const tab = (name: string) => page.getByRole('tab', { name });
   await tab('Extra colors').click();
   await expect(page.getByText('No colors added')).toBeVisible();
+  await expect(page.locator('#preview')).toHaveCount(0); // no extras, no preview on this tab
   const add = page.getByRole('button', { name: 'Add color' });
   for (let i = 0; i < 3; i++) await add.click();
   await expect(add).toBeDisabled();

@@ -1051,13 +1051,20 @@ code,
 .docs-brand-card-neutral {
   background: var(--surface-200);
 }
-/* The breakdown on the card's tint: the page surface, edged, rounded like the banner above it. */
+/* The breakdown on the card's tint: the page surface, with the card's own smoothed rounding (rad-lg through
+   .bland-smooth; .docs-data's plain radius would read as square at this size). */
 .docs-brand-card .docs-data {
-  --bland-radius: var(--rad-md);
+  --bland-radius: var(--rad-lg);
 
-  border-radius: var(--rad-md);
   background: var(--surface-100);
-  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-subtle);
+}
+.docs-brand-card .docs-data.bland-smooth {
+  border-radius: var(--bland-radius);
+}
+@supports (corner-shape: superellipse(2)) {
+  .docs-brand-card .docs-data.bland-smooth {
+    border-radius: calc(var(--bland-radius) * 2);
+  }
 }
 .docs-brand-card-label {
   padding-inline: var(--space-md);
