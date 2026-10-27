@@ -214,6 +214,9 @@ In order; tokens come before components.
 - [x] Base: fonts, reset, focus and smoothing helpers, icon slot, scroll area, conventions in `docs/components.md`. Done 2026-10-17. Grid system (17 Figma layout grids) is deferred until page layouts need it.
 - [x] Docs site, local (2026-10-17): sidebar of styles and components, live demo with controls, variants, props tables, theme switch. Runs with `npm run docs`. Redesigned from the Figma Doc site page (2026-10-22): Bland controls, full code view, props in Table, search (⌘K), page contents rail; see INTERFACE.md.
 - [ ] Docs site hosting: not deployed anywhere yet.
+- [ ] Extra project colors beside the brand (charts, illustrations): approach to decide (Godwin 2026-10-27).
+- [ ] Publish the `bland` package (private, 0.0.0 today) so projects can install it.
+- [ ] At the end: package agent skills, how a project's agent uses Bland (install, tokens and the no-hardcoded-values rule, components and props, brand override, extra colors) (Godwin 2026-10-27).
 
 ## Open questions (ask Godwin, don't assume)
 
