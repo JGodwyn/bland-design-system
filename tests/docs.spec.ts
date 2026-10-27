@@ -318,7 +318,8 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   // Reset warns first (extras go too, no undo); Cancel keeps everything.
   await page.getByRole('button', { name: 'Reset', exact: true }).click();
   const warning = page.getByRole('dialog', { name: 'Reset to Bland’s colors?' });
-  await expect(warning).toContainText('Your 2 extra accent colors will be removed too. This can’t be undone');
+  await expect(warning).toContainText('Reset this color to Bland’s default color. Your 2 extra accent colors will also be removed. You can’t undo this.');
+  await expect(warning).toContainText('Copy the CSS under How to use first');
   await warning.getByRole('button', { name: 'Cancel' }).click();
   await expect(warning).toBeHidden();
   expect(await brand('600')).not.toBe('');

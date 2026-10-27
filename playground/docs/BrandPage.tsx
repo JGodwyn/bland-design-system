@@ -451,17 +451,21 @@ function RoleRow({ name, scale }: { name: string; scale: Scale }) {
 }
 
 /**
- * Reset asks first: whether extra colors go too, and that it can't be undone. Reset colors is the danger action.
+ * Reset asks first (Figma 6819:11620): what goes, that it can't be undone, and an info Banner pointing to the CSS
+ * to copy before it goes. Reset colors is the danger action.
  */
 function ResetConfirm({ disabled, onReset, extras }: { disabled: boolean; onReset: () => void; extras: number }) {
-  const sentences = [
-    extras > 0 && (extras === 1 ? 'Your extra accent color will be removed too.' : `Your ${extras} extra accent colors will be removed too.`),
-    'This can’t be undone, so copy the CSS under How to use first if you want to keep this palette.',
-  ].filter(Boolean);
+  const description = [
+    'Reset this color to Bland’s default color.',
+    extras > 0 && (extras === 1 ? 'Your extra accent color will also be removed.' : `Your ${extras} extra accent colors will also be removed.`),
+    'You can’t undo this.',
+  ]
+    .filter(Boolean)
+    .join(' ');
   return (
     <Modal
       title="Reset to Bland’s colors?"
-      description={sentences.join(' ')}
+      description={description}
       trigger={
         <Button size="sm" type="stroke" disabled={disabled}>
           Reset
@@ -483,7 +487,11 @@ function ResetConfirm({ disabled, onReset, extras }: { disabled: boolean; onRese
           </Button>
         </>
       )}
-    />
+    >
+      <Banner status="info" colored>
+        Copy the CSS under How to use first if you want to keep this palette.
+      </Banner>
+    </Modal>
   );
 }
 
