@@ -157,6 +157,14 @@ export default {
             leading={<Icon><InfoIcon /></Icon>}
             trailing="Value"
           />
+          <ListItem
+            title="An icon in the trailing slot"
+            description={long}
+            lines="3+"
+            leading={<Icon><InfoIcon /></Icon>}
+            trailing={<Icon><CaretRightIcon /></Icon>}
+            onClick={() => {}}
+          />
           <ListItem title="Disabled with slots" description={description} altText="Alt" disabled leading={<Icon><UserIcon /></Icon>} trailing="Value" />
         </Rows>
       </div>

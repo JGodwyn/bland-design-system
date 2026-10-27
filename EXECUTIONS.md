@@ -1560,3 +1560,20 @@ not wrapped; rail contents centred (logo and account icon were off).
   timestamp centres on the first line (horizontal) and stays on a wrapping
   title's first line (header was `align-items: center`). Story: a vertical
   notification with a wrapping title; spec checks both timestamp cases.
+
+## 2026-10-27 — First-line alignment audit (side session)
+**Asked:** check every component against the first-line alignment rule and fix the ones that break it.
+
+- Grepped every `align-items: center` in `src/components/*/*.css`, then sorted the rows by whether their text can wrap (nowrap or ellipsis means it can't). Most rows can't wrap; the rows that can were already done (Accordion, Modal, File Upload, Checkbox, Radio, Toggle, Progress wizard inline, CodeText).
+- Broken: **Menu** items (label wraps, row centred). Figma's `_menu-item` centres too (read through the Figma MCP; Framelink's token had expired). The slots are 24 = the line, so `flex-start` alone fixes it and one line looks the same. Story row with a wrapping label; spec checks both slots centre on the first line.
+- **List item 3+**: a trailing icon/md sat 2px above the title line's centre. The trailing slot gets `min-height` of a body-lg line. Story row and spec.
+- Left for Godwin: List 3+ leading slot (40) sits at the top beside the text, as in Figma, so a 24px icon in it centres 8px below the first line.
+- The docs pane was 0x0 (hidden) and laid everything out at zero width; measured after `resize_window`. Port 5180 was another session's server, used as is.
+- Re-baselined menu and list stories plus the open-menu screenshots (only the page text behind the menu's top edge moved).
+
+## Brand page from the updated Figma (2026-10-27)
+
+- Godwin: no note about Bland's own near-misses on Bland's base blue. `Contrast` takes `base` (the blue, unfixed): the inherited note is dropped and, with no real misses, nothing shows. Real misses (Pure gray neutrals, say) still warn.
+- Figma 6773:21840 updated: the floating bar is gone. Reset (stroke sm, no icon; now resets everything, including the site) and Apply to site (primary sm) sit in the Brand color heading. The contrast warning is a Banner `colored` vertical warning titled Contrast warning with Fix contrast (primary) and Show breakdown (stroke, `aria-expanded`, toggles the misses table and the inherited note). The Figma Banner gained `Colored=true/false` variants (6781:24241…); code's Banner already had `colored` (status light surface + status border, info uses brand), so no component change.
+- Removed the bar's CSS and its hidden/rise motion, and the ArrowClockwise docs icon (unused now).
+- Test selectors: the contents rail's "Brand color" link also matches `/^Brand color/` at desktop widths; the spec uses `/^Brand color #/`.

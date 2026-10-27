@@ -163,6 +163,11 @@
   color: var(--_subtle);
 }
 
+/* 3+ lines sit at the top: the trailing slot is at least the title's line tall, so an icon/md (20) centres on the first line. */
+.bland-list-item[data-lines="3+"] .bland-list-item__trailing {
+  min-height: var(--type-body-lg-line-height);
+}
+
 .bland-list-item__trailing > .bland-icon {
   color: var(--icon-subtle);
 }

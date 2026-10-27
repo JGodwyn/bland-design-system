@@ -213,8 +213,9 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   const html = page.locator('html');
   const brand = (step: string) => html.evaluate((el, s) => el.style.getPropertyValue(`--brand-${s}`), step);
   const apply = page.getByRole('button', { name: 'Apply to site' });
-  const bar = page.getByRole('group', { name: 'Brand actions' });
-  await expect(bar).toBeHidden(); // Bland's own blue: nothing to reset or apply
+  await expect(apply).toBeDisabled(); // Bland's own blue: nothing to reset or apply
+  await expect(page.getByRole('button', { name: 'Reset', exact: true })).toBeDisabled();
+  await expect(page.getByText('Below the minimum with Bland’s own brand')).toHaveCount(0);
 
   // The swatch opens the picker; a typed hex lands on the step its lightness belongs on (orange: 400).
   await page.getByRole('button', { name: /^Brand color #0062FF/ }).click();
@@ -222,13 +223,15 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   await page.keyboard.press('Escape');
   await expect(page.getByRole('button', { name: /^Brand color #FF5A1F/ })).toBeVisible();
   await expect(page.getByRole('group', { name: 'Brand steps' })).toContainText('400#ff5a1f');
+  await expect(page.getByText('Contrast warning')).toBeVisible();
+  await page.getByRole('button', { name: 'Show breakdown' }).click();
   await expect(page.getByRole('table', { name: 'Pairings below their minimum' })).toContainText('Progress fill');
   // The only miss is the entered color's own: the fix may not move it.
   await expect(page.getByRole('table', { name: 'Pairings below their minimum' })).toContainText('Step 400 is your color');
   await expect(page.getByRole('button', { name: 'Fix contrast' })).toBeDisabled();
 
   // The field switches format (kept for the next visit) and reads what is typed in it.
-  await page.getByRole('button', { name: /^Brand color/ }).click();
+  await page.getByRole('button', { name: /^Brand color #/ }).click();
   const picker = page.getByRole('dialog', { name: 'Pick a brand color' });
   await picker.getByRole('button', { name: 'Color format: HEX' }).click();
   await page.getByRole('menuitemradio', { name: 'HSL' }).click();
@@ -268,9 +271,9 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
 
   await page.goto('/#/brand');
   await expect(page.getByRole('button', { name: /^Brand color #FFCC00/ })).toBeVisible();
-  await page.getByRole('button', { name: 'Reset to Bland' }).click();
+  await page.getByRole('button', { name: 'Reset', exact: true }).click();
   expect(await brand('600')).toBe('');
   expect(await neutral600()).toBe('');
-  await expect(bar).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Reset', exact: true })).toBeDisabled();
 });
 

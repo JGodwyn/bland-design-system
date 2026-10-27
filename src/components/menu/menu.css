@@ -67,7 +67,9 @@
 
   position: relative;
   display: flex;
-  align-items: center;
+  /* First-line alignment (docs/components.md): the 24px slots match the label's 24px line, so a
+     wrapping label keeps them on its first line. Figma centres the row; one line looks the same. */
+  align-items: flex-start;
   gap: var(--space-sm);
   padding: var(--_pad) var(--space-md);
   background-color: var(--_fill);

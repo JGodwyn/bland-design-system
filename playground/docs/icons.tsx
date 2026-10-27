@@ -214,14 +214,6 @@ export const PaletteIcon = (p: P) => (
   </svg>
 );
 
-/** Figma: ArrowClockwise (Brand theme page, 6773:21912). The brand color's Reset. Drawn on Figma's 20 grid. */
-export const ArrowClockwiseIcon = (p: P) => (
-  <svg {...stroked} viewBox="0 0 20 20" {...p}>
-    <path d="M14.375 8.125H18.125V4.375" />
-    <path d="M14.7188 15C13.736 15.9274 12.5017 16.5446 11.1701 16.7745C9.83858 17.0044 8.4688 16.8368 7.23195 16.2927C5.9951 15.7485 4.94602 14.852 4.21579 13.715C3.48555 12.5781 3.10656 11.2512 3.12614 9.90004C3.14573 8.54893 3.56304 7.23355 4.32592 6.11825C5.0888 5.00295 6.16343 4.13719 7.41554 3.62914C8.66765 3.1211 10.0417 2.99329 11.366 3.26169C12.6904 3.5301 13.9062 4.18281 14.8617 5.13828L18.125 8.125" />
-  </svg>
-);
-
 /** Figma: CopySimple (Brand theme page, 6773:21918). Copies a swatch's hex. */
 export const CopySimpleIcon = (p: P) => (
   <svg {...stroked} {...p}>

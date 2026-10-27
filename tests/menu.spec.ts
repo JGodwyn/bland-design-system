@@ -145,3 +145,14 @@ for (const theme of ['light', 'dark'] as const) {
     await expect(page).toHaveScreenshot(`menu-open-${theme}.png`, { clip });
   });
 }
+
+test('a wrapping label keeps its slots on the first line', async ({ page }) => {
+  const mid = (b: { y: number; height: number }) => b.y + b.height / 2;
+  const item = page.locator('.bland-menu__item', { hasText: 'Move this file' });
+  const label = (await item.locator('.bland-menu__label').boundingBox())!;
+  expect(label.height).toBeGreaterThan(24); // wraps
+  for (const slot of await item.locator('.bland-menu__slot').all()) {
+    const box = (await slot.boundingBox())!;
+    expect(Math.abs(mid(box) - (label.y + 12))).toBeLessThanOrEqual(0.5); // centre of the first 24px line
+  }
+});

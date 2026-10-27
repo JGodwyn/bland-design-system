@@ -115,3 +115,11 @@ test('the title and a 2 line description end in an ellipsis; a 3+ description wr
   // The alt text never gives way.
   expect(await clipped(long.nth(0).locator('.bland-list-item__alt'))).toBe(false);
 });
+
+test('on a 3+ line row a trailing icon centres on the title line', async ({ page }) => {
+  const mid = (b: { y: number; height: number }) => b.y + b.height / 2;
+  const item = page.locator('.bland-list-item', { hasText: 'An icon in the trailing slot' });
+  const title = (await item.locator('.bland-list-item__title').boundingBox())!;
+  const icon = (await item.locator('.bland-list-item__trailing .bland-icon').boundingBox())!;
+  expect(Math.abs(mid(icon) - mid(title))).toBeLessThanOrEqual(0.5);
+});

@@ -147,6 +147,13 @@ export default {
       </div>
 
       <div className="pg-stack">
+        <span className="pg-label">A label that wraps keeps its slots on the first line</span>
+        <Panel size="sm">
+          <MenuRow size="sm" item={{ id: 'w', label: 'Move this file and everything inside it to another folder', leading: icon(<PlusIcon />), trailing: 'Ctrl M' }} />
+        </Panel>
+      </div>
+
+      <div className="pg-stack">
         <span className="pg-label">Triggers: press, or focus and press Enter, Space or an arrow key (the open menus are screenshotted by tests/menu.spec.ts)</span>
         <Actions />
         <Selection />

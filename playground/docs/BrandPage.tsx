@@ -2,7 +2,7 @@
 // makes (the color lands on the step its lightness belongs on) and the 13 neutral steps tinted toward it (or pure
 // gray), check them, preview them on components in both themes, apply them to the whole site, or go back to
 // Bland's blue.
-import { useMemo, useRef, useState, type HTMLAttributes, type MouseEvent, type ReactNode, type Ref } from 'react';
+import { useId, useMemo, useRef, useState, type HTMLAttributes, type MouseEvent, type ReactNode, type Ref } from 'react';
 import { Badge } from '../../src/components/badge/Badge';
 import { Banner } from '../../src/components/banner/Banner';
 import { Button } from '../../src/components/button/Button';
@@ -43,7 +43,7 @@ import { paletteStyle, setAppliedBrand, useAppliedBrand, type Palette } from './
 import { normalHex } from './colorFormats';
 import { ColorPicker } from './ColorPicker';
 import { highlight } from './highlight';
-import { ArrowClockwiseIcon, CopySimpleIcon } from './icons';
+import { CopySimpleIcon } from './icons';
 import { brandPage } from './pages';
 import { PageHeader, Section } from './parts';
 
@@ -106,9 +106,14 @@ export function BrandPage() {
         title="Brand color"
         className="docs-brand-section"
         action={
-          <Button size="sm" type="stroke" iconStart={<ArrowClockwiseIcon />} disabled={isBlandColor && !fixed} onClick={() => edit(blandScale['600'])}>
-            Reset
-          </Button>
+          <div className="docs-section-actions">
+            <Button size="sm" type="stroke" disabled={isBland && !applied} onClick={resetAll}>
+              Reset
+            </Button>
+            <Button size="sm" disabled={isApplied || (isBland && !applied)} onClick={() => setAppliedBrand(palette)}>
+              {isApplied ? 'Applied to site' : 'Apply to site'}
+            </Button>
+          </div>
         }
       >
         <div className="docs-brand-card docs-brand-card-brand bland-smooth">
@@ -142,7 +147,7 @@ export function BrandPage() {
           </Popover>
         </div>
         <ScaleRow label="Brand steps" scale={scale} />
-        <Contrast misses={misses} known={known} keep={keep} />
+        <Contrast misses={misses} known={known} keep={keep} base={isBlandColor && !fixed} canFix={!same(fixedScale, scale)} onFix={() => setFixed(fixedScale)} />
       </Section>
 
       <Section title="Neutral color" className="docs-brand-section">
@@ -176,20 +181,6 @@ export function BrandPage() {
         />
       </Section>
 
-      {/* Only while there is something to reset: a color or neutrals other than Bland's, or a brand on the site. */}
-      <div className="docs-brand-bar bland-smooth" role="group" aria-label="Brand actions" hidden={isBland && !applied}>
-        <div className="docs-brand-bar-start">
-          <Button size="sm" emotion="danger" onClick={resetAll}>
-            Reset to Bland
-          </Button>
-          <Button size="sm" type="secondary" disabled={same(fixedScale, scale)} onClick={() => setFixed(fixedScale)}>
-            Fix contrast
-          </Button>
-        </div>
-        <Button size="sm" disabled={isApplied} onClick={() => setAppliedBrand(palette)}>
-          {isApplied ? 'Applied to site' : 'Apply to site'}
-        </Button>
-      </div>
     </>
   );
 }
@@ -226,16 +217,42 @@ function ScaleRow({ label, scale }: { label: string; scale: Scale }) {
   );
 }
 
-function Contrast({ misses, known, keep }: { misses: Finding[]; known: Finding[]; keep?: Step }) {
-  const knownText = known.length > 0 ? `Below the minimum with Bland’s own brand too, and no worse here: ${known.map((f) => `${f.where} (${f.mode}, ${f.ratio.toFixed(2)}:1)`).join('; ')}.` : '';
-  if (misses.length === 0) return <Banner status={knownText ? 'info' : 'success'}>{knownText || `All ${PAIRS.length} brand pairings pass in light and dark.`}</Banner>;
+/** `base`: Bland's own blue, whose near-misses are Bland's, not a project's to act on, so they go unmentioned. */
+function Contrast({ misses, known, keep, base, canFix, onFix }: { misses: Finding[]; known: Finding[]; keep?: Step; base: boolean; canFix: boolean; onFix: () => void }) {
+  const [open, setOpen] = useState(false);
+  const breakdown = useId();
+  const knownText = !base && known.length > 0 ? `Below the minimum with Bland’s own brand too, and no worse here: ${known.map((f) => `${f.where} (${f.mode}, ${f.ratio.toFixed(2)}:1)`).join('; ')}.` : '';
+  if (misses.length === 0 && base) return null;
+  if (misses.length === 0)
+    return (
+      <Banner status={knownText ? 'info' : 'success'} colored>
+        {knownText || `All ${PAIRS.length} brand pairings pass in light and dark.`}
+      </Banner>
+    );
   return (
     <>
-      <Banner status="warning">
+      <Banner
+        status="warning"
+        colored
+        orientation="vertical"
+        title="Contrast warning"
+        actions={
+          <>
+            <Button size="sm" disabled={!canFix} onClick={onFix}>
+              Fix contrast
+            </Button>
+            <Button size="sm" type="stroke" aria-expanded={open} aria-controls={breakdown} onClick={() => setOpen(!open)}>
+              {open ? 'Hide breakdown' : 'Show breakdown'}
+            </Button>
+          </>
+        }
+      >
         {misses.length} of {PAIRS.length * 2} pairings miss their minimum. Fix contrast moves the steps named, or keep a miss on purpose.
       </Banner>
-      <Findings items={misses} keep={keep} />
-      {knownText && <Banner status="info">{knownText}</Banner>}
+      <div id={breakdown} hidden={!open} className="docs-brand-breakdown">
+        <Findings items={misses} keep={keep} />
+        {knownText && <Banner status="info">{knownText}</Banner>}
+      </div>
     </>
   );
 }

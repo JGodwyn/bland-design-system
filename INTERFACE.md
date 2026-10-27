@@ -117,9 +117,31 @@ when), `docs/components.md` (how to build one).
   one keeps them at the top, on its first line. Rows use
   `align-items: flex-start` and offset the shorter side by half the height
   difference (icon, timestamp, or the text itself when buttons are taller);
-  `align-items: center` only where the text can never wrap. Applied so far in
-  `message/` (Alert, Banner, Toast, Notification); other components are to be
-  checked against it.
+  `align-items: center` only where the text can never wrap. Applied in
+  `message/` (Alert, Banner, Toast, Notification).
+- **Audit of every component against it (2026-10-27):**
+  - *Changed:* **Menu** rows (also Dropdown's and every Menu inside
+    Breadcrumb, Table, CodeSnippet, ChatNavbar): `align-items: center` →
+    `flex-start`. The 24px slots equal the label's 24px line, so one line
+    looks the same and a wrapping label keeps its icon, shortcut or Check on
+    the first line. Figma's `_menu-item` centres the row (its description
+    says the label wraps): Figma to rebind. **List item 3+**: the trailing
+    slot is at least one body-lg line tall, so an icon/md (20) centres on the
+    title line instead of sitting 2px high.
+  - *Already right:* Accordion header (caret space-2xs), Modal title row
+    (icon space-2xs, xs close = line), File Upload rows (icon space-2xs),
+    Checkbox, Radio and Toggle labels (label-wrap padding), Progress wizard
+    inline (marker space-2xs), CodeText copy button, `message/`.
+  - *Can't wrap, centre kept:* one-line text with an ellipsis or nowrap
+    (Badge, Button, Chip, Pill, tabs of every kind, Breadcrumb crumbs,
+    Sidebar rows, Table cells and headers, List 1 and 2 line rows, Chat list
+    item, Chat navbar, Chat bubble meta and file, Chat message bar reply,
+    Code snippet bar, Pagination, Logo, fields), and stacked columns (Empty
+    State, File Upload drop zone, Tooltip, Progress bar).
+  - *For Godwin:* List item 3+ follows Figma, which puts the 40px leading
+    slot at the top beside the text, so a 24px icon in it centres 8px below
+    the title line. The rule would move the text down 8 (or the slot up);
+    left as Figma until decided.
 
 ## 3. Icons (decided 2026-10-17)
 
@@ -2123,3 +2145,4 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - **Brand color placement (2026-10-26, Godwin):** no step to choose. A color lands unchanged on the Bland step closest in OKLCH lightness (`placeStep`), and the contrast fix never moves that step. Brand theme page rebuilt from Figma 6773:21840 (picker on the swatch, floating action bar: Reset to Bland, Fix contrast, Apply to site).
 - **Brand page action bar (2026-10-27, Godwin):** shown only while there is something to reset (a non-Bland palette, or a brand applied); rises in and sinks out over duration/lg easing/out.
 - **Color picker formats (2026-10-27, Godwin):** the picker field reads and writes HEX, RGB, HSL and OKLCH (format menu, kept per viewer); the panel is 288 wide (Figma 256) so an OKLCH value fits.
+- **Brand page actions (2026-10-27, Figma 6773:21840):** Reset and Apply to site in the Brand color heading (the floating bar is gone); contrast misses as a colored warning Banner with Fix contrast and Show breakdown; nothing about Bland's own near-misses on Bland's base blue.
