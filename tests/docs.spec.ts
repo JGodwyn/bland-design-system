@@ -310,10 +310,10 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   await expect(add).toBeEnabled();
 
   await tab('Brand colors').click();
-  // Reset warns first, naming what goes; Cancel keeps everything.
+  // Reset warns first (extras go too, no undo); Cancel keeps everything.
   await page.getByRole('button', { name: 'Reset', exact: true }).click();
   const warning = page.getByRole('dialog', { name: 'Reset to Bland’s colors?' });
-  await expect(warning).toContainText('Your brand color #FFCC00 goes back to Bland’s blue #0062FF and every page of this site goes back to Bland’s colors. Your 2 extra accent colors will be removed too.');
+  await expect(warning).toContainText('Your 2 extra accent colors will be removed too. This can’t be undone');
   await warning.getByRole('button', { name: 'Cancel' }).click();
   await expect(warning).toBeHidden();
   expect(await brand('600')).not.toBe('');

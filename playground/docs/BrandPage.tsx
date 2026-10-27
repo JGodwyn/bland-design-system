@@ -143,13 +143,6 @@ export function BrandPage() {
                         <ResetConfirm
                           disabled={isBland && !applied}
                           onReset={resetAll}
-                          changes={[
-                            input !== blandScale['600'] || fixed
-                              ? `your brand color ${input.toUpperCase()} goes back to Bland’s blue ${blandScale['600'].toUpperCase()}${fixed ? ', dropping its contrast fix' : ''}`
-                              : null,
-                            tint !== 'full' ? 'the neutrals go back to Tinted' : null,
-                            applied ? 'every page of this site goes back to Bland’s colors' : null,
-                          ]}
                           extras={extras.length}
                         />
                         <Button size="sm" disabled={isApplied || (isBland && !applied)} onClick={() => setAppliedBrand(palette)}>
@@ -458,14 +451,10 @@ function RoleRow({ name, scale }: { name: string; scale: Scale }) {
 }
 
 /**
- * Reset asks first: one paragraph says what goes back (only what differs from Bland's), that extra colors go too,
- * and that it can't be undone. Reset colors is the danger action.
+ * Reset asks first: whether extra colors go too, and that it can't be undone. Reset colors is the danger action.
  */
-function ResetConfirm({ disabled, onReset, changes, extras }: { disabled: boolean; onReset: () => void; changes: (string | null)[]; extras: number }) {
-  const items = changes.filter((c): c is string => !!c);
-  const list = items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1)}` : (items[0] ?? '');
+function ResetConfirm({ disabled, onReset, extras }: { disabled: boolean; onReset: () => void; extras: number }) {
   const sentences = [
-    list && `${list.charAt(0).toUpperCase()}${list.slice(1)}.`,
     extras > 0 && (extras === 1 ? 'Your extra accent color will be removed too.' : `Your ${extras} extra accent colors will be removed too.`),
     'This can’t be undone, so copy the CSS under How to use first if you want to keep this palette.',
   ].filter(Boolean);
