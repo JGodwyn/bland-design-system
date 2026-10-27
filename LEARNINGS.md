@@ -668,3 +668,9 @@ beside it, use a throwaway Playwright config that spreads
 `playwright.config.ts` with `baseURL` and `webServer` on another port
 (`npx vite --config playground/vite.config.ts --port 5191`; the CLI port
 beats `strictPort`'s config value), then delete it.
+
+## Figma descriptions double-escape (2026-10-27)
+
+- Symptom: a description's `aria-current="page"` read back as `&amp;amp;…quot;`, worse after every edit.
+- Cause: `node.description` returns HTML-escaped text; assigning that string back escapes it again.
+- Rule: to edit a description, decode the entities and write `descriptionMarkdown`, not `description`.

@@ -14,9 +14,9 @@
  *     Icon Button md primary: record (empty), send                        bottom aligned
  *   </div>
  *
- * Fills its container: message-bar/width (384) is Figma's frame. Figma's field is one line, 40 high;
- * the textarea grows with its lines (code only), and the field's icons and the send button stay on the
- * last line. The reply panel is as wide as the field, not the whole bar (Godwin 2026-10-20).
+ * Fills its container: message-bar/width (384) is Figma's frame. The textarea grows with its lines up to
+ * message-bar/max-height (168, about six lines; Figma 2026-10-27), then scrolls in a ScrollArea (fade and
+ * thumb); the field's icons and the send button stay on the last line. The reply panel is as wide as the field, not the whole bar (Godwin 2026-10-20).
  */
 
 .bland-chat-message-bar {
@@ -143,8 +143,16 @@
   outline-offset: var(--space-2xs);
 }
 
-.bland-chat-message-bar__input {
+.bland-chat-message-bar__scroll {
   flex: 1 1 auto;
+  max-height: var(--message-bar-max-height);
+}
+
+.bland-chat-message-bar__input {
+  display: block; /* inline, it would leave a line gap under it inside the scroll area */
+  flex: 1 1 auto;
+  width: 100%;
+  box-sizing: border-box;
   min-width: var(--space-none);
   margin: var(--space-none);
   padding: var(--space-sm) var(--space-none);

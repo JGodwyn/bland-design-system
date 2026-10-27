@@ -88,6 +88,16 @@ test('long text grows the field; without onRecordStart send is disabled while em
   await expect(disabled.getByRole('button', { name: 'Emoji' })).toBeDisabled();
 });
 
+test('the field stops growing at message-bar/max-height and scrolls', async ({ page }) => {
+  const input = page.locator('.bland-chat-message-bar__input').first();
+  await input.fill(Array.from({ length: 20 }, (_, i) => `Line ${i + 1}`).join('\n'));
+  const scroll = page.locator('.bland-chat-message-bar__scroll').first();
+  const cap = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--message-bar-max-height')));
+  expect((await scroll.boundingBox())!.height).toBe(cap);
+  const viewport = scroll.locator('.bland-scroll-area__viewport');
+  expect(await viewport.evaluate((v) => v.scrollHeight > v.clientHeight)).toBe(true);
+});
+
 test('the reply panel is as wide as the field, not the whole bar', async ({ page }) => {
   const bar = page.getByTestId('composer');
   const reply = (await bar.locator('.bland-chat-message-bar__reply').boundingBox())!;

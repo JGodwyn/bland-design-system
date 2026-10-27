@@ -37,6 +37,14 @@ test('pressing a row makes it the open chat (aria-current)', async ({ page }) =>
   await expect(jane).not.toHaveAttribute('aria-current');
 });
 
+test('the open chat takes the selected fill (Figma Selected), and its hover fill on hover', async ({ page }) => {
+  const list = page.getByRole('list', { name: 'Openable chats' });
+  const jane = list.getByRole('button', { name: /^Jane Doe/ });
+  expect(await style(jane, 'background-color')).toBe(await tokenColor(page, '--messaging-surface-list-selected'));
+  await jane.hover();
+  await expect.poll(() => style(jane, 'background-color')).toBe(await tokenColor(page, '--messaging-surface-list-selected-hover'));
+});
+
 test('a row with href is a link', async ({ page }) => {
   await expect(page.getByRole('list', { name: 'Links' }).getByRole('link')).toHaveAttribute('href', '#/components/chat-list-item');
 });

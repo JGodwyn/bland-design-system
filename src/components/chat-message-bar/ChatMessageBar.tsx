@@ -20,6 +20,7 @@ import { IconButton } from '../button/IconButton';
 import { Chip } from '../chip/Chip';
 import { Icon } from '../icon/Icon';
 import { Indicator } from '../indicator/Indicator';
+import { ScrollArea } from '../scroll-area/ScrollArea';
 import './chat-message-bar.css';
 
 /** The words the bar reads out: its field and buttons. */
@@ -223,6 +224,7 @@ export function ChatMessageBar({
           ) : (
             <>
               {onEmoji && fieldButton(<SmileyIcon />, l.emoji, onEmoji)}
+              <ScrollArea className="bland-chat-message-bar__scroll">
               <textarea
                 rows={1}
                 {...textareaProps}
@@ -235,6 +237,7 @@ export function ChatMessageBar({
                 onChange={(e) => change(e.target.value)}
                 onKeyDown={onKeyDown}
               />
+              </ScrollArea>
               {onSticker && fieldButton(<StickerIcon />, l.sticker, onSticker)}
               {onAttach && fieldButton(<PlusCircleIcon />, l.attach, onAttach)}
             </>

@@ -97,10 +97,11 @@ test('the focus ring shows on keyboard focus only', async ({ page }) => {
   expect(await outline()).toBe('solid');
 });
 
-test('a numeric count is an Indicator xl secondary: brand when selected, neutral otherwise or disabled', async ({ page }) => {
+test('a numeric count is an Indicator xl secondary: brand when selected, neutral otherwise; neutral primary when selected and disabled', async ({ page }) => {
   const emotion = (selector: string) =>
     page.locator(`${selector} .bland-pill__count .bland-indicator`).first().evaluate((e) => [e.getAttribute('data-size'), e.getAttribute('data-type'), e.getAttribute('data-emotion')]);
   expect(await emotion('.bland-pill[aria-pressed="false"]:not(:disabled)')).toEqual(['xl', 'secondary', 'neutral']);
   expect(await emotion('.bland-pill[aria-pressed="true"]:not(:disabled)')).toEqual(['xl', 'secondary', 'brand']);
-  expect(await emotion('.bland-pill[aria-pressed="true"]:disabled')).toEqual(['xl', 'secondary', 'neutral']);
+  // Figma 2026-10-27: neutral secondary vanished on the checked-disabled fill in dark.
+  expect(await emotion('.bland-pill[aria-pressed="true"]:disabled')).toEqual(['xl', 'primary', 'neutral']);
 });

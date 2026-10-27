@@ -42,7 +42,7 @@ export interface ChatListItemProps extends Omit<LiHTMLAttributes<HTMLLIElement>,
   href?: string;
   /** Makes the row a button that opens the chat. */
   onClick?: MouseEventHandler<HTMLElement>;
-  /** The chat that is open: `aria-current` on the row (Figma draws no look for it). */
+  /** The chat that is open: `aria-current` on the row and Figma's Selected fill (Messaging/surface-list-selected). */
   current?: boolean;
   /** Renders a link row with the project's router link. Default: a plain `<a>`. */
   renderLink?: (props: ChatListItemLinkProps) => ReactNode;

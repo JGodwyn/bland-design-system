@@ -46,7 +46,8 @@ export function Pill({
   const hasCount = count !== undefined && count !== null && count !== false;
   const badge =
     typeof count === 'number' || typeof count === 'string' ? (
-      <Indicator size="xl" type="secondary" emotion={isSelected && !rest.disabled ? 'brand' : 'neutral'}>
+      // Selected and disabled: neutral primary, so the count shows on the checked-disabled fill in dark (Figma 2026-10-27).
+      <Indicator size="xl" type={isSelected && rest.disabled ? 'primary' : 'secondary'} emotion={isSelected && !rest.disabled ? 'brand' : 'neutral'}>
         {count}
       </Indicator>
     ) : (

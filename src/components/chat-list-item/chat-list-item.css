@@ -101,6 +101,12 @@
   white-space: nowrap;
 }
 
+/* ---- The open chat (Figma Selected=true): aria-current on the row, the Sidebar's selected tint. ---- */
+
+.bland-chat-list-item__row[aria-current] {
+  --_bg: var(--messaging-surface-list-selected);
+}
+
 /* ---- Hover on link and button rows (Figma State=hover). Focus is .bland-focus-ring. ---- */
 
 @media (hover: hover) and (pointer: fine) {
@@ -108,5 +114,8 @@
     --_bg: var(--surface-200);
 
     cursor: pointer;
+  }
+  .bland-chat-list-item__row[aria-current]:is(button, a[href]):hover {
+    --_bg: var(--messaging-surface-list-selected-hover);
   }
 }
