@@ -234,8 +234,8 @@ function ScaleRow({ label, scale }: { label: string; scale: Scale }) {
 
 /**
  * The contrast check. Misses Bland's own brand shares (and this brand makes no worse) count as passing: they are
- * Bland's to fix, not a project's. Hidden (a drag in the picker, or Bland's own palette) it scales down and fades
- * out, then leaves the layout; it comes back the same way, and each new result eases in.
+ * Bland's to fix, not a project's. Hidden (a drag in the picker, or Bland's own palette) it fades and scales down
+ * while its space folds away; it comes back the same path, and each new result eases in.
  */
 function Contrast({ misses: current, keep, hidden, canFix, onFix }: { misses: Finding[]; keep?: Step; hidden: boolean; canFix: boolean; onFix: () => void }) {
   const [open, setOpen] = useState(false);
@@ -247,6 +247,7 @@ function Contrast({ misses: current, keep, hidden, canFix, onFix }: { misses: Fi
   const result = misses.length === 0 ? 'ok' : `miss-${misses.length}`;
   return (
     <div className="docs-brand-contrast" hidden={hidden}>
+      <div className="docs-brand-contrast-inner">
       <div key={result} className="docs-brand-contrast-result">
         {misses.length === 0 ? (
           <Banner status="success" colored>
@@ -278,6 +279,7 @@ function Contrast({ misses: current, keep, hidden, canFix, onFix }: { misses: Fi
           <Findings items={misses} keep={keep} />
         </div>
       )}
+      </div>
     </div>
   );
 }
