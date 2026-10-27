@@ -1623,3 +1623,9 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Command: `--extra name=#hex` (up to 3) on generate, each reported and fixed on its own with its step pinned; `check` reads a file's extras.
 - Page: the brand card became `ColorCard` (reused per extra). Extra colors section: Add color (disabled at 3), Name field with the clash check, Remove, steps, a roles row (light and dark halves, token name), its own Contrast with Fix. Previews show each extra's roles in that theme; the CSS includes them; kept for the visit in sessionStorage; Reset clears them.
 - The reusable card first named its dialog "Pick brand color"; tests caught it, so the card takes `pickerLabel`.
+
+## Brand page: extra colors no longer show a brand banner; agent skill notes (2026-10-27)
+
+- Bug: adding an extra on Bland's brand showed "Contrast checks out" under Brand color. `isBland` (used to hide the brand result) also required no extras. Split into `brandIsBland` for the brand result; `isBland` still drives Reset. The spec now adds an extra after Reset and checks the brand result stays hidden.
+- Same pass: an extra's warning said "n of 70 pairings"; Contrast takes a `total` (extras 12).
+- Started `docs/agent-skill.md` (setup, colors and roles, CSS rules, components, open points); CLAUDE.md points at it. docs/brand.md says plainly that steps are fixed and roles switch.

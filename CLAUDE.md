@@ -10,7 +10,7 @@ Bland is Godwin's personal design system: a Figma UI kit reused across client pr
 
 ```
 CLAUDE.md                 rules (this file)
-docs/                     long-form notes: components.md (how to build one), tokens.md, brand.md, lint.md, motion.md
+docs/                     long-form notes: components.md (how to build one), tokens.md, brand.md, lint.md, motion.md, agent-skill.md
 tokens/figma/raw/         raw Figma export, verified by checksum (generated)
 tokens/tokens.json        resolved tokens with descriptions (generated)
 src/tokens/tokens.css     CSS custom properties, shipped as bland/tokens.css (generated)
@@ -49,6 +49,8 @@ Three append-as-you-go files at the repo root, the working memory this file is t
 - **`INTERFACE.md`**: every design and API decision settled in code (tokens, conventions, icons, overflow, motion, each component, the docs site). **Read it before building a component**; write to it the moment a decision is made.
 - **`LEARNINGS.md`**: symptom → cause → rule for everything this project has been bitten by (Figma MCP limits, fonts, TypeScript 7, CSS, ports, parallel sessions). Read the section matching what you're about to touch; add an entry the moment something surprises you.
 - **`EXECUTIONS.md`**: the steps taken, task by task, including dead ends. Append a section **during** the task, not reconstructed after. Side sessions append their own.
+
+**`docs/agent-skill.md`** is the fourth: what a project's agent must know to use Bland (setup, colors, CSS rules, components), the raw material for the agent skill at the end of the project. Add a line there whenever a decision changes how a project uses Bland.
 
 They merge with git's `union` strategy (`.gitattributes`): append, never restructure another session's section.
 

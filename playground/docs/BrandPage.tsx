@@ -80,7 +80,9 @@ export function BrandPage() {
   const palette = useMemo(() => ({ brand: scale, neutrals, color: input }), [scale, neutrals, input]);
   const findings = useMemo(() => check(scale, neutrals), [scale, neutrals]);
   const misses = findings.filter((f) => !inherited(f));
-  const isBland = same(blandScale, scale) && same(blandNeutrals, neutrals) && extras.length === 0;
+  // The brand alone is Bland's: its contrast result has nothing to say. Extras don't count here, they have their own.
+  const brandIsBland = same(blandScale, scale) && same(blandNeutrals, neutrals);
+  const isBland = brandIsBland && extras.length === 0;
   const isApplied = samePalette(applied, palette);
   // The step holding the color you entered: the fix never moves it, so your color stays exactly yours.
   const keep = isBlandColor ? undefined : placeStep(input);
@@ -132,7 +134,7 @@ export function BrandPage() {
         <ColorCard label="Brand color" pickerLabel="Pick a brand color" color={input} onChange={edit} onDraggingChange={setDragging} className="docs-brand-card-brand" />
         <ScaleRow label="Brand steps" scale={scale} />
         {/* Bland's own palette has nothing to report (hidden, so it leaves with its exit); a project's palette shows its result. */}
-        <Contrast misses={misses} keep={keep} hidden={dragging || (isBland && misses.length === 0)} canFix={!same(fixedScale, scale)} onFix={() => setFixed(fixedScale)} />
+        <Contrast misses={misses} keep={keep} hidden={dragging || (brandIsBland && misses.length === 0)} canFix={!same(fixedScale, scale)} onFix={() => setFixed(fixedScale)} />
       </Section>
 
       <Section title="Neutral color" className="docs-brand-section">
@@ -332,7 +334,7 @@ function ExtraColor({
       <ColorCard label={label} pickerLabel={`Pick a color for ${error ? 'this extra color' : extra.name}`} color={extra.color} onChange={(hex) => onChange({ color: normalHex(hex), fixed: null })} onDraggingChange={setDragging} />
       <ScaleRow label={`${label} steps`} scale={scale} />
       <RoleRow name={error ? 'name' : extra.name} scale={scale} />
-      <Contrast misses={misses} keep={keep} hidden={dragging} canFix={!same(fixed, scale)} onFix={() => onChange({ fixed })} />
+      <Contrast misses={misses} keep={keep} hidden={dragging} total={EXTRA_PAIRS.length * 2} canFix={!same(fixed, scale)} onFix={() => onChange({ fixed })} />
     </div>
   );
 }
@@ -416,7 +418,7 @@ function ScaleRow({ label, scale }: { label: string; scale: Scale }) {
  * Bland's to fix, not a project's. Hidden (a drag in the picker, or Bland's own palette) it fades and scales down
  * while its space folds away; it comes back the same path, and each new result eases in.
  */
-function Contrast({ misses: current, keep, hidden, canFix, onFix }: { misses: Finding[]; keep?: Step; hidden: boolean; canFix: boolean; onFix: () => void }) {
+function Contrast({ misses: current, keep, hidden, total = PAIRS.length * 2, canFix, onFix }: { misses: Finding[]; keep?: Step; hidden: boolean; total?: number; canFix: boolean; onFix: () => void }) {
   const [open, setOpen] = useState(false);
   const breakdown = useId();
   // While hidden it keeps showing the last result, so the exit plays out on what was there, not on a new result.
@@ -449,7 +451,7 @@ function Contrast({ misses: current, keep, hidden, canFix, onFix }: { misses: Fi
               </>
             }
           >
-            {misses.length} of {PAIRS.length * 2} pairings miss their minimum. Fix contrast moves the steps named, or keep a miss on purpose.
+            {misses.length} of {total} pairings miss their minimum. Fix contrast moves the steps named, or keep a miss on purpose.
           </Banner>
         )}
       </div>

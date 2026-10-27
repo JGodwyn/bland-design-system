@@ -2150,3 +2150,8 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - **Brand page contrast result motion (2026-10-27, Godwin):** scale 0.97 + opacity, in duration/md, out duration/xs, easing/out, from the top centre; no height animation.
 - **Popover exit (2026-10-27, Godwin):** the shared popover opens over duration/md and closes over duration/xs (same path, easing/out). Exits quicker than entries is now the motion rule (docs/motion.md).
 - **Extra project colors (2026-10-27, Godwin):** up to three, beside the brand, never used by Bland's components. Each: `--name-0…1000` and themed roles `--name-surface`, `-surface-strong`, `-surface-light`, `-text`, `-icon`, `-border` that mirror the brand roles' light/dark steps; six contrast pairings; names can't take a Bland prefix. Chart palette deferred to a Figma design.
+
+## Agent skill notes (2026-10-27)
+
+- `docs/agent-skill.md` collects what a project's agent must know to use Bland, as we go; the end-of-project skill is written from it (Godwin 2026-10-27).
+- Brand theme page: the brand's contrast result hides on Bland's own brand whatever the extras; each extra's result counts its own pairings (12), not the brand's 70.

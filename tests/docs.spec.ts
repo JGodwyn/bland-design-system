@@ -303,5 +303,10 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   expect(await brand('600')).toBe('');
   expect(await neutral600()).toBe('');
   await expect(page.getByRole('button', { name: 'Reset', exact: true })).toBeDisabled();
+  // An extra on Bland's own brand shows its own result, never one for the brand.
+  await add.click();
+  await expect(page.locator('.docs-brand-contrast')).toHaveCount(2);
+  await expect(page.locator('.docs-brand-contrast').first()).toBeHidden();
+  await expect(page.locator('.docs-brand-contrast').last()).toBeVisible();
 });
 

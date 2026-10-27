@@ -59,6 +59,7 @@ A project can add up to three colors beside the brand, for charts, illustrations
 
 - **Bland's components never read them.** They're for the project's own CSS and components: a chart series, an illustration, a promo section, a tag. A project can also recolor a Bland component in one area by pointing that component's tokens at an extra's roles there, for example `.promo { --button-brand-primary-rest: var(--accent-surface-strong); }`, and dark mode follows because the roles switch.
 - **Steps:** 13, made like the brand's (the color lands unchanged on the step its lightness belongs on), as `--name-0 … --name-1000` on `:root`.
+- **The steps don't switch, the roles do**, as with the brand: `--brand-600` is one color in both modes, and the tokens built on it (`--surface-brand` 600 in light, 400 in dark) move. So every extra color gets dark mode through its roles; its raw steps are fixed.
 - **Roles** switch between light and dark exactly as the brand's do (they mirror the brand tokens in `tokens.json`, so they never drift):
 
 | Role | Mirrors | Light | Dark | For |
