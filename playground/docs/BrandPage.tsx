@@ -169,20 +169,17 @@ export function BrandPage() {
               id: 'extras',
               label: 'Extra colors',
               panel: (
-                <Section
-                  title="Extra colors"
-                  toc={false}
-                  className="docs-brand-section"
-                  action={
+                <div className="docs-section docs-brand-section">
+                  {/* No heading: the tab names it. The note and Add color share the row, the note's first line level with the button. */}
+                  <div className="docs-brand-extras-intro">
+                    <p className="docs-note">
+                      Colors beside the brand, up to {MAX_EXTRAS}, for charts, illustrations or a part of your own UI. Bland’s components don’t use them; your code does,
+                      through their roles, which switch in light and dark like the brand’s.
+                    </p>
                     <Button size="sm" iconStart={<PlusIcon />} disabled={extras.length >= MAX_EXTRAS} onClick={addExtra}>
                       Add color
                     </Button>
-                  }
-                >
-                  <p className="docs-note">
-                    Colors beside the brand, up to {MAX_EXTRAS}, for charts, illustrations or a part of your own UI. Bland’s components don’t use them; your code does, through
-                    their roles, which switch in light and dark like the brand’s.
-                  </p>
+                  </div>
                   {extras.length === 0 && (
                     <EmptyState
                       className="docs-brand-empty"
@@ -208,7 +205,7 @@ export function BrandPage() {
                       onRemove={() => setExtras((all) => all.filter((o) => o.id !== x.id))}
                     />
                   ))}
-                </Section>
+                </div>
               ),
             },
             {
@@ -289,6 +286,7 @@ function ColorCard({
   onChange,
   onDraggingChange,
   children,
+  tint,
 }: {
   label: string;
   pickerLabel: string;
@@ -297,13 +295,19 @@ function ColorCard({
   onDraggingChange: (dragging: boolean) => void;
   /** Under the swatch, inside the card: its contrast result (Figma 6806:8805). */
   children?: ReactNode;
+  /** The card's fill in light and dark: an extra's own surface-light role. Omitted, the brand's (surface-brand-light). */
+  tint?: { light: string; dark: string };
 }) {
   const [picking, setPicking] = useState<{ instant: boolean; x: number; y: number } | null>(null);
   const [hero, setHero] = useState<HTMLDivElement | null>(null);
   const [anchor, setAnchor] = useState<HTMLSpanElement | null>(null);
   const pick = useRef<HTMLButtonElement>(null);
   return (
-    <div className="docs-brand-card bland-smooth">
+    <div
+      className="docs-brand-card bland-smooth"
+      data-tint={tint ? '' : undefined}
+      style={tint ? ({ '--docs-tint-light': tint.light, '--docs-tint-dark': tint.dark } as CSSProperties) : undefined}
+    >
       <span className="docs-brand-card-label" aria-hidden="true">
         Tap to change
       </span>
@@ -370,6 +374,8 @@ function ExtraColor({
   const fixed = useMemo(() => (misses.length ? fixScale(scale, neutrals, keep, EXTRA_PAIRS) : scale), [misses.length, scale, neutrals, keep]);
   const label = error ? 'Extra color' : `Extra color ${extra.name}`;
   const errorId = useId();
+  // The card takes the extra's own quiet fill, as the brand's card takes the brand's: 50 in light, 1000 in dark.
+  const lightRole = EXTRA_ROLES.find((r) => r.role === 'surface-light')!;
   return (
     <div className="docs-brand-extra">
       <div className="docs-brand-extra-head">
@@ -396,7 +402,14 @@ function ExtraColor({
           {error}
         </p>
       )}
-      <ColorCard label={label} pickerLabel={`Pick a color for ${error ? 'this extra color' : extra.name}`} color={extra.color} onChange={(hex) => onChange({ color: normalHex(hex), fixed: null })} onDraggingChange={setDragging}>
+      <ColorCard
+        label={label}
+        pickerLabel={`Pick a color for ${error ? 'this extra color' : extra.name}`}
+        color={extra.color}
+        onChange={(hex) => onChange({ color: normalHex(hex), fixed: null })}
+        onDraggingChange={setDragging}
+        tint={{ light: scale[lightRole.light], dark: scale[lightRole.dark] }}
+      >
         <Contrast misses={misses} keep={keep} hidden={dragging} total={EXTRA_PAIRS.length * 2} canFix={!same(fixed, scale)} onFix={() => onChange({ fixed })} />
       </ColorCard>
       <ScaleRow label={`${label} steps`} scale={scale} />

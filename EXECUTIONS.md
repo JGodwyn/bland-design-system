@@ -1642,3 +1642,4 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Switching the neutral tint on Bland's brand showed "Contrast checks out": the brand result hid only when the neutrals were Bland's too. It now hides whenever the brand steps are Bland's (the neutrals keep Bland's contrast). Spec switches to Pure gray and back.
 - Preview is left out on the Extra colors tab while there are no extras (Figma 6806:7199).
 - Breakdown table: `.docs-data` set a plain rad-lg with superellipse, which reads square; inside the card it now uses .bland-smooth (doubled radius), like the swatch.
+- Follow-up: extra cards tinted with their own surface-light (light/dark through the same CSS-var switch as the roles row); extras intro row from Godwin's screenshot; name title-lg. Checked light, dark and 375 wide in Playwright screenshots.
