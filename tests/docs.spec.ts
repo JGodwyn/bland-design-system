@@ -358,10 +358,11 @@ test('the brand page shows the chart palette in both themes, takes your own pick
   const item = (n: number) => list.getByRole('listitem').nth(n - 1);
   await expect(list.getByRole('listitem')).toHaveCount(8);
   // Each color is a block like an extra color's: its token, where it comes from, its card and its own check.
-  await expect(item(1)).toContainText(/--chart-1\s*Brand color\s*#0062FF\s*This color checks out/, { useInnerText: true });
+  await expect(item(1)).toContainText(/--chart-1\s*Brand color\s*You can’t change this\s*#0062FF/, { useInnerText: true });
   await expect(item(1)).not.toContainText('Tap to change'); // the brand changes under Brand colors
   await expect(item(2)).toContainText('Tap to change');
-  await expect(list.getByText('This color checks out')).toHaveCount(8);
+  // Nothing to report on Bland's own colors (as the brand's result): the check shows once there is something to say.
+  await expect(list.getByText('This color checks out').filter({ visible: true })).toHaveCount(0);
   const reset = page.getByRole('button', { name: 'Use Bland’s picks' });
   await expect(reset).toBeDisabled();
   // The swatch shows the color for the page's theme.

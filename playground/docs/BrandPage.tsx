@@ -671,7 +671,9 @@ function ChartColor({
   const [dragging, setDragging] = useState(false);
   const editable = series.from === 'generated' || series.from === 'pinned';
   const fixed = useMemo(() => (editable && advice.length ? fix() : undefined), [editable, advice, fix]);
-  const check = <ChartColorCheck advice={advice} hidden={dragging} fixed={fixed} onFix={() => fixed && onPick(fixed)} />;
+  // As the brand's result: nothing to say on a color Bland made (or the brand's and extras', checked in their tabs)
+  // while it checks out; a color you picked says so.
+  const check = <ChartColorCheck advice={advice} hidden={dragging || (advice.length === 0 && series.from !== 'pinned')} fixed={fixed} onFix={() => fixed && onPick(fixed)} />;
   return (
     <li className="docs-brand-extra">
       <div className="docs-brand-extra-head">
@@ -690,6 +692,7 @@ function ChartColor({
         </ColorCard>
       ) : (
         <div className="docs-brand-card bland-smooth">
+          <span className="docs-brand-card-label">You can’t change this</span>
           <Swatch color={series[theme]}>
             <span className="docs-brand-hex">{series[theme].toUpperCase()}</span>
           </Swatch>

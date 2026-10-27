@@ -1313,6 +1313,7 @@ code,
 /* The chart palette, laid out as the Extra colors tab: the note, then a block per color (the .docs-brand-extras
    list and block), headed by its token in title-lg with where it comes from at the end of the row. */
 .docs-brand-chart-list {
+  gap: var(--space-2xl); /* tighter than the extras' space-5xl: eight blocks in a row */
   margin: var(--space-none);
   padding: var(--space-none);
   list-style: none;
