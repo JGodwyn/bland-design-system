@@ -1310,6 +1310,83 @@ code,
     display: inline;
   }
 }
+/* The chart palette: each series with its light and dark color side by side. */
+.docs-brand-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+.docs-brand-chart-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--space-7xl)), 1fr));
+  gap: var(--space-lg) var(--space-sm);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  list-style: none;
+}
+.docs-brand-chart-list li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  min-width: var(--space-none);
+}
+.docs-brand-chart-modes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2xs);
+}
+.docs-brand-chart-mode {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  min-width: var(--space-none);
+}
+.docs-brand-chart-findings {
+  margin: var(--space-none);
+  padding-inline-start: var(--space-lg);
+}
+/* The preview's sample chart: stacked bars, a surface gap between segments, and a legend. */
+.docs-brand-chart-sample {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin: var(--space-none);
+}
+.docs-brand-chart-bar {
+  display: grid;
+  grid-template-columns: var(--space-4xl) 1fr;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.docs-brand-chart-bar .docs-brand-step-hex {
+  padding-inline: var(--space-none);
+}
+.docs-brand-chart-track {
+  display: flex;
+  gap: var(--space-2xs);
+  height: var(--space-xl);
+}
+.docs-brand-chart-track > span {
+  flex-basis: var(--space-none);
+  border-radius: var(--rad-xs);
+}
+.docs-brand-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-md);
+  font: var(--type-body-sm);
+  color: var(--text-subtle);
+}
+.docs-brand-chart-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+.docs-brand-chart-dot {
+  width: var(--space-sm);
+  height: var(--space-sm);
+  border-radius: var(--rad-rd);
+}
 .docs-brand-extra-sample {
   display: inline-flex;
   align-items: center;

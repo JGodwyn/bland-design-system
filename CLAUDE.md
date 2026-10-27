@@ -28,6 +28,7 @@ scripts/stylelint/        bland/use-tokens lint rule, fixtures and test
 - `npm run tokens`: regenerate `tokens.json` and `tokens.css` from the raw export.
 - `npm run tokens:checksum`: hash of the raw export; must equal `scripts/figma/checksum.js` run in Figma.
 - `npm run brand`: the brand override tool: `generate "#hex"` makes 13 brand steps from one color and 13 neutral steps leaning toward it (`--neutrals full|subtle|none`), plus up to three `--extra name=#hex` colors, `check brand.css` tests the brand pairings (warns, never blocks), `--fix` applies suggested steps (`docs/brand.md`). `npm run test:brand` runs its tests.
+- Chart palette: `--chart-1` … `--chart-8`, the brand, then the extras, then generated hues, light and dark, 3:1 on the page and neighbours apart for color-blind readers; Bland's own is appended to `tokens.css`, a project's is in its override file. Components never use them (`docs/brand.md`, "Chart palette").
 - `npm run tokens:drift`: drift check against Figma, variable by variable, with the CSS tokens each change reaches; `-- --apply` takes the Figma version. Two steps around one `use_figma` call (`docs/tokens.md`, "Drift check"). `npm run test:drift` runs its tests.
 - `npm run build`: tokens, Vite library build, `dist/tokens.css`, type declarations.
 - `npm run typecheck`.
@@ -217,7 +218,7 @@ In order; tokens come before components.
 - [x] Base: fonts, reset, focus and smoothing helpers, icon slot, scroll area, conventions in `docs/components.md`. Done 2026-10-17. Grid system (17 Figma layout grids) is deferred until page layouts need it.
 - [x] Docs site, local (2026-10-17): sidebar of styles and components, live demo with controls, variants, props tables, theme switch. Runs with `npm run docs`. Redesigned from the Figma Doc site page (2026-10-22): Bland controls, full code view, props in Table, search (⌘K), page contents rail; see INTERFACE.md.
 - [ ] Docs site hosting: not deployed anywhere yet.
-- [ ] Extra project colors beside the brand: built 2026-10-27 (up to three, steps + light/dark roles, `docs/brand.md`). Left: a chart palette (`--chart-1…8`), Figma first.
+- [x] Extra project colors beside the brand: built 2026-10-27 (up to three, steps + light/dark roles, `docs/brand.md`). Chart palette `--chart-1…8` generated from the brand and extras, 2026-10-27 (Godwin: generated, not designed in Figma first).
 - [ ] Publish the `bland` package (private, 0.0.0 today) so projects can install it.
 - [ ] At the end: package agent skills, how a project's agent uses Bland (install, tokens and the no-hardcoded-values rule, components and props, brand override, extra colors) (Godwin 2026-10-27).
 

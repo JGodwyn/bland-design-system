@@ -304,12 +304,17 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   await names.first().fill('surface');
   await expect(page.getByText('Bland already uses --surface-…; pick another name.')).toBeVisible();
   await names.first().fill('chart');
+  await expect(page.getByText('Bland uses --chart-1 … --chart-8 for the chart palette; pick another name.')).toBeVisible();
+  await names.first().fill('charts');
   // Its roles show the value for the page's theme.
-  await expect(page.getByRole('list', { name: 'Roles of chart' })).toContainText(/--chart-surface\s*#[0-9a-f]{6}/, { useInnerText: true });
+  await expect(page.getByRole('list', { name: 'Roles of charts' })).toContainText(/--charts-surface\s*#[0-9a-f]{6}/, { useInnerText: true });
   await tab('How to use').click();
   const css = page.locator('#use-in-a-project pre');
-  await expect(css).toContainText(/--chart-600: #[0-9a-f]{6};/);
-  await expect(css).toContainText('--chart-surface: var(--chart-400);');
+  await expect(css).toContainText(/--charts-600: #[0-9a-f]{6};/);
+  await expect(css).toContainText('--charts-surface: var(--charts-400);');
+  // The chart palette follows: the brand, then the extras in order.
+  await expect(css).toContainText('--chart-1: var(--brand-600);');
+  await expect(css).toContainText('--chart-2: var(--charts-600);');
   await tab('Extra colors').click();
   await page.getByRole('button', { name: /^Remove/ }).last().click();
   await expect(add).toBeEnabled();
@@ -339,3 +344,36 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   await expect(page.locator('.docs-brand-contrast')).toBeHidden();
 });
 
+
+test('the brand page shows the chart palette in both themes with its check, in the preview chart and in the CSS', async ({ page }) => {
+  await page.goto('/#/brand');
+  // Bland ships its own palette in tokens.css: the brand first, then generated hexes.
+  const root = (name: string) => page.evaluate((n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim(), name);
+  expect(await root('--chart-1')).toBe(await root('--brand-600'));
+  expect(await root('--chart-8')).toMatch(/^#[0-9a-f]{6}$/);
+
+  await page.getByRole('tab', { name: 'Chart colors' }).click();
+  const list = page.getByRole('list', { name: 'Chart colors' });
+  await expect(list.getByRole('listitem')).toHaveCount(8);
+  await expect(list.getByRole('listitem').first()).toContainText(/--chart-1\s*Brand\s*Light\s*#0062ff\s*Dark\s*#659cff/, { useInnerText: true });
+  await expect(page.locator('.docs-brand-chart-check')).toContainText('Chart colors check out');
+
+  // Each preview sets the palette for its own theme, and its sample chart draws every series.
+  const previews = page.locator('.docs-brand-preview');
+  const series = (i: number, n: number) => previews.nth(i).evaluate((el, k) => getComputedStyle(el).getPropertyValue(`--chart-${k}`).trim(), n);
+  expect(await series(0, 1)).toBe('#0062ff');
+  expect(await series(1, 1)).toBe('#659cff');
+  expect(await series(0, 8)).toBe(await root('--chart-8'));
+  await expect(previews.first().locator('.docs-brand-chart-track').first().locator('span')).toHaveCount(8);
+  await expect(previews.first().getByText('Series 8')).toBeVisible();
+
+  // An extra color takes series 2, and the CSS carries the palette after the extra's roles.
+  await page.getByRole('tab', { name: 'Extra colors' }).click();
+  await page.getByRole('button', { name: 'Add color' }).click();
+  await page.getByRole('tab', { name: 'Chart colors' }).click();
+  await expect(list.getByRole('listitem').nth(1)).toContainText('Extra: accent');
+  await page.getByRole('tab', { name: 'How to use' }).click();
+  const css = page.locator('#use-in-a-project pre');
+  await expect(css).toContainText('--chart-2: var(--accent-600);');
+  await expect(css).toContainText('--chart-1: var(--brand-400);');
+});

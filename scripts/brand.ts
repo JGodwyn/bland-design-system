@@ -7,6 +7,9 @@
 //   npm run brand -- check brand.css [--neutrals full|subtle|none] [--fix] [--out fixed.css]
 //       the contrast check for an override file (its neutrals, or Bland's when it sets none, and its extra colors)
 //
+// Both also make the chart palette (--chart-1 … --chart-8: the brand, the extras, then generated hues) from the final
+// colors, check it (3:1 on the page, neighbours apart under normal and color-blind vision) and write it with the rest.
+//
 // --neutrals sets how far the grays lean toward the brand: full (Bland's own amount, the default), subtle (half)
 // or none (pure gray). On check it regenerates the file's neutrals from its brand. --fix takes the suggested brand
 // steps, regenerates the neutrals from the fixed brand and checks again; on generate it never moves the step that
@@ -15,9 +18,11 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
 import {
+  chartReport,
   EXTRA_PAIRS,
   extraNameError,
   generate,
+  generateChart,
   generateNeutrals,
   harmonyColor,
   MAX_EXTRAS,
@@ -90,9 +95,14 @@ function run(scale: Scale, note: string, print: boolean, tint: Tint | undefined,
     text += `\n\n${r.text}`;
     failures += r.failures;
   }
+  // The chart palette, from the final brand, extras and neutrals.
+  const chart = generateChart(scale, extras, neutrals);
+  const c = chartReport(chart, neutrals);
+  text += `\n\n${c.text}`;
+  failures += c.failures;
   if (tint) note += `, neutrals ${tint === 'none' ? 'pure gray' : `${tint} tint`}`;
   const out = flag('out');
-  const css = toCss(scale, note, neutrals, extras);
+  const css = toCss(scale, note, neutrals, extras, chart);
   if (out) writeFileSync(out, css);
   if (out) console.log(`Wrote ${out}.\n`);
   else if (print || fix) console.log(css);

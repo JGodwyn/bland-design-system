@@ -1690,3 +1690,13 @@ not wrapped; rail contents centred (logo and account icon were off).
   | Dashboard/{left,right}-wide | min/max | 12 | 112 | space-lg | 24 |
 
   Page frames: mobile 360 to 430, tablet 768 and 820 (Tablet/sm), 912 (md), 1024 (lg), desktop 1280 to 1536 (Desktop/sm), 1920 (Desktop/md), 2560 (Desktop/lg). Several frames carry local copies of a grid instead of the style. Figma can bind `count`, `sectionSize`, `offset` and `gutterSize` on a layout grid.
+
+## Chart palette (side session, 2026-10-27)
+
+- Read the brand tooling (core.ts, CLI, Brand page) and the dataviz method's color checks (lightness band, chroma floor, CVD ΔE via Machado 2009, normal-vision floor 15, contrast 3:1). Kept the task's rules: 3:1 and neighbour ΔE under normal/protan/deutan/tritan; the lightness band is not enforced.
+- First prototype took the dark value two steps lighter on a scale made from the light one: generated series placed on 400 came out as pale 200 tints in dark (#e2cca6 gold), and a yellow brand's dark series collapsed under normal vision. Switched to a chroma-keeping lift by Bland's 600-to-400 lightness gap: every test brand (orange, green, yellow, purple, crimson) passes among generated series; a near-black brand's gray series 1 sits too close to its gold extra, which is the project's own pair and is reported.
+- Ordering is a brute force over the generated series (up to 7! orders with a precomputed pair matrix, pruned), then up to six nudge rounds of ±0.04/0.08/0.12 lightness. Runs in well under a second.
+- `toCss` and the extra roles share one themed-selectors writer now; the roles block ends in one newline instead of two.
+- `npm run tokens` appends the default palette to tokens.css via a dynamic import of the brand core after tokens.json is written (core imports tokens.json). tokens.json unchanged.
+- An existing docs spec named an extra `chart`; now reserved, so the spec checks the error and uses `charts`.
+- Port 5180 was held by another session's docs server on this checkout; verified in the browser pane and ran docs.spec.ts against it (77 passed).

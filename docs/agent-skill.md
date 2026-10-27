@@ -16,6 +16,7 @@ Raw material for the skill we package at the end of the project: what an agent n
 - A new extra's default color is the next one in harmony with the brand (complement, then the square); pass a hex to choose your own.
 - **Use roles, not steps.** Brand: Bland's Theme tokens (`--surface-brand`, `--text-brand`, …). Extras: `--name-surface`, `-surface-strong`, `-surface-light`, `-text`, `-icon`, `-border`, which switch in dark mode. Raw steps (`--name-600`) are the same in both modes: only for something meant to look identical in light and dark.
 - White text goes on `-surface-strong`, never `-surface` (it lightens in dark).
+- **Charts:** series use `--chart-1` … `--chart-8` in order (series 1 = `--chart-1`, the brand), never cycled; past eight, fold into Other or split the chart. They switch in dark mode and hold 3:1 on `--surface-100`; keep a legend, and label series directly when the check warns. Meaning (good/bad) uses danger/success/warning tokens instead. Bland's components never use chart tokens.
 - To recolor a Bland component in one area, override that component's tokens on a wrapper: `.promo { --button-brand-primary-rest: var(--accent-surface-strong); }`.
 - Run `npm run brand -- check brand.css` after any hand change; it warns, never blocks.
 

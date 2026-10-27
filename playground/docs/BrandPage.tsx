@@ -28,6 +28,8 @@ import { CheckIcon, PlusIcon, TrashIcon } from '../../src/icons';
 import {
   blandNeutrals,
   blandScale,
+  CHART_COUNT,
+  checkChart,
   check,
   contrast,
   EXTRA_PAIRS,
@@ -35,6 +37,7 @@ import {
   extraNameError,
   fixScale,
   generate,
+  generateChart,
   generateNeutrals,
   harmonyColor,
   inherited,
@@ -43,6 +46,8 @@ import {
   placeStep,
   STEPS,
   toCss,
+  type ChartFinding,
+  type ChartSeries,
   type Finding,
   type Scale,
   type Step,
@@ -106,6 +111,8 @@ export function BrandPage() {
   // Extra colors: up to MAX_EXTRAS, each with a name that doesn't clash, made into a scale (fixed when asked).
   const extraScales = extras.map((x) => ({ ...x, scale: x.fixed ?? generate(x.color), error: extraNameError(x.name, extras.filter((o) => o.id !== x.id).map((o) => o.name)) }));
   const validExtras = extraScales.filter((x) => !x.error).map(({ name, scale }) => ({ name, scale }));
+  // The chart palette follows the brand, the valid extras (in order) and the neutrals' page color.
+  const chart = useMemo(() => generateChart(scale, validExtras, neutrals), [scale, neutrals, JSON.stringify(validExtras)]);
   const updateExtra = (id: string, patch: Partial<ExtraState>) => setExtras((all) => all.map((x) => (x.id === id ? { ...x, ...patch } : x)));
   const addExtra = () =>
     setExtras((all) => {
@@ -217,16 +224,31 @@ export function BrandPage() {
               ),
             },
             {
+              id: 'chart',
+              label: 'Chart colors',
+              panel: (
+                <div className="docs-section docs-brand-section docs-brand-chart">
+                  <p className="docs-note">
+                    {CHART_COUNT} colors for data series, used in order: <code>--chart-1</code> is the brand, the extra colors follow, and the rest are made to sit with them, spread
+                    round the color wheel. Each holds 3:1 on the page in both themes, and neighbours stay apart for color-blind readers too. Bland’s components don’t use them.
+                  </p>
+                  <ChartRow chart={chart} />
+                  <ChartCheck findings={checkChart(chart, neutrals)} />
+                </div>
+              ),
+            },
+            {
               id: 'use',
               label: 'How to use',
               panel: (
                 <Section title="Use in a project" toc={false} className="docs-brand-section">
                   <p className="docs-note">
                     Load it after Bland’s tokens. It overrides the brand and neutral steps at :root, and every brand-colored and neutral token follows in both themes. Extra colors
-                    add their steps and their roles (<code>--name-surface</code>, <code>--name-text</code> and so on), which your own CSS uses.
+                    add their steps and their roles (<code>--name-surface</code>, <code>--name-text</code> and so on), which your own CSS uses. The chart palette,
+                    <code>--chart-1</code> to <code>--chart-{CHART_COUNT}</code>, comes last.
                   </p>
                   <CodeSnippet
-                    code={{ css: toCss(scale, isBland ? 'Bland’s own blue' : `made from ${input}, neutrals ${tint === 'none' ? 'pure gray' : `${tint} tint`}`, neutrals, validExtras) }}
+                    code={{ css: toCss(scale, isBland ? 'Bland’s own blue' : `made from ${input}, neutrals ${tint === 'none' ? 'pure gray' : `${tint} tint`}`, neutrals, validExtras, chart) }}
                     languages={[{ id: 'css', label: 'CSS' }]}
                     highlight={highlight}
                   />
@@ -243,10 +265,11 @@ export function BrandPage() {
         <p className="docs-note">This brand on components, before it is applied. Apply to site to see it on every page.</p>
         <div className="docs-brand-previews">
           {(['light', 'dark'] as const).map((theme) => (
-            <div key={theme} className="docs-brand-preview bland-smooth" data-theme={theme} style={paletteStyle(palette)}>
+            <div key={theme} className="docs-brand-preview bland-smooth" data-theme={theme} style={{ ...paletteStyle(palette), ...chartStyle(chart, theme) }}>
               <span className="docs-brand-preview-label">{theme === 'light' ? 'Light' : 'Dark'}</span>
               <Sample />
               {validExtras.length > 0 && <ExtraSample extras={validExtras} theme={theme} />}
+              <ChartSample count={chart.length} />
             </div>
           ))}
         </div>
@@ -514,6 +537,96 @@ function ExtraSample({ extras, theme }: { extras: { name: string; scale: Scale }
         );
       })}
     </div>
+  );
+}
+
+/** The chart tokens for one theme, set inline on a preview so its sample chart shows this palette. */
+const chartStyle = (chart: ChartSeries[], theme: 'light' | 'dark') => Object.fromEntries(chart.map((s, i) => [`--chart-${i + 1}`, s[theme]])) as CSSProperties;
+
+/** Each series: its token, where it comes from, and its color in both themes side by side. */
+function ChartRow({ chart }: { chart: ChartSeries[] }) {
+  return (
+    <ol className="docs-brand-chart-list" aria-label="Chart colors">
+      {chart.map((s, i) => (
+        <li key={i}>
+          <span className="docs-brand-role-name">--chart-{i + 1}</span>
+          <span className="docs-brand-step-hex">{s.from === 'generated' ? 'Generated' : s.from === 'brand' ? 'Brand' : `Extra: ${s.from}`}</span>
+          <span className="docs-brand-chart-modes">
+            {(['light', 'dark'] as const).map((mode) => (
+              <span key={mode} className="docs-brand-chart-mode">
+                <span className="docs-brand-chip bland-smooth" style={{ background: s[mode] }} />
+                <span className="docs-brand-step-hex">
+                  {mode === 'light' ? 'Light' : 'Dark'}
+                  <br />
+                  {s[mode]}
+                </span>
+              </span>
+            ))}
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/** The chart palette's check: a pass, or each miss (fails) and near miss (label those series) in a list. */
+function ChartCheck({ findings }: { findings: ChartFinding[] }) {
+  const fails = findings.filter((f) => f.level === 'fail');
+  if (findings.length === 0) {
+    return (
+      <Banner className="docs-brand-chart-check" status="success" colored>
+        Chart colors check out: 3:1 on the page and neighbours apart, in both themes
+      </Banner>
+    );
+  }
+  return (
+    <Banner
+      className="docs-brand-chart-check"
+      status={fails.length ? 'warning' : 'info'}
+      colored
+      orientation="vertical"
+      title={fails.length ? 'Chart colors warning' : 'Label these series'}
+    >
+      <ul className="docs-brand-chart-findings">
+        {findings.map((f, i) => (
+          <li key={i}>
+            {f.mode === 'light' ? 'Light' : 'Dark'}: {f.text}.
+          </li>
+        ))}
+      </ul>
+    </Banner>
+  );
+}
+
+/** A small stacked bar chart in the preview: every series in order, so neighbours touch as they do in a chart. */
+const CHART_ROWS = [
+  { label: 'North', values: [18, 14, 12, 10, 9, 8, 6, 5] },
+  { label: 'South', values: [12, 16, 8, 12, 10, 6, 9, 7] },
+  { label: 'West', values: [20, 9, 13, 7, 12, 10, 5, 8] },
+];
+function ChartSample({ count }: { count: number }) {
+  const series = Array.from({ length: count }, (_, i) => i);
+  return (
+    <figure className="docs-brand-chart-sample" aria-label="Sample chart">
+      {CHART_ROWS.map((row) => (
+        <div key={row.label} className="docs-brand-chart-bar">
+          <span className="docs-brand-step-hex">{row.label}</span>
+          <span className="docs-brand-chart-track">
+            {series.map((i) => (
+              <span key={i} style={{ flexGrow: row.values[i] ?? 1, background: `var(--chart-${i + 1})` }} title={`Series ${i + 1}: ${row.values[i]}`} />
+            ))}
+          </span>
+        </div>
+      ))}
+      <figcaption className="docs-brand-chart-legend">
+        {series.map((i) => (
+          <span key={i}>
+            <span className="docs-brand-chart-dot" style={{ background: `var(--chart-${i + 1})` }} aria-hidden="true" />
+            Series {i + 1}
+          </span>
+        ))}
+      </figcaption>
+    </figure>
   );
 }
 

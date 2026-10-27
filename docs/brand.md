@@ -75,7 +75,33 @@ A project can add up to three colors beside the brand, for charts, illustrations
 - **Check:** six pairings per extra, both modes (`EXTRA_PAIRS`): white text on its strong fill, its text on the page and on its light fill (4.5:1), its icon, border and fill against the page (3:1). Fix contrast never moves the entered color's step.
 - **Names:** lowercase letters and hyphens, and not a prefix Bland already uses (`surface`, `text`, `brand`, `space` …), so an extra never shadows a Bland token.
 - **What theming costs:** the override file grows a light block and two dark blocks (the same selectors as `tokens.css`: `[data-theme="dark"]` and the `prefers-color-scheme` media query), about 20 lines per extra. Roles are `var()`s of the extra's own steps, so a nested `data-theme` section works as it does for Bland. Use the roles in project code and dark mode is handled; reach for raw steps only where a fixed color is meant (an illustration that should look the same in both modes).
-- **Not yet:** a chart palette (ordered `--chart-1…8`, brand first, then the extras), which needs a Figma design first; and Figma variables for extras (they live in code, like a project's neutrals).
+- **Names:** `chart` alone is taken by the chart palette below (`chart-orange` is fine).
+- **Not yet:** Figma variables for extras (they live in code, like a project's neutrals).
+
+## Chart palette (decided 2026-10-27)
+
+`--chart-1` … `--chart-8`: an ordered categorical palette for data series. Godwin's call: Claude generates it from the project's colors rather than designing it in Figma first. Bland's components never use it; a project's charts do.
+
+- **Order:** series 1 is the brand, then the extra colors in their order, then generated hues to fill the eight. Use them **in order** (series 1 gets `--chart-1`, …), never cycled: a ninth series folds into "Other" or a second chart.
+- **Generated hues** fill the widest hue gap left in OKLCH each time, so with the brand alone they sit 45° apart. Each is lit halfway between the brand's lightness and its hue's most vivid one, as saturated for its hue as the brand is (as `harmonyColor`), then darkened just enough to hold 3:1 on the light page. A gray brand uses Bland's blue as the source.
+- **Light and dark:** every series has both. The brand and extras use their solid fill steps (`--surface-brand`'s: 600 light, 400 dark), moved further along their own scale only if they miss 3:1, and stay `var()`s of those steps, so `--chart-1` follows a brand override even without the chart block. Generated series go lighter in dark by the same gap as 600 to 400, as colorful, and further if they need it for 3:1.
+- **Check** (`checkChart`), both modes: each series at least **3:1 on `--surface-100`**; each pair of neighbours at least **ΔE 15 apart under normal vision** and **ΔE 6 under protan, deutan and tritan** simulation (Machado et al. 2009, severity 1; ΔE is OKLab distance ×100). Between 6 and the target of 8 is a warning: label those series directly (legend plus direct labels, or a gap). Only neighbours are checked, which suits stacked bars, lines and grouped bars; a scatter or map, where any two series can touch, should stay at three or four series.
+- **Kept apart:** the generated series are ordered (every ordering tried, the one whose closest neighbours are furthest apart wins), and if a pair is still too close one of them is nudged lighter or darker, a few rounds, each kept only if it helps. The brand and extras never move from their places or colors, so a miss between two of them is the project's own, reported.
+- **Bland's default** (Bland's blue, no extras), in `tokens.css`, all checks passing (closest neighbours: ΔE 18.8 normal, 11.1 protan in light):
+
+| Token | Light | Dark | Hue |
+| --- | --- | --- | --- |
+| `--chart-1` | `var(--brand-600)` #0062ff | `var(--brand-400)` #659cff | blue (brand) |
+| `--chart-2` | #e34000 | #ff8867 | red-orange |
+| `--chart-3` | #00a3bf | #00d4f9 | cyan |
+| `--chart-4` | #bf8a00 | #f8b400 | gold |
+| `--chart-5` | #00a785 | #00daae | teal |
+| `--chart-6` | #9c37e5 | #c17cff | purple |
+| `--chart-7` | #76a100 | #9bd200 | lime |
+| `--chart-8` | #e41493 | #ff7abb | magenta |
+
+- **Where it lives:** `npm run tokens` appends Bland's palette to `tokens.css` (it isn't a Figma variable, so it isn't in `tokens.json`); the brand command prints its check and writes a project's palette at the end of the override file, after the extras' roles, in the same theme selectors. `check brand.css` makes the palette again from the file's colors.
+- **Status colors stay status:** when a series means good or bad (errors, pass/fail), use Bland's danger/success/warning tokens, not a chart color.
 
 ## The Brand theme page (docs site)
 
@@ -84,6 +110,7 @@ A project can add up to three colors beside the brand, for charts, illustrations
 - **Brand color:** tap the big swatch and a color picker opens where you tapped (under the hex from the keyboard): saturation and brightness area, hue slider, and a field that reads and writes HEX, RGB, HSL or OKLCH (pick the format from its menu, kept for your next visit; RGB, HSL and OKLCH have one field per number, arrow keys step them, and pasting CSS like `rgb(255 90 31)` or `oklch(68% 0.21 38)` into any of them takes the whole color). The swatch shows your color exactly, with a copy button. Under it, the 13 steps it makes (your color on its own step) and the contrast result: **Contrast checks out**, or a **Contrast warning** with **Fix contrast** (moves the other steps, never the color you entered) and **Show breakdown** (the misses as a table). Misses Bland's own blue shares, and this brand makes no worse, count as passing on the page: they are Bland's to fix (the command still lists them). The result hides while you drag in the picker and eases back in when you let go. **Reset** and **Apply to site** sit in the section heading: Reset (after a warning that lists what goes) goes back to Bland everywhere, including the site; Apply sets the steps on `<html>` so every docs page shows the brand, kept for the visit in sessionStorage with the color it was made from (it survives a reload).
 - **Neutral color:** Tinted, Subtle or Pure gray, the 400 neutral as a big swatch, and the 13 neutral steps.
 - **Extra colors:** Add color (up to three), each with a name, the same tap-to-change swatch, its steps, its roles in light and dark, and its own contrast check. They show in the previews and the CSS, and are kept for the visit; Reset clears them.
+- **Chart colors:** the eight series with their light and dark colors and where each comes from, and the check (passes, or each miss and near miss). The previews show a stacked bar chart in the palette.
 - **Preview** in light and dark, and **Use in a project** with the CSS to copy.
 
 The page imports `scripts/brand/core.ts`, so it never disagrees with the command.
@@ -93,7 +120,7 @@ The page imports `scripts/brand/core.ts`, so it never disagrees with the command
 ```bash
 npm run brand -- generate "#ff5a1f"                 # 13 brand + 13 neutral steps from one color, then the check
 npm run brand -- generate "#ff5a1f" --neutrals none # pure gray neutrals (or subtle; full is the default)
-npm run brand -- generate "#ff5a1f" --extra accent=#7c3aed --extra chart  # up to three extra colors; no color = the next in harmony
+npm run brand -- generate "#ff5a1f" --extra accent=#7c3aed --extra highlight  # up to three extra colors; no color = the next in harmony
 npm run brand -- generate "#ff5a1f" --fix --out brand.css
 npm run brand -- check brand.css                    # check a project's override (CSS or JSON)
 npm run brand -- check brand.css --fix --out fixed.css

@@ -2209,3 +2209,41 @@
     --elevation-warning-far: 0px 4px 8px -2px rgb(224 168 0 / 24%), 0px 16px 32px -6px rgb(224 168 0 / 40%);
   }
 }
+
+/* The chart palette, series in order (docs/brand.md, "Chart palette"). */
+
+:root,
+[data-theme="light"] {
+  --chart-1: var(--brand-600);
+  --chart-2: #e34000;
+  --chart-3: #00a3bf;
+  --chart-4: #bf8a00;
+  --chart-5: #00a785;
+  --chart-6: #9c37e5;
+  --chart-7: #76a100;
+  --chart-8: #e41493;
+}
+
+[data-theme="dark"] {
+  --chart-1: var(--brand-400);
+  --chart-2: #ff8867;
+  --chart-3: #00d4f9;
+  --chart-4: #f8b400;
+  --chart-5: #00daae;
+  --chart-6: #c17cff;
+  --chart-7: #9bd200;
+  --chart-8: #ff7abb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --chart-1: var(--brand-400);
+    --chart-2: #ff8867;
+    --chart-3: #00d4f9;
+    --chart-4: #f8b400;
+    --chart-5: #00daae;
+    --chart-6: #c17cff;
+    --chart-7: #9bd200;
+    --chart-8: #ff7abb;
+  }
+}

@@ -220,12 +220,14 @@ export function parseScale(text: string): Scale {
   return Object.fromEntries(STEPS.map((s) => [s, `#${parseHex(found[s]!).map((v) => Math.round(v * 255).toString(16).padStart(2, '0')).join('')}`])) as Scale;
 }
 
-export function toCss(scale: Scale, note = '', neutrals?: Scale, extras: Extra[] = []): string {
+export function toCss(scale: Scale, note = '', neutrals?: Scale, extras: Extra[] = [], chart?: ChartSeries[]): string {
   const lines = STEPS.map((s) => `  --brand-${s}: ${scale[s]};`);
   if (neutrals) lines.push('', ...STEPS.map((s) => `  --neutral-${s}: ${neutrals[s]};`));
   for (const x of extras) lines.push('', ...STEPS.map((s) => `  --${x.name}-${s}: ${x.scale[s]};`));
-  const css = `/* Brand override for Bland${note ? `: ${note}` : ''}. Load after bland/tokens.css. */\n:root {\n${lines.join('\n')}\n}\n`;
-  return extras.length ? `${css}\n${extraRolesCss(extras)}` : css;
+  let css = `/* Brand override for Bland${note ? `: ${note}` : ''}. Load after bland/tokens.css. */\n:root {\n${lines.join('\n')}\n}\n`;
+  if (extras.length) css += `\n${extraRolesCss(extras)}`;
+  if (chart) css += `\n${chartCss(chart)}`;
+  return css;
 }
 
 /** The 13 neutral steps from an override file, or undefined when it sets none (Bland's neutrals then stay). */
@@ -516,6 +518,7 @@ const taken = new Set(tokens.map((t) => /^--([a-z]+)/.exec(t.css)?.[1]).filter(B
 /** Why a name can't be used, or undefined when it can: lowercase letters and hyphens, not one of Bland's prefixes. */
 export function extraNameError(name: string, others: string[] = []): string | undefined {
   if (!/^[a-z][a-z-]{0,23}$/.test(name) || name.endsWith('-')) return 'Use lowercase letters and hyphens, such as accent or chart-orange.';
+  if (name === 'chart') return 'Bland uses --chart-1 … --chart-8 for the chart palette; pick another name.';
   if (taken.has(name.split('-')[0]!)) return `Bland already uses --${name.split('-')[0]}-…; pick another name.`;
   if (others.includes(name)) return 'Another extra color has this name.';
   return undefined;
@@ -523,15 +526,7 @@ export function extraNameError(name: string, others: string[] = []): string | un
 
 /** The themed roles of the extra colors, in Bland's theme selectors (light, then dark both ways). */
 function extraRolesCss(extras: Extra[]): string {
-  const block = (mode: 'light' | 'dark', indent: string) =>
-    extras.flatMap((x) => EXTRA_ROLES.map((r) => `${indent}--${x.name}-${r.role}: var(--${x.name}-${r[mode]});`)).join('\n');
-  return [
-    '/* Their roles, in light and dark like Bland\'s brand roles. */',
-    `:root,\n[data-theme="light"] {\n${block('light', '  ')}\n}`,
-    `[data-theme="dark"] {\n${block('dark', '  ')}\n}`,
-    `@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"]) {\n${block('dark', '    ')}\n  }\n}`,
-    '',
-  ].join('\n\n');
+  return themedCss("Their roles, in light and dark like Bland's brand roles.", (mode) => extras.flatMap((x) => EXTRA_ROLES.map((r) => `--${x.name}-${r.role}: var(--${x.name}-${r[mode]});`)));
 }
 
 /** Extra colors from an override file: every --name-0 … --name-1000 scale that isn't the brand or neutrals. */
@@ -546,4 +541,274 @@ export function parseExtras(text: string): Extra[] {
     found.set(m[1]!, { ...found.get(m[1]!), [m[2]!]: v });
   }
   return [...found].filter(([, steps]) => STEPS.every((s) => steps[s])).map(([name, steps]) => ({ name, scale: Object.fromEntries(STEPS.map((s) => [s, steps[s]!])) as Scale }));
+}
+
+// ---------- chart palette ----------
+
+/**
+ * The chart palette: `--chart-1` … `--chart-8`, an ordered categorical palette for data visualization (docs/brand.md,
+ * "Chart palette"). Series 1 is the brand, then the extra colors in their order, then hues generated to fill the
+ * eight: each in the widest hue gap left (so with the brand alone they sit 45° apart), at a lightness and chroma
+ * that sit with the brand as `harmonyColor`'s do. Every series has a light and a dark value, the dark one two steps
+ * lighter (as Bland's solids move in dark), and each holds 3:1 against `--surface-100` in its mode. The generated
+ * series are ordered, then nudged in lightness, so neighbours stay apart under protan, deutan and tritan vision
+ * too. Bland's components never read these; a project's charts do, in order.
+ */
+export const CHART_COUNT = 8;
+/** Mark contrast against the chart background (`--surface-100`), WCAG. */
+export const CHART_CONTRAST = 3;
+/**
+ * Neighbour distance, OKLab ΔE ×100: under simulated color-vision deficiency (Machado et al. 2009, severity 1) the
+ * target is 8 and the floor 6 (between them, label the series or add a gap); under normal vision the floor is 15.
+ */
+export const CHART_CVD_TARGET = 8;
+export const CHART_CVD_FLOOR = 6;
+export const CHART_NORMAL_FLOOR = 15;
+
+export type Vision = 'normal' | 'protan' | 'deutan' | 'tritan';
+export const VISIONS: Vision[] = ['normal', 'protan', 'deutan', 'tritan'];
+
+/** One series: its light and dark colors, where it comes from, and the scale steps it uses (brand and extras). */
+export type ChartSeries = { light: string; dark: string; from: string; ref?: Record<Mode, string> };
+
+// Machado, Oliveira & Fernandes (2009) at severity 1, on linear sRGB.
+const MACHADO: Record<Exclude<Vision, 'normal'>, number[][]> = {
+  protan: [[0.152286, 1.052583, -0.204868], [0.114503, 0.786281, 0.099216], [-0.003882, -0.048116, 1.051998]],
+  deutan: [[0.367322, 0.860646, -0.227968], [0.280085, 0.672501, 0.047413], [-0.01182, 0.04294, 0.968881]],
+  tritan: [[1.255528, -0.076749, -0.178779], [-0.078411, 0.930809, 0.147602], [0.004733, 0.691367, 0.3039]],
+};
+
+/** A color in OKLab as seen with this vision. */
+function seen(hex: string, vision: Vision): [number, number, number] {
+  let rgb = parseHex(hex).map(toLinear);
+  if (vision !== 'normal') rgb = MACHADO[vision].map((row) => Math.min(1, Math.max(0, row[0]! * rgb[0]! + row[1]! * rgb[1]! + row[2]! * rgb[2]!)));
+  const [r, g, b] = rgb as [number, number, number];
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  return [
+    0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+    1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+    0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
+  ];
+}
+
+/** OKLab ΔE ×100 between two colors as seen with this vision. */
+export function deltaE(a: string, b: string, vision: Vision = 'normal'): number {
+  const [p, q] = [seen(a, vision), seen(b, vision)];
+  return 100 * Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
+}
+
+const chartBg = (mode: Mode, neutrals: Scale) => colorOf('--surface-100', mode, blandScale, neutrals).hex;
+const SOLID = EXTRA_ROLES.find((r) => r.role === 'surface')!;
+const DARK_LIFT = toOklch(blandScale[SOLID.dark]).l - toOklch(blandScale[SOLID.light]).l;
+
+/**
+ * A series from a 13-step scale (the brand or an extra color): its solid fill steps (`--surface-brand`'s, 600 light
+ * and 400 dark), moved darker in light or lighter in dark until they hold 3:1 against the page.
+ */
+export function scaleSeries(from: string, scale: Scale, neutrals: Scale = blandNeutrals): ChartSeries {
+  const pick = (mode: Mode) => {
+    const bg = chartBg(mode, neutrals);
+    const dir = mode === 'light' ? 1 : -1;
+    let i = STEPS.indexOf(SOLID[mode]);
+    while (contrast(scale[STEPS[i]!], bg) < CHART_CONTRAST && i + dir > 0 && i + dir < STEPS.length) i += dir;
+    return STEPS[i]!;
+  };
+  const light = pick('light');
+  const dark = pick('dark');
+  return { from, light: scale[light], dark: scale[dark], ref: { light: `var(--${from}-${light})`, dark: `var(--${from}-${dark})` } };
+}
+
+/** The hue in the middle of the widest gap left between these, `count` times over. */
+export function chartHues(taken: number[], count: number): number[] {
+  const hues = taken.map((h) => ((h % 360) + 360) % 360);
+  const out: number[] = [];
+  for (let k = 0; k < count; k++) {
+    const sorted = [...hues].sort((a, b) => a - b);
+    let best = { at: 0, gap: -1 };
+    sorted.forEach((h, i) => {
+      const gap = (i === sorted.length - 1 ? sorted[0]! + 360 : sorted[i + 1]!) - h;
+      if (gap > best.gap + 1e-9) best = { at: h, gap };
+    });
+    const hue = (best.at + best.gap / 2) % 360;
+    hues.push(hue);
+    out.push(hue);
+  }
+  return out;
+}
+
+/** The brand's own color for the chart: its most colorful step, or Bland's blue for a gray brand. */
+function chartSource(brand: Scale): Oklch {
+  const top = STEPS.map((s) => toOklch(brand[s])).reduce((a, b) => (b.c > a.c ? b : a));
+  return top.c < 0.04 ? toOklch(blandScale['600']) : top;
+}
+
+/**
+ * A generated series at this hue: lightness halfway between the brand's and the hue's most vivid (as
+ * `harmonyColor`), as saturated for its hue as the brand is, `shift` lighter or darker, then darkened until it
+ * holds 3:1 on the light page. Dark is as much lighter as the brand's dark step is (600 to 400 in Bland's scale),
+ * as colorful, and lightened further if it needs to hold 3:1 on the dark page.
+ */
+export function hueSeries(hue: number, brand: Scale, neutrals: Scale = blandNeutrals, shift = 0): ChartSeries {
+  const { l, c, h } = chartSource(brand);
+  const vivid = Math.min(1, c / maxChroma(l, h));
+  let peak = 0.5;
+  for (let L = 0.3; L <= 0.9; L += 0.01) if (maxChroma(L, hue) > maxChroma(peak, hue)) peak = L;
+  const make = (L: number) => fromOklch({ l: L, c: Math.min(c, vivid * maxChroma(L, hue)), h: hue });
+  let L = Math.min(0.95, Math.max(0.2, (l + peak) / 2 + shift));
+  const lightBg = chartBg('light', neutrals);
+  while (contrast(make(L), lightBg) < CHART_CONTRAST && L > 0.1) L -= 0.005;
+  const light = make(L);
+  // Dark: lighter by the gap between Bland's 600 and 400 (the brand's two steps), as colorful, until it holds 3:1.
+  let D = L + DARK_LIFT;
+  const darkBg = chartBg('dark', neutrals);
+  while (contrast(make(D), darkBg) < CHART_CONTRAST && D < 0.99) D += 0.005;
+  const dark = make(Math.min(0.99, D));
+  return { from: 'generated', light, dark };
+}
+
+/** The closest two neighbours get under each vision, in both modes, as a share of their floor (1 = on it). */
+function pairScore(a: ChartSeries, b: ChartSeries): number {
+  let score = Infinity;
+  for (const mode of ['light', 'dark'] as const) {
+    for (const v of VISIONS) score = Math.min(score, deltaE(a[mode], b[mode], v) / (v === 'normal' ? CHART_NORMAL_FLOOR : CHART_CVD_TARGET));
+  }
+  return score;
+}
+
+/** Every ordering of the generated series after the fixed ones, keeping the one whose closest neighbours are furthest apart. */
+function bestOrder(fixed: ChartSeries[], free: ChartSeries[]): ChartSeries[] {
+  const all = [...fixed, ...free];
+  const score = all.map((a) => all.map((b) => (a === b ? Infinity : pairScore(a, b))));
+  const f = fixed.length;
+  let best = { order: free.map((_, i) => f + i), min: -Infinity };
+  const walk = (order: number[], left: number[], min: number) => {
+    if (min <= best.min) return;
+    if (!left.length) {
+      best = { order, min };
+      return;
+    }
+    for (const i of left) {
+      const prev = order.length ? order[order.length - 1]! : f - 1;
+      walk([...order, i], left.filter((j) => j !== i), prev < 0 ? min : Math.min(min, score[prev]![i]!));
+    }
+  };
+  walk([], free.map((_, i) => f + i), Infinity);
+  return [...fixed, ...best.order.map((i) => all[i]!)];
+}
+
+const worstNeighbours = (series: ChartSeries[]) =>
+  series.slice(1).reduce((w, s, i) => {
+    const score = pairScore(series[i]!, s);
+    return score < w.score ? { at: i, score } : w;
+  }, { at: -1, score: Infinity });
+
+/**
+ * The chart palette for a brand, its extra colors (up to three) and neutrals. Series 1 is the brand and the extras
+ * follow in order (only their steps move, for contrast); the rest are generated, ordered and, where two
+ * neighbours still come too close, nudged in lightness (a few rounds, each keeping a change only if it helps).
+ */
+export function generateChart(brand: Scale, extras: Extra[] = [], neutrals: Scale = blandNeutrals): ChartSeries[] {
+  const fixed = [scaleSeries('brand', brand, neutrals), ...extras.slice(0, MAX_EXTRAS).map((x) => scaleSeries(x.name, x.scale, neutrals))];
+  const hues = chartHues(fixed.map((s) => toOklch(s.light).h), CHART_COUNT - fixed.length);
+  const shifts = new Map<number, number>(hues.map((h) => [h, 0]));
+  const hueOf = new Map<ChartSeries, number>();
+  const build = () =>
+    hues.map((h) => {
+      const s = hueSeries(h, brand, neutrals, shifts.get(h));
+      hueOf.set(s, h);
+      return s;
+    });
+  let series = bestOrder(fixed, build());
+  for (let round = 0; round < 6; round++) {
+    const worst = worstNeighbours(series);
+    if (worst.score >= 1) break;
+    let improved = false;
+    for (const s of [series[worst.at + 1]!, series[worst.at]!]) {
+      const h = hueOf.get(s);
+      if (h === undefined) continue;
+      const base = shifts.get(h)!;
+      for (const step of [0.04, -0.04, 0.08, -0.08, 0.12, -0.12]) {
+        shifts.set(h, base + step);
+        const trial = bestOrder(fixed, build());
+        if (worstNeighbours(trial).score > worst.score + 1e-6) {
+          series = trial;
+          improved = true;
+          break;
+        }
+        shifts.set(h, base);
+      }
+      if (improved) break;
+    }
+    if (!improved) break;
+  }
+  return series;
+}
+
+/** Bland's own chart palette (Bland's blue, no extras), shipped in tokens.css. */
+export const blandChart = (): ChartSeries[] => generateChart(blandScale, [], blandNeutrals);
+
+export type ChartFinding = {
+  level: 'fail' | 'warn';
+  mode: Mode;
+  /** The series involved, from 1. */
+  series: number[];
+  text: string;
+};
+
+/**
+ * Misses in a chart palette, in both modes: a series under 3:1 on the page fails; neighbours under the normal-vision
+ * floor or the color-vision floor fail, and between the color-vision floor and target warn (label the series).
+ */
+export function checkChart(series: ChartSeries[], neutrals: Scale = blandNeutrals): ChartFinding[] {
+  const out: ChartFinding[] = [];
+  for (const mode of ['light', 'dark'] as const) {
+    const bg = chartBg(mode, neutrals);
+    series.forEach((s, i) => {
+      const ratio = contrast(s[mode], bg);
+      if (ratio < CHART_CONTRAST) out.push({ level: 'fail', mode, series: [i + 1], text: `--chart-${i + 1} ${s[mode]} is ${ratio.toFixed(2)}:1 on the page, needs ${CHART_CONTRAST}:1` });
+    });
+    for (let i = 1; i < series.length; i++) {
+      const [a, b] = [series[i - 1]![mode], series[i]![mode]];
+      for (const v of VISIONS) {
+        const e = deltaE(a, b, v);
+        const floor = v === 'normal' ? CHART_NORMAL_FLOOR : CHART_CVD_FLOOR;
+        const level = e < floor ? 'fail' : v !== 'normal' && e < CHART_CVD_TARGET ? 'warn' : undefined;
+        if (level) out.push({ level, mode, series: [i, i + 1], text: `--chart-${i} and --chart-${i + 1} are ΔE ${e.toFixed(1)} apart under ${v} vision, ${level === 'fail' ? `needs ${floor}` : `under the ${CHART_CVD_TARGET} target: label the series`}` });
+      }
+    }
+  }
+  return out;
+}
+
+export function chartReport(series: ChartSeries[], neutrals: Scale = blandNeutrals): { text: string; failures: number } {
+  const findings = checkChart(series, neutrals);
+  const fails = findings.filter((f) => f.level === 'fail');
+  const lines = [`Chart check: ${series.length} series, 3:1 on the page and neighbours apart (normal, protan, deutan, tritan) in light and dark.`];
+  lines.push(...series.map((s, i) => `  --chart-${i + 1}  light ${s.light}  dark ${s.dark}  (${s.from})`));
+  if (findings.length === 0) lines.push('All pass.');
+  for (const f of findings) lines.push(`  ${f.level === 'fail' ? '✗' : '·'} ${f.mode.padEnd(5)} ${f.text}.`);
+  if (fails.some((f) => f.series.length === 1 && series[f.series[0]! - 1]!.from !== 'generated')) {
+    lines.push('A brand or extra series under 3:1 has no step that holds it: pick a more contrasting color.');
+  }
+  return { text: lines.join('\n'), failures: fails.length };
+}
+
+/** The chart tokens in Bland's theme selectors: steps by reference for the brand and extras, hexes for the rest. */
+export function chartCss(series: ChartSeries[]): string {
+  return themedCss('The chart palette, series in order (docs/brand.md, "Chart palette").', (mode) =>
+    series.map((s, i) => `--chart-${i + 1}: ${s.ref?.[mode] ?? s[mode]};`),
+  );
+}
+
+/** Declarations in Bland's theme selectors: light on :root and [data-theme="light"], dark both ways. */
+function themedCss(comment: string, lines: (mode: Mode) => string[]): string {
+  const block = (mode: Mode, indent: string) => lines(mode).map((l) => `${indent}${l}`).join('\n');
+  return [
+    `/* ${comment} */`,
+    `:root,\n[data-theme="light"] {\n${block('light', '  ')}\n}`,
+    `[data-theme="dark"] {\n${block('dark', '  ')}\n}`,
+    `@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"]) {\n${block('dark', '    ')}\n  }\n}\n`,
+  ].join('\n\n');
 }

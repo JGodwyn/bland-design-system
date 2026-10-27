@@ -2,7 +2,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { EXTRA_PAIRS, EXTRA_ROLES, extraNameError, harmonyColor, HARMONY_TURNS, parseExtras, blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
+import { readFileSync } from 'node:fs';
+
+import { blandChart, CHART_CONTRAST, CHART_COUNT, chartCss, chartHues, checkChart, colorOf, deltaE, generateChart, EXTRA_PAIRS, EXTRA_ROLES, extraNameError, harmonyColor, HARMONY_TURNS, parseExtras, blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
 
 const close = (a: string, b: string) => toOklch(a).l - toOklch(b).l;
 
@@ -139,3 +141,71 @@ test('default extra colors go with the brand: complement first, then the square,
   assert.equal(harmonyColor('#777777', 0), harmonyColor(blandScale['600'], 0));
 });
 
+
+// ---------- chart palette ----------
+
+const bg = (mode: 'light' | 'dark') => colorOf('--surface-100', mode, blandScale).hex;
+const turn = (a: number, b: number) => Math.abs(((((a - b) % 360) + 540) % 360) - 180);
+
+test('generated chart hues fill the widest gaps: with the brand alone, 45° apart', () => {
+  const hues = chartHues([250], 7);
+  assert.deepEqual(hues.map(Math.round), [70, 160, 340, 115, 205, 295, 25]);
+  const all = [250, ...hues].sort((a, b) => a - b);
+  all.forEach((h, i) => assert.ok(Math.abs(turn(h, all[(i + 1) % all.length]!) - 45) < 1e-6));
+  // Taken hues bunched together leave the rest of the wheel to the generated ones.
+  for (const h of chartHues([0, 20], 6)) assert.ok(turn(h, 0) > 20 && turn(h, 20) > 20);
+});
+
+test('deltaE: zero for the same color, and red and green collapse under deutan vision but not tritan', () => {
+  assert.equal(deltaE('#123456', '#123456'), 0);
+  assert.ok(deltaE('#d03030', '#30a030', 'deutan') < deltaE('#d03030', '#30a030') / 5);
+  assert.ok(deltaE('#d03030', '#30a030', 'tritan') > deltaE('#d03030', '#30a030'));
+});
+
+test('Bland’s own chart palette: brand first by reference, 3:1 in both modes, every neighbour pair clear', () => {
+  const chart = blandChart();
+  assert.equal(chart.length, CHART_COUNT);
+  assert.equal(chart[0]!.from, 'brand');
+  assert.deepEqual(chart[0]!.ref, { light: 'var(--brand-600)', dark: 'var(--brand-400)' });
+  assert.equal(chart[0]!.light, blandScale['600']);
+  for (const s of chart) {
+    assert.ok(contrast(s.light, bg('light')) >= CHART_CONTRAST && contrast(s.dark, bg('dark')) >= CHART_CONTRAST, `${s.light} / ${s.dark}`);
+    assert.ok(toOklch(s.dark).l > toOklch(s.light).l, `${s.light}: dark is lighter`);
+  }
+  assert.deepEqual(checkChart(chart), [], 'no misses and no warnings');
+});
+
+test('tokens.css ships Bland’s current chart palette', () => {
+  const css = readFileSync(new URL('../../src/tokens/tokens.css', import.meta.url), 'utf8');
+  assert.ok(css.includes(chartCss(blandChart())), 'run npm run tokens');
+});
+
+test('a project’s chart: brand, then its extras in order, then generated series that pass among themselves', () => {
+  for (const hex of ['#ff5a1f', '#16a34a', '#ffcc00', '#7c3aed', '#e11d48', '#111111']) {
+    const brand = generate(hex);
+    const extras = [{ name: 'accent', scale: generate(harmonyColor(hex, 0)) }, { name: 'second', scale: generate(harmonyColor(hex, 1)) }];
+    const chart = generateChart(brand, extras, generateNeutrals(brand));
+    assert.deepEqual(chart.map((s) => s.from), ['brand', 'accent', 'second', 'generated', 'generated', 'generated', 'generated', 'generated']);
+    assert.equal(chart[1]!.ref?.light.startsWith('var(--accent-'), true);
+    // The project's own colors can't move, so a miss between two of them is theirs; every other pairing passes.
+    const fails = checkChart(chart, generateNeutrals(brand)).filter((f) => f.level === 'fail' && !f.series.every((n) => n <= 3));
+    assert.deepEqual(fails, [], hex);
+  }
+});
+
+test('a brand step under 3:1 moves along its scale until it holds', () => {
+  // Yellow's 400 is far too light for the dark page's opposite: the light value goes darker than 600.
+  const yellow = generate('#ffe14d', '600');
+  const s = generateChart(yellow)[0]!;
+  assert.ok(contrast(s.light, bg('light')) >= CHART_CONTRAST);
+  assert.notEqual(s.ref!.light, 'var(--brand-600)');
+});
+
+test('the chart tokens go in the override file, and an extra can’t be called chart', () => {
+  const extras = [{ name: 'accent', scale: generate('#7c3aed') }];
+  const css = toCss(blandScale, '', blandNeutrals, extras, generateChart(blandScale, extras));
+  assert.match(css, /\[data-theme="light"\] \{\n  --chart-1: var\(--brand-600\);\n  --chart-2: var\(--accent-600\);\n  --chart-3: #[0-9a-f]{6};/);
+  assert.match(css, /\[data-theme="dark"\] \{\n  --chart-1: var\(--brand-400\);/);
+  assert.deepEqual(parseExtras(css), extras);
+  assert.match(extraNameError('chart')!, /chart palette/);
+});
