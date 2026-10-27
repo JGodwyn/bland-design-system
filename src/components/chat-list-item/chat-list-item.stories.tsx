@@ -40,7 +40,7 @@ const long = 'A last message far too long for the row it sits in, so it ends in 
 export default {
   title: 'Chat list item',
   description:
-    'Row in a list of chats. Type: receiver (last message from the other person, shows Unread) or sender (last message from you, shows its delivery status). State rest or hover; the focus ring is inset because rows touch. Name and message truncate to one line. Width chat-list-item/width; use Fill container in layouts. No elevation. In code a li with a link or button; aria-current on the open chat.',
+    'Row in a list of chats. Type: receiver (last message from the other person, shows Unread) or sender (last message from you, shows its delivery status). State rest or hover; current marks the open chat with the selected fill (Figma Selected); the focus ring is inset because rows touch. Name and message truncate to one line. Width chat-list-item/width; use Fill container in layouts. No elevation. In code a li with a link or button; aria-current on the open chat.',
   components: ['ChatListItem'],
   demo: {
     component: 'ChatListItem',
@@ -92,6 +92,14 @@ export default {
       </div>
 
       <div className="pg-stack">
+        <span className="pg-label">Selected (current): the open chat, receiver and sender; hover deepens the fill</span>
+        <Chats label="Selected">
+          <ChatListItem current name="Jane Doe" date="09:41" message="Here is a brief message" unread avatar={avatar} onClick={() => {}} />
+          <ChatListItem current type="sender" status="seen" name="Ada Lovelace" date="Yesterday" message="Here is a brief message" avatar={<Avatar size="lg" initials="AL" />} onClick={() => {}} />
+        </Chats>
+      </div>
+
+      <div className="pg-stack">
         <span className="pg-label">Name and message end in an ellipsis; the date never truncates</span>
         <Chats label="Truncation">
           <ChatListItem name="A group name far too long for the row it sits in" date="Yesterday" message={long} unread avatar={avatar} />
@@ -100,7 +108,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Button and link rows: hover fill, aria-current on the open chat</span>
+        <span className="pg-label">Button and link rows: hover fill; press one to make it the open chat</span>
         <OpenableChats />
         <Chats label="Links">
           <ChatListItem name="Jane Doe" date="09:41" message="A link row" href="#/components/chat-list-item" avatar={avatar} />

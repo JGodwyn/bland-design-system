@@ -1662,3 +1662,8 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Descriptions read back HTML-escaped; writing `description` from that text escapes again (the "escaped several times" bug). Rewrote through `descriptionMarkdown` with entities decoded.
 - Token sync via the drift path: result-0.json built from the three new variables' records, `tokens:drift -- --apply`, `npm run tokens`; Figma checksum.js and `tokens:checksum` both {631, 8089d93b}, so nothing else drifted.
 - Code: Pill, ChatListItem CSS, ChatMessageBar ScrollArea; specs added (open chat fill, field cap) and pills expectation updated; screenshots unchanged (100 pass).
+
+## Chat list item: selected option in the playground (2026-10-27, branch claude/batch1-decisions-b6936a)
+
+- Godwin asked for the open chat's selected option on the playground, with the Messaging tokens added in Figma. Figma already had them; synced and built the CSS, then found another session had done the same on main (fee44e3, Batch 2). Rebuilt this branch on main keeping only what main lacked: a Selected section in the story (receiver and sender), labels that name the fill, and a spec that checks the fill, the hover fill and the selection moving. Old commit kept as backup/selected-4079a51.
+- Chat list item screenshots re-baselined (the new section); specs pass on a worktree server (5191).

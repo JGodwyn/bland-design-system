@@ -1,4 +1,4 @@
-// Behaviour of Chat list item: list semantics, button and link rows, aria-current, unread and status, hover, inset focus ring, truncation.
+// Behaviour of Chat list item: list semantics, button and link rows, aria-current and the selected fill, unread and status, hover, inset focus ring, truncation.
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { openStory } from './stories';
 
@@ -37,12 +37,18 @@ test('pressing a row makes it the open chat (aria-current)', async ({ page }) =>
   await expect(jane).not.toHaveAttribute('aria-current');
 });
 
-test('the open chat takes the selected fill (Figma Selected), and its hover fill on hover', async ({ page }) => {
+test('the open chat has the selected fill, deeper on hover, and follows aria-current', async ({ page }) => {
+  const row = page.getByRole('list', { name: 'Selected' }).getByRole('button').first();
+  await expect(row).toHaveCSS('background-color', await tokenColor(page, '--messaging-surface-list-selected'));
+  await row.hover();
+  await expect.poll(() => style(row, 'background-color')).toBe(await tokenColor(page, '--messaging-surface-list-selected-hover'));
+
   const list = page.getByRole('list', { name: 'Openable chats' });
-  const jane = list.getByRole('button', { name: /^Jane Doe/ });
-  expect(await style(jane, 'background-color')).toBe(await tokenColor(page, '--messaging-surface-list-selected'));
-  await jane.hover();
-  await expect.poll(() => style(jane, 'background-color')).toBe(await tokenColor(page, '--messaging-surface-list-selected-hover'));
+  const ada = list.getByRole('button', { name: /^Ada Lovelace/ });
+  await ada.click();
+  await page.mouse.move(0, 0);
+  await expect(ada).toHaveCSS('background-color', await tokenColor(page, '--messaging-surface-list-selected'));
+  await expect(list.getByRole('button', { name: /^Jane Doe/ })).toHaveCSS('background-color', await tokenColor(page, '--surface-100'));
 });
 
 test('a row with href is a link', async ({ page }) => {
