@@ -1533,3 +1533,16 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Godwin: switch the picker's field between color systems. A format menu (Bland Menu, single select) in the field: HEX, RGB, HSL, OKLCH, kept in localStorage. The field shows the numbers alone (the menu names the format) and reads them back, with commas or spaces, or CSS in any format (`rgb(255 90 31)`, `hsl(16deg 100% 56%)`, `oklch(68% 0.21 38)`) or a hex.
 - Color math moved to `playground/docs/colorFormats.ts` (pure; ColorPicker imports CSS, so tsx couldn't load it for a round-trip check). HEX, RGB, HSL (one decimal) round-trip exactly; OKLCH shows 3 decimals and a whole hue, enough to read, close to the color when typed back.
 - The OKLCH value overflowed Figma's 256 wide panel: the panel is now space-9xl + space-2xl (288). Measured the longest value of each format in Playwright: all fit. Escape closes the format menu first, then the picker.
+
+## 2026-10-27 — Banner: colored variant and tighter actions (feedback session)
+**Asked:** pick up Godwin's Figma changes: a Colored variant on Banner, less space between the text and the actions.
+
+- Read the Banner set again (now 16 variants, `Colored` false/true, default
+  false): colored = `surface-{status}-light` + `border-{status}`, no
+  elevation; icons unchanged. Vertical content gap is now `space-sm` in all
+  eight vertical variants. Notification checked too: unchanged (vertical
+  gap still `space-lg`), so only Banner moves.
+- Code: `colored` prop on Banner; the shared vertical gap reads a private
+  `--_actions-gap` (space-lg) that Banner sets to space-sm. Story shows
+  colored horizontal and vertical; specs check the tints, no shadow, and the
+  8 vs 16 gaps. Banner baselines re-taken and looked at.

@@ -19,6 +19,7 @@
 
 .bland-message {
   --bland-icon-size: var(--icon-md);
+  --_actions-gap: var(--space-lg); /* text to actions on vertical; Banner sets its own */
 
   display: flex;
   align-items: flex-start;
@@ -85,7 +86,7 @@
 .bland-message[data-orientation="vertical"] .bland-message__content {
   flex-direction: column;
   align-items: stretch;
-  gap: var(--space-lg);
+  gap: var(--_actions-gap);
 }
 
 .bland-message__text {

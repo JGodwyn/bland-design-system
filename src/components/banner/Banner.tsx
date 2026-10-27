@@ -6,8 +6,10 @@ export type BannerStatus = MessageStatus;
 export type BannerOrientation = MessageOrientation;
 
 export interface BannerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
-  /** Figma `Status`: sets the icon and its color. The surface stays surface-100 with a border-bold outline. */
+  /** Figma `Status`: sets the icon and its color, and when `colored` the surface and border. */
   status?: BannerStatus;
+  /** Figma `Colored`: the tinted status surface and border. Default `false` (Figma's): surface-100 with border-bold. */
+  colored?: boolean;
   /** Figma `Orientation`: horizontal is one row with inline actions; vertical puts a title over the text and actions under it. */
   orientation?: BannerOrientation;
   /** Figma `✏️ Title` (on horizontal, `👀 Title`): shown above the description. */
@@ -31,6 +33,7 @@ export interface BannerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title
 export function Banner({
   status = 'info',
   orientation = 'horizontal',
+  colored = false,
   title,
   children,
   actions,
@@ -46,6 +49,7 @@ export function Banner({
       className={joinClass('bland-banner bland-message bland-smooth', className)}
       data-status={status}
       data-orientation={orientation}
+      data-colored={colored}
     >
       <MessageLayout
         status={status}

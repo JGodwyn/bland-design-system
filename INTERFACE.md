@@ -514,10 +514,14 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   - Alert: icon and label only (`children`, body-lg in
     `Text/text-{status}`; info is `text-bold`, as Figma binds it). No
     surface, close or actions. `max-width: alert/max-width`; text wraps.
-  - Banner: surface-100, `border-bold` inside stroke for every status, no
-    elevation, rad-md, padding `space-sm` `space-md`. `title`, `children`
-    (description), `actions`, `onClose` (Figma `👀 Close`), `orientation`
-    horizontal (default) / vertical. Figma's `banner/width` (384) is only its
+  - Banner: `colored` (Figma `Colored`, added 2026-10-27, default **false**,
+    Figma's) = `surface-{status}-light` with `border-{status}`; uncolored =
+    surface-100 with `border-bold`. No elevation either way. rad-md, padding
+    `space-sm` `space-md`. `title`, `children` (description), `actions`,
+    `onClose` (Figma `👀 Close`), `orientation` horizontal (default) /
+    vertical. On vertical the actions sit `space-sm` under the text (Godwin
+    2026-10-27, tighter than Notification's `space-lg`); message.css reads it
+    from a private `--_actions-gap` that Banner sets. Figma's `banner/width` (384) is only its
     default frame: the description says to fill the container, so in code it
     is a block spanning its container.
   - Toast: strong fill `surface-{status}-strong`, white content

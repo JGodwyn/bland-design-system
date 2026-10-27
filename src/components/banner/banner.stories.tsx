@@ -41,7 +41,7 @@ export default {
   components: ['Banner'],
   demo: {
     component: 'Banner',
-    args: { children: 'Banners display important announcements', title: 'Banner title', status: 'info', orientation: 'vertical', actions: 'two', onClose: true, icon: true },
+    args: { children: 'Banners display important announcements', title: 'Banner title', status: 'info', orientation: 'vertical', colored: false, actions: 'two', onClose: true, icon: true },
     controls: {
       children: { kind: 'text' },
       title: { kind: 'text' },
@@ -77,6 +77,20 @@ export default {
         <span className="pg-label">orientation="vertical": a title over the description</span>
         {statuses.map((status) => (
           <Banner key={status} status={status} orientation="vertical" title="Banner title">
+            Banners display important announcements ({status})
+          </Banner>
+        ))}
+      </div>
+
+      <div className="pg-stack">
+        <span className="pg-label">colored: the tinted status surface and border, horizontal then vertical</span>
+        {statuses.map((status) => (
+          <Banner key={status} status={status} colored>
+            Banners display important announcements ({status})
+          </Banner>
+        ))}
+        {statuses.map((status) => (
+          <Banner key={status} status={status} colored orientation="vertical" title="Banner title" actions={status === 'info' ? actionsFor('vertical', 2) : undefined}>
             Banners display important announcements ({status})
           </Banner>
         ))}

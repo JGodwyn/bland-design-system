@@ -39,6 +39,10 @@ test('the vertical timestamp sits beside the title; the close button is named an
   expect(time.x).toBeGreaterThanOrEqual(title.x + title.width);
   expect(Math.abs(time.y + time.height / 2 - (title.y + title.height / 2))).toBeLessThanOrEqual(1);
 
+  const text = (await n.locator('.bland-message__text').boundingBox())!;
+  const actions = (await n.locator('.bland-message__actions').boundingBox())!;
+  expect(actions.y - (text.y + text.height)).toBe(16); // space-lg, unlike Banner's space-sm
+
   const close = n.getByRole('button', { name: 'Dismiss' });
   await close.focus();
   await expect(close).toBeFocused();

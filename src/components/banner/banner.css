@@ -3,14 +3,26 @@
  *
  *   <div class="bland-banner bland-message bland-smooth" data-status="warning" data-orientation="horizontal">…</div>
  *
+ * Uncolored (default): surface-100 with a border-bold outline. Colored: the status's light surface
+ * and border. No elevation either way.
+ *
  * Figma's banner/width (384) is only its default frame width: the description says to fill the
  * container in layouts, so in code the banner is a block that spans its container.
  */
 
-.bland-banner {
+.bland-message.bland-banner {
+  --_bg: var(--surface-100);
+  --_border: var(--border-bold);
+  --_actions-gap: var(--space-sm); /* Figma: space-sm between the text and the actions on vertical */
+
   padding: var(--space-sm) var(--space-md);
   --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
-  background-color: var(--surface-100);
+  background-color: var(--_bg);
   /* Figma's inside stroke: drawn inside the box, so it adds no size. */
-  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-bold);
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--_border);
+}
+
+.bland-banner[data-colored="true"] {
+  --_bg: var(--_s-surface-light);
+  --_border: var(--_s-border);
 }
