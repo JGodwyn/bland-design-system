@@ -430,6 +430,17 @@ export function fixScale(scale: Scale, neutrals: Scale = blandNeutrals, keep?: S
   return current;
 }
 
+/**
+ * When the misses left after `fixScale` are ones only the kept step (the project's own color) can fix: the same
+ * fix with that step free, so the color moves just enough (same hue and chroma). Undefined when nothing changes.
+ */
+export function adjustColor(scale: Scale, neutrals: Scale = blandNeutrals, keep?: Step, pairs: Pair[] = PAIRS): { color: string; scale: Scale } | undefined {
+  if (!keep) return undefined;
+  const fixed = fixScale(scale, neutrals, undefined, pairs);
+  if (fixed[keep] === scale[keep] || check(fixed, neutrals, pairs).some((f) => !inherited(f))) return undefined;
+  return { color: fixed[keep], scale: fixed };
+}
+
 export function report(scale: Scale, neutrals: Scale = blandNeutrals, keep?: Step, pairs: Pair[] = PAIRS, label = 'Brand'): { text: string; failures: number; fixes: Partial<Scale> } {
   const findings = check(scale, neutrals, pairs);
   const real = findings.filter((f) => !inherited(f));
@@ -447,7 +458,12 @@ export function report(scale: Scale, neutrals: Scale = blandNeutrals, keep?: Ste
     for (const [step, hex] of fixed) lines.push(`  ${step.padStart(4)}: ${scale[step as Step]} → ${hex}`);
   }
   if (keep && real.some((f) => f.steps.every((s) => s === keep))) {
-    lines.push(`Step ${keep} is the color you entered and stays as it is: a miss only it can fix is yours to keep, or pick another color.`);
+    const adjusted = adjustColor(all, neutrals, keep, pairs);
+    lines.push(
+      adjusted
+        ? `Step ${keep} is the color you entered and stays as it is. Moving it to ${adjusted.color} (lightness only) clears what only it can fix: generate from that color, keep the miss, or pick another.`
+        : `Step ${keep} is the color you entered and stays as it is: a miss only it can fix is yours to keep, or pick another color.`,
+    );
   }
   if (known.length) {
     lines.push('Below the minimum with Bland’s own brand too, and no worse here:');
