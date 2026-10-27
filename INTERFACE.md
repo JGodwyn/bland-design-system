@@ -2098,3 +2098,4 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - **Docs site, brand reset (2026-10-26, Godwin):** one reset, **Reset to Bland** on the Brand theme page; no toolbar button. The anchor field reads **Your color becomes step**.
 
 - **Brand color placement (2026-10-26, Godwin):** no step to choose. A color lands unchanged on the Bland step closest in OKLCH lightness (`placeStep`), and the contrast fix never moves that step. Brand theme page rebuilt from Figma 6773:21840 (picker on the swatch, floating action bar: Reset to Bland, Fix contrast, Apply to site).
+- **Brand page action bar (2026-10-27, Godwin):** shown only while there is something to reset (a non-Bland palette, or a brand applied); rises in and sinks out over duration/lg easing/out.

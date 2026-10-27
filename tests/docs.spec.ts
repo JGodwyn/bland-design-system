@@ -213,7 +213,8 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   const html = page.locator('html');
   const brand = (step: string) => html.evaluate((el, s) => el.style.getPropertyValue(`--brand-${s}`), step);
   const apply = page.getByRole('button', { name: 'Apply to site' });
-  await expect(apply).toBeDisabled(); // Bland's own blue: nothing to apply
+  const bar = page.getByRole('group', { name: 'Brand actions' });
+  await expect(bar).toBeHidden(); // Bland's own blue: nothing to reset or apply
 
   // The swatch opens the picker; a typed hex lands on the step its lightness belongs on (orange: 400).
   await page.getByRole('button', { name: /^Brand color #0062FF/ }).click();
@@ -261,5 +262,6 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   await page.getByRole('button', { name: 'Reset to Bland' }).click();
   expect(await brand('600')).toBe('');
   expect(await neutral600()).toBe('');
+  await expect(bar).toBeHidden();
 });
 

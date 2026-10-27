@@ -175,16 +175,17 @@ export function BrandPage() {
         />
       </Section>
 
-      <div className="docs-brand-bar bland-smooth" role="group" aria-label="Brand actions">
+      {/* Only while there is something to reset: a color or neutrals other than Bland's, or a brand on the site. */}
+      <div className="docs-brand-bar bland-smooth" role="group" aria-label="Brand actions" hidden={isBland && !applied}>
         <div className="docs-brand-bar-start">
-          <Button size="sm" emotion="danger" disabled={isBland && !applied && tint === 'full'} onClick={resetAll}>
+          <Button size="sm" emotion="danger" onClick={resetAll}>
             Reset to Bland
           </Button>
           <Button size="sm" type="secondary" disabled={same(fixedScale, scale)} onClick={() => setFixed(fixedScale)}>
             Fix contrast
           </Button>
         </div>
-        <Button size="sm" disabled={isApplied || (isBland && !applied)} onClick={() => setAppliedBrand(palette)}>
+        <Button size="sm" disabled={isApplied} onClick={() => setAppliedBrand(palette)}>
           {isApplied ? 'Applied to site' : 'Apply to site'}
         </Button>
       </div>
