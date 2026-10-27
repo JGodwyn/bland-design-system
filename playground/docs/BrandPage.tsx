@@ -2,7 +2,7 @@
 // makes (the color lands on the step its lightness belongs on) and the 13 neutral steps tinted toward it (or pure
 // gray), check them, preview them on components in both themes, apply them to the whole site, or go back to
 // Bland's blue.
-import { useEffect, useId, useMemo, useRef, useState, type ChangeEvent, type CSSProperties, type HTMLAttributes, type MouseEvent, type ReactNode, type Ref } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type ChangeEvent, type CSSProperties, type HTMLAttributes, type MouseEvent, type ReactNode, type Ref } from 'react';
 import { Badge } from '../../src/components/badge/Badge';
 import { Banner } from '../../src/components/banner/Banner';
 import { Button } from '../../src/components/button/Button';
@@ -31,6 +31,7 @@ import {
   CHART_COUNT,
   chartAdvice,
   checkChart,
+  fixChartColor,
   check,
   contrast,
   EXTRA_PAIRS,
@@ -232,18 +233,18 @@ export function BrandPage() {
               id: 'chart',
               label: 'Chart colors',
               panel: (
-                <div className="docs-section docs-brand-section docs-brand-chart">
-                  {/* As the Extra colors tab: the note, with its action beside it. */}
+                <div className="docs-section docs-brand-section docs-brand-extras docs-brand-chart">
+                  {/* As the Extra colors tab: the note, with its action beside it, then one block per color. */}
                   <div className="docs-brand-extras-intro">
                     <p className="docs-note">
                       {CHART_COUNT} colors for charts, used in order. The first is your brand color and your extra colors come next; Bland picks the rest to go with
-                      them. Tap one of Bland’s picks to choose your own. Bland’s components don’t use these.
+                      them. Tap one of Bland’s picks to choose your own. Each shows its color for the theme the page is in. Bland’s components don’t use these.
                     </p>
                     <Button size="sm" type="stroke" disabled={!chart.some((x) => x.from === 'pinned')} onClick={() => setPins({})}>
                       Use Bland’s picks
                     </Button>
                   </div>
-                  <ChartColors chart={chart} onPick={(n, hex) => setPins((p) => ({ ...p, [n]: normalHex(hex) }))} onUnpick={(n) => setPins(({ [n]: _, ...p }) => p)} />
+                  <ChartColors chart={chart} neutrals={neutrals} onPick={(n, hex) => setPins((p) => ({ ...p, [n]: normalHex(hex) }))} onUnpick={(n) => setPins(({ [n]: _, ...p }) => p)} />
                 </div>
               ),
             },
@@ -341,6 +342,7 @@ function ColorCard({
   label,
   pickerLabel,
   color,
+  shown,
   onChange,
   onDraggingChange,
   children,
@@ -349,6 +351,8 @@ function ColorCard({
   label: string;
   pickerLabel: string;
   color: string;
+  /** The color the swatch shows, when not the one the picker edits (a chart color in dark: its dark value). */
+  shown?: string;
   onChange: (hex: string) => void;
   onDraggingChange: (dragging: boolean) => void;
   /** Under the swatch, inside the card: its contrast result (Figma 6806:8805). */
@@ -365,7 +369,7 @@ function ColorCard({
       <span className="docs-brand-card-label" aria-hidden="true">
         Tap to change
       </span>
-      <PickSwatch label={label} pickerLabel={pickerLabel} color={color} onChange={onChange} onDraggingChange={onDraggingChange} />
+      <PickSwatch label={label} pickerLabel={pickerLabel} color={color} shown={shown} onChange={onChange} onDraggingChange={onDraggingChange} />
       {children}
     </div>
   );
@@ -379,16 +383,16 @@ function PickSwatch({
   label,
   pickerLabel,
   color,
+  shown = color,
   onChange,
   onDraggingChange,
-  compact,
 }: {
   label: string;
   pickerLabel: string;
   color: string;
+  shown?: string;
   onChange: (hex: string) => void;
   onDraggingChange: (dragging: boolean) => void;
-  compact?: boolean;
 }) {
   const [picking, setPicking] = useState<{ instant: boolean; x: number; y: number } | null>(null);
   const [hero, setHero] = useState<HTMLDivElement | null>(null);
@@ -396,13 +400,13 @@ function PickSwatch({
   const pick = useRef<HTMLButtonElement>(null);
   return (
     <>
-      <Swatch color={color} ref={setHero} compact={compact}>
+      <Swatch color={shown} ref={setHero}>
         <span ref={setAnchor} className="docs-brand-anchor" style={{ left: picking?.x ?? 0, top: picking?.y ?? 0 }} aria-hidden="true" />
         <button
           ref={pick}
           type="button"
           className="docs-brand-pick bland-focus-ring"
-          aria-label={`${label} ${color.toUpperCase()}, change it`}
+          aria-label={`${label} ${shown.toUpperCase()}, change it`}
           aria-expanded={!!picking}
           aria-haspopup="dialog"
           onClick={(e: MouseEvent<HTMLButtonElement>) => {
@@ -417,7 +421,7 @@ function PickSwatch({
             });
           }}
         >
-          {color.toUpperCase()}
+          {shown.toUpperCase()}
         </button>
       </Swatch>
       <Popover
@@ -597,98 +601,134 @@ function ExtraSample({ extras, theme }: { extras: { name: string; scale: Scale }
 /** The chart tokens for one theme, set inline on a preview so its sample chart shows this palette. */
 const chartStyle = (chart: ChartSeries[], theme: 'light' | 'dark') => Object.fromEntries(chart.map((s, i) => [`--chart-${i + 1}`, s[theme]])) as CSSProperties;
 
+/** The page's theme: its data-theme, else the system's. Swatches show each color as it is in this theme. */
+function usePageTheme(): 'light' | 'dark' {
+  return useSyncExternalStore(
+    (on) => {
+      const watch = new MutationObserver(on);
+      watch.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      const system = matchMedia('(prefers-color-scheme: dark)');
+      system.addEventListener('change', on);
+      return () => {
+        watch.disconnect();
+        system.removeEventListener('change', on);
+      };
+    },
+    () => {
+      const set = document.documentElement.getAttribute('data-theme');
+      return set === 'dark' || set === 'light' ? set : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    },
+    () => 'light' as const,
+  );
+}
+
+/** The chart colors, one block each, laid out as an extra color's: its token, its card, its own check inside. */
+function ChartColors({ chart, neutrals, onPick, onUnpick }: { chart: ChartSeries[]; neutrals: Scale; onPick: (n: number, hex: string) => void; onUnpick: (n: number) => void }) {
+  const theme = usePageTheme();
+  const advice = useMemo(() => chartAdvice(checkChart(chart, neutrals), chart), [chart, neutrals]);
+  return (
+    <ol className="docs-brand-extras-list docs-brand-chart-list" aria-label="Chart colors">
+      {chart.map((s, i) => (
+        <ChartColor
+          key={i}
+          n={i + 1}
+          series={s}
+          theme={theme}
+          advice={advice.filter((a) => a.series === i + 1)}
+          fix={() => fixChartColor(chart, i + 1, neutrals)}
+          onPick={(hex) => onPick(i + 1, hex)}
+          onUnpick={() => onUnpick(i + 1)}
+        />
+      ))}
+    </ol>
+  );
+}
+
+const SOURCES: Record<string, string> = { brand: 'Brand color', generated: 'Bland’s pick', pinned: 'Your pick' };
+
 /**
- * The chart colors, laid out as the brand's (Figma 6806:6170's card): a card of eight swatches, Bland's picks tapped
- * to change (as the brand swatch), the check in plain words inside it, then the light and dark values as step rows.
+ * One chart color: its token as the heading, where it comes from (or Use Bland's pick on your own), then its card.
+ * Bland's picks and yours are tapped to change (the picker sets the light color; dark is made from it); the brand
+ * and extras change in their own tabs, so their card has no Tap to change. The check inside is this color's own.
  */
-function ChartColors({ chart, onPick, onUnpick }: { chart: ChartSeries[]; onPick: (n: number, hex: string) => void; onUnpick: (n: number) => void }) {
+function ChartColor({
+  n,
+  series,
+  theme,
+  advice,
+  fix,
+  onPick,
+  onUnpick,
+}: {
+  n: number;
+  series: ChartSeries;
+  theme: 'light' | 'dark';
+  advice: ChartAdvice[];
+  fix: () => string | undefined;
+  onPick: (hex: string) => void;
+  onUnpick: () => void;
+}) {
   const [dragging, setDragging] = useState(false);
-  const advice = useMemo(() => chartAdvice(checkChart(chart), chart), [chart]);
-  const source = (s: ChartSeries) => (s.from === 'brand' ? 'Brand color' : s.from === 'generated' ? 'Bland’s pick' : s.from === 'pinned' ? 'Your pick' : `Extra: ${s.from}`);
+  const editable = series.from === 'generated' || series.from === 'pinned';
+  const fixed = useMemo(() => (editable && advice.length ? fix() : undefined), [editable, advice, fix]);
+  const check = <ChartColorCheck advice={advice} hidden={dragging} fixed={fixed} onFix={() => fixed && onPick(fixed)} />;
   return (
-    <>
-      <div className="docs-brand-card bland-smooth">
-        <span className="docs-brand-card-label" aria-hidden="true">
-          Tap to change
-        </span>
-        <ol className="docs-brand-chart-grid" aria-label="Chart colors">
-          {chart.map((s, i) => {
-            const n = i + 1;
-            const own = s.from === 'generated' || s.from === 'pinned';
-            return (
-              <li key={n}>
-                <div className="docs-brand-chart-head">
-                  <span className="docs-brand-chart-name">--chart-{n}</span>
-                  {s.from === 'pinned' ? (
-                    <Button size="xs" type="ghost" onClick={() => onUnpick(n)} aria-label={`Series ${n}: back to Bland’s pick`}>
-                      Reset
-                    </Button>
-                  ) : (
-                    <span className="docs-brand-chart-source">{source(s)}</span>
-                  )}
-                </div>
-                {own ? (
-                  <PickSwatch
-                    compact
-                    label={`Series ${n}`}
-                    pickerLabel={`Pick a color for series ${n}`}
-                    color={s.light}
-                    onChange={(hex) => onPick(n, hex)}
-                    onDraggingChange={setDragging}
-                  />
-                ) : (
-                  <Swatch color={s.light} compact>
-                    <span className="docs-brand-hex">{s.light.toUpperCase()}</span>
-                  </Swatch>
-                )}
-              </li>
-            );
-          })}
-        </ol>
-        <ChartResult advice={advice} hidden={dragging} />
+    <li className="docs-brand-extra">
+      <div className="docs-brand-extra-head">
+        <h3 className="docs-brand-chart-title">--chart-{n}</h3>
+        {series.from === 'pinned' ? (
+          <Button size="sm" type="stroke" onClick={onUnpick} aria-label={`Series ${n}: back to Bland’s pick`}>
+            Use Bland’s pick
+          </Button>
+        ) : (
+          <span className="docs-brand-chart-source">{SOURCES[series.from] ?? `Extra color ${series.from}`}</span>
+        )}
       </div>
-      <ChartModeRow label="Light" chart={chart} mode="light" />
-      <ChartModeRow label="Dark" chart={chart} mode="dark" />
-    </>
+      {editable ? (
+        <ColorCard label={`Series ${n}`} pickerLabel={`Pick a color for series ${n}`} color={series.light} shown={series[theme]} onChange={onPick} onDraggingChange={setDragging}>
+          {check}
+        </ColorCard>
+      ) : (
+        <div className="docs-brand-card bland-smooth">
+          <Swatch color={series[theme]}>
+            <span className="docs-brand-hex">{series[theme].toUpperCase()}</span>
+          </Swatch>
+          {check}
+        </div>
+      )}
+    </li>
   );
 }
 
-/** One theme's eight values, in the brand's step-row style. */
-function ChartModeRow({ label, chart, mode }: { label: string; chart: ChartSeries[]; mode: 'light' | 'dark' }) {
-  return (
-    <div className="docs-brand-chart-mode-row">
-      <span className="docs-brand-chart-mode-label">{label}</span>
-      <ScrollArea axis="x" className="docs-brand-scale" viewportProps={{ role: 'group', 'aria-label': `Chart colors, ${label.toLowerCase()} theme` } as HTMLAttributes<HTMLDivElement>}>
-        <ol>
-          {chart.map((s, i) => (
-            <li key={i}>
-              <span className="docs-brand-chip bland-smooth" style={{ background: s[mode] }} />
-              <span className="docs-brand-step">{i + 1}</span>
-              <span className="docs-brand-step-hex">{s[mode]}</span>
-            </li>
-          ))}
-        </ol>
-      </ScrollArea>
-    </div>
-  );
-}
-
-/** The chart check in plain words (no ratios or vision jargon): checks out, or each thing to change or label. */
-function ChartResult({ advice, hidden }: { advice: ChartAdvice[]; hidden: boolean }) {
-  const fails = advice.filter((a) => a.level === 'fail');
+/** One chart color's check in plain words, with Fix color when a nearby color clears it (named before you press). */
+function ChartColorCheck({ advice, hidden, fixed, onFix }: { advice: ChartAdvice[]; hidden: boolean; fixed?: string; onFix: () => void }) {
+  const fails = advice.some((a) => a.level === 'fail');
   return (
     <div className="docs-brand-chart-check" hidden={hidden}>
       {advice.length === 0 ? (
         <Banner status="success" colored>
-          Chart colors check out
+          This color checks out
         </Banner>
       ) : (
-        <Banner status="warning" colored orientation="vertical" title={fails.length ? 'Some colors need a change' : 'Some colors are close for color-blind readers'}>
-          <ul className="docs-brand-chart-findings">
-            {advice.map((a) => (
-              <li key={a.text}>{a.text}</li>
-            ))}
-          </ul>
+        <Banner
+          status="warning"
+          colored
+          orientation="vertical"
+          title={fails ? 'This color needs a change' : 'Close for color-blind readers'}
+          actions={
+            fixed && (
+              <Button size="sm" onClick={onFix}>
+                Fix color
+              </Button>
+            )
+          }
+        >
+          {advice.map((a) => (
+            <p key={a.text} className="docs-brand-chart-finding">
+              {a.text}
+            </p>
+          ))}
+          {fixed && <p className="docs-brand-chart-finding">Fix color changes it to {fixed.toUpperCase()}.</p>}
         </Banner>
       )}
     </div>
@@ -728,15 +768,15 @@ function ChartSample({ count }: { count: number }) {
 }
 
 /** A big swatch of one color with its hex and a copy button. Its text is white on dark colors, dark on light ones. */
-function Swatch({ color, children, ref, compact }: { color: string; children: ReactNode; ref?: Ref<HTMLDivElement>; compact?: boolean }) {
+function Swatch({ color, children, ref }: { color: string; children: ReactNode; ref?: Ref<HTMLDivElement> }) {
   const { copied, copy, status } = useCopy('Copied');
   // Light colors take the light theme's bold text, so the hex reads on them in either theme.
   const light = contrast('#ffffff', color) < 3;
   return (
-    <div ref={ref} className="docs-brand-swatch bland-smooth" data-compact={compact ? '' : undefined} data-theme={light ? 'light' : undefined} data-ink={light ? 'dark' : 'light'} style={{ background: color }}>
+    <div ref={ref} className="docs-brand-swatch bland-smooth" data-theme={light ? 'light' : undefined} data-ink={light ? 'dark' : 'light'} style={{ background: color }}>
       {children}
       <button type="button" className="docs-brand-copy bland-focus-ring" aria-label={`Copy ${color.toUpperCase()}`} onClick={() => copy(color)}>
-        <Icon size={compact ? 'md' : 'lg'}>{copied ? <CheckIcon /> : <CopySimpleIcon />}</Icon>
+        <Icon size="lg">{copied ? <CheckIcon /> : <CopySimpleIcon />}</Icon>
       </button>
       {status}
     </div>

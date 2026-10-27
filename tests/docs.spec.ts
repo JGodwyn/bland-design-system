@@ -355,32 +355,39 @@ test('the brand page shows the chart palette in both themes, takes your own pick
 
   await page.getByRole('tab', { name: 'Chart colors' }).click();
   const list = page.getByRole('list', { name: 'Chart colors' });
+  const item = (n: number) => list.getByRole('listitem').nth(n - 1);
   await expect(list.getByRole('listitem')).toHaveCount(8);
-  await expect(list.getByRole('listitem').first()).toContainText(/--chart-1\s*Brand color\s*#0062FF/, { useInnerText: true });
-  await expect(page.getByRole('group', { name: 'Chart colors, light theme' })).toContainText('1#0062ff');
-  await expect(page.getByRole('group', { name: 'Chart colors, dark theme' })).toContainText('1#659cff');
-  await expect(page.locator('.docs-brand-chart-check')).toHaveText('Chart colors check out');
-  // The brand's swatch isn't tapped here (it changes under Brand colors); Bland's picks are.
-  await expect(list.getByRole('button', { name: /^Series 1 / })).toHaveCount(0);
+  // Each color is a block like an extra color's: its token, where it comes from, its card and its own check.
+  await expect(item(1)).toContainText(/--chart-1\s*Brand color\s*#0062FF\s*This color checks out/, { useInnerText: true });
+  await expect(item(1)).not.toContainText('Tap to change'); // the brand changes under Brand colors
+  await expect(item(2)).toContainText('Tap to change');
+  await expect(list.getByText('This color checks out')).toHaveCount(8);
   const reset = page.getByRole('button', { name: 'Use Bland’s picks' });
   await expect(reset).toBeDisabled();
+  // The swatch shows the color for the page's theme.
+  await page.getByRole('radiogroup', { name: 'Theme' }).getByRole('radio', { name: 'Dark' }).check({ force: true });
+  await expect(item(1)).toContainText('#659CFF');
+  await page.getByRole('radiogroup', { name: 'Theme' }).getByRole('radio', { name: 'Light' }).check({ force: true });
+  await expect(item(1)).toContainText('#0062FF');
 
-  // Picking your own color for a series: it keeps that place and color, and the check speaks plainly.
-  await list.getByRole('button', { name: /^Series 3 #/ }).click();
+  // Your own color keeps its place; its check speaks plainly, and Fix color names the color it moves to.
+  await item(3).getByRole('button', { name: /^Series 3 #/ }).click();
   await page.getByRole('textbox', { name: 'HEX color' }).fill('#f4f000');
   await page.keyboard.press('Escape');
-  await expect(list.getByRole('button', { name: 'Series 3 #F4F000, change it' })).toBeVisible();
-  await expect(list.getByRole('listitem').nth(2)).toContainText('Reset');
-  const check = page.locator('.docs-brand-chart-check');
-  await expect(check).toContainText('Some colors need a change');
-  await expect(check).toContainText('Series 3 is too faint on the white page. Pick another color for series 3.');
-  await expect(check).not.toContainText(/ΔE|protan|deutan|tritan|:1/);
+  await expect(item(3).getByRole('button', { name: 'Series 3 #F4F000, change it' })).toBeVisible();
+  await expect(item(3)).toContainText('This color needs a change');
+  await expect(item(3)).toContainText('Series 3 is too faint on the white page. Pick another color for series 3.');
+  await expect(item(3)).not.toContainText(/ΔE|protan|deutan|tritan|:1/);
+  await expect(item(3)).toContainText(/Fix color changes it to #[0-9A-F]{6}\./);
   await page.getByRole('tab', { name: 'How to use' }).click();
   await expect(page.locator('#use-in-a-project pre')).toContainText('--chart-3: #f4f000; /* picked */');
   await page.getByRole('tab', { name: 'Chart colors' }).click();
-  await list.getByRole('button', { name: 'Series 3: back to Bland’s pick' }).click();
-  await expect(check).toHaveText('Chart colors check out');
-  await list.getByRole('button', { name: /^Series 4 #/ }).click();
+  await item(3).getByRole('button', { name: 'Fix color' }).click();
+  await expect(item(3)).toContainText('This color checks out');
+  await expect(item(3).getByRole('button', { name: /^Series 3 #/ })).not.toHaveAccessibleName('Series 3 #F4F000, change it');
+  await item(3).getByRole('button', { name: 'Series 3: back to Bland’s pick' }).click();
+  await expect(item(3)).toContainText('Bland’s pick');
+  await item(4).getByRole('button', { name: /^Series 4 #/ }).click();
   await page.getByRole('textbox', { name: 'HEX color' }).fill('#2b2bd0');
   await page.keyboard.press('Escape');
   await expect(reset).toBeEnabled();
@@ -400,7 +407,7 @@ test('the brand page shows the chart palette in both themes, takes your own pick
   await page.getByRole('tab', { name: 'Extra colors' }).click();
   await page.getByRole('button', { name: 'Add color' }).click();
   await page.getByRole('tab', { name: 'Chart colors' }).click();
-  await expect(list.getByRole('listitem').nth(1)).toContainText('Extra: accent');
+  await expect(list.getByRole('listitem').nth(1)).toContainText('Extra color accent');
   await page.getByRole('tab', { name: 'How to use' }).click();
   const css = page.locator('#use-in-a-project pre');
   await expect(css).toContainText('--chart-2: var(--accent-600);');

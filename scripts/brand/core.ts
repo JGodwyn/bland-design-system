@@ -855,7 +855,14 @@ function themedCss(comment: string, lines: (mode: Mode) => string[]): string {
 }
 
 /** A chart check result in plain words, for people who don't speak contrast ratios: one line per problem, both modes merged. */
-export type ChartAdvice = { level: 'fail' | 'warn'; text: string };
+export type ChartAdvice = {
+  level: 'fail' | 'warn';
+  text: string;
+  /** The series this is about, from 1: the one to change (a pick first, then the later one), else the later one. */
+  series: number;
+  /** True when that series can change here (Bland's pick or the project's); false for the brand and extras. */
+  editable: boolean;
+};
 
 export function chartAdvice(findings: ChartFinding[], series: ChartSeries[]): ChartAdvice[] {
   const name = (n: number) => {
@@ -884,7 +891,13 @@ export function chartAdvice(findings: ChartFinding[], series: ChartSeries[]): Ch
     const key = f.kind === 'contrast' ? `c|${f.series[0]}|${f.mode}` : `a|${f.series.join(',')}`;
     groups.set(key, [...(groups.get(key) ?? []), f]);
   }
-  return [...groups.values()].map((fs): ChartAdvice => {
+  return [...groups.values()].map((fs) => {
+    const f = fs[0]!;
+    const t = target(f.series);
+    return { ...say(fs), series: t ?? f.series.at(-1)!, editable: t !== undefined };
+  });
+
+  function say(fs: ChartFinding[]): Pick<ChartAdvice, 'level' | 'text'> {
     const f = fs[0]!;
     if (f.kind === 'contrast') return { level: 'fail', text: `${name(f.series[0]!)} is too faint on the ${f.mode === 'light' ? 'white' : 'dark'} page. ${cap(changeFor(f))}.` };
     const pair = `${name(f.series[0]!)} and ${name(f.series[1]!).replace(/^Series/, 'series')}`;
@@ -896,7 +909,43 @@ export function chartAdvice(findings: ChartFinding[], series: ChartSeries[]): Ch
     const who = `people with ${kinds.join(' or ')} color blindness`;
     if (fails.length) return { level: 'fail', text: `${pair} look the same to ${who}${whereOf(fails)}. ${cap(changeFor(f))}.` };
     return { level: 'warn', text: `${pair} are hard to tell apart for ${who}${whereOf(fs)}. Name each series on the chart (a legend or labels), or ${changeFor(f)}.` };
-  });
+  }
+}
+
+/**
+ * The nearest color to series `n`'s (lightness moved up to 0.35, hue turned up to 30°, chroma kept) that clears
+ * every problem it is in: 3:1 on both pages and apart from both neighbours, near misses too when it can, else the
+ * misses only. Undefined when nothing nearby does. The fix becomes a pick for that series.
+ */
+export function fixChartColor(series: ChartSeries[], n: number, neutrals: Scale = blandNeutrals): string | undefined {
+  const i = n - 1;
+  const base = toOklch(series[i]!.light);
+  const near = [i - 1, i + 1].filter((j) => j >= 0 && j < series.length).map((j) => series[j]!);
+  const problems = (s: ChartSeries, warn: boolean) => {
+    for (const mode of ['light', 'dark'] as const) {
+      if (contrast(s[mode], chartBg(mode, neutrals)) < CHART_CONTRAST) return true;
+      for (const o of near) {
+        for (const v of VISIONS) {
+          const e = deltaE(s[mode], o[mode], v);
+          if (e < (v === 'normal' ? CHART_NORMAL_FLOOR : warn ? CHART_CVD_TARGET : CHART_CVD_FLOOR)) return true;
+        }
+      }
+    }
+    return false;
+  };
+  const candidates: { hex: string; d: number }[] = [];
+  for (let dl = -0.35; dl <= 0.35 + 1e-9; dl += 0.01) {
+    for (let dh = -30; dh <= 30; dh += 5) {
+      const hex = fromOklch({ l: Math.min(0.97, Math.max(0.15, base.l + dl)), c: base.c, h: (base.h + dh + 360) % 360 });
+      candidates.push({ hex, d: deltaE(hex, series[i]!.light) });
+    }
+  }
+  candidates.sort((a, b) => a.d - b.d);
+  for (const warn of [true, false]) {
+    const found = candidates.find((c) => c.d > 0.5 && !problems(pinnedSeries(c.hex, neutrals), warn));
+    if (found) return found.hex;
+  }
+  return undefined;
 }
 
 /**

@@ -4,7 +4,7 @@ import { test } from 'node:test';
 
 import { readFileSync } from 'node:fs';
 
-import { blandChart, chartAdvice, chartPins, parseChart, pinnedSeries, CHART_CONTRAST, CHART_COUNT, chartCss, chartHues, checkChart, colorOf, deltaE, generateChart, EXTRA_PAIRS, EXTRA_ROLES, extraNameError, harmonyColor, HARMONY_TURNS, parseExtras, blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
+import { blandChart, fixChartColor, chartAdvice, chartPins, parseChart, pinnedSeries, CHART_CONTRAST, CHART_COUNT, chartCss, chartHues, checkChart, colorOf, deltaE, generateChart, EXTRA_PAIRS, EXTRA_ROLES, extraNameError, harmonyColor, HARMONY_TURNS, parseExtras, blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
 
 const close = (a: string, b: string) => toOklch(a).l - toOklch(b).l;
 
@@ -242,4 +242,16 @@ test('the chart check in plain words: who, where, and what to do', () => {
   assert.ok(alike.some((a) => a.text === 'Series 1 (your brand color) and series 2 look too much alike. Pick another color for series 2.'), JSON.stringify(alike));
   assert.equal(alike.length, 1, 'one line per pair, the worst of it');
   for (const a of [...advice, ...alike]) assert.doesNotMatch(a.text, /ΔE|protan|deutan|tritan|:1/);
+});
+
+test('fixing one chart color: the nearest color that clears its problems, said on that color', () => {
+  const chart = generateChart(blandScale, [], blandNeutrals, { 4: '#1458e8', 5: '#0a50e0', 6: '#f4f000' });
+  const advice = chartAdvice(checkChart(chart), chart);
+  assert.deepEqual(advice.map((a) => [a.series, a.editable]).sort(), [[4, true], [6, true]], JSON.stringify(advice));
+  for (const n of [4, 6]) {
+    const hex = fixChartColor(chart, n)!;
+    assert.ok(hex, `series ${n} has a fix`);
+    const fixed = chart.map((s, i) => (i === n - 1 ? pinnedSeries(hex) : s));
+    assert.deepEqual(chartAdvice(checkChart(fixed), fixed).filter((a) => a.series === n && a.level === 'fail'), [], `series ${n} after the fix`);
+  }
 });
