@@ -1672,3 +1672,8 @@ not wrapped; rail contents centred (logo and account icon were off).
 
 - Godwin: text from Heading lg up looks cut off at the bottom. `.docs-type-sample` had `overflow: hidden` for its ellipsis; scrollHeight exceeded clientHeight by 2 to 6px from Heading lg up (descenders below tight line boxes). Now `overflow-x: clip` with `overflow-y: visible`. Checked in the browser pane on a 5181 server; docs specs pass.
 - Follow-up: with descenders visible the samples crowded their token line; the row gap went space-xs to space-md (Godwin).
+
+## Grid system: Figma audit, stopped before code (2026-10-27)
+
+- Read the Grid system page (1145:1071) and the 17 grid styles read-only through the official Figma MCP. All column grids, no descriptions. Bound: every gutter (space-sm, space-lg, space-xl) and the Mobile styles' offset (Layout/margin-mobile), all already CSS tokens. Raw: every column count (4, 6, 8, 10, 12, 14), every fixed column width (104, 112, 128, 136, 144) and the Dashboard offset (24). Layout/margin-desktop (152) is bound by no grid.
+- Stopped there (hard rule: no invented tokens). Nothing to extend in the token pipeline yet: the bound values already reach tokens.css. Table and proposal in the side-session notes (grid-system-figma-audit.md) and the tracker's Needs your call.
