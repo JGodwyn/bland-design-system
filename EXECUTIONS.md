@@ -1595,3 +1595,8 @@ not wrapped; rail contents centred (logo and account icon were off).
 
 - Godwin: animate the banner's exit too. It now stays mounted and is `hidden` both while dragging and on Bland's own palette, so both leave the same way: opacity and a fold (grid row 1fr to 0fr) plus a negative margin that folds the section's gap, duration/md easing/out, then display none (`allow-discrete`); entering unfolds the same path (`@starting-style`). Reduced motion keeps the fade only. While hidden it keeps its last result, so the exit plays on what was shown.
 - Dead end: `height: auto` to 0 with `interpolate-size: allow-keywords` on the element didn't animate in Chromium 156 (height held at 132 until display none), though `CSS.supports` said yes. The grid-rows fold works; measured in Playwright: out in ~160 ms, in ~160 ms.
+
+## Brand page: contrast result motion is scale + opacity (2026-10-27)
+
+- Godwin didn't like the fold; asked for scale + opacity per Emil Kowalski's course. Following it: transitions (interruptible) instead of keyframes, from scale 0.97 + opacity 0 (never 0), easing/out, exit faster than entry (duration/xs out, duration/md in), only transform and opacity animate (no height or margin). Scaled from the top centre, where the result hangs from the step row; `display` allow-discrete drops it from the layout after the exit. Each new result (keyed) enters the same way with `@starting-style`. Reduced motion: opacity only.
+- The fold's grid wrapper is gone. Measured in Playwright: out in ~110 ms, in ~180 ms.
