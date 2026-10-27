@@ -246,8 +246,8 @@ function Contrast({ misses: current, keep, hidden, canFix, onFix }: { misses: Fi
   const misses = shown.current;
   const result = misses.length === 0 ? 'ok' : `miss-${misses.length}`;
   return (
-    <div className="docs-brand-contrast" hidden={hidden}>
-      <div className="docs-brand-contrast-inner">
+    <div className="docs-brand-contrast docs-fold" hidden={hidden}>
+      <div className="docs-fold-inner">
       <div key={result} className="docs-brand-contrast-result">
         {misses.length === 0 ? (
           <Banner status="success" colored>
@@ -275,8 +275,10 @@ function Contrast({ misses: current, keep, hidden, canFix, onFix }: { misses: Fi
         )}
       </div>
       {misses.length > 0 && (
-        <div id={breakdown} hidden={!open}>
-          <Findings items={misses} keep={keep} />
+        <div id={breakdown} className="docs-fold" hidden={!open}>
+          <div className="docs-fold-inner">
+            <Findings items={misses} keep={keep} />
+          </div>
         </div>
       )}
       </div>

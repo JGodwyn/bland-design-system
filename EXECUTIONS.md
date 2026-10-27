@@ -1605,3 +1605,7 @@ not wrapped; rail contents centred (logo and account icon were off).
 
 - Godwin: try the fold again with Emil's principles. Two parts: the content (inner) scales from 0.97 and fades from the top centre; the wrapper's grid row folds 1fr to 0fr (plus the section gap via a negative margin) so the page glides. Exit: content out in duration/xs with no delay while the space folds over duration/md. Entry: the space unfolds first, the content follows a quarter of duration/md later. Transitions throughout (interruptible), easing/out. Reduced motion: fade only, the space goes at once.
 - Measured in Playwright: exit content gone ~90 ms, space ~150 ms; entry space ~130 ms, content in by ~160 ms.
+
+## Brand page: breakdown table folds too (2026-10-27)
+
+- Godwin: give Show/Hide breakdown the same fold + scale. The motion is now a shared docs class, `.docs-fold` (wrapper, `hidden` toggles it) + `.docs-fold-inner` (content), used by the contrast result and the breakdown. Measured: the table (362 high) unfolds and scales in by ~170 ms, folds away in ~190 ms with its content gone by ~90 ms.
