@@ -656,3 +656,15 @@ switch test does.
 - **Symptom:** a Popover opened with no content (and focus fell to the body) on its first open after a load. **Cause:** `reference={ref.current}` read during render, null on the earlier render. **Rule:** give Popover its anchor through state (`const [el, setEl] = useState(null)` + `ref={setEl}`), as the components do.
 - **Symptom:** a CSS transition sat at its start value, `startTime` null, in the browser pane. **Cause:** the pane was hidden, so no frames are produced. **Rule:** measure motion in Playwright (or with the pane shown), not in a hidden pane.
 - **Symptom:** a `height: auto` to 0 transition jumped, with `interpolate-size: allow-keywords` set on the element itself. **Rule:** for fold animations use the grid-rows trick (`grid-template-rows: 1fr` to `0fr`, inner `min-height: 0; overflow: clip`); measure it in Playwright.
+
+## Worktree tests and the shared port (2026-10-27)
+
+**A worktree's `npm test` ran against the main checkout's docs server.** The
+List spec passed with the old CSS, then a new spec failed by exactly the
+change: 5180 was held by a server whose cwd was the main checkout, and
+`reuseExistingServer` used it. Stopping it would break another session. →
+Check `lsof -p <pid> -a -d cwd` for the server's checkout; to test a worktree
+beside it, use a throwaway Playwright config that spreads
+`playwright.config.ts` with `baseURL` and `webServer` on another port
+(`npx vite --config playground/vite.config.ts --port 5191`; the CLI port
+beats `strictPort`'s config value), then delete it.

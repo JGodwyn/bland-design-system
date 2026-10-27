@@ -123,3 +123,11 @@ test('on a 3+ line row a trailing icon centres on the title line', async ({ page
   const icon = (await item.locator('.bland-list-item__trailing .bland-icon').boundingBox())!;
   expect(Math.abs(mid(icon) - mid(title))).toBeLessThanOrEqual(0.5);
 });
+
+test('on a 3+ line row the title centres on the 40px leading slot', async ({ page }) => {
+  const mid = (b: { y: number; height: number }) => b.y + b.height / 2;
+  const item = page.locator('.bland-list-item', { hasText: 'An icon in the trailing slot' });
+  const title = (await item.locator('.bland-list-item__title').boundingBox())!;
+  const leading = (await item.locator('.bland-list-item__leading').boundingBox())!;
+  expect(Math.abs(mid(leading) - mid(title))).toBeLessThanOrEqual(0.5);
+});

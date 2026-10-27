@@ -48,6 +48,15 @@ gap: "10px" is hardcoded and no Spacing token is 10px. Nearest Spacing: var(--sp
 
 The audit check is `npm run audit` (`npm audit --omit=dev`), which reports 0 vulnerabilities. Recheck the full `npm audit` when `braces` or `micromatch` ships a fix (recorded 2026-10-17).
 
+## Scope kept as is (Godwin 2026-10-27)
+
+The rule stays at the values above; no new rules for now:
+
+- **`%` and viewport units** are layout (a column's share, a full-height panel), not design values, and no token could name them.
+- **Angles** are rotations (a caret turning 180°, a spinner), set by the motion, not by the design scale.
+- **Opacity** is needed for fades and enter/exit motion, so it stays allowed outside disabled states, where it is already rejected. Raw times are already rejected too.
+- **`z-index`** is rare because overlays (Tooltip, Menu, Modal, Toaster) use the top layer. Add a rule only if `z-index` starts appearing in component CSS.
+
 ## Known gaps
 
 - A `transition` with a token duration but no easing (`transition: color var(--duration-xs)`) passes and gets the browser default `ease`. Always write the easing token.

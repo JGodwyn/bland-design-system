@@ -27,8 +27,9 @@ when), `docs/components.md` (how to build one).
 ### Light and dark
 - Light on `:root`. Dark redefines only the Theme tokens and the elevation
   shadows, under `[data-theme="dark"]`, and under `prefers-color-scheme: dark`
-  when no `data-theme="light"` is set. Apps can use either; which one products
-  use is still an open question in `CLAUDE.md`.
+  when no `data-theme="light"` is set. **Both ways stay (Godwin 2026-10-27):**
+  `data-theme` wins, else the system preference; a project's toggle sets
+  `data-theme` on `<html>`.
 
 ### Brand override (Godwin, 2026-10-26)
 - One package; a project brings its brand by overriding the 13 `--brand-*`
@@ -840,6 +841,13 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   flush or not (4 + 24 + 4); supersedes the 40 above. Dark mode fills moved
   one step darker in Figma the same day (`List/surface-rest` Neutral900,
   hover 800, pressed 700), synced as tokens.
+- **3+ rows follow the first-line rule (Godwin 2026-10-27):** with a leading
+  slot (40) the text and the trailing slot move down half the difference
+  from the title's line (`(list/slot-lg - body-lg line) / 2`, 8), so the
+  title centres on the slot and the description runs below; without a
+  leading slot nothing moves. Code first; Figma to follow.
+- **2 line rows (Godwin 2026-10-27):** Figma's row is to hug with padding
+  tokens instead of the fixed 64, with no new token; code's 62 stands.
 
 ### Empty State (2026-10-19)
 - `import { EmptyState } from 'bland'`, folder `empty-state/`. Figma: set
@@ -2167,3 +2175,11 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - (2026-10-27) Reset on the Brand theme page asks first (Godwin): a Modal "Reset to Bland’s colors?", no icon, one short paragraph: "Your N extra accent colors will be removed too." (when there are any) and that it can’t be undone (Godwin dropped the list of what goes back); danger "Reset colors" first, secondary Cancel.
 - (2026-10-27) Color picker: RGB, HSL and OKLCH are one field per number (Godwin: values must not run together), each with its unit beside it (°, %), its range clamped, arrow keys stepping (Shift ten), a paste of a whole color taken by any of them; HEX stays one field. OKLCH lightness shows as a percent. The format label is body-lg-bold; the picker is 352 wide (space-9xl + 0.75 x space-7xl).
 - (2026-10-27) Reset dialog rebuilt from Figma 6819:11620: description "Reset this color to Bland’s default color. Your N extra accent colors will also be removed. You can’t undo this." and an info Banner (colored) in the body's bottom slot: "Copy the CSS under How to use first if you want to keep this palette." Reset colors (danger) then Cancel (secondary).
+
+## Batch 1 of the open decisions (Godwin, 2026-10-27)
+
+- Dark mode switch: both (`data-theme` wins, else `prefers-color-scheme`); recorded in CLAUDE.md, Light and dark above, `docs/agent-skill.md`.
+- Lint scope kept as is (`docs/lint.md`, "Scope kept as is").
+- ChatBubble audio stays project-owned; an optional hook may come later.
+- Waiting on Figma (Batch 2), not built yet: Chat list item selected look (as the Sidebar's selected row, on `aria-current`); message bar cap from a new `message-bar/max-height` (about 200), the textarea then scrolls in a ScrollArea; selected disabled pill count rebound to a contrasting color in dark; `_menu-item` slots rebound to the top; List 2 line row hug; chat file separator bound to space-sm (code is already 8).
+- Built: List 3+ rows centre the title on the leading slot (List item above).

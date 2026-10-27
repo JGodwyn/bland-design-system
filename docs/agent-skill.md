@@ -6,7 +6,7 @@ Raw material for the skill we package at the end of the project: what an agent n
 
 - Install the package (not published yet: see the roadmap), import `bland/tokens.css`, then the project's `brand.css`, then the components' CSS. Order matters: the override comes after Bland's tokens (`docs/brand.md`).
 - Fonts: Inter and Geist Mono ship self-hosted in `src/styles/fonts.css`; base reset and helpers in `base.css`.
-- Theme: `data-theme="light|dark"` on any element wins; without it `prefers-color-scheme` decides. Nested `data-theme` sections work.
+- Theme (Godwin 2026-10-27: both ways): `data-theme="light|dark"` on any element wins; without it `prefers-color-scheme` decides. Nested `data-theme` sections work. A theme toggle sets `data-theme` on `<html>` (and removes it to follow the system again); don't add a class or a second set of dark styles.
 
 ## Brand and colors
 
@@ -38,6 +38,7 @@ Raw material for the skill we package at the end of the project: what an agent n
 - Variants are props (`size`, `emotion`, `type`), never class overrides. Defaults: most sizes default to sm or md; check the map.
 - Routers: links take `renderLink` (Breadcrumb, TabBar, Sidebar, Pagination, ListItem, Logo).
 - Disabled uses the disabled tokens, never opacity.
+- ChatBubble audio: the project owns the `<audio>` element and its playback; the bubble only draws it (`playing`, `onPlayingChange`, `progress`, `duration`). Wire play/pause and progress to the project's own player.
 
 ## Open (decide before writing the skill)
 

@@ -1648,3 +1648,10 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Reset warning: Modal with the trigger as the Reset button; the spec checks the listed changes, Cancel keeping the brand, and Reset clearing it (waits for the dialog to close, since its danger Reset button shares the name while it exits).
 - Picker number fields: CHANNELS/channelsOf/fromChannels in colorFormats.ts; Channels component keeps the typed field's text while others follow. First pass clipped values at 320 wide with equal columns; widened to 352 and let each column and input hug its number (size attribute, field-sizing).
 - Picker follow-up: the dividers were inset shadows on rounded boxes (format button, number fields), so they bent at the corners and read as cut off; now straight 1px lines (pseudo-elements) space-sm in from top and bottom, hidden beside a focused field. Format menu md, at least space-7xl wide.
+
+## Batch 1 of Godwin's open decisions (2026-10-27, branch claude/batch1-decisions-b6936a)
+
+- Recorded the accepted answers: dark mode switch both ways (CLAUDE.md Decisions, open question removed, INTERFACE Light and dark, agent-skill), lint scope kept with reasons (docs/lint.md), chat audio project-owned (map row, agent-skill), and the Figma-first items as notes on the List, Chat list item, Chat bubble, Chat message bar, Pill and Menu rows.
+- List 3+ rows: `--_line-offset` on the row, `(list/slot-lg - body-lg line) / 2` when a leading slot is present, applied as margin-top on the text column and the trailing slot (message.css pattern). New spec: title centre equals leading slot centre.
+- Dead end: the first run passed visual and failed the new spec by 8px: Playwright reused the main checkout's server on 5180 (LEARNINGS). Ran against this worktree on 5191 with a throwaway config: behaviour specs pass, List screenshot 16px taller (two 3+ rows with a leading slot). Looked at the PNG, re-baselined list light/dark only with `--update-snapshots=all`. lint:css and typecheck clean.
+- Not built (needs Figma, Batch 2): Chat list item selected look, message bar max height, pill count in dark. Checklist written into the tracker.

@@ -22,7 +22,11 @@
  * Heights: 1 line rows pad space-xs above and below, flush or not: 4 + 24 + 4 = 32, as in Figma
  * (2026-10-22). Figma fixes 2 line rows at 64 (unbound) and centres the content, so its
  * space-md padding never shows there; code pads them space-sm: 8 + 46 + 8 = 62. 3+ line rows
- * hug, as in Figma.
+ * hug, as in Figma. Godwin 2026-10-27: Figma's 2 line row is to hug with padding tokens too; code's 62 stands.
+ *
+ * First-line alignment (docs/components.md): on a 3+ line row the 40px leading slot is taller than the title's
+ * line, so the text and the trailing slot move down half the difference and the title centres on the slot
+ * (Godwin 2026-10-27).
  */
 
 .bland-list-item {
@@ -39,6 +43,7 @@
   --_title: var(--text-bold);
   --_subtle: var(--text-subtle);
   --_icon: var(--icon-bold);
+  --_line-offset: var(--space-none); /* moves the title line down to centre on a taller leading slot */
 
   display: flex;
   align-items: center;
@@ -68,6 +73,10 @@
 .bland-list-item[data-lines="3+"] > .bland-list-item__row {
   align-items: flex-start;
   padding-block: var(--space-md);
+}
+
+.bland-list-item[data-lines="3+"] > .bland-list-item__row:has(> .bland-list-item__leading) {
+  --_line-offset: calc((var(--list-slot-lg) - var(--type-body-lg-line-height)) / 2);
 }
 
 /* Flush: no resting fill, no radius, space-sm above and below (space-xs on 1 line rows), space-2xs at the sides. */
@@ -115,6 +124,7 @@
   flex-direction: column;
   gap: var(--space-2xs);
   min-width: var(--space-none);
+  margin-block-start: var(--_line-offset);
 }
 
 .bland-list-item__header {
@@ -160,6 +170,7 @@
   flex: none;
   align-items: center;
   justify-content: center;
+  margin-block-start: var(--_line-offset);
   color: var(--_subtle);
 }
 
