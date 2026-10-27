@@ -932,7 +932,7 @@ code,
 .docs-type-row {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--space-md); /* room for the descenders that hang below large samples */
   padding: var(--space-lg) 0;
   border-bottom: var(--stroke-sm) solid var(--border-subtle);
 }

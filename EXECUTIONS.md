@@ -1671,3 +1671,4 @@ not wrapped; rail contents centred (logo and account icon were off).
 ## Typography page: large samples cut off (2026-10-27)
 
 - Godwin: text from Heading lg up looks cut off at the bottom. `.docs-type-sample` had `overflow: hidden` for its ellipsis; scrollHeight exceeded clientHeight by 2 to 6px from Heading lg up (descenders below tight line boxes). Now `overflow-x: clip` with `overflow-y: visible`. Checked in the browser pane on a 5181 server; docs specs pass.
+- Follow-up: with descenders visible the samples crowded their token line; the row gap went space-xs to space-md (Godwin).
