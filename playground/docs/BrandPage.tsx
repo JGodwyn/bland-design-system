@@ -29,6 +29,7 @@ import {
   blandNeutrals,
   blandScale,
   CHART_COUNT,
+  chartAdvice,
   checkChart,
   check,
   contrast,
@@ -46,7 +47,8 @@ import {
   placeStep,
   STEPS,
   toCss,
-  type ChartFinding,
+  type ChartAdvice,
+  type ChartPins,
   type ChartSeries,
   type Finding,
   type Scale,
@@ -78,8 +80,10 @@ export function BrandPage() {
   // While a pointer drags in the picker the contrast message hides, and comes back once it is released.
   const [dragging, setDragging] = useState(false);
   const [extras, setExtras] = useState<ExtraState[]>(savedExtras);
+  const [pins, setPins] = useState<ChartPins>(savedPins);
   const [tab, setTab] = useState('brand');
   useEffect(() => saveExtras(extras), [extras]);
+  useEffect(() => savePins(pins), [pins]);
 
   // Bland's own blue is Bland's scale exactly (generating it again lands within 1/255).
   const isBlandColor = input === blandScale['600'];
@@ -106,13 +110,14 @@ export function BrandPage() {
     edit(blandScale['600']);
     setTint('full');
     setExtras([]);
+    setPins({});
     setAppliedBrand(null);
   };
   // Extra colors: up to MAX_EXTRAS, each with a name that doesn't clash, made into a scale (fixed when asked).
   const extraScales = extras.map((x) => ({ ...x, scale: x.fixed ?? generate(x.color), error: extraNameError(x.name, extras.filter((o) => o.id !== x.id).map((o) => o.name)) }));
   const validExtras = extraScales.filter((x) => !x.error).map(({ name, scale }) => ({ name, scale }));
   // The chart palette follows the brand, the valid extras (in order) and the neutrals' page color.
-  const chart = useMemo(() => generateChart(scale, validExtras, neutrals), [scale, neutrals, JSON.stringify(validExtras)]);
+  const chart = useMemo(() => generateChart(scale, validExtras, neutrals, pins), [scale, neutrals, JSON.stringify(validExtras), pins]);
   const updateExtra = (id: string, patch: Partial<ExtraState>) => setExtras((all) => all.map((x) => (x.id === id ? { ...x, ...patch } : x)));
   const addExtra = () =>
     setExtras((all) => {
@@ -228,12 +233,17 @@ export function BrandPage() {
               label: 'Chart colors',
               panel: (
                 <div className="docs-section docs-brand-section docs-brand-chart">
-                  <p className="docs-note">
-                    {CHART_COUNT} colors for data series, used in order: <code>--chart-1</code> is the brand, the extra colors follow, and the rest are made to sit with them, spread
-                    round the color wheel. Each holds 3:1 on the page in both themes, and neighbours stay apart for color-blind readers too. Bland’s components don’t use them.
-                  </p>
-                  <ChartRow chart={chart} />
-                  <ChartCheck findings={checkChart(chart, neutrals)} />
+                  {/* As the Extra colors tab: the note, with its action beside it. */}
+                  <div className="docs-brand-extras-intro">
+                    <p className="docs-note">
+                      {CHART_COUNT} colors for charts, used in order. The first is your brand color and your extra colors come next; Bland picks the rest to go with
+                      them. Tap one of Bland’s picks to choose your own. Bland’s components don’t use these.
+                    </p>
+                    <Button size="sm" type="stroke" disabled={!chart.some((x) => x.from === 'pinned')} onClick={() => setPins({})}>
+                      Use Bland’s picks
+                    </Button>
+                  </div>
+                  <ChartColors chart={chart} onPick={(n, hex) => setPins((p) => ({ ...p, [n]: normalHex(hex) }))} onUnpick={(n) => setPins(({ [n]: _, ...p }) => p)} />
                 </div>
               ),
             },
@@ -286,6 +296,24 @@ const EXTRA_NAMES = ['accent', 'highlight', 'illustration'];
 const EXTRAS_KEY = 'bland-docs-extras';
 
 /** The extra colors are kept for the visit, like an applied brand (they don't change the site, so they aren't applied). */
+const PINS_KEY = 'bland-docs-chart-picks';
+function savedPins(): ChartPins {
+  try {
+    const raw = JSON.parse(sessionStorage.getItem(PINS_KEY) ?? '{}') as ChartPins;
+    return raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  } catch {
+    return {};
+  }
+}
+function savePins(pins: ChartPins) {
+  try {
+    if (Object.keys(pins).length) sessionStorage.setItem(PINS_KEY, JSON.stringify(pins));
+    else sessionStorage.removeItem(PINS_KEY);
+  } catch {
+    /* Private mode: they last until the page reloads. */
+  }
+}
+
 function savedExtras(): ExtraState[] {
   try {
     const raw = JSON.parse(sessionStorage.getItem(EXTRAS_KEY) ?? '[]') as ExtraState[];
@@ -328,10 +356,6 @@ function ColorCard({
   /** The card's fill in light and dark: an extra's own surface-light role. Omitted, the brand's (surface-brand-light). */
   tint?: { light: string; dark: string };
 }) {
-  const [picking, setPicking] = useState<{ instant: boolean; x: number; y: number } | null>(null);
-  const [hero, setHero] = useState<HTMLDivElement | null>(null);
-  const [anchor, setAnchor] = useState<HTMLSpanElement | null>(null);
-  const pick = useRef<HTMLButtonElement>(null);
   return (
     <div
       className="docs-brand-card bland-smooth"
@@ -341,7 +365,38 @@ function ColorCard({
       <span className="docs-brand-card-label" aria-hidden="true">
         Tap to change
       </span>
-      <Swatch color={color} ref={setHero}>
+      <PickSwatch label={label} pickerLabel={pickerLabel} color={color} onChange={onChange} onDraggingChange={onDraggingChange} />
+      {children}
+    </div>
+  );
+}
+
+/**
+ * A swatch whose hex opens the color picker where it was tapped (a zero-size anchor there), or under the hex from
+ * the keyboard. The anchor is in state, not a ref read during render: the popover needs it on the render that opens it.
+ */
+function PickSwatch({
+  label,
+  pickerLabel,
+  color,
+  onChange,
+  onDraggingChange,
+  compact,
+}: {
+  label: string;
+  pickerLabel: string;
+  color: string;
+  onChange: (hex: string) => void;
+  onDraggingChange: (dragging: boolean) => void;
+  compact?: boolean;
+}) {
+  const [picking, setPicking] = useState<{ instant: boolean; x: number; y: number } | null>(null);
+  const [hero, setHero] = useState<HTMLDivElement | null>(null);
+  const [anchor, setAnchor] = useState<HTMLSpanElement | null>(null);
+  const pick = useRef<HTMLButtonElement>(null);
+  return (
+    <>
+      <Swatch color={color} ref={setHero} compact={compact}>
         <span ref={setAnchor} className="docs-brand-anchor" style={{ left: picking?.x ?? 0, top: picking?.y ?? 0 }} aria-hidden="true" />
         <button
           ref={pick}
@@ -377,8 +432,7 @@ function ColorCard({
       >
         <ColorPicker value={color} onChange={onChange} onDraggingChange={onDraggingChange} />
       </Popover>
-      {children}
-    </div>
+    </>
   );
 }
 
@@ -543,58 +597,101 @@ function ExtraSample({ extras, theme }: { extras: { name: string; scale: Scale }
 /** The chart tokens for one theme, set inline on a preview so its sample chart shows this palette. */
 const chartStyle = (chart: ChartSeries[], theme: 'light' | 'dark') => Object.fromEntries(chart.map((s, i) => [`--chart-${i + 1}`, s[theme]])) as CSSProperties;
 
-/** Each series: its token, where it comes from, and its color in both themes side by side. */
-function ChartRow({ chart }: { chart: ChartSeries[] }) {
+/**
+ * The chart colors, laid out as the brand's (Figma 6806:6170's card): a card of eight swatches, Bland's picks tapped
+ * to change (as the brand swatch), the check in plain words inside it, then the light and dark values as step rows.
+ */
+function ChartColors({ chart, onPick, onUnpick }: { chart: ChartSeries[]; onPick: (n: number, hex: string) => void; onUnpick: (n: number) => void }) {
+  const [dragging, setDragging] = useState(false);
+  const advice = useMemo(() => chartAdvice(checkChart(chart), chart), [chart]);
+  const source = (s: ChartSeries) => (s.from === 'brand' ? 'Brand color' : s.from === 'generated' ? 'Bland’s pick' : s.from === 'pinned' ? 'Your pick' : `Extra: ${s.from}`);
   return (
-    <ol className="docs-brand-chart-list" aria-label="Chart colors">
-      {chart.map((s, i) => (
-        <li key={i}>
-          <span className="docs-brand-role-name">--chart-{i + 1}</span>
-          <span className="docs-brand-step-hex">{s.from === 'generated' ? 'Generated' : s.from === 'brand' ? 'Brand' : `Extra: ${s.from}`}</span>
-          <span className="docs-brand-chart-modes">
-            {(['light', 'dark'] as const).map((mode) => (
-              <span key={mode} className="docs-brand-chart-mode">
-                <span className="docs-brand-chip bland-smooth" style={{ background: s[mode] }} />
-                <span className="docs-brand-step-hex">
-                  {mode === 'light' ? 'Light' : 'Dark'}
-                  <br />
-                  {s[mode]}
-                </span>
-              </span>
-            ))}
-          </span>
-        </li>
-      ))}
-    </ol>
+    <>
+      <div className="docs-brand-card bland-smooth">
+        <span className="docs-brand-card-label" aria-hidden="true">
+          Tap to change
+        </span>
+        <ol className="docs-brand-chart-grid" aria-label="Chart colors">
+          {chart.map((s, i) => {
+            const n = i + 1;
+            const own = s.from === 'generated' || s.from === 'pinned';
+            return (
+              <li key={n}>
+                <div className="docs-brand-chart-head">
+                  <span className="docs-brand-chart-name">--chart-{n}</span>
+                  {s.from === 'pinned' ? (
+                    <Button size="xs" type="ghost" onClick={() => onUnpick(n)} aria-label={`Series ${n}: back to Bland’s pick`}>
+                      Reset
+                    </Button>
+                  ) : (
+                    <span className="docs-brand-chart-source">{source(s)}</span>
+                  )}
+                </div>
+                {own ? (
+                  <PickSwatch
+                    compact
+                    label={`Series ${n}`}
+                    pickerLabel={`Pick a color for series ${n}`}
+                    color={s.light}
+                    onChange={(hex) => onPick(n, hex)}
+                    onDraggingChange={setDragging}
+                  />
+                ) : (
+                  <Swatch color={s.light} compact>
+                    <span className="docs-brand-hex">{s.light.toUpperCase()}</span>
+                  </Swatch>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+        <ChartResult advice={advice} hidden={dragging} />
+      </div>
+      <ChartModeRow label="Light" chart={chart} mode="light" />
+      <ChartModeRow label="Dark" chart={chart} mode="dark" />
+    </>
   );
 }
 
-/** The chart palette's check: a pass, or each miss (fails) and near miss (label those series) in a list. */
-function ChartCheck({ findings }: { findings: ChartFinding[] }) {
-  const fails = findings.filter((f) => f.level === 'fail');
-  if (findings.length === 0) {
-    return (
-      <Banner className="docs-brand-chart-check" status="success" colored>
-        Chart colors check out: 3:1 on the page and neighbours apart, in both themes
-      </Banner>
-    );
-  }
+/** One theme's eight values, in the brand's step-row style. */
+function ChartModeRow({ label, chart, mode }: { label: string; chart: ChartSeries[]; mode: 'light' | 'dark' }) {
   return (
-    <Banner
-      className="docs-brand-chart-check"
-      status={fails.length ? 'warning' : 'info'}
-      colored
-      orientation="vertical"
-      title={fails.length ? 'Chart colors warning' : 'Label these series'}
-    >
-      <ul className="docs-brand-chart-findings">
-        {findings.map((f, i) => (
-          <li key={i}>
-            {f.mode === 'light' ? 'Light' : 'Dark'}: {f.text}.
-          </li>
-        ))}
-      </ul>
-    </Banner>
+    <div className="docs-brand-chart-mode-row">
+      <span className="docs-brand-chart-mode-label">{label}</span>
+      <ScrollArea axis="x" className="docs-brand-scale" viewportProps={{ role: 'group', 'aria-label': `Chart colors, ${label.toLowerCase()} theme` } as HTMLAttributes<HTMLDivElement>}>
+        <ol>
+          {chart.map((s, i) => (
+            <li key={i}>
+              <span className="docs-brand-chip bland-smooth" style={{ background: s[mode] }} />
+              <span className="docs-brand-step">{i + 1}</span>
+              <span className="docs-brand-step-hex">{s[mode]}</span>
+            </li>
+          ))}
+        </ol>
+      </ScrollArea>
+    </div>
+  );
+}
+
+/** The chart check in plain words (no ratios or vision jargon): checks out, or each thing to change or label. */
+function ChartResult({ advice, hidden }: { advice: ChartAdvice[]; hidden: boolean }) {
+  const fails = advice.filter((a) => a.level === 'fail');
+  return (
+    <div className="docs-brand-chart-check" hidden={hidden}>
+      {advice.length === 0 ? (
+        <Banner status="success" colored>
+          Chart colors check out
+        </Banner>
+      ) : (
+        <Banner status="warning" colored orientation="vertical" title={fails.length ? 'Some colors need a change' : 'Some colors are close for color-blind readers'}>
+          <ul className="docs-brand-chart-findings">
+            {advice.map((a) => (
+              <li key={a.text}>{a.text}</li>
+            ))}
+          </ul>
+        </Banner>
+      )}
+    </div>
   );
 }
 
@@ -631,15 +728,15 @@ function ChartSample({ count }: { count: number }) {
 }
 
 /** A big swatch of one color with its hex and a copy button. Its text is white on dark colors, dark on light ones. */
-function Swatch({ color, children, ref }: { color: string; children: ReactNode; ref?: Ref<HTMLDivElement> }) {
+function Swatch({ color, children, ref, compact }: { color: string; children: ReactNode; ref?: Ref<HTMLDivElement>; compact?: boolean }) {
   const { copied, copy, status } = useCopy('Copied');
   // Light colors take the light theme's bold text, so the hex reads on them in either theme.
   const light = contrast('#ffffff', color) < 3;
   return (
-    <div ref={ref} className="docs-brand-swatch bland-smooth" data-theme={light ? 'light' : undefined} data-ink={light ? 'dark' : 'light'} style={{ background: color }}>
+    <div ref={ref} className="docs-brand-swatch bland-smooth" data-compact={compact ? '' : undefined} data-theme={light ? 'light' : undefined} data-ink={light ? 'dark' : 'light'} style={{ background: color }}>
       {children}
       <button type="button" className="docs-brand-copy bland-focus-ring" aria-label={`Copy ${color.toUpperCase()}`} onClick={() => copy(color)}>
-        <Icon size="lg">{copied ? <CheckIcon /> : <CopySimpleIcon />}</Icon>
+        <Icon size={compact ? 'md' : 'lg'}>{copied ? <CheckIcon /> : <CopySimpleIcon />}</Icon>
       </button>
       {status}
     </div>

@@ -1721,3 +1721,12 @@ not wrapped; rail contents centred (logo and account icon were off).
 
 - Godwin: "my brand color is my brand color": Adjust my color changed the swatch. Reverted 1c01f7a (adjustColor, its test and CLI line gone).
 - Now: Fix contrast shows only when it can move something; when every miss left is on the entered color's step, the warning has no Fix button and says the miss is on your color, kept as picked. Show breakdown stays. Docs spec asserts no Fix button and the wording.
+
+## Chart palette picks and the chart tab redesign (2026-10-27)
+
+- Godwin: avoid jargon banners (copy review before going live added to the tracker's Release list and the roadmap), build the picks, redesign the chart tab like the other two.
+- Core: `arrange` replaces `bestOrder` (generated series fill open slots around fixed ones: brand, extras, picks; pairs of two fixed series don't count toward the score, else a fixed clash flattened every order to a tie). `pinnedSeries`, `darkFor`, `ChartPins`, `chartPins`, `parseChart` (resolves `var()` steps through the file's scales; plain hexes are generated unless marked `/* picked */`), `chartAdvice`.
+- First plain-language pass gave three lines for one pair (normal, red-green, blue-yellow); now one line per pair, saying the worst of it.
+- A picked yellow (#f4f000) got #feffdb in dark (lift past white, chroma gone to gamut); `darkFor` now caps the lift at OKLCH 0.85 and keeps an already light color.
+- ColorCard split: `PickSwatch` (swatch + picker) used by ColorCard and the chart tiles; `Swatch` takes `compact`.
+- Picker typing in the browser pane was flaky after scrolls (stale refs); tested picks there by seeding sessionStorage, and through the docs spec.

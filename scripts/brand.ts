@@ -1,6 +1,6 @@
 // Brand override tool (docs/brand.md).
 //
-//   npm run brand -- generate "#ff5a1f" [--at 400] [--neutrals full|subtle|none] [--extra accent=#7c3aed …] [--fix] [--out brand.css]
+//   npm run brand -- generate "#ff5a1f" [--at 400] [--neutrals full|subtle|none] [--extra accent=#7c3aed …] [--chart 4=#hex …] [--fix] [--out brand.css]
 //       13 brand steps from one color (placed on the step its lightness belongs on, or --at), 13 neutral steps
 //       tinted toward it, up to three extra colors (13 steps and light/dark roles each; `--extra name` alone takes the
 //       next color in harmony with the brand: complement, then the square's other two), then the check
@@ -9,6 +9,9 @@
 //
 // Both also make the chart palette (--chart-1 … --chart-8: the brand, the extras, then generated hues) from the final
 // colors, check it (3:1 on the page, neighbours apart under normal and color-blind vision) and write it with the rest.
+// `--chart 4=#hex` (repeatable) picks a series' color yourself; the others are generated around it. On check, a file
+// that carries its own chart block is checked as it is, unless --chart or --fix asks for a new one (its picked
+// colors, marked /* picked */, stay).
 //
 // --neutrals sets how far the grays lean toward the brand: full (Bland's own amount, the default), subtle (half)
 // or none (pure gray). On check it regenerates the file's neutrals from its brand. --fix takes the suggested brand
@@ -23,6 +26,11 @@ import {
   extraNameError,
   generate,
   generateChart,
+  CHART_COUNT,
+  parseChart,
+  chartPins,
+  type ChartPins,
+  type ChartSeries,
   generateNeutrals,
   harmonyColor,
   MAX_EXTRAS,
@@ -62,6 +70,19 @@ function extrasFromFlags(): (Extra & { keep?: Step })[] {
     return { name, scale: generate(hex), keep: placeStep(hex) };
   });
 }
+/** Every `--chart N=#hex`: a series' color picked by hand. */
+function pinsFromFlags(): ChartPins {
+  const pins: ChartPins = {};
+  rest.forEach((a, i) => {
+    if (a !== '--chart' || !rest[i + 1]) return;
+    const [n = '', hex = ''] = rest[i + 1]!.split('=');
+    const at = Number(n);
+    if (!Number.isInteger(at) || at < 2 || at > CHART_COUNT || !hex) throw new Error(`--chart ${rest[i + 1]}: use --chart N=#hex with N from 2 to ${CHART_COUNT} (series 1 is the brand).`);
+    pins[at] = hex;
+  });
+  return pins;
+}
+const pins = pinsFromFlags();
 if (tintFlag && !TINTS.includes(tintFlag)) throw new Error(`--neutrals must be one of ${TINTS.join(', ')}.`);
 
 function finish(text: string, failures: number) {
@@ -74,7 +95,7 @@ function finish(text: string, failures: number) {
  * Checks a brand scale with its neutrals (generated at `tint`, or the file's own when `tint` is undefined); with
  * --fix takes the suggestions once and checks again. Writes or prints the CSS when asked.
  */
-function run(scale: Scale, note: string, print: boolean, tint: Tint | undefined, own?: Scale, keep?: Step, extras: (Extra & { keep?: Step })[] = []) {
+function run(scale: Scale, note: string, print: boolean, tint: Tint | undefined, own?: Scale, keep?: Step, extras: (Extra & { keep?: Step })[] = [], ownChart?: (n: Scale | undefined) => ChartSeries[] | undefined) {
   const neutralsFor = (brand: Scale) => (tint ? generateNeutrals(brand, tint) : own);
   let neutrals = neutralsFor(scale);
   let { text, failures, fixes } = report(scale, neutrals, keep);
@@ -95,8 +116,10 @@ function run(scale: Scale, note: string, print: boolean, tint: Tint | undefined,
     text += `\n\n${r.text}`;
     failures += r.failures;
   }
-  // The chart palette, from the final brand, extras and neutrals.
-  const chart = generateChart(scale, extras, neutrals);
+  // The chart palette: the file's own when it has one (and nothing asks for a new one), else made from the final
+  // brand, extras, neutrals and any --chart picks.
+  const fileChart = ownChart?.(neutrals);
+  const chart = (!fix && Object.keys(pins).length === 0 && fileChart) || generateChart(scale, extras, neutrals, { ...chartPins(fileChart), ...pins });
   const c = chartReport(chart, neutrals);
   text += `\n\n${c.text}`;
   failures += c.failures;
@@ -115,10 +138,12 @@ if (command === 'generate' && arg) {
   run(generate(arg, at), `generated from ${arg} at step ${at}`, true, tintFlag ?? 'full', undefined, at, extrasFromFlags());
 } else if (command === 'check' && arg) {
   const file = readFileSync(arg, 'utf8');
-  run(parseScale(file), `checked from ${arg}`, false, tintFlag, parseNeutrals(file), undefined, parseExtras(file));
+  const brand = parseScale(file);
+  const extras = parseExtras(file);
+  run(brand, `checked from ${arg}`, false, tintFlag, parseNeutrals(file), undefined, extras, (n) => parseChart(file, brand, extras, n));
 } else {
   console.log(
-    'Usage:\n  npm run brand -- generate "#rrggbb" [--at <step>] [--neutrals full|subtle|none] [--extra name[=#rrggbb] …] [--fix] [--out brand.css]\n  npm run brand -- check brand.css [--neutrals full|subtle|none] [--fix] [--out fixed.css]',
+    'Usage:\n  npm run brand -- generate "#rrggbb" [--at <step>] [--neutrals full|subtle|none] [--extra name[=#rrggbb] …] [--chart N=#rrggbb …] [--fix] [--out brand.css]\n  npm run brand -- check brand.css [--neutrals full|subtle|none] [--chart N=#rrggbb …] [--fix] [--out fixed.css]',
   );
   process.exitCode = 2;
 }

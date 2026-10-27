@@ -677,41 +677,75 @@ function pairScore(a: ChartSeries, b: ChartSeries): number {
   return score;
 }
 
-/** Every ordering of the generated series after the fixed ones, keeping the one whose closest neighbours are furthest apart. */
-function bestOrder(fixed: ChartSeries[], free: ChartSeries[]): ChartSeries[] {
-  const all = [...fixed, ...free];
-  const score = all.map((a) => all.map((b) => (a === b ? Infinity : pairScore(a, b))));
-  const f = fixed.length;
-  let best = { order: free.map((_, i) => f + i), min: -Infinity };
-  const walk = (order: number[], left: number[], min: number) => {
+/**
+ * The generated series placed in the open slots (the others hold the brand, the extras and any pinned colors), in
+ * the order whose closest neighbours are furthest apart. Every order is tried; pairs of two fixed series can't
+ * change, so they don't count.
+ */
+function arrange(slots: (ChartSeries | undefined)[], free: ChartSeries[]): ChartSeries[] {
+  const open = slots.flatMap((s, i) => (s ? [] : [i]));
+  const fixedAt = (i: number) => slots[i];
+  let best: { seq: ChartSeries[]; min: number } = { seq: slots.map((s, i) => s ?? free[open.indexOf(i)]!), min: -Infinity };
+  const walk = (seq: (ChartSeries | undefined)[], left: ChartSeries[], k: number, min: number) => {
     if (min <= best.min) return;
-    if (!left.length) {
-      best = { order, min };
+    if (k === open.length) {
+      best = { seq: seq as ChartSeries[], min };
       return;
     }
-    for (const i of left) {
-      const prev = order.length ? order[order.length - 1]! : f - 1;
-      walk([...order, i], left.filter((j) => j !== i), prev < 0 ? min : Math.min(min, score[prev]![i]!));
+    const at = open[k]!;
+    for (const s of left) {
+      let m = min;
+      if (at > 0 && seq[at - 1]) m = Math.min(m, pairScore(seq[at - 1]!, s));
+      if (at < slots.length - 1 && fixedAt(at + 1)) m = Math.min(m, pairScore(s, fixedAt(at + 1)!));
+      const next = [...seq];
+      next[at] = s;
+      walk(next, left.filter((x) => x !== s), k + 1, m);
     }
   };
-  walk([], free.map((_, i) => f + i), Infinity);
-  return [...fixed, ...best.order.map((i) => all[i]!)];
+  walk([...slots], free, 0, Infinity);
+  return best.seq;
 }
 
+/** The closest neighbour pair that a generated series is part of (only those can be nudged). */
 const worstNeighbours = (series: ChartSeries[]) =>
   series.slice(1).reduce((w, s, i) => {
+    if (s.from !== 'generated' && series[i]!.from !== 'generated') return w;
     const score = pairScore(series[i]!, s);
     return score < w.score ? { at: i, score } : w;
   }, { at: -1, score: Infinity });
 
+/** Colors a project chose for some series, by series number (from 1). Series held by the brand or an extra ignore it. */
+export type ChartPins = Partial<Record<number, string>>;
+
+/** The dark value for a light one: lighter by Bland's 600-to-400 gap (up to OKLCH 0.85), as colorful as sRGB allows, then until 3:1. */
+function darkFor(light: string, neutrals: Scale): string {
+  const { l, c, h } = toOklch(light);
+  const bg = chartBg('dark', neutrals);
+  // A color already light (a yellow) stays as it is rather than washing out to white.
+  let D = Math.max(l, Math.min(l + DARK_LIFT, 0.85));
+  while (contrast(fromOklch({ l: Math.min(0.99, D), c, h }), bg) < CHART_CONTRAST && D < 0.99) D += 0.005;
+  return fromOklch({ l: Math.min(0.99, D), c, h });
+}
+
+/** A series the project picked: its color exactly as entered in light (never moved, like the brand), dark made from it. */
+export function pinnedSeries(hex: string, neutrals: Scale = blandNeutrals): ChartSeries {
+  const light = `#${parseHex(hex).map((v) => Math.round(v * 255).toString(16).padStart(2, '0')).join('')}`;
+  return { from: 'pinned', light, dark: darkFor(light, neutrals) };
+}
+
 /**
- * The chart palette for a brand, its extra colors (up to three) and neutrals. Series 1 is the brand and the extras
- * follow in order (only their steps move, for contrast); the rest are generated, ordered and, where two
- * neighbours still come too close, nudged in lightness (a few rounds, each keeping a change only if it helps).
+ * The chart palette for a brand, its extra colors (up to three), neutrals and any pinned series. Series 1 is the
+ * brand and the extras follow in order (only their steps move, for contrast); pinned series keep their place and
+ * color; the rest are generated around them, ordered and, where two neighbours still come too close, nudged in
+ * lightness (a few rounds, each keeping a change only if it helps).
  */
-export function generateChart(brand: Scale, extras: Extra[] = [], neutrals: Scale = blandNeutrals): ChartSeries[] {
+export function generateChart(brand: Scale, extras: Extra[] = [], neutrals: Scale = blandNeutrals, pins: ChartPins = {}): ChartSeries[] {
   const fixed = [scaleSeries('brand', brand, neutrals), ...extras.slice(0, MAX_EXTRAS).map((x) => scaleSeries(x.name, x.scale, neutrals))];
-  const hues = chartHues(fixed.map((s) => toOklch(s.light).h), CHART_COUNT - fixed.length);
+  const slots = Array.from({ length: CHART_COUNT }, (_, i) => fixed[i] ?? (pins[i + 1] ? pinnedSeries(pins[i + 1]!, neutrals) : undefined));
+  const hues = chartHues(
+    slots.flatMap((s) => (s ? [toOklch(s.light).h] : [])),
+    slots.filter((s) => !s).length,
+  );
   const shifts = new Map<number, number>(hues.map((h) => [h, 0]));
   const hueOf = new Map<ChartSeries, number>();
   const build = () =>
@@ -720,7 +754,7 @@ export function generateChart(brand: Scale, extras: Extra[] = [], neutrals: Scal
       hueOf.set(s, h);
       return s;
     });
-  let series = bestOrder(fixed, build());
+  let series = arrange(slots, build());
   for (let round = 0; round < 6; round++) {
     const worst = worstNeighbours(series);
     if (worst.score >= 1) break;
@@ -731,7 +765,7 @@ export function generateChart(brand: Scale, extras: Extra[] = [], neutrals: Scal
       const base = shifts.get(h)!;
       for (const step of [0.04, -0.04, 0.08, -0.08, 0.12, -0.12]) {
         shifts.set(h, base + step);
-        const trial = bestOrder(fixed, build());
+        const trial = arrange(slots, build());
         if (worstNeighbours(trial).score > worst.score + 1e-6) {
           series = trial;
           improved = true;
@@ -752,8 +786,12 @@ export const blandChart = (): ChartSeries[] => generateChart(blandScale, [], bla
 export type ChartFinding = {
   level: 'fail' | 'warn';
   mode: Mode;
+  /** contrast: one series against the page; apart: two neighbours too close. */
+  kind: 'contrast' | 'apart';
   /** The series involved, from 1. */
   series: number[];
+  /** For apart: the vision they come too close under. */
+  vision?: Vision;
   text: string;
 };
 
@@ -767,7 +805,7 @@ export function checkChart(series: ChartSeries[], neutrals: Scale = blandNeutral
     const bg = chartBg(mode, neutrals);
     series.forEach((s, i) => {
       const ratio = contrast(s[mode], bg);
-      if (ratio < CHART_CONTRAST) out.push({ level: 'fail', mode, series: [i + 1], text: `--chart-${i + 1} ${s[mode]} is ${ratio.toFixed(2)}:1 on the page, needs ${CHART_CONTRAST}:1` });
+      if (ratio < CHART_CONTRAST) out.push({ level: 'fail', mode, kind: 'contrast', series: [i + 1], text: `--chart-${i + 1} ${s[mode]} is ${ratio.toFixed(2)}:1 on the page, needs ${CHART_CONTRAST}:1` });
     });
     for (let i = 1; i < series.length; i++) {
       const [a, b] = [series[i - 1]![mode], series[i]![mode]];
@@ -775,7 +813,7 @@ export function checkChart(series: ChartSeries[], neutrals: Scale = blandNeutral
         const e = deltaE(a, b, v);
         const floor = v === 'normal' ? CHART_NORMAL_FLOOR : CHART_CVD_FLOOR;
         const level = e < floor ? 'fail' : v !== 'normal' && e < CHART_CVD_TARGET ? 'warn' : undefined;
-        if (level) out.push({ level, mode, series: [i, i + 1], text: `--chart-${i} and --chart-${i + 1} are ΔE ${e.toFixed(1)} apart under ${v} vision, ${level === 'fail' ? `needs ${floor}` : `under the ${CHART_CVD_TARGET} target: label the series`}` });
+        if (level) out.push({ level, mode, kind: 'apart', series: [i, i + 1], vision: v, text: `--chart-${i} and --chart-${i + 1} are ΔE ${e.toFixed(1)} apart under ${v} vision, ${level === 'fail' ? `needs ${floor}` : `under the ${CHART_CVD_TARGET} target: label the series`}` });
       }
     }
   }
@@ -786,7 +824,7 @@ export function chartReport(series: ChartSeries[], neutrals: Scale = blandNeutra
   const findings = checkChart(series, neutrals);
   const fails = findings.filter((f) => f.level === 'fail');
   const lines = [`Chart check: ${series.length} series, 3:1 on the page and neighbours apart (normal, protan, deutan, tritan) in light and dark.`];
-  lines.push(...series.map((s, i) => `  --chart-${i + 1}  light ${s.light}  dark ${s.dark}  (${s.from})`));
+  lines.push(...series.map((s, i) => `  --chart-${i + 1}  light ${s.light}  dark ${s.dark}  (${s.from === 'pinned' ? 'picked' : s.from})`));
   if (findings.length === 0) lines.push('All pass.');
   for (const f of findings) lines.push(`  ${f.level === 'fail' ? '✗' : '·'} ${f.mode.padEnd(5)} ${f.text}.`);
   if (fails.some((f) => f.series.length === 1 && series[f.series[0]! - 1]!.from !== 'generated')) {
@@ -795,10 +833,13 @@ export function chartReport(series: ChartSeries[], neutrals: Scale = blandNeutra
   return { text: lines.join('\n'), failures: fails.length };
 }
 
-/** The chart tokens in Bland's theme selectors: steps by reference for the brand and extras, hexes for the rest. */
+/**
+ * The chart tokens in Bland's theme selectors: steps by reference for the brand and extras, hexes for the rest. A
+ * color the project picked is marked `/* picked *\/` in the light block, so checking the file later keeps it.
+ */
 export function chartCss(series: ChartSeries[]): string {
   return themedCss('The chart palette, series in order (docs/brand.md, "Chart palette").', (mode) =>
-    series.map((s, i) => `--chart-${i + 1}: ${s.ref?.[mode] ?? s[mode]};`),
+    series.map((s, i) => `--chart-${i + 1}: ${s.ref?.[mode] ?? s[mode]};${mode === 'light' && s.from === 'pinned' ? ' /* picked */' : ''}`),
   );
 }
 
@@ -812,3 +853,84 @@ function themedCss(comment: string, lines: (mode: Mode) => string[]): string {
     `@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"]) {\n${block('dark', '    ')}\n  }\n}\n`,
   ].join('\n\n');
 }
+
+/** A chart check result in plain words, for people who don't speak contrast ratios: one line per problem, both modes merged. */
+export type ChartAdvice = { level: 'fail' | 'warn'; text: string };
+
+export function chartAdvice(findings: ChartFinding[], series: ChartSeries[]): ChartAdvice[] {
+  const name = (n: number) => {
+    const from = series[n - 1]?.from;
+    return from === 'brand' ? `Series ${n} (your brand color)` : from && from !== 'generated' && from !== 'pinned' ? `Series ${n} (${from})` : `Series ${n}`;
+  };
+  // Only a generated or picked series can change here; prefer the one the project picked, then the later one.
+  const target = (ns: number[]) => {
+    const own = ns.filter((n) => ['generated', 'pinned'].includes(series[n - 1]!.from));
+    return own.find((n) => series[n - 1]!.from === 'pinned') ?? own.at(-1);
+  };
+  const cap = (x: string) => x[0]!.toUpperCase() + x.slice(1);
+  const whereOf = (fs: ChartFinding[]) => {
+    const modes = new Set(fs.map((x) => x.mode));
+    return modes.size === 2 ? '' : modes.has('dark') ? ' in dark mode' : ' in light mode';
+  };
+  const changeFor = (f: ChartFinding) => {
+    const t = target(f.series);
+    if (t !== undefined) return `pick another color for series ${t}`;
+    if (f.series.length === 2) return 'change one of them under Brand colors or Extra colors';
+    return `pick ${f.mode === 'light' ? 'a darker' : 'a lighter'} color under ${series[f.series[0]! - 1]!.from === 'brand' ? 'Brand colors' : 'Extra colors'}`;
+  };
+  // One line per series that is too faint (per mode) and one per neighbour pair, saying the worst of it.
+  const groups = new Map<string, ChartFinding[]>();
+  for (const f of findings) {
+    const key = f.kind === 'contrast' ? `c|${f.series[0]}|${f.mode}` : `a|${f.series.join(',')}`;
+    groups.set(key, [...(groups.get(key) ?? []), f]);
+  }
+  return [...groups.values()].map((fs): ChartAdvice => {
+    const f = fs[0]!;
+    if (f.kind === 'contrast') return { level: 'fail', text: `${name(f.series[0]!)} is too faint on the ${f.mode === 'light' ? 'white' : 'dark'} page. ${cap(changeFor(f))}.` };
+    const pair = `${name(f.series[0]!)} and ${name(f.series[1]!).replace(/^Series/, 'series')}`;
+    const normal = fs.filter((x) => x.vision === 'normal');
+    if (normal.length) return { level: 'fail', text: `${pair} look too much alike${whereOf(normal)}. ${cap(changeFor(f))}.` };
+    const fails = fs.filter((x) => x.level === 'fail');
+    const shown = fails.length ? fails : fs;
+    const kinds = [...new Set(shown.map((x) => (x.vision === 'tritan' ? 'blue-yellow' : 'red-green')))].sort().reverse();
+    const who = `people with ${kinds.join(' or ')} color blindness`;
+    if (fails.length) return { level: 'fail', text: `${pair} look the same to ${who}${whereOf(fails)}. ${cap(changeFor(f))}.` };
+    return { level: 'warn', text: `${pair} are hard to tell apart for ${who}${whereOf(fs)}. Name each series on the chart (a legend or labels), or ${changeFor(f)}.` };
+  });
+}
+
+/**
+ * The chart palette an override file carries, or undefined when it has none: each `--chart-N` in its light block,
+ * then its dark block, a `var()` of the brand, neutral or an extra's steps resolved through the file's scales.
+ * Plain colors marked `/* picked *\/` are the project's own (`pinned`); other plain colors were generated.
+ */
+export function parseChart(text: string, brand: Scale, extras: Extra[] = [], neutrals: Scale = blandNeutrals): ChartSeries[] | undefined {
+  if (text.trim().startsWith('{')) return undefined;
+  const seen = new Map<number, string[]>();
+  const picked = new Set<number>();
+  for (const m of text.matchAll(/--chart-(\d+)\s*:\s*([^;}]+);[ \t]*(\/\*\s*picked\s*\*\/)?/g)) {
+    seen.set(Number(m[1]), [...(seen.get(Number(m[1])) ?? []), m[2]!.trim()]);
+    if (m[3]) picked.add(Number(m[1]));
+  }
+  if (seen.size === 0) return undefined;
+  const scales = new Map<string, Scale>([['brand', brand], ['neutral', neutrals], ...extras.map((x) => [x.name, x.scale] as [string, Scale])]);
+  const resolve = (v: string) => {
+    const m = /^var\(--([a-z][a-z-]*)-(\d+)\)$/.exec(v);
+    if (!m) return { hex: `#${parseHex(v).map((x) => Math.round(x * 255).toString(16).padStart(2, '0')).join('')}` };
+    const scale = scales.get(m[1]!);
+    if (!scale || !STEPS.includes(m[2] as Step)) throw new Error(`${v} names no step this file sets.`);
+    return { hex: scale[m[2] as Step], from: m[1]! === 'neutral' ? 'generated' : m[1]! };
+  };
+  return [...seen.keys()]
+    .sort((a, b) => a - b)
+    .map((n) => {
+      const [lightRef, darkRef = lightRef] = seen.get(n)!;
+      const light = resolve(lightRef!);
+      const dark = resolve(darkRef!);
+      return { from: light.from ?? (picked.has(n) ? 'pinned' : 'generated'), light: light.hex, dark: dark.hex, ...(light.from ? { ref: { light: lightRef!, dark: darkRef! } } : {}) };
+    });
+}
+
+/** The series a project picked in a chart palette, as pins to generate around. */
+export const chartPins = (series: ChartSeries[] = []): ChartPins =>
+  Object.fromEntries(series.flatMap((s, i) => (s.from === 'pinned' ? [[i + 1, s.light]] : [])));

@@ -4,7 +4,7 @@ import { test } from 'node:test';
 
 import { readFileSync } from 'node:fs';
 
-import { blandChart, CHART_CONTRAST, CHART_COUNT, chartCss, chartHues, checkChart, colorOf, deltaE, generateChart, EXTRA_PAIRS, EXTRA_ROLES, extraNameError, harmonyColor, HARMONY_TURNS, parseExtras, blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
+import { blandChart, chartAdvice, chartPins, parseChart, pinnedSeries, CHART_CONTRAST, CHART_COUNT, chartCss, chartHues, checkChart, colorOf, deltaE, generateChart, EXTRA_PAIRS, EXTRA_ROLES, extraNameError, harmonyColor, HARMONY_TURNS, parseExtras, blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
 
 const close = (a: string, b: string) => toOklch(a).l - toOklch(b).l;
 
@@ -208,4 +208,38 @@ test('the chart tokens go in the override file, and an extra can’t be called c
   assert.match(css, /\[data-theme="dark"\] \{\n  --chart-1: var\(--brand-400\);/);
   assert.deepEqual(parseExtras(css), extras);
   assert.match(extraNameError('chart')!, /chart palette/);
+});
+
+test('a picked chart color keeps its place and value; the rest are generated around it', () => {
+  const chart = generateChart(blandScale, [], blandNeutrals, { 4: '#2B2BD0', 1: '#ff0000' });
+  assert.equal(chart[0]!.from, 'brand', 'series 1 is always the brand');
+  assert.deepEqual([chart[3]!.from, chart[3]!.light], ['pinned', '#2b2bd0']);
+  assert.ok(toOklch(chart[3]!.dark).l > toOklch(chart[3]!.light).l && contrast(chart[3]!.dark, bg('dark')) >= CHART_CONTRAST);
+  assert.equal(chart.filter((s) => s.from === 'generated').length, 6);
+  // Generated hues avoid the picked one: none within 30° of its blue.
+  for (const s of chart.filter((x) => x.from === 'generated')) assert.ok(turn(toOklch(s.light).h, toOklch('#2b2bd0').h) > 30, s.light);
+  assert.deepEqual(chartPins(chart), { 4: '#2b2bd0' });
+});
+
+test('an override file’s chart reads back as written, picked colors marked, and keeps them when made again', () => {
+  const extras = [{ name: 'accent', scale: generate('#7c3aed') }];
+  const chart = generateChart(blandScale, extras, blandNeutrals, { 5: '#d4a000' });
+  const css = toCss(blandScale, '', blandNeutrals, extras, chart);
+  assert.match(css, /--chart-5: #d4a000; \/\* picked \*\//);
+  assert.deepEqual(parseChart(css, blandScale, extras), chart);
+  assert.equal(parseChart(toCss(blandScale), blandScale), undefined);
+  assert.deepEqual(chartPins(parseChart(css, blandScale, extras)), { 5: '#d4a000' });
+});
+
+test('the chart check in plain words: who, where, and what to do', () => {
+  // A faint pick, and a pick next to a near twin of itself.
+  const faint = generateChart(blandScale, [], blandNeutrals, { 2: '#f2f200' });
+  const advice = chartAdvice(checkChart(faint), faint);
+  assert.ok(advice.some((a) => a.level === 'fail' && a.text === 'Series 2 is too faint on the white page. Pick another color for series 2.'), JSON.stringify(advice));
+  const twins = [pinnedSeries('#0062ff'), pinnedSeries('#0a66f5')];
+  twins[0] = { ...twins[0]!, from: 'brand' };
+  const alike = chartAdvice(checkChart(twins), twins);
+  assert.ok(alike.some((a) => a.text === 'Series 1 (your brand color) and series 2 look too much alike. Pick another color for series 2.'), JSON.stringify(alike));
+  assert.equal(alike.length, 1, 'one line per pair, the worst of it');
+  for (const a of [...advice, ...alike]) assert.doesNotMatch(a.text, /ΔE|protan|deutan|tritan|:1/);
 });

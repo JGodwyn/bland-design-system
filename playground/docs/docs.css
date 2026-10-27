@@ -1310,38 +1310,74 @@ code,
     display: inline;
   }
 }
-/* The chart palette: each series with its light and dark color side by side. */
+/* The chart palette, laid out as the brand's: one card of eight swatches (a grid of four, two on a phone) with the
+   check under them, then the light and dark values as step rows. */
 .docs-brand-chart {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
 }
-.docs-brand-chart-list {
+.docs-brand-chart > .docs-brand-extras-intro {
+  margin-bottom: var(--space-lg);
+}
+.docs-brand-chart-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--space-7xl)), 1fr));
-  gap: var(--space-lg) var(--space-sm);
+  grid-template-columns: repeat(2, minmax(var(--space-none), 1fr));
+  gap: var(--space-md) var(--space-sm);
   margin: var(--space-none);
   padding: var(--space-none);
   list-style: none;
 }
-.docs-brand-chart-list li {
+@media (min-width: 768px) {
+  .docs-brand-chart-grid {
+    grid-template-columns: repeat(4, minmax(var(--space-none), 1fr));
+  }
+}
+.docs-brand-chart-grid li {
   display: flex;
   flex-direction: column;
   gap: var(--space-2xs);
   min-width: var(--space-none);
 }
-.docs-brand-chart-modes {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-2xs);
+.docs-brand-chart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  min-height: var(--control-xs);
+  padding-inline: var(--space-xs);
 }
-.docs-brand-chart-mode {
+.docs-brand-chart-name {
+  white-space: nowrap;
+  font: var(--type-body-md-bold);
+  color: var(--text-bold);
+}
+.docs-brand-chart-source {
+  font: var(--type-body-sm);
+  color: var(--text-subtle);
+  text-align: end;
+}
+/* A small swatch: the hex at title size, padding to match. */
+.docs-brand-swatch[data-compact] {
+  padding: var(--space-lg) var(--space-md);
+}
+.docs-brand-swatch[data-compact] :is(.docs-brand-hex, .docs-brand-pick) {
+  font: var(--type-title-md);
+  letter-spacing: var(--type-title-md-letter-spacing);
+}
+.docs-brand-chart-mode-row {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xs);
-  min-width: var(--space-none);
+  gap: var(--space-xs);
+}
+.docs-brand-chart-mode-label {
+  font: var(--type-body-md-bold);
+  color: var(--text-bold);
 }
 .docs-brand-chart-findings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
   margin: var(--space-none);
   padding-inline-start: var(--space-lg);
 }
