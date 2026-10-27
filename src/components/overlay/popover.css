@@ -24,19 +24,21 @@
   background: transparent;
   overflow: visible;
 
-  /* Opens and closes along the same path: opacity and a small scale from the trigger side. */
+  /* Opens and closes along the same path: opacity and a small scale from the trigger side. Closing is quicker
+     (duration/xs) than opening (duration/md): the user has moved on, so the system answers fast (docs/motion.md). */
   opacity: 0;
   transform: scale(0.96);
   transition:
-    opacity var(--duration-md) var(--easing-out),
-    transform var(--duration-md) var(--easing-out),
-    display var(--duration-md) allow-discrete,
-    overlay var(--duration-md) allow-discrete;
+    opacity var(--duration-xs) var(--easing-out),
+    transform var(--duration-xs) var(--easing-out),
+    display var(--duration-xs) allow-discrete,
+    overlay var(--duration-xs) allow-discrete;
 }
 
 .bland-popover:popover-open {
   opacity: 1;
   transform: none;
+  transition-duration: var(--duration-md);
 }
 
 @starting-style {

@@ -1609,3 +1609,8 @@ not wrapped; rail contents centred (logo and account icon were off).
 ## Brand page: breakdown table folds too (2026-10-27)
 
 - Godwin: give Show/Hide breakdown the same fold + scale. The motion is now a shared docs class, `.docs-fold` (wrapper, `hidden` toggles it) + `.docs-fold-inner` (content), used by the contrast result and the breakdown. Measured: the table (362 high) unfolds and scales in by ~170 ms, folds away in ~190 ms with its content gone by ~90 ms.
+
+## Popovers close faster than they open (2026-10-27)
+
+- Godwin: make the shared popover's exit faster than its entry. `popover.css`: the closed state's transitions run duration/xs, `:popover-open` sets duration/md, so opening (Menu, Dropdown, Breadcrumb overflow, date pickers, the docs color picker) stays 200 ms and closing is 125 ms; same path, easing/out; keyboard opens stay instant. Measured in Playwright on a Menu: in ~190 ms, out ~125 ms. Tooltip has its own CSS and is unchanged.
+- docs/motion.md and CLAUDE.md now say exits run the same path, quicker. Full suite: 629 passed; the flaky Section tab spec passed on its own.

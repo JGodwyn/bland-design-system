@@ -33,7 +33,7 @@ The lint rejects raw `ms`/`s` values, easing keywords, `cubic-bezier()`, `steps(
 - **Never scale from 0.** Nothing in the world appears from nothing. Start at `scale(0.95)` to `scale(0.97)` with `opacity: 0`.
 - **Scale from the origin.** Popovers, dropdowns and tooltips scale from their trigger (`transform-origin` set from Floating UI's placement). Modals stay centered.
 - **Press feedback** is `transform: scale(0.97)` on `:active`, over `--duration-sm` with `--easing-out`.
-- **Exit the way you came in.** The exit runs the entrance in reverse, same path and curve.
+- **Exit the way you came in, but quicker.** The exit runs the entrance in reverse, same path and curve, at a shorter duration: `--duration-xs` out against `--duration-md` in for popovers (Menu, Dropdown, date pickers) and the docs site's folds (Godwin 2026-10-27). The user has already moved on, so the system answers fast.
 - **Reduced motion.** Every animation ships a `@media (prefers-reduced-motion: reduce)` fallback that keeps opacity and color changes and drops transform motion.
 - **Hover motion only for real hover.** Gate it behind `@media (hover: hover) and (pointer: fine)`, so touch devices don't get stuck hover states.
 - **Name the properties.** List exactly what transitions (`background-color, transform`), never `transition: all`. The lint rejects `all`.
