@@ -24,7 +24,7 @@ import { SectionTabs } from '../../src/components/section-tab/SectionTabs';
 import { SegmentedBar } from '../../src/components/segmented-bar/SegmentedBar';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../../src/components/table/Table';
 import { Toggle } from '../../src/components/toggle/Toggle';
-import { CheckIcon, PlusIcon, TrashIcon, WarningCircleIcon } from '../../src/icons';
+import { CheckIcon, PlusIcon, TrashIcon } from '../../src/icons';
 import {
   blandNeutrals,
   blandScale,
@@ -144,13 +144,13 @@ export function BrandPage() {
                           disabled={isBland && !applied}
                           onReset={resetAll}
                           changes={[
-                            input !== blandScale['600'] || fixed ? `Your brand color ${input.toUpperCase()} goes back to Bland’s blue ${blandScale['600'].toUpperCase()}${fixed ? ', and its contrast fix is dropped' : ''}.` : null,
-                            tint !== 'full' ? `The neutrals go back to Tinted (now ${tint === 'none' ? 'Pure gray' : 'Subtle'}).` : null,
-                            extras.length
-                              ? `${extras.length === 1 ? 'Your extra color' : `Your ${extras.length} extra colors`} (${extras.map((x) => x.name).join(', ')}) ${extras.length === 1 ? 'is' : 'are'} removed.`
+                            input !== blandScale['600'] || fixed
+                              ? `your brand color ${input.toUpperCase()} goes back to Bland’s blue ${blandScale['600'].toUpperCase()}${fixed ? ', dropping its contrast fix' : ''}`
                               : null,
-                            applied ? 'The brand applied to this site is removed: every page goes back to Bland’s colors.' : null,
+                            tint !== 'full' ? 'the neutrals go back to Tinted' : null,
+                            applied ? 'every page of this site goes back to Bland’s colors' : null,
                           ]}
+                          extras={extras.length}
                         />
                         <Button size="sm" disabled={isApplied || (isBland && !applied)} onClick={() => setAppliedBrand(palette)}>
                           {isApplied ? 'Applied to site' : 'Apply to site'}
@@ -458,16 +458,21 @@ function RoleRow({ name, scale }: { name: string; scale: Scale }) {
 }
 
 /**
- * Reset asks first: a dialog lists what goes (only what differs from Bland's), with Reset as the danger action.
- * Nothing is kept to undo it, so the warning says so.
+ * Reset asks first: one paragraph says what goes back (only what differs from Bland's), that extra colors go too,
+ * and that it can't be undone. Reset colors is the danger action.
  */
-function ResetConfirm({ disabled, onReset, changes }: { disabled: boolean; onReset: () => void; changes: (string | null)[] }) {
+function ResetConfirm({ disabled, onReset, changes, extras }: { disabled: boolean; onReset: () => void; changes: (string | null)[]; extras: number }) {
   const items = changes.filter((c): c is string => !!c);
+  const list = items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1)}` : (items[0] ?? '');
+  const sentences = [
+    list && `${list.charAt(0).toUpperCase()}${list.slice(1)}.`,
+    extras > 0 && (extras === 1 ? 'Your extra accent color will be removed too.' : `Your ${extras} extra accent colors will be removed too.`),
+    'This can’t be undone, so copy the CSS under How to use first if you want to keep this palette.',
+  ].filter(Boolean);
   return (
     <Modal
       title="Reset to Bland’s colors?"
-      icon={<WarningCircleIcon />}
-      description="This can’t be undone. Copy the CSS under How to use first if you want to keep this palette."
+      description={sentences.join(' ')}
       trigger={
         <Button size="sm" type="stroke" disabled={disabled}>
           Reset
@@ -482,20 +487,14 @@ function ResetConfirm({ disabled, onReset, changes }: { disabled: boolean; onRes
               close();
             }}
           >
-            Reset
+            Reset colors
           </Button>
-          <Button type="stroke" onClick={close}>
+          <Button type="secondary" onClick={close}>
             Cancel
           </Button>
         </>
       )}
-    >
-      <ul className="docs-brand-reset-list">
-        {items.map((c) => (
-          <li key={c}>{c}</li>
-        ))}
-      </ul>
-    </Modal>
+    />
   );
 }
 
