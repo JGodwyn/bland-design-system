@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
+import { EXTRA_PAIRS, EXTRA_ROLES, extraNameError, parseExtras, blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
 
 const close = (a: string, b: string) => toOklch(a).l - toOklch(b).l;
 
@@ -96,3 +96,31 @@ test('an override file carries its neutrals, and one without them leaves Blandâ€
   assert.throws(() => parseNeutrals('--neutral-600: #616161;'), /Set all 13, or none/);
 });
 
+
+test('extra colors mirror the brand roles and check out on their own pairings', () => {
+  // The roles take the brand's steps in each mode: solid 600 in light, 400 in dark; the light fill 50 / 1000.
+  const role = (r: string) => EXTRA_ROLES.find((x) => x.role === r)!;
+  assert.deepEqual([role('surface').light, role('surface').dark], ['600', '400']);
+  assert.deepEqual([role('surface-light').light, role('surface-light').dark], ['50', '1000']);
+  assert.deepEqual([role('surface-strong').light, role('surface-strong').dark], ['600', '600']);
+  const green = generate('#16a34a');
+  const n = generateNeutrals(generate('#0062ff'));
+  assert.ok(check(green, n, EXTRA_PAIRS).some((f) => f.where === 'White text on its strong fill'));
+  const fixed = fixScale(green, n, placeStep('#16a34a'), EXTRA_PAIRS);
+  assert.equal(fixed[placeStep('#16a34a')], '#16a34a');
+  assert.equal(check(fixed, n, EXTRA_PAIRS).filter((f) => f.baseline >= f.min).length, 0);
+});
+
+test('extra color names avoid Bland prefixes, and the override file round-trips them with their roles', () => {
+  assert.equal(extraNameError('accent'), undefined);
+  assert.equal(extraNameError('chart-orange'), undefined);
+  assert.match(extraNameError('surface')!, /already uses/);
+  assert.match(extraNameError('Accent')!, /lowercase/);
+  assert.match(extraNameError('accent', ['accent'])!, /Another/);
+  const accent = generate('#7c3aed');
+  const css = toCss(blandScale, '', blandNeutrals, [{ name: 'accent', scale: accent }]);
+  assert.match(css, /\[data-theme="dark"\] \{\n  --accent-surface: var\(--accent-400\);/);
+  assert.match(css, /prefers-color-scheme: dark/);
+  assert.deepEqual(parseExtras(css), [{ name: 'accent', scale: accent }]);
+  assert.deepEqual(parseScale(css), blandScale);
+});

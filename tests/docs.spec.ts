@@ -282,8 +282,24 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
 
   await page.goto('/#/brand');
   await expect(page.getByRole('button', { name: /^Brand color #FFCC00/ })).toBeVisible();
+  // Extra colors: up to three, named, with their steps and light/dark roles in the CSS; Reset clears them.
+  await page.goto('/#/brand');
+  const add = page.getByRole('button', { name: 'Add color' });
+  for (let i = 0; i < 3; i++) await add.click();
+  await expect(add).toBeDisabled();
+  const names = page.getByRole('textbox', { name: 'Name' });
+  await names.first().fill('surface');
+  await expect(page.getByText('Bland already uses --surface-…; pick another name.')).toBeVisible();
+  await names.first().fill('chart');
+  const css = page.locator('#use-in-a-project pre');
+  await expect(css).toContainText('--chart-600: #7c3aed;');
+  await expect(css).toContainText('--chart-surface: var(--chart-400);');
+  await page.getByRole('button', { name: 'Remove' }).last().click();
+  await expect(add).toBeEnabled();
+
   await page.getByRole('button', { name: 'Reset', exact: true }).click();
-  await expect(page.locator('.docs-brand-contrast')).toBeHidden();
+  await expect(page.getByRole('textbox', { name: 'Name' })).toHaveCount(0);
+  await expect(page.locator('.docs-brand-contrast').first()).toBeHidden();
   expect(await brand('600')).toBe('');
   expect(await neutral600()).toBe('');
   await expect(page.getByRole('button', { name: 'Reset', exact: true })).toBeDisabled();

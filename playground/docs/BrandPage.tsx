@@ -2,7 +2,7 @@
 // makes (the color lands on the step its lightness belongs on) and the 13 neutral steps tinted toward it (or pure
 // gray), check them, preview them on components in both themes, apply them to the whole site, or go back to
 // Bland's blue.
-import { useId, useMemo, useRef, useState, type HTMLAttributes, type MouseEvent, type ReactNode, type Ref } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type ChangeEvent, type HTMLAttributes, type MouseEvent, type ReactNode, type Ref } from 'react';
 import { Badge } from '../../src/components/badge/Badge';
 import { Banner } from '../../src/components/banner/Banner';
 import { Button } from '../../src/components/button/Button';
@@ -21,15 +21,21 @@ import { SectionTabs } from '../../src/components/section-tab/SectionTabs';
 import { SegmentedBar } from '../../src/components/segmented-bar/SegmentedBar';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../../src/components/table/Table';
 import { Toggle } from '../../src/components/toggle/Toggle';
-import { CheckIcon, PlusIcon } from '../../src/icons';
+import { CheckIcon, PlusIcon, TrashIcon } from '../../src/icons';
+import { TextInput } from '../../src/components/text-input/TextInput';
 import {
   blandNeutrals,
   blandScale,
   check,
   contrast,
+  EXTRA_PAIRS,
+  EXTRA_ROLES,
+  extraNameError,
   fixScale,
   generate,
   generateNeutrals,
+  inherited,
+  MAX_EXTRAS,
   PAIRS,
   placeStep,
   STEPS,
@@ -49,8 +55,6 @@ import { PageHeader, Section } from './parts';
 
 const same = (a: Scale | null | undefined, b: Scale) => !!a && STEPS.every((s) => a[s] === b[s]);
 const samePalette = (a: Palette | null, b: Palette) => !!a && same(a.brand, b.brand) && same(a.neutrals, b.neutrals);
-/** A miss Bland's own brand shares and this brand makes no worse (as in the command's report). */
-const inherited = (f: Finding) => f.baseline < f.min && f.ratio >= f.baseline - 0.01;
 
 const tintItems = [
   { id: 'full', label: 'Tinted' },
@@ -63,14 +67,10 @@ export function BrandPage() {
   const [input, setInput] = useState(applied?.color ?? blandScale['600']);
   const [tint, setTint] = useState<Tint>('full');
   const [fixed, setFixed] = useState<Scale | null>(null);
-  const [picking, setPicking] = useState<{ instant: boolean; x: number; y: number } | null>(null);
   // While a pointer drags in the picker the contrast message hides, and comes back once it is released.
   const [dragging, setDragging] = useState(false);
-  // The picker opens at the point tapped (a zero-size anchor there), or under the hex from the keyboard. The anchor
-  // is in state, not a ref read during render: the popover needs it on the render that opens it.
-  const [hero, setHero] = useState<HTMLDivElement | null>(null);
-  const [anchor, setAnchor] = useState<HTMLSpanElement | null>(null);
-  const pick = useRef<HTMLButtonElement>(null);
+  const [extras, setExtras] = useState<ExtraState[]>(savedExtras);
+  useEffect(() => saveExtras(extras), [extras]);
 
   // Bland's own blue is Bland's scale exactly (generating it again lands within 1/255).
   const isBlandColor = input === blandScale['600'];
@@ -80,7 +80,7 @@ export function BrandPage() {
   const palette = useMemo(() => ({ brand: scale, neutrals, color: input }), [scale, neutrals, input]);
   const findings = useMemo(() => check(scale, neutrals), [scale, neutrals]);
   const misses = findings.filter((f) => !inherited(f));
-  const isBland = same(blandScale, scale) && same(blandNeutrals, neutrals);
+  const isBland = same(blandScale, scale) && same(blandNeutrals, neutrals) && extras.length === 0;
   const isApplied = samePalette(applied, palette);
   // The step holding the color you entered: the fix never moves it, so your color stays exactly yours.
   const keep = isBlandColor ? undefined : placeStep(input);
@@ -93,8 +93,18 @@ export function BrandPage() {
   const resetAll = () => {
     edit(blandScale['600']);
     setTint('full');
+    setExtras([]);
     setAppliedBrand(null);
   };
+  // Extra colors: up to MAX_EXTRAS, each with a name that doesn't clash, made into a scale (fixed when asked).
+  const extraScales = extras.map((x) => ({ ...x, scale: x.fixed ?? generate(x.color), error: extraNameError(x.name, extras.filter((o) => o.id !== x.id).map((o) => o.name)) }));
+  const validExtras = extraScales.filter((x) => !x.error).map(({ name, scale }) => ({ name, scale }));
+  const updateExtra = (id: string, patch: Partial<ExtraState>) => setExtras((all) => all.map((x) => (x.id === id ? { ...x, ...patch } : x)));
+  const addExtra = () =>
+    setExtras((all) => {
+      const name = EXTRA_NAMES.find((n) => !all.some((x) => x.name === n)) ?? `color-${all.length + 1}`;
+      return [...all, { id: `${Date.now()}`, name, color: EXTRA_DEFAULTS[all.length % EXTRA_DEFAULTS.length]!, fixed: null }];
+    });
 
   return (
     <>
@@ -119,47 +129,7 @@ export function BrandPage() {
           </div>
         }
       >
-        <div className="docs-brand-card docs-brand-card-brand bland-smooth">
-          <span className="docs-brand-card-label" aria-hidden="true">
-            Tap to change
-          </span>
-          <Swatch color={input} ref={setHero}>
-            <span ref={setAnchor} className="docs-brand-anchor" style={{ left: picking?.x ?? 0, top: picking?.y ?? 0 }} aria-hidden="true" />
-            <button
-              ref={pick}
-              type="button"
-              className="docs-brand-pick bland-focus-ring"
-              aria-label={`Brand color ${input.toUpperCase()}, change it`}
-              aria-expanded={!!picking}
-              aria-haspopup="dialog"
-              onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                if (picking || !hero) return setPicking(null);
-                const box = hero.getBoundingClientRect();
-                const button = e.currentTarget;
-                const keyboard = e.detail === 0;
-                setPicking({
-                  instant: keyboard,
-                  x: keyboard ? button.offsetLeft : e.clientX - box.left,
-                  y: keyboard ? button.offsetTop + button.offsetHeight : e.clientY - box.top,
-                });
-              }}
-            >
-              {input.toUpperCase()}
-            </button>
-          </Swatch>
-          <Popover
-            open={!!picking}
-            reference={anchor}
-            placement="bottom"
-            instant={picking?.instant ?? true}
-            onClose={() => setPicking(null)}
-            returnFocus={pick}
-            role="dialog"
-            aria-label="Pick a brand color"
-          >
-            <ColorPicker value={input} onChange={edit} onDraggingChange={setDragging} />
-          </Popover>
-        </div>
+        <ColorCard label="Brand color" pickerLabel="Pick a brand color" color={input} onChange={edit} onDraggingChange={setDragging} className="docs-brand-card-brand" />
         <ScaleRow label="Brand steps" scale={scale} />
         {/* Bland's own palette has nothing to report (hidden, so it leaves with its exit); a project's palette shows its result. */}
         <Contrast misses={misses} keep={keep} hidden={dragging || (isBland && misses.length === 0)} canFix={!same(fixedScale, scale)} onFix={() => setFixed(fixedScale)} />
@@ -175,6 +145,32 @@ export function BrandPage() {
         <ScaleRow label="Neutral steps" scale={neutrals} />
       </Section>
 
+      <Section
+        title="Extra colors"
+        className="docs-brand-section"
+        action={
+          <Button size="sm" type="stroke" iconStart={<PlusIcon />} disabled={extras.length >= MAX_EXTRAS} onClick={addExtra}>
+            Add color
+          </Button>
+        }
+      >
+        <p className="docs-note">
+          Colors beside the brand, up to {MAX_EXTRAS}, for charts, illustrations or a part of your own UI. Bland’s components don’t use them; your code does, through
+          their roles, which switch in light and dark like the brand’s.
+        </p>
+        {extraScales.map((x) => (
+          <ExtraColor
+            key={x.id}
+            extra={x}
+            scale={x.scale}
+            error={x.error}
+            neutrals={neutrals}
+            onChange={(patch) => updateExtra(x.id, patch)}
+            onRemove={() => setExtras((all) => all.filter((o) => o.id !== x.id))}
+          />
+        ))}
+      </Section>
+
       <Section title="Preview" className="docs-brand-section">
         <p className="docs-note">This brand on components, before it is applied. Apply to site to see it on every page.</p>
         <div className="docs-brand-previews">
@@ -182,21 +178,204 @@ export function BrandPage() {
             <div key={theme} className="docs-brand-preview bland-smooth" data-theme={theme} style={paletteStyle(palette)}>
               <span className="docs-brand-preview-label">{theme === 'light' ? 'Light' : 'Dark'}</span>
               <Sample />
+              {validExtras.length > 0 && <ExtraSample extras={validExtras} theme={theme} />}
             </div>
           ))}
         </div>
       </Section>
 
       <Section title="Use in a project" className="docs-brand-section">
-        <p className="docs-note">Load it after Bland’s tokens. It overrides the brand and neutral steps at :root, and every brand-colored and neutral token follows in both themes.</p>
+        <p className="docs-note">
+          Load it after Bland’s tokens. It overrides the brand and neutral steps at :root, and every brand-colored and neutral token follows in both themes. Extra colors add
+          their steps and their roles (<code>--name-surface</code>, <code>--name-text</code> and so on), which your own CSS uses.
+        </p>
         <CodeSnippet
-          code={{ css: toCss(scale, isBland ? 'Bland’s own blue' : `made from ${input}, neutrals ${tint === 'none' ? 'pure gray' : `${tint} tint`}`, neutrals) }}
+          code={{ css: toCss(scale, isBland ? 'Bland’s own blue' : `made from ${input}, neutrals ${tint === 'none' ? 'pure gray' : `${tint} tint`}`, neutrals, validExtras) }}
           languages={[{ id: 'css', label: 'CSS' }]}
           highlight={highlight}
         />
       </Section>
 
     </>
+  );
+}
+
+type ExtraState = { id: string; name: string; color: string; fixed: Scale | null };
+const EXTRA_NAMES = ['accent', 'highlight', 'illustration'];
+const EXTRA_DEFAULTS = ['#7c3aed', '#f5a623', '#14b8a6'];
+const EXTRAS_KEY = 'bland-docs-extras';
+
+/** The extra colors are kept for the visit, like an applied brand (they don't change the site, so they aren't applied). */
+function savedExtras(): ExtraState[] {
+  try {
+    const raw = JSON.parse(sessionStorage.getItem(EXTRAS_KEY) ?? '[]') as ExtraState[];
+    return Array.isArray(raw) ? raw.slice(0, MAX_EXTRAS) : [];
+  } catch {
+    return [];
+  }
+}
+function saveExtras(extras: ExtraState[]) {
+  try {
+    if (extras.length) sessionStorage.setItem(EXTRAS_KEY, JSON.stringify(extras));
+    else sessionStorage.removeItem(EXTRAS_KEY);
+  } catch {
+    /* Private mode: they last until the page reloads. */
+  }
+}
+
+/**
+ * A color you tap to change (Figma 6773:21840's brand card): the swatch, its hex and a copy button. The picker opens
+ * where it was tapped (a zero-size anchor there), or under the hex from the keyboard. The anchor is in state, not a
+ * ref read during render: the popover needs it on the render that opens it.
+ */
+function ColorCard({
+  label,
+  pickerLabel,
+  color,
+  onChange,
+  onDraggingChange,
+  className,
+}: {
+  label: string;
+  pickerLabel: string;
+  color: string;
+  onChange: (hex: string) => void;
+  onDraggingChange: (dragging: boolean) => void;
+  className?: string;
+}) {
+  const [picking, setPicking] = useState<{ instant: boolean; x: number; y: number } | null>(null);
+  const [hero, setHero] = useState<HTMLDivElement | null>(null);
+  const [anchor, setAnchor] = useState<HTMLSpanElement | null>(null);
+  const pick = useRef<HTMLButtonElement>(null);
+  return (
+    <div className={`docs-brand-card bland-smooth${className ? ` ${className}` : ''}`}>
+      <span className="docs-brand-card-label" aria-hidden="true">
+        Tap to change
+      </span>
+      <Swatch color={color} ref={setHero}>
+        <span ref={setAnchor} className="docs-brand-anchor" style={{ left: picking?.x ?? 0, top: picking?.y ?? 0 }} aria-hidden="true" />
+        <button
+          ref={pick}
+          type="button"
+          className="docs-brand-pick bland-focus-ring"
+          aria-label={`${label} ${color.toUpperCase()}, change it`}
+          aria-expanded={!!picking}
+          aria-haspopup="dialog"
+          onClick={(e: MouseEvent<HTMLButtonElement>) => {
+            if (picking || !hero) return setPicking(null);
+            const box = hero.getBoundingClientRect();
+            const button = e.currentTarget;
+            const keyboard = e.detail === 0;
+            setPicking({
+              instant: keyboard,
+              x: keyboard ? button.offsetLeft : e.clientX - box.left,
+              y: keyboard ? button.offsetTop + button.offsetHeight : e.clientY - box.top,
+            });
+          }}
+        >
+          {color.toUpperCase()}
+        </button>
+      </Swatch>
+      <Popover
+        open={!!picking}
+        reference={anchor}
+        placement="bottom"
+        instant={picking?.instant ?? true}
+        onClose={() => setPicking(null)}
+        returnFocus={pick}
+        role="dialog"
+        aria-label={pickerLabel}
+      >
+        <ColorPicker value={color} onChange={onChange} onDraggingChange={onDraggingChange} />
+      </Popover>
+    </div>
+  );
+}
+
+/** One extra color: its name, the color, its steps, its roles in both modes and its own contrast check. */
+function ExtraColor({
+  extra,
+  scale,
+  error,
+  neutrals,
+  onChange,
+  onRemove,
+}: {
+  extra: ExtraState;
+  scale: Scale;
+  error?: string;
+  neutrals: Scale;
+  onChange: (patch: Partial<ExtraState>) => void;
+  onRemove: () => void;
+}) {
+  const [dragging, setDragging] = useState(false);
+  const keep = placeStep(extra.color);
+  const misses = useMemo(() => check(scale, neutrals, EXTRA_PAIRS).filter((f) => !inherited(f)), [scale, neutrals]);
+  const fixed = useMemo(() => (misses.length ? fixScale(scale, neutrals, keep, EXTRA_PAIRS) : scale), [misses.length, scale, neutrals, keep]);
+  const label = error ? 'Extra color' : `Extra color ${extra.name}`;
+  return (
+    <div className="docs-brand-extra">
+      <div className="docs-brand-extra-head">
+        <TextInput
+          label="Name"
+          value={extra.name}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => onChange({ name: e.target.value.trim().toLowerCase() })}
+          status={error ? 'danger' : 'default'}
+          helperText={error ?? `Its tokens start with --${extra.name}-.`}
+          spellCheck={false}
+          autoComplete="off"
+        />
+        <Button size="sm" type="ghost" iconStart={<TrashIcon />} onClick={onRemove}>
+          Remove
+        </Button>
+      </div>
+      <ColorCard label={label} pickerLabel={`Pick a color for ${error ? 'this extra color' : extra.name}`} color={extra.color} onChange={(hex) => onChange({ color: normalHex(hex), fixed: null })} onDraggingChange={setDragging} />
+      <ScaleRow label={`${label} steps`} scale={scale} />
+      <RoleRow name={error ? 'name' : extra.name} scale={scale} />
+      <Contrast misses={misses} keep={keep} hidden={dragging} canFix={!same(fixed, scale)} onFix={() => onChange({ fixed })} />
+    </div>
+  );
+}
+
+/** An extra color's roles: each one's color in light and dark, and the token a project uses. */
+function RoleRow({ name, scale }: { name: string; scale: Scale }) {
+  return (
+    <ul className="docs-brand-roles" aria-label={`Roles of ${name}`}>
+      {EXTRA_ROLES.map((r) => (
+        <li key={r.role} title={r.about}>
+          <span className="docs-brand-role-chips bland-smooth">
+            <span className="docs-brand-role-chip" style={{ background: scale[r.light] }} />
+            <span className="docs-brand-role-chip" style={{ background: scale[r.dark] }} />
+          </span>
+          <code className="docs-brand-role-name">--{name}-{r.role}</code>
+          <span className="docs-brand-step-hex">
+            {r.light} light, {r.dark} dark
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** The extra colors' roles in use, inside a preview: their values are set inline for that preview's theme. */
+function ExtraSample({ extras, theme }: { extras: { name: string; scale: Scale }[]; theme: 'light' | 'dark' }) {
+  return (
+    <div className="docs-brand-sample-row">
+      {extras.map(({ name, scale }) => {
+        const role = (r: string) => scale[EXTRA_ROLES.find((x) => x.role === r)![theme]];
+        return (
+          <span key={name} className="docs-brand-extra-sample">
+            <span className="docs-brand-extra-pill bland-smooth" style={{ background: role('surface-light'), color: role('text'), boxShadow: `inset 0 0 0 var(--stroke-sm) ${role('border')}` }}>
+              {name}
+            </span>
+            <span className="docs-brand-extra-pill bland-smooth" style={{ background: role('surface-strong'), color: 'var(--text-on-color)' }}>
+              {name}
+            </span>
+            <span className="docs-brand-extra-dot" style={{ background: role('surface') }} aria-hidden="true" />
+          </span>
+        );
+      })}
+    </div>
   );
 }
 

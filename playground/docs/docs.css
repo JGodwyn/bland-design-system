@@ -1129,6 +1129,77 @@ code,
   gap: var(--space-sm);
 }
 
+/* Extra colors: each a block of its own, ruled off from the one before. */
+.docs-brand-extra {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+.docs-brand-extra + .docs-brand-extra {
+  padding-top: var(--space-xl);
+  box-shadow: inset var(--space-none) var(--stroke-sm) var(--space-none) var(--space-none) var(--border-subtle);
+}
+.docs-brand-extra-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+.docs-brand-extra-head .bland-text-input {
+  width: min(100%, var(--space-9xl));
+}
+.docs-brand-extra-head .bland-button {
+  margin-top: var(--space-xl); /* level with the field, under its label */
+}
+.docs-brand-roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--space-9xl) * 0.75)), 1fr));
+  gap: var(--space-sm) var(--space-lg);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  list-style: none;
+}
+.docs-brand-roles li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: var(--space-sm);
+}
+.docs-brand-role-chips {
+  --bland-radius: var(--rad-sm);
+
+  display: flex;
+  grid-row: span 2;
+  overflow: hidden;
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-subtle);
+}
+/* Light value, then dark. */
+.docs-brand-role-chip {
+  width: var(--icon-lg);
+  height: var(--space-3xl);
+}
+.docs-brand-role-name {
+  font: var(--type-code-body-sm);
+  color: var(--text-bold);
+  overflow-wrap: anywhere;
+}
+.docs-brand-extra-sample {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.docs-brand-extra-pill {
+  --bland-radius: var(--rad-sm);
+
+  padding: var(--space-2xs) var(--space-sm);
+  font: var(--type-body-md-bold);
+}
+.docs-brand-extra-dot {
+  width: var(--icon-md);
+  height: var(--icon-md);
+  border-radius: var(--rad-rd);
+}
+
 /* A zero-size point inside the swatch where it was tapped: the picker opens from it. */
 .docs-brand-anchor {
   position: absolute;

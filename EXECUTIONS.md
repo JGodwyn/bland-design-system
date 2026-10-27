@@ -1614,3 +1614,12 @@ not wrapped; rail contents centred (logo and account icon were off).
 
 - Godwin: make the shared popover's exit faster than its entry. `popover.css`: the closed state's transitions run duration/xs, `:popover-open` sets duration/md, so opening (Menu, Dropdown, Breadcrumb overflow, date pickers, the docs color picker) stays 200 ms and closing is 125 ms; same path, easing/out; keyboard opens stay instant. Measured in Playwright on a Menu: in ~190 ms, out ~125 ms. Tooltip has its own CSS and is unchanged.
 - docs/motion.md and CLAUDE.md now say exits run the same path, quicker. Full suite: 629 passed; the flaky Section tab spec passed on its own.
+
+## Extra project colors (2026-10-27)
+
+- Godwin: projects may want colors beside the brand (charts, illustrations, parts of their UI); the brand stays on every component; extras get light/dark theming; cap 3.
+- Researched: Material 3 (secondary/tertiary roles used by components), Carbon/Atlassian/shadcn (ordered chart palettes, data marks only), Radix/Tailwind (custom scales next to the system). Bland takes the third for extras and plans the second as a chart palette (needs Figma).
+- core.ts: `check`, `suggest`, `fixScale`, `report` take a set of pairs. `EXTRA_ROLES` mirrors the brand tokens (surface, surface-strong, surface-light, text, icon, border) by reading their light/dark steps from tokens.json; `EXTRA_PAIRS` (6) are the brand pairings those roles draw. `toCss` emits extras' steps on :root and their roles in Bland's light and dark selectors; `parseExtras` reads them back; `extraNameError` blocks Bland's own prefixes.
+- Command: `--extra name=#hex` (up to 3) on generate, each reported and fixed on its own with its step pinned; `check` reads a file's extras.
+- Page: the brand card became `ColorCard` (reused per extra). Extra colors section: Add color (disabled at 3), Name field with the clash check, Remove, steps, a roles row (light and dark halves, token name), its own Contrast with Fix. Previews show each extra's roles in that theme; the CSS includes them; kept for the visit in sessionStorage; Reset clears them.
+- The reusable card first named its dialog "Pick brand color"; tests caught it, so the card takes `pickerLabel`.

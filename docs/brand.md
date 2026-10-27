@@ -53,12 +53,35 @@ Load a stylesheet after Bland's tokens:
 
 Neutrals are optional in the file: set all 13 or none. Override at `:root`, not on a nested element: the brand-colored tokens are computed where `tokens.css` defines them (`:root` and `[data-theme]`), and they read the brand steps from there. Step 0 is white in Bland's scale; keep it white unless the brand needs otherwise.
 
+## Extra colors (decided 2026-10-27)
+
+A project can add up to three colors beside the brand, for charts, illustrations or any part of its own UI. Godwin's calls: the brand stays on every component; extras are the project's to place; they get light and dark theming; three at most.
+
+- **Bland's components never read them.** They're for the project's own CSS and components: a chart series, an illustration, a promo section, a tag. A project can also recolor a Bland component in one area by pointing that component's tokens at an extra's roles there, for example `.promo { --button-brand-primary-rest: var(--accent-surface-strong); }`, and dark mode follows because the roles switch.
+- **Steps:** 13, made like the brand's (the color lands unchanged on the step its lightness belongs on), as `--name-0 … --name-1000` on `:root`.
+- **Roles** switch between light and dark exactly as the brand's do (they mirror the brand tokens in `tokens.json`, so they never drift):
+
+| Role | Mirrors | Light | Dark | For |
+| --- | --- | --- | --- | --- |
+| `--name-surface` | `surface-brand` | 600 | 400 | Solid fills, chart marks; no white text on it (it lightens in dark) |
+| `--name-surface-strong` | `surface-brand-strong` | 600 | 600 | Solid fills that carry white text |
+| `--name-surface-light` | `surface-brand-light` | 50 | 1000 | Quiet tinted fills |
+| `--name-text` | `text-brand` | 600 | 400 | Text on the page |
+| `--name-icon` | `icon-brand` | 600 | 400 | Icons |
+| `--name-border` | `border-brand` | 600 | 400 | Borders and bars |
+
+- **Check:** six pairings per extra, both modes (`EXTRA_PAIRS`): white text on its strong fill, its text on the page and on its light fill (4.5:1), its icon, border and fill against the page (3:1). Fix contrast never moves the entered color's step.
+- **Names:** lowercase letters and hyphens, and not a prefix Bland already uses (`surface`, `text`, `brand`, `space` …), so an extra never shadows a Bland token.
+- **What theming costs:** the override file grows a light block and two dark blocks (the same selectors as `tokens.css`: `[data-theme="dark"]` and the `prefers-color-scheme` media query), about 20 lines per extra. Roles are `var()`s of the extra's own steps, so a nested `data-theme` section works as it does for Bland. Use the roles in project code and dark mode is handled; reach for raw steps only where a fixed color is meant (an illustration that should look the same in both modes).
+- **Not yet:** a chart palette (ordered `--chart-1…8`, brand first, then the extras), which needs a Figma design first; and Figma variables for extras (they live in code, like a project's neutrals).
+
 ## The Brand theme page (docs site)
 
 `npm run docs`, then **Brand theme** under Overview (`#/brand`; Figma 6773:21840): the same tool in the browser.
 
 - **Brand color:** tap the big swatch and a color picker opens where you tapped (under the hex from the keyboard): saturation and brightness area, hue slider, and a field that reads and writes HEX, RGB, HSL or OKLCH (pick the format from its menu, kept for your next visit; paste CSS like `rgb(255 90 31)` or `oklch(68% 0.21 38)` in any format). The swatch shows your color exactly, with a copy button. Under it, the 13 steps it makes (your color on its own step) and the contrast result: **Contrast checks out**, or a **Contrast warning** with **Fix contrast** (moves the other steps, never the color you entered) and **Show breakdown** (the misses as a table). Misses Bland's own blue shares, and this brand makes no worse, count as passing on the page: they are Bland's to fix (the command still lists them). The result hides while you drag in the picker and eases back in when you let go. **Reset** and **Apply to site** sit in the section heading: Reset goes back to Bland everywhere, including the site; Apply sets the steps on `<html>` so every docs page shows the brand, kept for the visit in sessionStorage with the color it was made from (it survives a reload).
 - **Neutral color:** Tinted, Subtle or Pure gray, the 400 neutral as a big swatch, and the 13 neutral steps.
+- **Extra colors:** Add color (up to three), each with a name, the same tap-to-change swatch, its steps, its roles in light and dark, and its own contrast check. They show in the previews and the CSS, and are kept for the visit; Reset clears them.
 - **Preview** in light and dark, and **Use in a project** with the CSS to copy.
 
 The page imports `scripts/brand/core.ts`, so it never disagrees with the command.
@@ -68,6 +91,7 @@ The page imports `scripts/brand/core.ts`, so it never disagrees with the command
 ```bash
 npm run brand -- generate "#ff5a1f"                 # 13 brand + 13 neutral steps from one color, then the check
 npm run brand -- generate "#ff5a1f" --neutrals none # pure gray neutrals (or subtle; full is the default)
+npm run brand -- generate "#ff5a1f" --extra accent=#7c3aed --extra chart=#14b8a6  # up to three extra colors
 npm run brand -- generate "#ff5a1f" --fix --out brand.css
 npm run brand -- check brand.css                    # check a project's override (CSS or JSON)
 npm run brand -- check brand.css --fix --out fixed.css

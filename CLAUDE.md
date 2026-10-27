@@ -2,7 +2,7 @@
 
 Bland is Godwin's personal design system: a Figma UI kit reused across client projects, being turned into code with a token pipeline and (later) a docs site. Figma is finished; this repo is the code side.
 
-- Light and dark themes. A per-project brand color: a project overrides the 13 `--brand-*` steps (and the 13 `--neutral-*`, tinted toward its brand or pure gray) at `:root` and everything follows (`docs/brand.md`).
+- Light and dark themes. A per-project brand color: a project overrides the 13 `--brand-*` steps (and the 13 `--neutral-*`, tinted toward its brand or pure gray) at `:root` and everything follows (`docs/brand.md`). Up to three extra project colors (charts, illustrations, its own UI) get 13 steps and light/dark roles each; Bland's components never use them.
 - Inter for UI text, Geist Mono for code, Phosphor icons, 100% corner smoothing on every rounded corner.
 - One-person system (Godwin plus Claude). Keep process light: no review flow, no client-facing docs yet.
 
@@ -27,7 +27,7 @@ scripts/stylelint/        bland/use-tokens lint rule, fixtures and test
 
 - `npm run tokens`: regenerate `tokens.json` and `tokens.css` from the raw export.
 - `npm run tokens:checksum`: hash of the raw export; must equal `scripts/figma/checksum.js` run in Figma.
-- `npm run brand`: the brand override tool: `generate "#hex"` makes 13 brand steps from one color and 13 neutral steps leaning toward it (`--neutrals full|subtle|none`), `check brand.css` tests the brand pairings (warns, never blocks), `--fix` applies suggested steps (`docs/brand.md`). `npm run test:brand` runs its tests.
+- `npm run brand`: the brand override tool: `generate "#hex"` makes 13 brand steps from one color and 13 neutral steps leaning toward it (`--neutrals full|subtle|none`), plus up to three `--extra name=#hex` colors, `check brand.css` tests the brand pairings (warns, never blocks), `--fix` applies suggested steps (`docs/brand.md`). `npm run test:brand` runs its tests.
 - `npm run tokens:drift`: drift check against Figma, variable by variable, with the CSS tokens each change reaches; `-- --apply` takes the Figma version. Two steps around one `use_figma` call (`docs/tokens.md`, "Drift check"). `npm run test:drift` runs its tests.
 - `npm run build`: tokens, Vite library build, `dist/tokens.css`, type declarations.
 - `npm run typecheck`.
@@ -214,7 +214,7 @@ In order; tokens come before components.
 - [x] Base: fonts, reset, focus and smoothing helpers, icon slot, scroll area, conventions in `docs/components.md`. Done 2026-10-17. Grid system (17 Figma layout grids) is deferred until page layouts need it.
 - [x] Docs site, local (2026-10-17): sidebar of styles and components, live demo with controls, variants, props tables, theme switch. Runs with `npm run docs`. Redesigned from the Figma Doc site page (2026-10-22): Bland controls, full code view, props in Table, search (⌘K), page contents rail; see INTERFACE.md.
 - [ ] Docs site hosting: not deployed anywhere yet.
-- [ ] Extra project colors beside the brand (charts, illustrations): approach to decide (Godwin 2026-10-27).
+- [ ] Extra project colors beside the brand: built 2026-10-27 (up to three, steps + light/dark roles, `docs/brand.md`). Left: a chart palette (`--chart-1…8`), Figma first.
 - [ ] Publish the `bland` package (private, 0.0.0 today) so projects can install it.
 - [ ] At the end: package agent skills, how a project's agent uses Bland (install, tokens and the no-hardcoded-values rule, components and props, brand override, extra colors) (Godwin 2026-10-27).
 

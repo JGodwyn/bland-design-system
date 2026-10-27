@@ -220,10 +220,12 @@ export function parseScale(text: string): Scale {
   return Object.fromEntries(STEPS.map((s) => [s, `#${parseHex(found[s]!).map((v) => Math.round(v * 255).toString(16).padStart(2, '0')).join('')}`])) as Scale;
 }
 
-export function toCss(scale: Scale, note = '', neutrals?: Scale): string {
+export function toCss(scale: Scale, note = '', neutrals?: Scale, extras: Extra[] = []): string {
   const lines = STEPS.map((s) => `  --brand-${s}: ${scale[s]};`);
   if (neutrals) lines.push('', ...STEPS.map((s) => `  --neutral-${s}: ${neutrals[s]};`));
-  return `/* Brand override for Bland${note ? `: ${note}` : ''}. Load after bland/tokens.css. */\n:root {\n${lines.join('\n')}\n}\n`;
+  for (const x of extras) lines.push('', ...STEPS.map((s) => `  --${x.name}-${s}: ${x.scale[s]};`));
+  const css = `/* Brand override for Bland${note ? `: ${note}` : ''}. Load after bland/tokens.css. */\n:root {\n${lines.join('\n')}\n}\n`;
+  return extras.length ? `${css}\n${extraRolesCss(extras)}` : css;
 }
 
 /** The 13 neutral steps from an override file, or undefined when it sets none (Bland's neutrals then stay). */
@@ -321,10 +323,10 @@ export type Finding = Pair & {
 };
 
 /** Every pairing below its minimum with this scale, in both modes. */
-export function check(scale: Scale, neutrals: Scale = blandNeutrals): Finding[] {
+export function check(scale: Scale, neutrals: Scale = blandNeutrals, pairs: Pair[] = PAIRS): Finding[] {
   const out: Finding[] = [];
   for (const mode of ['light', 'dark'] as const) {
-    for (const pair of PAIRS) {
+    for (const pair of pairs) {
       const fg = colorOf(pair.fg, mode, scale, neutrals);
       const bg = colorOf(pair.bg, mode, scale, neutrals);
       const ratio = contrast(fg.hex, bg.hex);
@@ -351,16 +353,16 @@ export function check(scale: Scale, neutrals: Scale = blandNeutrals): Finding[] 
 }
 
 /** A miss Bland's own brand has too, and this brand makes no worse: not this brand's doing. */
-const inherited = (f: Finding) => f.baseline < f.min && f.ratio >= f.baseline - 0.01;
+export const inherited = (f: Finding) => f.baseline < f.min && f.ratio >= f.baseline - 0.01;
 
 /**
  * For each brand step behind a miss, the nearest color (same hue and chroma, lightness moved the way the advice
  * says) that clears every pairing it is in, with the other steps as they are. One step at a time: run the check
  * again after taking them.
  */
-export function suggest(scale: Scale, neutrals: Scale = blandNeutrals, keep?: Step): Partial<Scale> {
+export function suggest(scale: Scale, neutrals: Scale = blandNeutrals, keep?: Step, all: Pair[] = PAIRS): Partial<Scale> {
   // `keep` (the step holding the project's own color) never moves; a miss only it could fix stays a miss.
-  const misses = check(scale, neutrals).filter((f) => !inherited(f) && f.steps.some((s) => s !== keep));
+  const misses = check(scale, neutrals, all).filter((f) => !inherited(f) && f.steps.some((s) => s !== keep));
   // A miss between a tint (below 400) and a solid step is the solid step's to fix: moving the tint would wash out
   // the light end of the scale. Between two of a kind, the darker step.
   const owner = (f: Finding) => {
@@ -370,10 +372,10 @@ export function suggest(scale: Scale, neutrals: Scale = blandNeutrals, keep?: St
   };
   const out: Partial<Scale> = {};
   for (const step of new Set(misses.map(owner))) {
-    const pairs = PAIRS.filter((p) => ['light', 'dark'].some((m) => [p.fg, p.bg].some((css) => colorOf(css, m as Mode, scale, neutrals).step === step)));
+    const pairs = all.filter((p) => ['light', 'dark'].some((m) => [p.fg, p.bg].some((css) => colorOf(css, m as Mode, scale, neutrals).step === step)));
     const passes = (hex: string) => {
       const trial = { ...scale, [step]: hex };
-      return check(trial, neutrals).filter((f) => !inherited(f) && pairs.includes(PAIRS.find((p) => p.fg === f.fg && p.bg === f.bg)!) && f.steps.includes(step)).length === 0;
+      return check(trial, neutrals, all).filter((f) => !inherited(f) && pairs.includes(all.find((p) => p.fg === f.fg && p.bg === f.bg)!) && f.steps.includes(step)).length === 0;
     };
     const base = toOklch(scale[step]);
     const lighten = misses.some((f) => owner(f) === step && f.advice.includes(`lighten ${step}`));
@@ -415,27 +417,27 @@ function keepOrder(scale: Scale, original: Scale, moved: Partial<Scale>, keep?: 
  * The suggested steps, applied and kept in order, repeated (up to four rounds) until the check passes. `keep` pins
  * one step (the project's own color, so it stays exactly as entered): misses only it could fix are left.
  */
-export function fixScale(scale: Scale, neutrals: Scale = blandNeutrals, keep?: Step): Scale {
+export function fixScale(scale: Scale, neutrals: Scale = blandNeutrals, keep?: Step, pairs: Pair[] = PAIRS): Scale {
   let current = scale;
   for (let round = 0; round < 4; round++) {
-    if (check(current, neutrals).every((f) => inherited(f) || f.steps.every((s) => s === keep))) break;
-    const moved = suggest(current, neutrals, keep);
+    if (check(current, neutrals, pairs).every((f) => inherited(f) || f.steps.every((s) => s === keep))) break;
+    const moved = suggest(current, neutrals, keep, pairs);
     if (Object.keys(moved).length === 0) break;
     current = keepOrder({ ...current, ...moved }, scale, moved, keep);
   }
   return current;
 }
 
-export function report(scale: Scale, neutrals: Scale = blandNeutrals, keep?: Step): { text: string; failures: number; fixes: Partial<Scale> } {
-  const findings = check(scale, neutrals);
+export function report(scale: Scale, neutrals: Scale = blandNeutrals, keep?: Step, pairs: Pair[] = PAIRS, label = 'Brand'): { text: string; failures: number; fixes: Partial<Scale> } {
+  const findings = check(scale, neutrals, pairs);
   const real = findings.filter((f) => !inherited(f));
   const known = findings.filter(inherited);
-  const lines = [`Brand check: ${PAIRS.length} brand pairings in light and dark.`];
-  if (real.length === 0) lines.push('All pass with this brand.');
+  const lines = [`${label} check: ${pairs.length} pairings in light and dark.`];
+  if (real.length === 0) lines.push(`All pass with this ${label === 'Brand' ? 'brand' : 'color'}.`);
   for (const f of real) {
     lines.push(`  ✗ ${f.mode.padEnd(5)} ${f.ratio.toFixed(2)}:1, needs ${f.min}:1  ${f.where} (${f.fg} on ${f.bg}). ${f.advice}.`);
   }
-  const all = real.length ? fixScale(scale, neutrals, keep) : scale;
+  const all = real.length ? fixScale(scale, neutrals, keep, pairs) : scale;
   const fixes = Object.fromEntries(STEPS.filter((s) => all[s] !== scale[s]).map((s) => [s, all[s]])) as Partial<Scale>;
   const fixed = Object.entries(fixes);
   if (fixed.length) {
@@ -450,4 +452,78 @@ export function report(scale: Scale, neutrals: Scale = blandNeutrals, keep?: Ste
     for (const f of known) lines.push(`  · ${f.mode.padEnd(5)} ${f.ratio.toFixed(2)}:1 (Bland ${f.baseline.toFixed(2)}:1)  ${f.where}`);
   }
   return { text: lines.join('\n'), failures: real.length, fixes };
+}
+
+// ---------- extra colors ----------
+
+/**
+ * A project's own colors beside the brand (charts, illustrations, a section of its UI). Bland's components never
+ * read them; project code does. Each is a 13-step scale made like the brand's (the color lands unchanged on its
+ * own step) plus themed roles that switch in dark mode exactly as the brand's do (docs/brand.md, "Extra colors").
+ */
+export type Extra = { name: string; scale: Scale };
+export const MAX_EXTRAS = 3;
+
+/** Each role mirrors a brand token: the same steps in light and dark, read from tokens.json so they never drift. */
+export const EXTRA_ROLES = (
+  [
+    ['surface', '--surface-brand', 'Solid fill. Lighter in dark mode, so keep white text off it'],
+    ['surface-strong', '--surface-brand-strong', 'Solid fill that carries white text in both modes'],
+    ['surface-light', '--surface-brand-light', 'Quiet tinted fill'],
+    ['text', '--text-brand', 'Text on the page'],
+    ['icon', '--icon-brand', 'Icons on the page'],
+    ['border', '--border-brand', 'Borders, bars and chart marks'],
+  ] as const
+).map(([role, from, about]) => {
+  const t = byCss.get(from)!;
+  const step = (ref: string | undefined) => /--brand-(\d+)/.exec(ref ?? '')![1] as Step;
+  return { role, from, about, light: step(t.cssValue?.light), dark: step(t.dark !== undefined ? t.cssValue?.dark : t.cssValue?.light) };
+});
+
+/** The brand pairings an extra color's roles also draw, checked against its own scale. */
+export const EXTRA_PAIRS: Pair[] = [
+  text('--text-on-color', '--surface-brand-strong', 'White text on its strong fill'),
+  text('--text-brand', '--surface-100', 'Its text on the page'),
+  text('--text-brand', '--surface-brand-light', 'Its text on its light fill'),
+  part('--icon-brand', '--surface-100', 'Its icon on the page'),
+  part('--border-brand', '--surface-100', 'Its border on the page'),
+  part('--surface-brand', '--surface-100', 'Its fill against the page (charts, shapes)'),
+];
+
+/** Prefixes Bland's own tokens use, which an extra color's name may not take. */
+const taken = new Set(tokens.map((t) => /^--([a-z]+)/.exec(t.css)?.[1]).filter(Boolean) as string[]);
+
+/** Why a name can't be used, or undefined when it can: lowercase letters and hyphens, not one of Bland's prefixes. */
+export function extraNameError(name: string, others: string[] = []): string | undefined {
+  if (!/^[a-z][a-z-]{0,23}$/.test(name) || name.endsWith('-')) return 'Use lowercase letters and hyphens, such as accent or chart-orange.';
+  if (taken.has(name.split('-')[0]!)) return `Bland already uses --${name.split('-')[0]}-…; pick another name.`;
+  if (others.includes(name)) return 'Another extra color has this name.';
+  return undefined;
+}
+
+/** The themed roles of the extra colors, in Bland's theme selectors (light, then dark both ways). */
+function extraRolesCss(extras: Extra[]): string {
+  const block = (mode: 'light' | 'dark', indent: string) =>
+    extras.flatMap((x) => EXTRA_ROLES.map((r) => `${indent}--${x.name}-${r.role}: var(--${x.name}-${r[mode]});`)).join('\n');
+  return [
+    '/* Their roles, in light and dark like Bland\'s brand roles. */',
+    `:root,\n[data-theme="light"] {\n${block('light', '  ')}\n}`,
+    `[data-theme="dark"] {\n${block('dark', '  ')}\n}`,
+    `@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"]) {\n${block('dark', '    ')}\n  }\n}`,
+    '',
+  ].join('\n\n');
+}
+
+/** Extra colors from an override file: every --name-0 … --name-1000 scale that isn't the brand or neutrals. */
+export function parseExtras(text: string): Extra[] {
+  const found = new Map<string, Partial<Record<string, string>>>();
+  const entries: [string, string][] = text.trim().startsWith('{')
+    ? Object.entries(JSON.parse(text) as Record<string, string>)
+    : [...text.matchAll(/(--[a-z][a-z-]*-\d+)\s*:\s*([^;}\s]+)/g)].map((m) => [m[1]!, m[2]!]);
+  for (const [k, v] of entries) {
+    const m = /^--([a-z][a-z-]*)-(\d+)$/.exec(k);
+    if (!m || m[1] === 'brand' || m[1] === 'neutral' || !STEPS.includes(m[2] as Step)) continue;
+    found.set(m[1]!, { ...found.get(m[1]!), [m[2]!]: v });
+  }
+  return [...found].filter(([, steps]) => STEPS.every((s) => steps[s])).map(([name, steps]) => ({ name, scale: Object.fromEntries(STEPS.map((s) => [s, steps[s]!])) as Scale }));
 }
