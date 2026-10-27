@@ -161,7 +161,8 @@ export function BrandPage() {
           </Popover>
         </div>
         <ScaleRow label="Brand steps" scale={scale} />
-        <Contrast misses={misses} keep={keep} hidden={dragging} canFix={!same(fixedScale, scale)} onFix={() => setFixed(fixedScale)} />
+        {/* Bland's own palette has nothing to report; a project's palette shows its result. */}
+        {!(isBland && misses.length === 0) && <Contrast misses={misses} keep={keep} hidden={dragging} canFix={!same(fixedScale, scale)} onFix={() => setFixed(fixedScale)} />}
       </Section>
 
       <Section title="Neutral color" className="docs-brand-section">
@@ -233,14 +234,15 @@ function ScaleRow({ label, scale }: { label: string; scale: Scale }) {
 
 /**
  * The contrast check. Misses Bland's own brand shares (and this brand makes no worse) count as passing: they are
- * Bland's to fix, not a project's. While `hidden` (a drag in the picker) it fades out; each new result eases in.
+ * Bland's to fix, not a project's. While `hidden` (a drag in the picker) it is out of the layout; when it comes
+ * back, and on each new result, it eases in.
  */
 function Contrast({ misses, keep, hidden, canFix, onFix }: { misses: Finding[]; keep?: Step; hidden: boolean; canFix: boolean; onFix: () => void }) {
   const [open, setOpen] = useState(false);
   const breakdown = useId();
   const result = misses.length === 0 ? 'ok' : `miss-${misses.length}`;
   return (
-    <div className="docs-brand-contrast" data-hidden={hidden || undefined} aria-hidden={hidden || undefined}>
+    <div className="docs-brand-contrast" hidden={hidden}>
       <div key={result} className="docs-brand-contrast-result">
         {misses.length === 0 ? (
           <Banner status="success" colored>

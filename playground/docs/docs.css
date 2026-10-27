@@ -1136,16 +1136,15 @@ code,
   height: var(--space-none);
   pointer-events: none;
 }
-/* The contrast result fades out while the picker is dragged, and each new result eases in. */
+/* The contrast result leaves the layout while the picker is dragged; it eases back in (the result's animation
+   replays when display returns), as each new result does. */
 .docs-brand-contrast {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  transition: opacity var(--duration-md) var(--easing-out);
 }
-.docs-brand-contrast[data-hidden] {
-  opacity: 0;
-  pointer-events: none;
+.docs-brand-contrast[hidden] {
+  display: none;
 }
 .docs-brand-contrast-result {
   animation: docs-brand-result var(--duration-md) var(--easing-out);

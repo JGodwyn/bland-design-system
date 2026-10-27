@@ -1585,3 +1585,8 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Fix contrast never changes the entered color (its step is pinned since 21d7f8f); the spec now asserts it.
 - The picker opens where the swatch was tapped: a zero-size anchor span at the press point (or under the hex for keyboard presses), placement bottom.
 - Format field: the trigger is body-sm-bold, full field height and flush with the field's left edge, space-md before the value; its menu is as wide as its labels (`docs-picker-format-menu`), lines up with the field and sits space-xs further down. The field's ring shows only for the value input.
+
+## Brand page: no result on Bland's palette, none of its space while dragging (2026-10-27)
+
+- Godwin: after Reset to Bland, no "Contrast checks out". Bland's own palette (brand and neutrals) shows no result unless it has real misses.
+- Godwin: the hidden result still took its space while scrubbing. It now uses `hidden` (display none) while a pointer drags in the picker, so the page closes up; on release the result's ease-in animation replays as display returns (checked in Playwright: running from opacity 0).
