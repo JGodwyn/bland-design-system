@@ -2,7 +2,8 @@
 //
 //   npm run brand -- generate "#ff5a1f" [--at 400] [--neutrals full|subtle|none] [--extra accent=#7c3aed …] [--fix] [--out brand.css]
 //       13 brand steps from one color (placed on the step its lightness belongs on, or --at), 13 neutral steps
-//       tinted toward it, up to three extra colors (13 steps and light/dark roles each), then the check
+//       tinted toward it, up to three extra colors (13 steps and light/dark roles each; `--extra name` alone takes the
+//       next color in harmony with the brand: complement, then the square's other two), then the check
 //   npm run brand -- check brand.css [--neutrals full|subtle|none] [--fix] [--out fixed.css]
 //       the contrast check for an override file (its neutrals, or Bland's when it sets none, and its extra colors)
 //
@@ -18,6 +19,7 @@ import {
   extraNameError,
   generate,
   generateNeutrals,
+  harmonyColor,
   MAX_EXTRAS,
   parseExtras,
   parseNeutrals,
@@ -46,9 +48,11 @@ function extrasFromFlags(): (Extra & { keep?: Step })[] {
   if (given.length > MAX_EXTRAS) throw new Error(`Up to ${MAX_EXTRAS} extra colors.`);
   const names: string[] = [];
   return given.map((g) => {
-    const [name = '', hex = ''] = g.split('=');
+    // Without a color, the extra takes its default: the next color in harmony with the brand (complement first).
+    const [name = '', given = ''] = g.split('=');
     const problem = extraNameError(name, names);
     if (problem) throw new Error(`--extra ${g}: ${problem}`);
+    const hex = given || harmonyColor(arg!, names.length);
     names.push(name);
     return { name, scale: generate(hex), keep: placeStep(hex) };
   });
@@ -104,7 +108,7 @@ if (command === 'generate' && arg) {
   run(parseScale(file), `checked from ${arg}`, false, tintFlag, parseNeutrals(file), undefined, parseExtras(file));
 } else {
   console.log(
-    'Usage:\n  npm run brand -- generate "#rrggbb" [--at <step>] [--neutrals full|subtle|none] [--extra name=#rrggbb …] [--fix] [--out brand.css]\n  npm run brand -- check brand.css [--neutrals full|subtle|none] [--fix] [--out fixed.css]',
+    'Usage:\n  npm run brand -- generate "#rrggbb" [--at <step>] [--neutrals full|subtle|none] [--extra name[=#rrggbb] …] [--fix] [--out brand.css]\n  npm run brand -- check brand.css [--neutrals full|subtle|none] [--fix] [--out fixed.css]',
   );
   process.exitCode = 2;
 }

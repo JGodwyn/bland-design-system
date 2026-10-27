@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { EXTRA_PAIRS, EXTRA_ROLES, extraNameError, parseExtras, blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
+import { EXTRA_PAIRS, EXTRA_ROLES, extraNameError, harmonyColor, HARMONY_TURNS, parseExtras, blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
 
 const close = (a: string, b: string) => toOklch(a).l - toOklch(b).l;
 
@@ -124,3 +124,18 @@ test('extra color names avoid Bland prefixes, and the override file round-trips 
   assert.deepEqual(parseExtras(css), [{ name: 'accent', scale: accent }]);
   assert.deepEqual(parseScale(css), blandScale);
 });
+
+test('default extra colors go with the brand: complement first, then the square, apart on the wheel', () => {
+  for (const brand of [blandScale['600'], '#ff5a1f', '#16a34a', '#7c3aed']) {
+    const h = toOklch(brand).h;
+    HARMONY_TURNS.forEach((turn, i) => {
+      const color = harmonyColor(brand, i);
+      const off = (((toOklch(color).h - h - turn) % 360) + 540) % 360 - 180;
+      assert.ok(Math.abs(off) < 3, `${brand} extra ${i} is ${turn}° round (off ${off.toFixed(1)}°)`);
+      assert.ok(toOklch(color).c <= toOklch(brand).c + 0.005, 'never more colorful than the brand');
+    });
+  }
+  // A gray brand has no hue: Bland's blue stands in.
+  assert.equal(harmonyColor('#777777', 0), harmonyColor(blandScale['600'], 0));
+});
+

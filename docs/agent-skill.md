@@ -13,6 +13,7 @@ Raw material for the skill we package at the end of the project: what an agent n
 - A project's brand is 13 `--brand-*` steps and 13 `--neutral-*` steps at `:root`, made by `npm run brand -- generate "#hex"` or the docs site's Brand theme page. Never edit Bland's tokens to rebrand.
 - The entered color lands unchanged on the step its lightness belongs on; Fix contrast moves the other steps only.
 - Up to three extra colors (`--extra name=#hex`), for the project's own UI: charts, illustrations, a section, a tag. Bland's components never read them.
+- A new extra's default color is the next one in harmony with the brand (complement, then the square); pass a hex to choose your own.
 - **Use roles, not steps.** Brand: Bland's Theme tokens (`--surface-brand`, `--text-brand`, …). Extras: `--name-surface`, `-surface-strong`, `-surface-light`, `-text`, `-icon`, `-border`, which switch in dark mode. Raw steps (`--name-600`) are the same in both modes: only for something meant to look identical in light and dark.
 - White text goes on `-surface-strong`, never `-surface` (it lightens in dark).
 - To recolor a Bland component in one area, override that component's tokens on a wrapper: `.promo { --button-brand-primary-rest: var(--accent-surface-strong); }`.

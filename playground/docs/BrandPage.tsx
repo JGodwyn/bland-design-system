@@ -35,6 +35,7 @@ import {
   fixScale,
   generate,
   generateNeutrals,
+  harmonyColor,
   inherited,
   MAX_EXTRAS,
   PAIRS,
@@ -108,7 +109,7 @@ export function BrandPage() {
   const addExtra = () =>
     setExtras((all) => {
       const name = EXTRA_NAMES.find((n) => !all.some((x) => x.name === n)) ?? `color-${all.length + 1}`;
-      return [...all, { id: `${Date.now()}`, name, color: EXTRA_DEFAULTS[all.length % EXTRA_DEFAULTS.length]!, fixed: null }];
+      return [...all, { id: `${Date.now()}`, name, color: harmonyColor(input, all.length), fixed: null }];
     });
 
   return (
@@ -256,7 +257,6 @@ export function BrandPage() {
 
 type ExtraState = { id: string; name: string; color: string; fixed: Scale | null };
 const EXTRA_NAMES = ['accent', 'highlight', 'illustration'];
-const EXTRA_DEFAULTS = ['#7c3aed', '#f5a623', '#14b8a6'];
 const EXTRAS_KEY = 'bland-docs-extras';
 
 /** The extra colors are kept for the visit, like an applied brand (they don't change the site, so they aren't applied). */

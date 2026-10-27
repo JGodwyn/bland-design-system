@@ -58,6 +58,7 @@ Neutrals are optional in the file: set all 13 or none. Override at `:root`, not 
 A project can add up to three colors beside the brand, for charts, illustrations or any part of its own UI. Godwin's calls: the brand stays on every component; extras are the project's to place; they get light and dark theming; three at most.
 
 - **Bland's components never read them.** They're for the project's own CSS and components: a chart series, an illustration, a promo section, a tag. A project can also recolor a Bland component in one area by pointing that component's tokens at an extra's roles there, for example `.promo { --button-brand-primary-rest: var(--accent-surface-strong); }`, and dark mode follows because the roles switch.
+- **Default colors go with the brand** (Godwin 2026-10-27): a new extra starts on the next color in harmony with the brand, turning its hue in OKLCH: the complement (180°) first, then the square's other two (90°, 270°), so brand and extras sit evenly round the wheel. Each is lit halfway between the brand's lightness and its own hue's most vivid one, and never more colorful than the brand. Bland's blue gives gold, magenta and teal. A gray brand uses Bland's blue as the starting hue. The page does this on Add color; the command does it for `--extra name` with no color. Typing a color replaces it. (`harmonyColor` in `scripts/brand/core.ts`.)
 - **Steps:** 13, made like the brand's (the color lands unchanged on the step its lightness belongs on), as `--name-0 … --name-1000` on `:root`.
 - **The steps don't switch, the roles do**, as with the brand: `--brand-600` is one color in both modes, and the tokens built on it (`--surface-brand` 600 in light, 400 in dark) move. So every extra color gets dark mode through its roles; its raw steps are fixed.
 - **Roles** switch between light and dark exactly as the brand's do (they mirror the brand tokens in `tokens.json`, so they never drift):
@@ -92,7 +93,7 @@ The page imports `scripts/brand/core.ts`, so it never disagrees with the command
 ```bash
 npm run brand -- generate "#ff5a1f"                 # 13 brand + 13 neutral steps from one color, then the check
 npm run brand -- generate "#ff5a1f" --neutrals none # pure gray neutrals (or subtle; full is the default)
-npm run brand -- generate "#ff5a1f" --extra accent=#7c3aed --extra chart=#14b8a6  # up to three extra colors
+npm run brand -- generate "#ff5a1f" --extra accent=#7c3aed --extra chart  # up to three extra colors; no color = the next in harmony
 npm run brand -- generate "#ff5a1f" --fix --out brand.css
 npm run brand -- check brand.css                    # check a project's override (CSS or JSON)
 npm run brand -- check brand.css --fix --out fixed.css

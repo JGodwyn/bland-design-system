@@ -490,6 +490,26 @@ export const EXTRA_PAIRS: Pair[] = [
   part('--surface-brand', '--surface-100', 'Its fill against the page (charts, shapes)'),
 ];
 
+/**
+ * Default extra colors: colors that go with the brand by color harmony. The hue turns from the brand's in OKLCH:
+ * the first extra is its complement (180°), the next two complete the square (90°, 270°), so the brand and three
+ * extras sit evenly around the wheel. Each takes its hue at that hue's most vivid lightness (yellow is light, blue
+ * is deep), as saturated for its hue as the brand is for its own, so they read as one family. A gray or near-black
+ * brand has no hue to turn from; Bland's blue stands in.
+ */
+export const HARMONY_TURNS = [180, 90, 270] as const;
+export function harmonyColor(brand: string, index: number): string {
+  let { l, c, h } = toOklch(brand);
+  if (c < 0.04) ({ l, c, h } = toOklch(blandScale['600']));
+  const vivid = Math.min(1, c / maxChroma(l, h));
+  const hue = (h + HARMONY_TURNS[index % HARMONY_TURNS.length]!) % 360;
+  let peak = 0.5;
+  for (let L = 0.3; L <= 0.9; L += 0.01) if (maxChroma(L, hue) > maxChroma(peak, hue)) peak = L;
+  // Halfway from the brand's lightness to the hue's most vivid one, and never more colorful than the brand.
+  const L = (l + peak) / 2;
+  return fromOklch({ l: L, c: Math.min(c, vivid * maxChroma(L, hue)), h: hue });
+}
+
 /** Prefixes Bland's own tokens use, which an extra color's name may not take. */
 const taken = new Set(tokens.map((t) => /^--([a-z]+)/.exec(t.css)?.[1]).filter(Boolean) as string[]);
 
