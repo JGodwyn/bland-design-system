@@ -1,0 +1,7 @@
+# Inert example (docs/release.md, "Netlify"): copy to the repo root as netlify.toml to use it.
+[build]
+  command = "npm run docs:build"
+  publish = "dist-docs"
+
+[build.environment]
+  NODE_VERSION = "24"

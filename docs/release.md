@@ -1,0 +1,131 @@
+# Release
+
+How Bland goes live: the package and the docs site. Everything below is prepared and checked; nothing is published or deployed. `package.json` keeps `"private": true` until Godwin picks a registry (prepared 2026-10-27).
+
+## What is ready
+
+| Command | Does |
+| --- | --- |
+| `npm run build` | `dist/`: `index.js` (ES module; React, React Aria, React Stately, Floating UI and `@internationalized/*` stay imports), `index.d.ts` and one `.d.ts` per module, `index.css` (every component), `tokens.css`, `fonts.css`, `base.css` |
+| `npm pack` | the tarball a registry would get. `prepack` runs the build first, so a pack or publish never ships a stale `dist/`. Holds `dist/`, `README.md`, `CHANGELOG.md`, `package.json` (about 140 kB packed, 74 files) |
+| `npm run test:package` | packs, installs the tarball into a throwaway Vite + React 19 app, type-checks the app against Bland's declarations (`skipLibCheck` off), builds it and checks it in Chromium: the four stylesheets in order plus a `npm run brand` override with one extra color, Button, Badge, TextInput, Toggle, Alert and Tooltip in a light and a `data-theme="dark"` section. Fails unless the primary button takes the override's 600, Inter loads, the dark section switches, the extra's roles switch, and keyboard focus opens the tooltip. Needs the network. `-- <dir>` keeps the app there |
+| `npm run docs:build` | the docs site as static files in `dist-docs/` (not committed) |
+| `npm run docs:preview` | serves `dist-docs/` at http://localhost:5181 |
+
+Package entry points (`exports`): `bland` (JS and types), `bland/tokens.css`, `bland/fonts.css`, `bland/base.css`, `bland/styles.css`, `bland/package.json`. `sideEffects` is `**/*.css`, so bundlers tree-shake the JS and keep the CSS imports. A new stylesheet in `src/styles/` needs both a line in the build's `cp` and an `exports` entry.
+
+Peer dependencies are React and React DOM **19**: components take `ref` as a plain prop, which React 18 drops.
+
+`fonts.css` `@import`s the `@fontsource` packages (dependencies of Bland), so it needs a bundler that resolves CSS imports from `node_modules`. Every mainstream one does.
+
+## Decide first (any option)
+
+1. **Registry**: public npm, GitHub Packages or a git install (below).
+2. **Name**: `bland` is taken on public npm (someone else's 0.0.1). Public npm needs a scope you own (`@jgodwyn/bland`, free; the scope is your npm username or an npm org). GitHub Packages needs the scope of the repo owner, lowercased: `@jgodwyn/bland`. A git install can keep `bland`. Renaming means `import … from '@jgodwyn/bland'` in projects, the README, and the docs site's import lines (`playground/docs/ComponentPage.tsx`, `Overview.tsx`).
+3. **License**: there is no `LICENSE` file or `license` field. For a package only you use, add `"license": "UNLICENSED"`. Anything public (npm or a public docs site) needs your choice of license, or it is all rights reserved by default.
+4. **Who can see it**: public npm is public to everyone (private npm packages need a paid npm account). GitHub Packages and git installs follow the repo's access: anyone installing needs a GitHub token or SSH access.
+
+## Before every release
+
+```bash
+npm run typecheck && npm run lint:css && npm test && npm run test:package
+```
+
+Move the CHANGELOG's "unreleased" heading to the version and date, then `npm version <patch|minor> --no-git-tag-version` for the next one (0.1.0 is set already), commit, and tag `v<version>`. Until 1.0, a minor may break an API; a patch never does (`CHANGELOG.md`).
+
+## Package option A: public npm
+
+Needs: an npm account with two-factor auth, the scoped name, a license.
+
+1. In `package.json`: `"name": "@jgodwyn/bland"`, delete `"private": true`, add `"license": "…"` and `"publishConfig": { "access": "public" }` (scoped packages are private by default).
+2. Update the import lines named in "Decide first".
+3. `npm login` once.
+
+Go live:
+
+```bash
+npm publish
+```
+
+A project installs it with `npm install @jgodwyn/bland`.
+
+## Package option B: GitHub Packages
+
+Needs: the scoped name `@jgodwyn/bland`, and a classic personal access token with `write:packages` (publishing) or `read:packages` (installing). The `repository` field is already set, which links the package to the repo.
+
+1. In `package.json`: `"name": "@jgodwyn/bland"`, delete `"private": true`, add `"publishConfig": { "registry": "https://npm.pkg.github.com" }` and a `license`.
+2. Update the import lines.
+3. In `~/.npmrc` (never in the repo): `//npm.pkg.github.com/:_authToken=<token with write:packages>`.
+
+Go live:
+
+```bash
+npm publish
+```
+
+Each project then needs an `.npmrc` with `@jgodwyn:registry=https://npm.pkg.github.com` and a `read:packages` token (GitHub's npm registry asks for one even for public packages), then `npm install @jgodwyn/bland`.
+
+## Package option C: install from the GitHub repo
+
+Needs: the repo to stay reachable by whoever installs (SSH key or token for the private repo), and a `prepare` script. Keeps the name `bland` and `"private": true` (that only blocks publishing).
+
+1. In `package.json` scripts: `"prepare": "npm run build"`. A git install installs Bland's dev dependencies and runs `prepare` before packing; `prepack` alone runs without them and fails. The cost: every `npm install` in this repo also runs the build (a few seconds).
+2. Tag the release.
+
+Go live (pushes, so only with Godwin's yes):
+
+```bash
+git tag v0.1.0 && git push origin main v0.1.0
+```
+
+A project installs it with `npm install github:JGodwyn/bland-design-system#v0.1.0`. Installs are slower (Bland's dev dependencies come along for the build). Tried 2026-10-27 on a local clone tagged v0.1.0: without `prepare` the install succeeds with no `dist/`; with it, `dist/` is built (about 10 s). npm 11 warns that `bland`'s `prepare` is not covered by `allowScripts` but runs it; if a later npm blocks unapproved scripts, the project runs `npm install-scripts approve bland` once.
+
+## Docs site
+
+`npm run docs:build` writes a static site to `dist-docs/`. Asset paths are relative (`base: './'`) and every route is a hash (`#/components/button`), so it works at a domain root or under a subpath with no rewrites or 404 page. Checked 2026-10-27 from a plain static server under `/bland-design-system/` (the GitHub Pages path): pages, fonts, images, no failed requests.
+
+The site is the whole playground, Brand theme page included; anything hosted publicly shows every component and token. Host configs are kept as inert examples in `docs/hosting/`: copy one into place to use it.
+
+### Vercel
+
+Needs: a Vercel account with GitHub connected (Hobby works with a private repo for a personal account; password protection is a paid feature).
+
+1. Copy `docs/hosting/vercel.json` to the repo root (or enter the same build command `npm run docs:build` and output directory `dist-docs` in the project settings).
+2. Import the repo at vercel.com/new: it then deploys on every push to `main`.
+
+Go live from the command line instead (after `npx vercel link` once):
+
+```bash
+npx vercel --prod
+```
+
+### Netlify
+
+Needs: a Netlify account (password protection is a paid feature).
+
+1. Copy `docs/hosting/netlify.toml` to the repo root.
+2. Connect the repo in Netlify (deploys on every push), or deploy from here (after `npx netlify-cli login` and `npx netlify-cli link` once):
+
+```bash
+npx netlify-cli deploy --build --prod
+```
+
+### GitHub Pages
+
+Needs: a public repo, or GitHub Pro/Team for Pages on a private repo; the site itself is public either way. URL: `https://jgodwyn.github.io/bland-design-system/`.
+
+1. Copy `docs/hosting/github-pages.yml` to `.github/workflows/docs.yml`.
+2. Repo Settings → Pages → Source: **GitHub Actions**.
+
+Go live (pushes, so only with Godwin's yes): commit the workflow and
+
+```bash
+git push origin main
+```
+
+It then rebuilds and deploys on every push to `main`.
+
+## Not in 0.1.0
+
+- The brand tool (`npm run brand`) lives in this repo, not the package: a project runs it from a Bland checkout or uses the docs site's Brand theme page. Shipping it as a `bin` is a later call.
+- No CI runs the tests on push; `npm test` needs Chromium and the docs server.

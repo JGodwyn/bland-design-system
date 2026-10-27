@@ -676,3 +676,11 @@ beats `strictPort`'s config value), then delete it.
 - Rule: to edit a description, decode the entities and write `descriptionMarkdown`, not `description`.
 
 **`overflow: hidden` for an ellipsis clips descenders of tight display type.** The Typography page cut off the bottom of Heading lg and up: their line heights (48 on 43px, 88 on 83px) leave Inter's descenders 2 to 6px below the line box. → For a one-line ellipsis on large type, `overflow-x: clip; overflow-y: visible` (clip doesn't force the other axis to scroll, and text-overflow still works).
+
+## Packaging (2026-10-27)
+
+- **A git install without `prepare` ships no `dist/`.** `npm install git+…#tag` succeeded and gave `package.json`, README and CHANGELOG only: `dist/` is gitignored and `prepack` alone did not build. → A git-installed package needs `"prepare": "npm run build"` (`docs/release.md`, option C).
+- **`bland` is taken on public npm** (someone else's 0.0.1). → Public npm or GitHub Packages needs a scope (`@jgodwyn/bland`).
+- **React Aria's `@internationalized/number` types need the ES2023 lib** (`Intl.NumberRangeFormatPart`). A consumer app on `lib: ES2022` with `skipLibCheck: false` fails to type-check. → Vite's own template uses ES2023; the smoke app does too.
+- **Reinstalling a same-version tarball is "up to date"**: npm keeps the old copy. → The smoke test deletes `node_modules/bland` and the lockfile before installing.
+- **`page.evaluate` under tsx throws `__name is not defined`**: esbuild's keep-names wraps named inner functions in `__name()`, which doesn't exist in the page. → `page.addInitScript('window.__name = (fn) => fn')` first.

@@ -2196,3 +2196,13 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Bland's default is appended to `tokens.css` by `npm run tokens` (not in `tokens.json`: not a Figma variable); a project's goes at the end of its override file. `chart` is a reserved extra name.
 - Brand theme page: a Chart colors tab (series in both modes, source, check banner) between Extra colors and How to use; the previews draw a stacked bar chart (2px gaps, legend) from inline `--chart-N` values for their theme. Apply to site does not set the chart tokens (only `--chart-1` follows, through `var(--brand-600)`).
 - Lint unchanged: it doesn't reject `var(--chart-N)` (it only rejects raw values and brand/neutral primitives); "components never use them" is a rule in docs, not enforced.
+
+## Release prep: package and docs hosting (2026-10-27)
+
+- Version **0.1.0** (CHANGELOG "unreleased"); `"private": true` stays until Godwin picks a registry. Semver: before 1.0 a minor may break, a patch never does.
+- Peer deps **React 19** (`^19.0.0`): components take `ref` as a plain prop, which React 18 drops. Was `>=18`, which was wrong.
+- `exports`: `bland`, `bland/tokens.css`, `bland/fonts.css`, `bland/base.css`, `bland/styles.css`, plus `bland/package.json`. `files`: `dist`, README, CHANGELOG. `prepack` runs the build. `repository` set (GitHub Packages links through it).
+- CSS order for projects: tokens, fonts, base, styles, then the project's `brand.css` (README).
+- Name: `bland` is taken on public npm, so npm or GitHub Packages means `@jgodwyn/bland`; a git install keeps `bland`. Godwin's call (`docs/release.md`).
+- Docs site builds static with `npm run docs:build` into `dist-docs/` (`base: './'`, hash routes, works under a subpath); `docs:preview` on 5181. Host configs are inert examples in `docs/hosting/`.
+- `npm run test:package` proves the tarball in a throwaway Vite app (`scripts/release/package-smoke.ts`).

@@ -23,6 +23,8 @@ scripts/build-tokens.ts   raw export -> tokens.json + tokens.css
 scripts/tokens/           token build core (core.ts) and drift check logic (drift.ts)
 scripts/figma/            Plugin API scripts run through use_figma, plus the local checksum
 scripts/stylelint/        bland/use-tokens lint rule, fixtures and test
+scripts/release/          package smoke test (npm run test:package)
+docs/hosting/             inert host config examples for the docs site (docs/release.md)
 ```
 
 - `npm run tokens`: regenerate `tokens.json` and `tokens.css` from the raw export.
@@ -30,7 +32,9 @@ scripts/stylelint/        bland/use-tokens lint rule, fixtures and test
 - `npm run brand`: the brand override tool: `generate "#hex"` makes 13 brand steps from one color and 13 neutral steps leaning toward it (`--neutrals full|subtle|none`), plus up to three `--extra name=#hex` colors, `check brand.css` tests the brand pairings (warns, never blocks), `--fix` applies suggested steps (`docs/brand.md`). `npm run test:brand` runs its tests.
 - Chart palette: `--chart-1` … `--chart-8`, the brand, then the extras, then generated hues, light and dark, 3:1 on the page and neighbours apart for color-blind readers; Bland's own is appended to `tokens.css`, a project's is in its override file. Components never use them (`docs/brand.md`, "Chart palette").
 - `npm run tokens:drift`: drift check against Figma, variable by variable, with the CSS tokens each change reaches; `-- --apply` takes the Figma version. Two steps around one `use_figma` call (`docs/tokens.md`, "Drift check"). `npm run test:drift` runs its tests.
-- `npm run build`: tokens, Vite library build, `dist/tokens.css`, type declarations.
+- `npm run build`: tokens, Vite library build, `dist/tokens.css`, type declarations. `npm pack` runs it first (`prepack`).
+- `npm run test:package`: packs Bland, installs the tarball into a throwaway Vite + React 19 app with a brand override, type-checks, builds and checks it in Chromium. Needs the network. Publishing options and the command to go live for each: `docs/release.md` (nothing is published; `private: true` stays until Godwin picks a registry).
+- `npm run docs:build`: the docs site as static files in `dist-docs/` (relative paths, hash routes: any host or subpath); `npm run docs:preview` serves it at http://localhost:5181.
 - `npm run typecheck`.
 - `npm run lint:css`: Stylelint on `src/components/**/*.css`; rejects any value that is not a `var(--…)` token (including durations, easings and `@media` widths) and names the token to use (`docs/lint.md`). `npm run test:lint` runs its fixtures.
 - `npm test`: Playwright in Chromium against the docs site: screenshots of every story in both themes, axe, behaviour specs, docs smoke tests. `npm run test:update` re-baselines screenshots after an intended visual change.
@@ -217,14 +221,15 @@ In order; tokens come before components.
 - [x] Playwright (decided 2026-10-17): screenshots of every story in both themes, axe checks and behaviour specs, Chromium only, against the playground. Set up 2026-10-17.
 - [x] Base: fonts, reset, focus and smoothing helpers, icon slot, scroll area, conventions in `docs/components.md`. Done 2026-10-17. Grid system (17 Figma layout grids) is deferred until page layouts need it.
 - [x] Docs site, local (2026-10-17): sidebar of styles and components, live demo with controls, variants, props tables, theme switch. Runs with `npm run docs`. Redesigned from the Figma Doc site page (2026-10-22): Bland controls, full code view, props in Table, search (⌘K), page contents rail; see INTERFACE.md.
-- [ ] Docs site hosting: not deployed anywhere yet.
+- [ ] Docs site hosting: not deployed anywhere yet. Static build ready (2026-10-27, `npm run docs:build`); Vercel, Netlify and GitHub Pages steps in `docs/release.md`. Left: Godwin picks a host.
 - [x] Extra project colors beside the brand: built 2026-10-27 (up to three, steps + light/dark roles, `docs/brand.md`). Chart palette `--chart-1…8` generated from the brand and extras, 2026-10-27 (Godwin: generated, not designed in Figma first).
-- [ ] Publish the `bland` package (private, 0.0.0 today) so projects can install it.
+- [ ] Publish the `bland` package so projects can install it. Ready 2026-10-27: 0.1.0, React 19 peers, README, CHANGELOG, `npm run test:package`. Left: Godwin picks public npm, GitHub Packages (both need the name `@jgodwyn/bland`; `bland` is taken on npm) or a git install, and a license (`docs/release.md`).
 - [ ] At the end: package agent skills, how a project's agent uses Bland (install, tokens and the no-hardcoded-values rule, components and props, brand override, extra colors) (Godwin 2026-10-27).
 
 ## Open questions (ask Godwin, don't assume)
 
-- Docs site hosting: where, if anywhere, to deploy `npm run docs` as a static site.
+- Docs site hosting: Vercel, Netlify or GitHub Pages (or none); each is ready in `docs/release.md`.
+- Package registry, name and license: public npm, GitHub Packages or a git install (`docs/release.md`).
 
 ## Pending context to merge into `docs/`
 

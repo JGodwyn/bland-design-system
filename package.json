@@ -1,8 +1,12 @@
 {
   "name": "bland",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Bland design system: tokens and React components",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JGodwyn/bland-design-system.git"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -14,10 +18,13 @@
     "./tokens.css": "./dist/tokens.css",
     "./fonts.css": "./dist/fonts.css",
     "./base.css": "./dist/base.css",
-    "./styles.css": "./dist/index.css"
+    "./styles.css": "./dist/index.css",
+    "./package.json": "./package.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
   ],
   "sideEffects": [
     "**/*.css"
@@ -26,6 +33,8 @@
     "tokens": "tsx scripts/build-tokens.ts",
     "tokens:checksum": "tsx scripts/figma/checksum.ts",
     "build": "npm run tokens && vite build && cp src/tokens/tokens.css src/styles/fonts.css src/styles/base.css dist/ && tsc -p tsconfig.build.json",
+    "prepack": "npm run build",
+    "test:package": "tsx scripts/release/package-smoke.ts",
     "typecheck": "tsc --noEmit",
     "lint:css": "stylelint \"src/components/**/*.css\" --allow-empty-input",
     "test:lint": "node --test scripts/stylelint/*.test.js",
@@ -34,6 +43,8 @@
     "test:update": "playwright test --update-snapshots",
     "props": "tsx scripts/build-props.ts",
     "docs": "npm run props && vite --config playground/vite.config.ts",
+    "docs:build": "npm run props && vite build --config playground/vite.config.ts",
+    "docs:preview": "vite preview --config playground/vite.config.ts",
     "docs:stop": "lsof -t -iTCP:5180 -sTCP:LISTEN | xargs kill 2>/dev/null; echo \"Port 5180 is free.\"",
     "tokens:drift": "tsx scripts/drift.ts",
     "test:drift": "tsx --test scripts/tokens/drift.test.ts",
@@ -41,8 +52,8 @@
     "test:brand": "tsx --test scripts/brand/brand.test.ts"
   },
   "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
