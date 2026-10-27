@@ -1677,3 +1677,16 @@ not wrapped; rail contents centred (logo and account icon were off).
 
 - Read the Grid system page (1145:1071) and the 17 grid styles read-only through the official Figma MCP. All column grids, no descriptions. Bound: every gutter (space-sm, space-lg, space-xl) and the Mobile styles' offset (Layout/margin-mobile), all already CSS tokens. Raw: every column count (4, 6, 8, 10, 12, 14), every fixed column width (104, 112, 128, 136, 144) and the Dashboard offset (24). Layout/margin-desktop (152) is bound by no grid.
 - Stopped there (hard rule: no invented tokens). Nothing to extend in the token pipeline yet: the bound values already reach tokens.css. Table and proposal in the side-session notes (grid-system-figma-audit.md) and the tracker's Needs your call.
+- The audit table (bound values named, everything else raw):
+
+  | Style | Align | Columns | Column width | Gutter | Margin |
+  | --- | --- | --- | --- | --- | --- |
+  | Mobile/sm, md, lg (identical) | stretch | 4 | fluid | space-sm | Layout/margin-mobile |
+  | Tablet/sm, md, lg | center | 6 | 104, 128, 144 | space-lg | none (704, 848, 944 wide) |
+  | Desktop/sm, md, lg | center | 8, 10, 14 | 128, 136, 128 | space-lg | none (1136, 1504, 1999 wide; 1440 - 1136 = 2 x 152) |
+  | Dashboard/{left,right}-tight | min/max | 10 | 104 | space-sm | 24 |
+  | Dashboard/{left,right}-basic | min/max | 8 | 128 | space-lg | 24 |
+  | Dashboard/{left,right}-loose | min/max | 8 | 112 | space-xl | 24 |
+  | Dashboard/{left,right}-wide | min/max | 12 | 112 | space-lg | 24 |
+
+  Page frames: mobile 360 to 430, tablet 768 and 820 (Tablet/sm), 912 (md), 1024 (lg), desktop 1280 to 1536 (Desktop/sm), 1920 (Desktop/md), 2560 (Desktop/lg). Several frames carry local copies of a grid instead of the style. Figma can bind `count`, `sectionSize`, `offset` and `gutterSize` on a layout grid.
