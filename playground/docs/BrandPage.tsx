@@ -26,7 +26,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } fro
 import { Toggle } from '../../src/components/toggle/Toggle';
 import { CheckIcon, PlusIcon, TrashIcon } from '../../src/icons';
 import {
-  adjustColor,
   blandNeutrals,
   blandScale,
   CHART_COUNT,
@@ -98,9 +97,6 @@ export function BrandPage() {
   // The step holding the color you entered: the fix never moves it, so your color stays exactly yours.
   const keep = isBlandColor ? undefined : placeStep(input);
   const fixedScale = useMemo(() => (misses.length ? fixScale(scale, neutrals, keep) : scale), [misses.length, scale, neutrals, keep]);
-  const canFix = !same(fixedScale, scale);
-  // Misses only your own color's step can fix: the fix leaves it, so offer to nudge the color itself.
-  const colorFix = useMemo(() => (misses.length && !canFix && keep ? adjustColor(scale, neutrals, keep) : null), [misses.length, canFix, scale, neutrals, keep]);
 
   const edit = (hex: string) => {
     setInput(normalHex(hex));
@@ -164,11 +160,7 @@ export function BrandPage() {
                   >
                     <ColorCard label="Brand color" pickerLabel="Pick a brand color" color={input} onChange={edit} onDraggingChange={setDragging}>
                       {/* Bland's own palette has nothing to report (hidden, so it leaves with its exit); a project's palette shows its result. */}
-                      <Contrast misses={misses} keep={keep} hidden={dragging || (brandIsBland && misses.length === 0)} canFix={canFix} onFix={() => setFixed(fixedScale)} adjustTo={colorFix?.color} onAdjust={() => {
-                        if (!colorFix) return;
-                        setInput(colorFix.color);
-                        setFixed(colorFix.scale);
-                      }} />
+                      <Contrast misses={misses} keep={keep} hidden={dragging || (brandIsBland && misses.length === 0)} canFix={!same(fixedScale, scale)} onFix={() => setFixed(fixedScale)} />
                     </ColorCard>
                     <ScaleRow label="Brand steps" scale={scale} />
                   </Section>
@@ -410,8 +402,6 @@ function ExtraColor({
   const keep = placeStep(extra.color);
   const misses = useMemo(() => check(scale, neutrals, EXTRA_PAIRS).filter((f) => !inherited(f)), [scale, neutrals]);
   const fixed = useMemo(() => (misses.length ? fixScale(scale, neutrals, keep, EXTRA_PAIRS) : scale), [misses.length, scale, neutrals, keep]);
-  const canFix = !same(fixed, scale);
-  const colorFix = useMemo(() => (misses.length && !canFix ? adjustColor(scale, neutrals, keep, EXTRA_PAIRS) : null), [misses.length, canFix, scale, neutrals, keep]);
   const label = error ? 'Extra color' : `Extra color ${extra.name}`;
   const errorId = useId();
   // The card takes the extra's own quiet fill, as the brand's card takes the brand's: 50 in light, 1000 in dark.
@@ -450,7 +440,7 @@ function ExtraColor({
         onDraggingChange={setDragging}
         tint={{ light: scale[lightRole.light], dark: scale[lightRole.dark] }}
       >
-        <Contrast misses={misses} keep={keep} hidden={dragging} total={EXTRA_PAIRS.length * 2} canFix={canFix} onFix={() => onChange({ fixed })} adjustTo={colorFix?.color} onAdjust={() => colorFix && onChange({ color: colorFix.color, fixed: colorFix.scale })} />
+        <Contrast misses={misses} keep={keep} hidden={dragging} total={EXTRA_PAIRS.length * 2} canFix={!same(fixed, scale)} onFix={() => onChange({ fixed })} />
       </ColorCard>
       <ScaleRow label={`${label} steps`} scale={scale} />
       <RoleRow name={error ? 'name' : extra.name} scale={scale} />
@@ -677,26 +667,7 @@ function ScaleRow({ label, scale }: { label: string; scale: Scale }) {
  * Bland's to fix, not a project's. Hidden (a drag in the picker, or Bland's own palette) it fades and scales down
  * while its space folds away; it comes back the same path, and each new result eases in.
  */
-function Contrast({
-  misses: current,
-  keep,
-  hidden,
-  total = PAIRS.length * 2,
-  canFix,
-  onFix,
-  adjustTo,
-  onAdjust,
-}: {
-  misses: Finding[];
-  keep?: Step;
-  hidden: boolean;
-  total?: number;
-  canFix: boolean;
-  onFix: () => void;
-  /** Your color moved just enough to clear the misses only it can fix (when the fix has nothing else to move). */
-  adjustTo?: string;
-  onAdjust: () => void;
-}) {
+function Contrast({ misses: current, keep, hidden, total = PAIRS.length * 2, canFix, onFix }: { misses: Finding[]; keep?: Step; hidden: boolean; total?: number; canFix: boolean; onFix: () => void }) {
   const [open, setOpen] = useState(false);
   const breakdown = useId();
   // While hidden it keeps showing the last result, so the exit plays out on what was there, not on a new result.
@@ -720,13 +691,10 @@ function Contrast({
             title="Contrast warning"
             actions={
               <>
-                {canFix || !adjustTo ? (
-                  <Button size="sm" disabled={!canFix} onClick={onFix}>
+                {/* No dead button: when only your own color's step is left, there is nothing the fix may move. */}
+                {canFix && (
+                  <Button size="sm" onClick={onFix}>
                     Fix contrast
-                  </Button>
-                ) : (
-                  <Button size="sm" onClick={onAdjust}>
-                    Adjust my color
                   </Button>
                 )}
                 <Button size="sm" type="stroke" aria-expanded={open} aria-controls={breakdown} onClick={() => setOpen(!open)}>
@@ -735,9 +703,9 @@ function Contrast({
               </>
             }
           >
-            {canFix || !adjustTo
+            {canFix
               ? `${misses.length} of ${total} pairings miss their minimum. Fix contrast moves the steps named, or keep a miss on purpose.`
-              : `${misses.length} of ${total} pairings miss their minimum, and only your color can fix ${misses.length === 1 ? 'it' : 'them'}. Adjust my color moves it to ${adjustTo.toUpperCase()}, a small change in lightness, or keep the miss on purpose.`}
+              : `${misses.length} of ${total} pairings ${misses.length === 1 ? 'misses its' : 'miss their'} minimum on your color itself, which stays exactly as you picked it. Keep ${misses.length === 1 ? 'the miss' : 'them'}, or pick another color.`}
           </Banner>
         )}
       </div>
@@ -772,7 +740,7 @@ function Findings({ items, keep }: { items: Finding[]; keep?: Step }) {
             <TableCell>
               {f.ratio.toFixed(2)}:1 (needs {f.min}:1)
             </TableCell>
-            <TableCell>{f.steps.every((step) => step === keep) ? `Step ${keep} is your color: adjust it, keep the miss, or pick another color` : f.advice.replace(/^./, (c) => c.toUpperCase())}</TableCell>
+            <TableCell>{f.steps.every((step) => step === keep) ? `Step ${keep} is your color: keep the miss, or pick another color` : f.advice.replace(/^./, (c) => c.toUpperCase())}</TableCell>
           </TableRow>
         ))}
       </TableBody>

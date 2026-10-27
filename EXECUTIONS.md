@@ -1716,3 +1716,8 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Godwin: with #FF00BB, Fix contrast showed disabled, or went disabled after a press instead of reaching Contrast checks out.
 - Cause: the only miss left (dark Progress fill on its track) was on step 400, the entered color's own step, which the fix may not move; `canFix` was false and nothing explained it. A sweep of 360 bright colors: 54 hit it (Progress fill, Calendar selected hover, Link on a raised surface), all cleared by a small move of the color itself.
 - Fix: `adjustColor` (core.ts) runs the fix with that step free; the banner offers Adjust my color with the new hex. CLI report names the color too. Unit test (22 brand tests) and the docs spec updated (it had asserted the disabled button).
+
+## Brand page: Adjust my color taken out (2026-10-27)
+
+- Godwin: "my brand color is my brand color": Adjust my color changed the swatch. Reverted 1c01f7a (adjustColor, its test and CLI line gone).
+- Now: Fix contrast shows only when it can move something; when every miss left is on the entered color's step, the warning has no Fix button and says the miss is on your color, kept as picked. Show breakdown stays. Docs spec asserts no Fix button and the wording.

@@ -4,7 +4,7 @@ import { test } from 'node:test';
 
 import { readFileSync } from 'node:fs';
 
-import { blandChart, CHART_CONTRAST, CHART_COUNT, chartCss, chartHues, checkChart, colorOf, deltaE, generateChart, EXTRA_PAIRS, EXTRA_ROLES, extraNameError, harmonyColor, adjustColor, inherited, HARMONY_TURNS, parseExtras, blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
+import { blandChart, CHART_CONTRAST, CHART_COUNT, chartCss, chartHues, checkChart, colorOf, deltaE, generateChart, EXTRA_PAIRS, EXTRA_ROLES, extraNameError, harmonyColor, HARMONY_TURNS, parseExtras, blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
 
 const close = (a: string, b: string) => toOklch(a).l - toOklch(b).l;
 
@@ -48,22 +48,6 @@ test('the fix never moves the step holding the entered color', () => {
   assert.equal(fixed['400'], '#ff5a1f');
   const yellow = generate('#ffcc00');
   assert.equal(fixScale(yellow, generateNeutrals(yellow), '200')['200'], '#ffcc00');
-});
-
-test('a miss only the entered color can fix: adjusting moves that color a little and clears every pairing', () => {
-  for (const [hex, step] of [['#ff00bb', '400'], ['#ff3333', '500'], ['#da2e0b', '600']] as const) {
-    const scale = generate(hex);
-    const neutrals = generateNeutrals(scale);
-    const fixed = fixScale(scale, neutrals, step);
-    assert.ok(check(fixed, neutrals).some((f) => !inherited(f)), `${hex}: the fix alone leaves a miss`);
-    const adjusted = adjustColor(fixed, neutrals, step)!;
-    assert.ok(adjusted, hex);
-    assert.equal(check(adjusted.scale, neutrals).filter((f) => !inherited(f)).length, 0, hex);
-    assert.equal(adjusted.scale[step], adjusted.color);
-    assert.ok(Math.abs(toOklch(adjusted.color).l - toOklch(hex).l) < 0.08, `${hex} → ${adjusted.color}`);
-  }
-  const orange = generate('#ff6a00');
-  assert.equal(adjustColor(orange, generateNeutrals(orange), '400'), undefined); // nothing to adjust
 });
 
 test('override files parse from CSS and JSON, and need all 13 steps', () => {
