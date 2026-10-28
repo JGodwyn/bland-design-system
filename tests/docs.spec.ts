@@ -521,3 +521,50 @@ test('the Grid page sits on its own grid, and Shift+G or the switch shows its co
   await page.getByRole('button', { name: 'Show columns' }).click();
   await expect(overlay).toBeVisible();
 });
+
+/** How far the page scrolls sideways: 0 when nothing runs past the screen. */
+const sidewaysScroll = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+
+test.describe('on a phone', () => {
+  test.use({ viewport: { width: 320, height: 700 }, hasTouch: true });
+
+  for (const path of ['', 'brand', ...stylePages.map((p) => `styles/${p}`), ...storyIds.map((id) => `components/${id}`)]) {
+    test(`/${path} never scrolls sideways`, async ({ page }) => {
+      await page.goto(`/#/${path}`);
+      await expect(page.locator('.docs-page-header h1')).toBeVisible();
+      await page.evaluate(() => document.fonts.ready);
+      expect(await sidewaysScroll(page)).toBe(0);
+    });
+  }
+
+  test('the brand contrast breakdown stays inside its card as a stacked list', async ({ page }) => {
+    await page.goto('/#/brand');
+    await page.getByRole('button', { name: /^Brand color #/ }).click();
+    await page.getByRole('textbox', { name: 'HEX color' }).fill('#224B8D');
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Show breakdown' }).click();
+    const list = page.getByRole('list', { name: 'Color pairs that are hard to read' });
+    await expect(list).toBeVisible();
+    await expect(page.getByRole('table', { name: 'Color pairs that are hard to read' })).toBeHidden(); // the table is for wider screens
+    const card = (await page.locator('.docs-brand-card').first().boundingBox())!;
+    for (const box of [await list.boundingBox(), await page.locator('.docs-brand-contrast .bland-banner').boundingBox()])
+      expect(box!.x + box!.width).toBeLessThanOrEqual(card.x + card.width);
+    expect(await sidewaysScroll(page)).toBe(0);
+  });
+
+  test('the menu, search and color picker fit the screen', async ({ page }) => {
+    await page.goto('/#/brand');
+    await page.getByRole('button', { name: /^Brand color #/ }).click();
+    const picker = (await page.getByRole('dialog', { name: 'Pick a brand color' }).boundingBox())!;
+    expect(picker.x).toBeGreaterThanOrEqual(0);
+    expect(picker.x + picker.width).toBeLessThanOrEqual(320);
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Menu' }).click();
+    await expect(page.getByRole('navigation', { name: 'Docs' })).toBeVisible();
+    expect(await sidewaysScroll(page)).toBe(0);
+    await page.getByRole('button', { name: 'Close' }).click();
+    await page.getByRole('button', { name: /Search Bland/ }).click();
+    await page.keyboard.type('button');
+    expect(await sidewaysScroll(page)).toBe(0);
+  });
+});

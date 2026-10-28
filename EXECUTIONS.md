@@ -1790,3 +1790,17 @@ not wrapped; rail contents centred (logo and account icon were off).
 - A browser sweep of every component page (captions with `<code>` removed, matched against prop values and `prop=`) found the rest: `vertical`/`horizontal` (Checkbox, Radio, Banner, Notification), `receiver`/`sender` (Chat list item), `inline` `connector` (Progress wizard), `single`/`double` (Slider). Marked as code.
 - Dead end: adding `.pg-label code` to docs.css restyled every raw story caption (raw pages load docs.css too) and broke every screenshot. Not needed: docs pages lift the label into `.docs-variant-caption`. Reverted.
 - The modal and tooltip "open" screenshots still had the old captions from 47b3329; re-baselined. `npm test` 637 passed.
+
+## Docs site on phones (2026-10-28)
+
+- Port 5180 was held by another session's dev server; used it, then it stopped mid-sweep and I started `docs` from launch.json.
+- The in-app browser's mobile preset kept resetting (the pane width changed), so the sweep ran as a Playwright script (scratchpad, not in the repo): every route at 375 and 320, light and dark, listing page overflow, elements past the screen with no scrolling ancestor, and elements clipped by a non-scrolling ancestor.
+- Dead end: with `isMobile: true` the layout viewport widens to the content (538 on the brand breakdown), so `innerWidth` and `scrollWidth` agree and nothing reports. Compare with the device width instead (LEARNINGS).
+- Brand breakdown (#224B8D, Show breakdown): `.docs-fold` is a grid with an implicit `auto` column, so the Table's min-content set the fold's width (538) and the Banner and table ran past the card. Fixed with `grid-template-columns: minmax(0, 1fr)`. Then the Table scrolled sideways inside the card with the Fix column out of sight, so below breakpoint/md the breakdown is a stacked list (where, theme and contrast, fix); the table from md up.
+- Color picker popover was 352 wide on a 320 screen: `max-width: calc(100vw - space-sm * 2)`.
+- Date Range Picker: two fields side by side cut the year off at 320 and 375; the fields stack below breakpoint/sm (component CSS, map row updated).
+- Sidebar demo: the story Frame (width 100cqi) clipped the sidebar at 320; the Frame is now at least min-content, so the demo stage scrolls.
+- False positives filtered: React Aria's hidden selects (clip), Progress fills (translated inside their track).
+- Touch targets under 24 outside the demos: CodeText copy (12x20, on every style page), Dropdown toggle and Clear, date field calendar button, Chat message bar field icons (20). Gave each a centred control/xs `::before` hit area, Chip's pattern. Left: date segments (inline text) and the Calendar title toggle (98x20 inside its pill).
+- Shell (menu, search modal, page header, theme switch), every style page, all Brand tabs and the Reset modal: no overflow at 320.
+- Added "on a phone" to tests/docs.spec.ts (every route at 320, the breakdown inside its card as a list, picker/menu/search on screen); checked it fails with the fold fix taken out. Added `npm run docs:phone` (`vite --host`), in CLAUDE.md and README.

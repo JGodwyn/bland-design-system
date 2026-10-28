@@ -164,6 +164,7 @@
 /* Filterable: the chevron toggles the menu and Clear empties the input. Neither is a Tab stop (Search Input). */
 .bland-dropdown__toggle,
 .bland-dropdown__clear {
+  position: relative;
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -174,6 +175,18 @@
   background: none;
   color: var(--_icon);
   cursor: pointer;
+}
+
+/* The 20px toggle and Clear are below the 24px target: the hit area is control/xs, centered (as Chip's close). */
+.bland-dropdown__toggle::before,
+.bland-dropdown__clear::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--control-xs);
+  height: var(--control-xs);
+  transform: translate(-50%, -50%);
 }
 
 .bland-dropdown .bland-dropdown__clear-icon {

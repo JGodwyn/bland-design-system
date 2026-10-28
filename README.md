@@ -93,7 +93,7 @@ Build on the same tokens, never raw values: `color: var(--text-bold)`, `padding:
 
 ## Docs
 
-The docs site shows every token and component with live controls, in both themes. It is not hosted yet: run it from a checkout with `npm run docs` (http://localhost:5180).
+The docs site shows every token and component with live controls, in both themes. It is not hosted yet: run it from a checkout with `npm run docs` (http://localhost:5180). To try it on a phone on the same Wi-Fi, run `npm run docs:phone` instead and open the `Network:` address it prints.
 
 ## Developing Bland
 

@@ -43,6 +43,7 @@
     "test:update": "playwright test --update-snapshots",
     "props": "tsx scripts/build-props.ts",
     "docs": "npm run props && vite --config playground/vite.config.ts",
+    "docs:phone": "npm run props && vite --config playground/vite.config.ts --host",
     "docs:build": "npm run props && vite build --config playground/vite.config.ts",
     "docs:preview": "vite preview --config playground/vite.config.ts",
     "docs:stop": "lsof -t -iTCP:5180 -sTCP:LISTEN | xargs kill 2>/dev/null; echo \"Port 5180 is free.\"",

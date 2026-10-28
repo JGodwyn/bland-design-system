@@ -183,6 +183,7 @@
 .bland-chat-message-bar__tool {
   --bland-radius: var(--rad-xs);
 
+  position: relative;
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -197,6 +198,17 @@
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   transition: color var(--duration-xs) var(--easing-ease);
+}
+
+/* The 20px field icons are below the 24px target: the hit area is control/xs, centered (as Chip's close). */
+.bland-chat-message-bar__tool::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--control-xs);
+  height: var(--control-xs);
+  transform: translate(-50%, -50%);
 }
 
 .bland-chat-message-bar__delete {

@@ -37,6 +37,7 @@ Raw material for the skill we package at the end of the project: what an agent n
 ## Using components
 
 - The component map in `CLAUDE.md` is the prop reference (Figma name → prop); the docs site shows each with live props.
+- Phones: Bland's components fit 320px wide; DateRangePicker stacks its fields below 640. Give wide content (Table, code) its own sideways scroll and never let the page scroll sideways; in a CSS grid that means `minmax(0, 1fr)` columns.
 - Icons: Bland ships none for the project; pass any SVG (Phosphor React recommended). Icon-only controls need `aria-label`.
 - Variants are props (`size`, `emotion`, `type`), never class overrides. Defaults: most sizes default to sm or md; check the map.
 - Routers: links take `renderLink` (Breadcrumb, TabBar, Sidebar, Pagination, ListItem, Logo).

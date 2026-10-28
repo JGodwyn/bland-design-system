@@ -901,9 +901,33 @@ function Contrast({ misses: current, keep, hidden, total = PAIRS.length * 2, can
   );
 }
 
+/**
+ * The breakdown: a table from the tablet layout up; on a phone a stacked list (one card per pair), since four
+ * columns side by side would leave the fix scrolled out of sight. CSS shows one of the two.
+ */
 function Findings({ items, keep }: { items: Finding[]; keep?: Step }) {
+  const fix = (f: Finding) => (f.steps.every((step) => step === keep) ? `Step ${keep} is your color: keep the miss, or pick another color` : f.advice.replace(/^./, (c) => c.toUpperCase()));
   return (
-    <Table size="md" className="docs-data bland-smooth" aria-label="Color pairs that are hard to read">
+    <>
+      <ul className="docs-findings-list bland-smooth" aria-label="Color pairs that are hard to read">
+        {items.map((f) => (
+          <li key={`${f.mode}${f.fg}${f.bg}`}>
+            <span className="docs-findings-where">{f.where}</span>
+            <span className="docs-findings-meta">
+              {f.mode === 'light' ? 'Light' : 'Dark'} · {f.ratio.toFixed(2)}:1 (needs {f.min}:1)
+            </span>
+            <span>{fix(f)}</span>
+          </li>
+        ))}
+      </ul>
+      {findingsTable(items, fix)}
+    </>
+  );
+}
+
+function findingsTable(items: Finding[], fix: (f: Finding) => string) {
+  return (
+    <Table size="md" className="docs-data docs-findings-table bland-smooth" aria-label="Color pairs that are hard to read">
       <TableHead>
         <TableRow>
           <TableHeaderCell>Theme</TableHeaderCell>
@@ -920,7 +944,7 @@ function Findings({ items, keep }: { items: Finding[]; keep?: Step }) {
             <TableCell>
               {f.ratio.toFixed(2)}:1 (needs {f.min}:1)
             </TableCell>
-            <TableCell>{f.steps.every((step) => step === keep) ? `Step ${keep} is your color: keep the miss, or pick another color` : f.advice.replace(/^./, (c) => c.toUpperCase())}</TableCell>
+            <TableCell>{fix(f)}</TableCell>
           </TableRow>
         ))}
       </TableBody>

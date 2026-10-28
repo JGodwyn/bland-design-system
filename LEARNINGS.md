@@ -695,3 +695,9 @@ beats `strictPort`'s config value), then delete it.
 - Figma `moveLocalGridStyleAfter` throws "Target and reference node must live in the same folder" across name prefixes (`Desktop/` vs `Tablet/`): styles are grouped into folders by their name, so a new `Desktop/md` already sits in the Desktop folder.
 - An absolutely positioned grid child with `grid-column: 1 / -1` takes those lines as its containing block, but still needs `inset: 0` (or left/right) to fill it; without them it shrinks to fit (0 wide when its content is a grid of fr columns).
 - A class that adds `.bland-grid` to an element that already has a docs `gap` (flex stacks) keeps that gap for its columns: set `column-gap: var(--bland-grid-gutter)` where the two meet.
+
+## Checking a page on a phone width (2026-10-28)
+
+- Symptom: a Playwright sweep with `isMobile: true` reported no overflow on a page that clearly ran past the screen. Cause: with a mobile viewport the layout viewport widens to fit the content (375 became 538), so `innerWidth` and `scrollWidth` match. Rule: compare with the intended device width, or test overflow without `isMobile` (`viewport` only, as the "on a phone" spec does).
+- Symptom: a table in a `display: grid` wrapper pushed the wrapper wider than its card, though the Table scrolls sideways itself. Cause: an implicit grid column is `auto`, whose minimum is the content's min-content width. Rule: a grid that can hold wide content gets `grid-template-columns: minmax(0, 1fr)` (flex children: `min-width: 0`).
+- The in-app browser's mobile preset resets when the pane width changes, mid-script; use a Playwright script for a sweep and the pane for a look.

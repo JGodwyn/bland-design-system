@@ -55,6 +55,7 @@
 .bland-code-text__copy {
   --bland-radius: var(--rad-xs);
 
+  position: relative;
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -65,4 +66,15 @@
   background: none;
   color: var(--icon-subtle);
   cursor: pointer;
+}
+
+/* The copy button is one line tall and icon wide, below the 24px target: the hit area is control/xs, centered (as Chip's close). */
+.bland-code-text__copy::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--control-xs);
+  height: var(--control-xs);
+  transform: translate(-50%, -50%);
 }

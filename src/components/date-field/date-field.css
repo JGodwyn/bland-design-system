@@ -83,6 +83,7 @@
 .bland-date-field__button {
   --bland-radius: var(--rad-sm); /* drawn by .bland-smooth */
 
+  position: relative;
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -93,6 +94,17 @@
   background: transparent;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* The 20px calendar button is below the 24px target: the hit area is control/xs, centered (as Chip's close). */
+.bland-date-field__button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--control-xs);
+  height: var(--control-xs);
+  transform: translate(-50%, -50%);
 }
 
 .bland-date-field__button:disabled {

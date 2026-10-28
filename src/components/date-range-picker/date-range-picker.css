@@ -11,7 +11,8 @@
  *   </div>
  *
  * Fills its container (Figma's 582 is its frame); the two fields share it equally, space-sm apart. One helper
- * text under both, colored by the status as Text Input's.
+ * text under both, colored by the status as Text Input's. On a phone (below breakpoint/sm) the fields stack, since
+ * two side by side are too narrow to show a whole date.
  */
 
 .bland-date-range-picker {
@@ -23,7 +24,14 @@
 
 .bland-date-range-picker__fields {
   display: flex;
+  flex-direction: column;
   gap: var(--space-sm);
+}
+
+@media (min-width: 640px) {
+  .bland-date-range-picker__fields {
+    flex-direction: row;
+  }
 }
 
 .bland-date-range-picker__fields > * {

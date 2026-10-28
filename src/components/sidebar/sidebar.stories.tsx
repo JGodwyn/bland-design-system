@@ -78,9 +78,9 @@ const many: SidebarItem[] = Array.from({ length: 24 }, (_, i) => ({
 // Links stay on the docs page: the story's hrefs are fragments, which the playground would read as routes.
 const prevent = { onClick: (e: { preventDefault(): void }) => e.preventDefault() };
 
-/** A page-wide box: one sidebar per row, so collapsing one never moves another. */
+/** A page-wide box: one sidebar per row, so collapsing one never moves another. Never narrower than the sidebar, so on a phone the demo scrolls instead of clipping it. */
 function Frame({ children, height = 'var(--sidebar-height)', width = '100%' }: { children: ReactNode; height?: string; width?: string }) {
-  const style: CSSProperties = { display: 'flex', height, width, boxShadow: 'inset 0 0 0 var(--stroke-sm) var(--border-subtle)', overflow: 'hidden' };
+  const style: CSSProperties = { display: 'flex', height, width, minWidth: 'min-content', boxShadow: 'inset 0 0 0 var(--stroke-sm) var(--border-subtle)', overflow: 'hidden' };
   return (
     <div style={style} {...prevent}>
       {children}

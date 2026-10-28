@@ -1119,6 +1119,55 @@ code,
     border-radius: calc(var(--bland-radius) * 2);
   }
 }
+/* The breakdown on a phone: one card per pair (where, then theme and contrast, then the fix), on the page surface
+   like the table; the table takes over at the tablet layout. */
+.docs-findings-list {
+  --bland-radius: var(--rad-lg);
+
+  display: flex;
+  flex-direction: column;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  list-style: none;
+  background: var(--surface-100);
+  border: var(--stroke-sm) solid var(--border-subtle);
+  border-radius: var(--bland-radius);
+  font: var(--type-body-md);
+  letter-spacing: var(--type-body-md-letter-spacing);
+  color: var(--text-bold);
+}
+@supports (corner-shape: superellipse(2)) {
+  .docs-findings-list.bland-smooth {
+    border-radius: calc(var(--bland-radius) * 2);
+  }
+}
+.docs-findings-list > li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: var(--space-md);
+}
+.docs-findings-list > li + li {
+  border-top: var(--stroke-sm) solid var(--border-subtle);
+}
+.docs-findings-where {
+  font: var(--type-body-md-bold);
+  color: var(--text-bold);
+}
+.docs-findings-meta {
+  color: var(--text-subtle);
+}
+.docs-findings-table {
+  display: none;
+}
+@media (min-width: 768px) {
+  .docs-findings-list {
+    display: none;
+  }
+  .docs-findings-table {
+    display: flex; /* the Table's ScrollArea wrapper */
+  }
+}
 .docs-brand-card-label {
   padding-inline: var(--space-md);
   font: var(--type-body-md);
@@ -1429,6 +1478,7 @@ code,
 .docs-fold {
   display: grid;
   grid-template-rows: 1fr;
+  grid-template-columns: minmax(0, 1fr); /* never wider than its container: a wide table inside scrolls instead */
   transition:
     grid-template-rows var(--duration-md) var(--easing-out),
     margin-top var(--duration-md) var(--easing-out),
@@ -1500,6 +1550,7 @@ code,
   flex-direction: column;
   gap: var(--space-lg);
   width: calc(var(--space-9xl) + var(--space-7xl) * 0.75); /* Figma's 256 plus room for three number fields beside the format */
+  max-width: calc(100vw - var(--space-sm) * 2); /* a phone: the screen less the popover's edge gap */
   padding: var(--space-lg);
   background: var(--surface-100);
   box-shadow:

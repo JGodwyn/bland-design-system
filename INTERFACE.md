@@ -2271,3 +2271,13 @@ Readers are designers, developers and agents. The voice follows systems known fo
 - **Prop descriptions:** what the prop does, then its default. Sizes as plain numbers (`sm 32, md 40`), not token paths (`input/*`, `control/xs`).
 - **Messages** (Brand page): plain words a project's designer understands: "color pairs harder to read than they should be", not "pairings below their minimum"; no ΔE or color-vision terms on the page (the CLI report keeps them).
 - No em dashes, as everywhere.
+
+## Docs site on phones (2026-10-28)
+
+- Every docs page fits 320px with no sideways page scroll; `tests/docs.spec.ts` "on a phone" holds it for every route.
+- Wide content scrolls inside its own box, never the page: a grid that holds a table gets `minmax(0, 1fr)` columns (`.docs-fold`).
+- The Brand page's contrast breakdown is a stacked list below breakpoint/md (one card per pair: where, then theme and contrast, then the fix) and the table from md up. Both are named "Color pairs that are hard to read"; CSS shows one.
+- Popovers on the docs site are never wider than the screen less space-sm each side (color picker).
+- Date Range Picker stacks its two fields below breakpoint/sm.
+- Buttons smaller than 24px get a centred control/xs `::before` hit area (Chip close, Search clear, and now CodeText copy, Dropdown toggle and Clear, date field calendar button, Chat message bar icons).
+- `npm run docs:phone` serves the docs on the local network for a real phone.
