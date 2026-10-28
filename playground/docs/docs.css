@@ -1677,3 +1677,66 @@ code,
   font: var(--type-body-lg);
   color: var(--text-link);
 }
+
+/* Grid page: each Figma grid frame drawn with the tokens .bland-grid uses there, scaled to fit. */
+.docs-grid-frames {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+.docs-grid-frame {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.docs-grid-frame figcaption {
+  font: var(--type-body-md);
+  letter-spacing: var(--type-body-md-letter-spacing);
+  color: var(--text-subtle);
+}
+.docs-grid-frame figcaption strong {
+  color: var(--text-bold);
+}
+.docs-grid-fit {
+  width: 100%;
+}
+.docs-grid-canvas {
+  height: 240px;
+  background: var(--surface-200);
+  border-radius: var(--rad-md);
+  overflow: hidden;
+}
+.docs-grid-columns {
+  height: 100%;
+  margin-inline: auto;
+  padding-inline: var(--frame-margin);
+  display: grid;
+  grid-template-columns: repeat(var(--frame-columns), minmax(0, 1fr));
+  column-gap: var(--frame-gutter);
+}
+.docs-grid-canvas[data-capped] .docs-grid-columns {
+  max-width: calc(var(--layout-max-width) + var(--frame-margin) * 2);
+}
+.docs-grid-columns > span {
+  background: var(--surface-brand-light);
+  box-shadow: inset 0 0 0 var(--stroke-sm) var(--border-brand);
+}
+.docs-grid-live {
+  padding: var(--space-lg);
+  background: var(--surface-200);
+  border-radius: var(--rad-lg);
+}
+.docs-grid-live .bland-grid {
+  row-gap: var(--space-lg);
+}
+.docs-grid-cell {
+  padding: var(--space-md);
+  background: var(--surface-brand-light);
+  box-shadow: inset 0 0 0 var(--stroke-sm) var(--border-brand);
+  border-radius: var(--rad-sm);
+  font: var(--type-code-body-md);
+  letter-spacing: var(--type-code-body-md-letter-spacing);
+  color: var(--text-bold);
+  text-align: center;
+}

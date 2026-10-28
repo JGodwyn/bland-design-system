@@ -30,6 +30,7 @@ Raw material for the skill we package at the end of the project: what an agent n
 - Rounded corners: set `--bland-radius` and add `.bland-smooth`.
 - Scroll areas: `ScrollArea` or `.bland-scroll-fade`, never a custom mask. Truncated text ends in an ellipsis, never a fade.
 - Media queries: `min-width` on the breakpoint values only, mobile first.
+- Page layout (optional, `docs/grid.md`): `class="bland-grid"` on the main container gives 4 / 6 / 8 columns with the right gutters and margins per breakpoint, capped and centred on desktop; place children with `--span`, `--span-md`, `--span-xl` (a child with none fills the row); `data-inset` for a grid inside a card or beside a Sidebar. Set `row-gap` yourself with a space token. Don't hardcode column counts or a page max width: use `--layout-columns-*` and `--layout-max-width`.
 - Motion: tokens only, `easing/out` for enter and exit, at most `duration/lg` for UI, reduced-motion fallback, no animation on keyboard actions (`docs/motion.md`).
 - Focus: `:focus-visible` ring only (`.bland-focus-ring`).
 

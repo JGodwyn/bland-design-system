@@ -2225,3 +2225,13 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - (2026-10-28, Godwin) Every chart color but the brand's is editable, an extra's slot too; a pick stays in its slot over an extra (no more moving it on, `placePins` dropped) until Use Bland's pick. Each card's warning is written about that color, one line per kind of problem naming its neighbours (`localNotes`), never "Series N … pick another color for series N".
 - (2026-10-28, Godwin) Banner messages are sentences in one run, no line per sentence (break lines only for a real list). The chart warning ends "Fixing this color changes it to #…".
 - (2026-10-28, Godwin) Each chart color's card takes its own quiet tint (steps 50 / 1000 of a scale made from the color, the extras' surface-light role), not surface-brand-light; the brand's card keeps the brand tint.
+
+## Page grid (2026-10-28, Godwin; docs/grid.md)
+
+- Godwin: column counts become tokens, desktop gets a max content width, Dashboard grids are ignored. Added in Figma (Spacing, `Layout/`): `columns-mobile` 4, `columns-tablet` 6, `columns-desktop` 8 (bound to the counts of the Mobile, Tablet and Desktop/sm grid styles) and `max-width` 1136 (WIDTH_HEIGHT scope; the counts have no scope, since Figma has none for grid counts).
+- Code: `.bland-grid` in `base.css` (ships as `bland/base.css`), not a component and no React wrapper. Fluid `minmax(0, 1fr)` columns; gutters space-sm then space-lg (md); margins Layout/margin-mobile, then margin-desktop at xl, where `max-width` is `--layout-max-width` plus both margins and the grid centres. Exact match with Figma at 375 and 1440.
+- Tablet keeps the mobile 24 margin: Figma's tablet styles centre fixed columns with no margin value, and inventing a tablet margin token was not asked for.
+- Placement: `--span`, `--span-md`, `--span-xl` per child, each falling back to the one before, none = full row, capped with `min()` at the grid's count. Registered with `@property` `syntax: "*"`, `inherits: false`, so nested grids start clean. `data-inset` drops margins and cap.
+- Column gaps only; row gaps are the page's.
+- Token build: `Layout/columns-*` FLOATs are emitted without `px`.
+- Docs site: Grid style page after Breakpoints (Columns icon from the Figma Icons page): four Figma frames (375, 768, 1440, 1920) drawn from the same tokens and scaled to fit, a live inset grid that follows the window, HTML/React/CSS usage, the Layout tokens. Layout tokens moved off the Spacing page; search sends them to Grid.

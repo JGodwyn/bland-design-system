@@ -5,6 +5,7 @@ import { Icon } from '../../src/components/icon/Icon';
 import { componentDocs, stories, stylePages, tokens, type DocsPage, type StylePageId } from './data';
 import {
   ArrowsOutCardinalIcon,
+  ColumnsIcon,
   CornersOutIcon,
   DevicesIcon,
   PaletteIcon,
@@ -28,6 +29,7 @@ const styleIcons: Record<StylePageId, ComponentType> = {
   elevation: StackIcon,
   motion: TornadoIcon,
   breakpoints: DevicesIcon,
+  grid: ColumnsIcon,
   sizing: ArrowsOutCardinalIcon,
   icons: ShapesIcon,
 };
@@ -128,7 +130,7 @@ export function search(query: string): SearchResults {
         if (all(`${name} ${prop.name}`)) add({ href: `#/components/${s.id}`, title: s.story.title, detail: `${name} ${prop.name}: ${prop.description}` });
   }
   for (const t of tokens) {
-    const page = tokenPage[t.collection];
+    const page = t.name.startsWith('Layout/') ? 'grid' : tokenPage[t.collection];
     if (page && all(`${t.css} ${t.name} ${t.description}`)) add({ href: `#/styles/${page}`, title: t.css, detail: t.description || t.name });
   }
   return { foundations, components, other };

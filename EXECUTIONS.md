@@ -1737,3 +1737,12 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Godwin: editing one chart color changed the others. Cause: `chartHues` took the picks as taken hues, so each pick reshaped the gaps and `arrange` reordered every generated series. Now `generateChart` builds Bland's picks from brand + extras only (`generateAround`) and overlays pins slot by slot. Test asserts every other series equals the unpinned palette.
 - Side effect: a yellow pick beside Bland's gold had no fix within ±30° hue; `fixChartColor` now searches hue all the way round (nearest first, ~2.5k candidates, well under 100 ms).
 - "Contrast checks out" and "This color checks out" removed; Contrast hides when nothing misses (brand and extras), the chart check when a color has no advice.
+
+## Grid system in code (2026-10-28)
+
+- Godwin answered the audit: column counts become tokens, desktop gets a max content width, Dashboard grids ignored.
+- Figma (official MCP, use_figma): created `Layout/columns-mobile` 4, `-tablet` 6, `-desktop` 8 and `Layout/max-width` 1136 in Spacing (6849:364 to 367); bound the count of Mobile/sm, md, lg, Tablet/sm, md, lg and Desktop/sm to them; gave those seven styles a one-line description pointing at docs/grid.md.
+- Sync through the drift path: `tokens:drift` wrote check.js; instead of pasting its 17 KB, ran a small read-only script returning the four new records in the drift format plus the full checksum (635, e33ab92a), saved as result-0.json with the check's localHash. The report showed exactly 4 added, `--apply`, `npm run tokens`; `tokens:checksum` 635 e33ab92a, equal to Figma, so nothing else drifted.
+- The report showed the counts as `4px`: `core.ts` now emits `Layout/columns-*` without a unit.
+- `.bland-grid` in base.css; checked it with Stylelint as if it were component CSS (clean). Spans as unregistered custom properties would inherit into a nested grid's children; registered `--span*` with `inherits: false`.
+- Docs Grid page; checked in the browser pane at 1440, 800 and 375: column counts, gaps, margins, spans per breakpoint, nested grid not inheriting, span 9 cut to 6, the 1920 frame capped at 1440, no sideways scroll, no console errors.

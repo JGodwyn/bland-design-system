@@ -10,6 +10,7 @@ export const leads: Record<StylePageId, string> = {
   elevation: 'Each elevation is one box-shadow: a tight ambient layer and a soft key layer. Colors switch in dark mode.',
   motion: 'Durations and easings for every transition. UI motion stays at or under duration-lg; see docs/motion.md for the rules.',
   breakpoints: 'Mobile first: base styles are mobile, md starts the tablet layout and xl the desktop layout. Media queries use the pixel value; the tokens are for JavaScript.',
+  grid: 'An optional page grid: columns, gutters and side margins that switch at the tablet and desktop breakpoints, the Figma grid styles in code. Add the bland-grid class and give each child a span.',
   sizing: 'Component dimensions: heights, slots, widths and icon sizes.',
   icons: 'Bland ships no icon pack: any SVG works in an icon slot. These are Bland’s own icons, exported from the Figma Icons page, used inside components.',
 };

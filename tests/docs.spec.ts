@@ -3,7 +3,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { pickOption, storyIds } from './stories';
 
-const stylePages = ['colors', 'typography', 'spacing', 'radius', 'stroke', 'elevation', 'motion', 'breakpoints', 'sizing', 'icons'];
+const stylePages = ['colors', 'typography', 'spacing', 'radius', 'stroke', 'elevation', 'motion', 'breakpoints', 'grid', 'sizing', 'icons'];
 
 function collectErrors(page: Page) {
   const errors: string[] = [];
@@ -439,4 +439,41 @@ test('the brand page shows the chart palette in both themes, takes your own pick
   const css = page.locator('#use-in-a-project pre');
   await expect(css).toContainText('--chart-2: var(--accent-600);');
   await expect(css).toContainText('--chart-1: var(--brand-400);');
+});
+
+test('the page grid switches columns, gutters and spans at md and xl, and nested grids start clean', async ({ page }) => {
+  await page.goto('/#/styles/grid');
+  const grid = page.locator('.docs-grid-live .bland-grid');
+  const read = () =>
+    grid.evaluate((g) => ({
+      columns: getComputedStyle(g).gridTemplateColumns.split(' ').length,
+      gap: getComputedStyle(g).columnGap,
+      spans: [...g.children].map((c) => getComputedStyle(c).gridColumnStart),
+    }));
+  for (const [width, expected] of [
+    [375, { columns: 4, gap: '8px', spans: ['span 4', 'span 4', 'span 4', 'span 2', 'span 2'] }],
+    [800, { columns: 6, gap: '16px', spans: ['span 6', 'span 3', 'span 3', 'span 2', 'span 4'] }],
+    [1440, { columns: 8, gap: '16px', spans: ['span 8', 'span 2', 'span 2', 'span 2', 'span 2'] }],
+  ] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect.poll(read).toEqual(expected);
+  }
+  // A page grid at 1920: desktop margins, content capped at layout-max-width; a nested grid ignores its cell's span.
+  await page.setViewportSize({ width: 1920, height: 900 });
+  const probe = await page.evaluate(() => {
+    const outer = document.createElement('div');
+    outer.className = 'bland-grid';
+    outer.innerHTML = '<div style="--span: 2"><div class="bland-grid" data-inset><i></i></div></div><div style="--span: 12"></div>';
+    document.body.append(outer);
+    const s = (el: Element) => getComputedStyle(el);
+    const out = {
+      width: outer.getBoundingClientRect().width,
+      padding: s(outer).paddingLeft,
+      nested: s(outer.querySelector('[data-inset] > i')!).gridColumnStart,
+      cut: s(outer.children[1]!).gridColumnStart,
+    };
+    outer.remove();
+    return out;
+  });
+  expect(probe).toEqual({ width: 1440, padding: '152px', nested: 'span 8', cut: 'span 8' });
 });

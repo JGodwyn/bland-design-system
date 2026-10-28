@@ -173,7 +173,8 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
 
   function cssValue(value: string | number, type: string, name: string): string {
     if (type === 'COLOR') return formatColor(hexToRgba(String(value)));
-    if (type === 'FLOAT') return `${value}px`;
+    // Column counts are plain numbers (repeat(var(--layout-columns-mobile), …)); every other FLOAT is a dimension.
+    if (type === 'FLOAT') return /^Layout\/columns-/.test(name) ? String(value) : `${value}px`;
     // Figma stores durations in seconds as float32 (0.16 arrives as 0.1599999964).
     if (type === 'TIMING') return `${Math.round(Number(value) * 1000)}ms`;
     if (type === 'STRING') {

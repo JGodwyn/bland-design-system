@@ -684,3 +684,9 @@ beats `strictPort`'s config value), then delete it.
 - **React Aria's `@internationalized/number` types need the ES2023 lib** (`Intl.NumberRangeFormatPart`). A consumer app on `lib: ES2022` with `skipLibCheck: false` fails to type-check. → Vite's own template uses ES2023; the smoke app does too.
 - **Reinstalling a same-version tarball is "up to date"**: npm keeps the old copy. → The smoke test deletes `node_modules/bland` and the lockfile before installing.
 - **`page.evaluate` under tsx throws `__name is not defined`**: esbuild's keep-names wraps named inner functions in `__name()`, which doesn't exist in the page. → `page.addInitScript('window.__name = (fn) => fn')` first.
+
+## Page grid (2026-10-28)
+
+- Symptom: a span set on a grid cell (`--span: 2`) would also reach the children of a grid nested in that cell. Cause: custom properties inherit. Rule: register per-element knobs with `@property { syntax: "*"; inherits: false; }`; `"*"` needs no initial value, so `var(--span, fallback)` still falls back.
+- Symptom: the drift report showed the new column counts as `4px`. Cause: the build gives every FLOAT a px unit. Rule: unitless FLOATs are named in `cssValue` (`Layout/columns-*`); add a pattern there for any new count-like variable.
+- Figma layout grids can bind `count`, `sectionSize`, `offset` and `gutterSize` (`setBoundVariableForLayoutGrid`, then reassign `style.layoutGrids`); there is no variable scope for a grid count, so count variables get `[]` scopes and are bound through the API.

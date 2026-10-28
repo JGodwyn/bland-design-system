@@ -75,3 +75,68 @@ textarea {
     corner-shape: superellipse(2);
   }
 }
+
+/*
+ * Page grid: docs/grid.md. Optional; components never need it. Mobile first, as the Figma grid styles:
+ * mobile Layout/columns-mobile columns, space-sm gutters, Layout/margin-mobile sides; tablet (breakpoint/md)
+ * Layout/columns-tablet columns, space-lg gutters; desktop (breakpoint/xl) Layout/columns-desktop columns,
+ * Layout/margin-desktop sides, and no wider than Layout/max-width plus those margins, centred.
+ * Columns are fluid (Figma's fixed tablet and desktop column widths are canvas aids).
+ * A child spans --span columns (--span-md from tablet, --span-xl from desktop, each falling back to the
+ * one before), the full row when none is set, and never more than the grid has.
+ * data-inset keeps the columns and gutters but drops the side margins and the cap: a grid inside a card,
+ * a panel or the area beside a Sidebar. The 2 is a code constant (a margin on each side), not a token.
+ */
+@property --span {
+  syntax: "*";
+  inherits: false; /* a nested grid's children never take the span of the cell they sit in */
+}
+@property --span-md {
+  syntax: "*";
+  inherits: false;
+}
+@property --span-xl {
+  syntax: "*";
+  inherits: false;
+}
+
+.bland-grid {
+  --bland-grid-columns: var(--layout-columns-mobile);
+  display: grid;
+  grid-template-columns: repeat(var(--bland-grid-columns), minmax(0, 1fr));
+  column-gap: var(--space-sm);
+  padding-inline: var(--layout-margin-mobile);
+  margin-inline: auto;
+  width: 100%;
+}
+.bland-grid > * {
+  --bland-span: var(--span, var(--bland-grid-columns));
+  grid-column: span min(var(--bland-span), var(--bland-grid-columns));
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .bland-grid {
+    --bland-grid-columns: var(--layout-columns-tablet);
+    column-gap: var(--space-lg);
+  }
+  .bland-grid > * {
+    --bland-span: var(--span-md, var(--span, var(--bland-grid-columns)));
+  }
+}
+
+@media (min-width: 1280px) {
+  .bland-grid {
+    --bland-grid-columns: var(--layout-columns-desktop);
+    padding-inline: var(--layout-margin-desktop);
+    max-width: calc(var(--layout-max-width) + var(--layout-margin-desktop) * 2);
+  }
+  .bland-grid > * {
+    --bland-span: var(--span-xl, var(--span-md, var(--span, var(--bland-grid-columns))));
+  }
+}
+
+.bland-grid[data-inset] {
+  padding-inline: 0;
+  max-width: none;
+}

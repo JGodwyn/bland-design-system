@@ -10,11 +10,11 @@ Bland is Godwin's personal design system: a Figma UI kit reused across client pr
 
 ```
 CLAUDE.md                 rules (this file)
-docs/                     long-form notes: components.md (how to build one), tokens.md, brand.md, lint.md, motion.md, agent-skill.md
+docs/                     long-form notes: components.md (how to build one), tokens.md, brand.md, lint.md, motion.md, grid.md, agent-skill.md
 tokens/figma/raw/         raw Figma export, verified by checksum (generated)
 tokens/tokens.json        resolved tokens with descriptions (generated)
 src/tokens/tokens.css     CSS custom properties, shipped as bland/tokens.css (generated)
-src/styles/               fonts.css (self-hosted Inter, Geist Mono) and base.css (reset, focus and smoothing helpers)
+src/styles/               fonts.css (self-hosted Inter, Geist Mono) and base.css (reset, focus and smoothing helpers, the .bland-grid page grid)
 src/components/           one folder per component: <Name>.tsx, <name>.css, <name>.stories.tsx
 src/icons/                Bland's own icons, exported from Figma
 playground/               the docs site (npm run docs): style pages from tokens.json, component pages from stories and generated props; #/raw/<id> is what Playwright screenshots
@@ -79,7 +79,7 @@ They merge with git's `union` strategy (`.gitattributes`): append, never restruc
 
 ## Token architecture
 
-Three layers. **Components bind only to Theme or scale tokens, never primitives.** 628 variables in 12 collections (as of 2026-10-25), plus 15 elevation styles and 23 text styles. Primitives are not emitted to CSS, except the 13 brand and 13 neutral steps (`--brand-*`, `--neutral-*`), which exist only for a project's brand override; the lint keeps components off them.
+Three layers. **Components bind only to Theme or scale tokens, never primitives.** 635 variables in 12 collections (as of 2026-10-28), plus 15 elevation styles and 23 text styles. Primitives are not emitted to CSS, except the 13 brand and 13 neutral steps (`--brand-*`, `--neutral-*`), which exist only for a project's brand override; the lint keeps components off them.
 
 | Collection | Layer | Modes | Holds |
 | --- | --- | --- | --- |
@@ -87,7 +87,7 @@ Three layers. **Components bind only to Theme or scale tokens, never primitives.
 | `_Functional Colors` | Primitive, hidden | 1 | `Red/*`, `Green/*`, `Amber/*` + alphas |
 | `_Units` | Primitive, hidden | 1 | `unit/0`–`unit/640`, `unit/0-5`, `unit/1-5`, `unit/full` |
 | `Theme` | Semantic + component | Light, Dark | `Text/`, `Icon/`, `Surface/`, `Border/`, `Shadow/`, `Scrollbar/`, `Fade/`, one group per component (`Button/`, `Indicator/`, `Badge/`, `Toggle/`, `TextInput/`, `Menu/`, `Table/`, `Messaging/`, `Code/`, …) |
-| `Spacing` | Scale | 1 | `space-none` 0 – `space-9xl` 256, `Layout/margin-desktop` 152, `Layout/margin-mobile` 24 |
+| `Spacing` | Scale | 1 | `space-none` 0 – `space-9xl` 256, `Layout/margin-desktop` 152, `Layout/margin-mobile` 24, `Layout/columns-mobile` 4, `-tablet` 6, `-desktop` 8 (plain numbers in CSS), `Layout/max-width` 1136 (page grid, `docs/grid.md`) |
 | `Corner Radius` | Scale | 1 | `rad-null` 0, `rad-xs` 2, `rad-sm` 4, `rad-md` 8, `rad-lg` 16, `rad-xl` 24, `rad-rd` full |
 | `Stroke` | Scale | 1 | `stroke-none` 0, `stroke-xs` 0.5, `stroke-sm` 1 (borders), `stroke-md` 1.5 (icons), `stroke-lg` 2 (focus), `stroke-xl` 4 |
 | `_Typography` | Primitive, hidden | 1 | `family/`, `weight/`, `size/`, `line-height/`, `letter-spacing/normal` (0). Hidden 2026-10-25: type reaches code only through text styles |
@@ -123,6 +123,7 @@ Implemented in `scripts/build-tokens.ts`; CSS naming and the sync steps are in `
 - **Icons (decided 2026-10-17):** Bland ships no icon pack. Every icon prop takes any SVG as a React node; Bland sizes it from `icon/*` (12, 16, 20, 24) and colors it through `currentColor` from the matching `Icon/*` token. Stroked icons (the Figma set, Lucide) get `stroke-md` (1.5) at every size; filled packs (Phosphor React, any weight) keep their own weight. The design source is the Phosphor-based Figma Icons page; the few icons Bland needs internally (spinner, caret, close, check) are exported from it into `src/icons/` as components need them. Details in `docs/components.md`.
 - **Overflow:** every overflowing scroll area shows **both** a scrollbar (thumb `Scrollbar/thumb`, width `scrollbar/width`) and an edge fade. **The scrollbar shows only while the area scrolls** (Godwin 2026-10-22): it appears on scroll, stays while held or under the pointer, and fades out over `duration/md` once scrolling has stopped for `duration/scrollbar-hide-delay` (1000); the fade is always there. The fade is a real `mask-image: linear-gradient(...)` on the scroll container, transparent only on edges with hidden content, length `fade/md` (32) by default or `fade/sm` (16), updated on scroll; a focused item scrolls clear of it. (Figma's surface-colored overlay is only a workaround.) In code every fade uses the shared `.bland-scroll-fade` class; don't write another mask. Scrolling in Figma today: Menu, Calendar month/year, Sidebar, Code snippet, Text Area. Table, Modal body and chat list follow the same rule if they scroll in code. **Exceptions, fade alone with no scrollbar:** tab rows (Section, Pill, File tab) scroll sideways (Godwin 2026-10-19; a vertical wheel scrolls them sideways), and the Sidebar's list (Godwin 2026-10-20).
 - **Disabled:** disabled states use the disabled color tokens (`Button/*-disabled`, `Toggle/*-disabled`, `Control/checked-disabled`). No opacity, and no opacity token; the lint rejects `opacity` on disabled selectors.
+- **Page grid** (Godwin 2026-10-28): optional `.bland-grid` in `base.css`: 4 / 6 / 8 fluid columns (mobile, `md`, `xl`), gutters space-sm then space-lg, margins Layout/margin-mobile then margin-desktop, content capped at `Layout/max-width` and centred; children span `--span` / `--span-md` / `--span-xl`; `data-inset` for nested grids. Figma's Desktop md/lg and Dashboard styles stay in Figma (`docs/grid.md`).
 - **Layout:** mobile-first. Base styles are mobile, `breakpoint/md` (768) is the tablet layout, `breakpoint/xl` (1280) the desktop layout; `sm`, `lg` and `2xl` are for component-level tweaks. Media queries use `min-width` on a breakpoint value only (`var()` does not work there; the lint holds the list). `--breakpoint-*` exist for JS (`matchMedia`, Floating UI).
 - **Motion:** details and reasons in `docs/motion.md`.
   - Durations and easings are Motion tokens only. Never `ease-in` on UI; entering and exiting use `easing/out`.
@@ -219,7 +220,7 @@ In order; tokens come before components.
 - [x] Token export pipeline (Light/Dark CSS, resolved aliases and alphas, descriptions kept, `Fade/*-clear` skipped). First export 2026-10-16.
 - [x] Token lint (Stylelint) before any component code. Set up 2026-10-16, see `docs/lint.md`.
 - [x] Playwright (decided 2026-10-17): screenshots of every story in both themes, axe checks and behaviour specs, Chromium only, against the playground. Set up 2026-10-17.
-- [x] Base: fonts, reset, focus and smoothing helpers, icon slot, scroll area, conventions in `docs/components.md`. Done 2026-10-17. Grid system (17 Figma layout grids) is deferred until page layouts need it.
+- [x] Base: fonts, reset, focus and smoothing helpers, icon slot, scroll area, conventions in `docs/components.md`. Done 2026-10-17. Grid system done 2026-10-28: `.bland-grid` on new Layout column and max-width tokens (`docs/grid.md`).
 - [x] Docs site, local (2026-10-17): sidebar of styles and components, live demo with controls, variants, props tables, theme switch. Runs with `npm run docs`. Redesigned from the Figma Doc site page (2026-10-22): Bland controls, full code view, props in Table, search (⌘K), page contents rail; see INTERFACE.md.
 - [ ] Docs site hosting: not deployed anywhere yet. Static build ready (2026-10-27, `npm run docs:build`); Vercel, Netlify and GitHub Pages steps in `docs/release.md`. Left: Godwin picks a host.
 - [x] Extra project colors beside the brand: built 2026-10-27 (up to three, steps + light/dark roles, `docs/brand.md`). Chart palette `--chart-1…8` generated from the brand and extras, 2026-10-27 (Godwin: generated, not designed in Figma first).

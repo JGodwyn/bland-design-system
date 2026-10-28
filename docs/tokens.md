@@ -55,7 +55,7 @@ Not set up yet: running the check on a schedule. It needs the Figma MCP, so it w
 - **Text styles** become a `font` shorthand value each (`weight size/line-height family`), plus `--type-<style>-line-height` and `--type-<style>-letter-spacing` (the shorthand can't carry letter spacing, so components set it beside the `font`). The `-underline` styles also need `text-decoration: underline`; their description says so.
 - **Font weights** map from Figma style names to numbers: Regular 400, Medium 500, Semi Bold / SemiBold 600.
 - **Font families** get fallback stacks: Inter falls back to `system-ui, sans-serif`, Geist Mono to `ui-monospace, monospace`.
-- All dimensions are in `px`.
+- All dimensions are in `px`. Column counts (`Layout/columns-*`) are plain numbers.
 - **Durations** (Figma `TIMING`, stored in seconds as float32, so 0.16 arrives as 0.1599999964) become whole milliseconds: `--duration-sm: 160ms`.
 - **Easings** (Figma `EASING`) become `cubic-bezier()` with coordinates rounded to 3 decimals, and `LINEAR` becomes `linear`. Any other easing type fails the build.
 - **Breakpoints** are emitted as `--breakpoint-*` for JS (`matchMedia`, Floating UI). CSS media queries cannot read `var()`, so `bland/use-tokens` reads the values from `tokens.json` and allows only those in `@media` (see `lint.md`).
@@ -77,6 +77,7 @@ Not set up yet: running the check on a schedule. It needs the Figma MCP, so it w
 | `duration/md` | `--duration-md` | Motion |
 | `easing/in-out` | `--easing-in-out` | Motion |
 | `breakpoint/md` | `--breakpoint-md` | Breakpoints |
+| `Layout/columns-mobile` | `--layout-columns-mobile` | Page grid (`grid.md`), unitless |
 
 Prefer the composite tokens in components: `font: var(--type-body-md)` and `box-shadow: var(--elevation-neutral-mid)`. Reach for the parts (`--type-body-md-line-height`, `--elevation-mid-key-y`) only when a component needs one property alone. Families, weights and sizes have no tokens of their own: pick the text style.
 
@@ -119,3 +120,7 @@ Two Motion variables added in Figma for the Sidebar's hover intent, through the 
 
 - 594 variables (the handoff said 584), 15 elevation styles, 23 text styles. 499 tokens emitted.
 - The raw descriptions of the `Purple/*` primitives contain an HTML entity (`&#39;`). The build decodes it. Fix it at the source in Figma when convenient.
+
+## Sync of 2026-10-28 (page grid)
+
+Four Spacing variables added in Figma for the page grid (`docs/grid.md`): `Layout/columns-mobile` 4, `Layout/columns-tablet` 6, `Layout/columns-desktop` 8 and `Layout/max-width` 1136. Synced through the drift check (4 added) and `--apply`; checksum 635 variables, `e33ab92a`, equal in Figma and the repo. The column counts are the first unitless FLOATs: the build emits `Layout/columns-*` as plain numbers (`--layout-columns-mobile: 4`). 583 tokens emitted.

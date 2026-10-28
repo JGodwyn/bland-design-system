@@ -45,6 +45,7 @@ export const stylePages = [
   { id: 'icons', title: 'Icons' },
   { id: 'sizing', title: 'Sizing' },
   { id: 'breakpoints', title: 'Breakpoints' },
+  { id: 'grid', title: 'Grid' },
   { id: 'elevation', title: 'Elevation' },
   { id: 'motion', title: 'Motion' },
   { id: 'radius', title: 'Corner radius' },
