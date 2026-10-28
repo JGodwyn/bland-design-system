@@ -266,6 +266,12 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   await expect(result).toBeHidden(); // nothing misses: no banner at all, not a "checks out" one
   await expect(page.getByText('Contrast checks out')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /^Brand color #FFCC00/ })).toBeVisible(); // the fix never changes the entered color
+  // Leaving the page and coming back keeps the color and its fix.
+  await page.goto('/#/styles/colors');
+  await page.goto('/#/brand');
+  await expect(page.getByRole('button', { name: /^Brand color #FFCC00/ })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Brand steps' })).toContainText('200#ffcc00');
+  await expect(page.getByText('Contrast warning')).toBeHidden();
   await apply.click();
   await expect(page.getByRole('button', { name: 'Applied to site' })).toBeDisabled();
   expect(await brand('200')).toBe('#ffcc00');

@@ -1759,3 +1759,9 @@ not wrapped; rail contents centred (logo and account icon were off).
 
 - Godwin saw odd grid styles in Figma and allowed removing those out of line. Read the Grid system page: 22 Screen templates instances (main components on the Spacing page, each with a local grid, no style), 8 of them Dashboard demos.
 - Reshaped Mobile/sm, md, lg to CENTER 4 x 72 / 80 / 88 (count and gutter bound); deleted Desktop/md, Desktop/lg and 8 Dashboard styles; attached styles to the 14 main components by size; deleted the 8 Dashboard instances, set the 14 remaining instances to their styles, moved the tablet and mobile rows up 2320, shrank the frame to 4060 and moved the Footer up to its edge. Rewrote the Tablet and Desktop descriptions with their screens.
+
+## Brand page: contrast fix lost on return (2026-10-28)
+
+- Godwin: edit the color, Fix contrast, visit another page, come back: the warning is back.
+- Cause: the fixed scale and tint lived only in component state; on return the page rebuilt the scale from the color alone (and the color only from an applied brand).
+- Fix: a draft {color, tint, fixed} saved to sessionStorage and read on mount; falls back to the applied palette. Docs spec leaves and returns after the fix; it fails without the change.

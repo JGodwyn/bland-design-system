@@ -76,9 +76,12 @@ const tintItems = [
 
 export function BrandPage() {
   const applied = useAppliedBrand();
-  const [input, setInput] = useState(applied?.color ?? blandScale['600']);
-  const [tint, setTint] = useState<Tint>('full');
-  const [fixed, setFixed] = useState<Scale | null>(null);
+  // The brand you were working on comes back as you left it (color, neutral tint and any contrast fix), else the
+  // applied one, fix included.
+  const [draft] = useState(() => savedDraft() ?? (applied ? { color: applied.color, tint: 'full' as Tint, fixed: applied.brand } : null));
+  const [input, setInput] = useState(draft?.color ?? blandScale['600']);
+  const [tint, setTint] = useState<Tint>(draft?.tint ?? 'full');
+  const [fixed, setFixed] = useState<Scale | null>(draft?.fixed ?? null);
   // While a pointer drags in the picker the contrast message hides, and comes back once it is released.
   const [dragging, setDragging] = useState(false);
   const [extras, setExtras] = useState<ExtraState[]>(savedExtras);
@@ -87,6 +90,7 @@ export function BrandPage() {
   const [edited, setEdited] = useState<number>();
   const [tab, setTab] = useState('brand');
   useEffect(() => saveExtras(extras), [extras]);
+  useEffect(() => saveDraft({ color: input, tint, fixed }), [input, tint, fixed]);
   useEffect(() => savePins(pins), [pins]);
 
   // Bland's own blue is Bland's scale exactly (generating it again lands within 1/255).
@@ -307,6 +311,26 @@ export function BrandPage() {
 type ExtraState = { id: string; name: string; color: string; fixed: Scale | null };
 const EXTRA_NAMES = ['accent', 'highlight', 'illustration'];
 const EXTRAS_KEY = 'bland-docs-extras';
+
+/** The brand color being worked on, kept for the visit so leaving the page and coming back loses nothing. */
+type Draft = { color: string; tint: Tint; fixed: Scale | null };
+const DRAFT_KEY = 'bland-docs-brand-draft';
+function savedDraft(): Draft | null {
+  try {
+    const raw = JSON.parse(sessionStorage.getItem(DRAFT_KEY) ?? 'null') as Draft | null;
+    return raw && typeof raw.color === 'string' ? raw : null;
+  } catch {
+    return null;
+  }
+}
+function saveDraft(draft: Draft) {
+  try {
+    if (draft.color === blandScale['600'] && !draft.fixed && draft.tint === 'full') sessionStorage.removeItem(DRAFT_KEY);
+    else sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+  } catch {
+    /* Private mode: it lasts until the page reloads. */
+  }
+}
 
 /** The extra colors are kept for the visit, like an applied brand (they don't change the site, so they aren't applied). */
 const PINS_KEY = 'bland-docs-chart-picks';

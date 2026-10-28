@@ -2250,3 +2250,4 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Removed: Desktop/md, Desktop/lg, the eight Dashboard styles, and the eight Dashboard demo frames on the Grid system page (rows below moved up, frame and footer follow).
 - Styles now attached to the 14 Screen templates main components (Spacing page), so every template a design starts from carries the grid; descriptions name the screens and margins.
 - Known gap: at 820 the Tablet/sm style draws 104 columns where code computes 112 (a style covers a range of screens).
+- **Brand page keeps your work (2026-10-28):** the brand color, neutral tint and contrast fix are kept for the visit (sessionStorage `bland-docs-brand-draft`, like the extras and chart picks), so leaving the page and coming back shows them as left; without a draft the applied brand comes back with its fix. Reset clears it.
