@@ -2243,3 +2243,10 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - `--bland-grid-margin`, `--bland-grid-columns`, `--bland-grid-gutter` are the knobs (set inside the project's own media query). `data-inset`: minimum margin none, no cap.
 - Layout/margin-mobile and margin-desktop are no longer read by the grid (margins are derived); margin-desktop is the suggested landing-page minimum. No column-width tokens: the rule derives 104 / 128 / 144 from the screen.
 - Docs Grid page: seven frames (375, 412, 768, 1024, 1280, 1440, 1920), each a real `.bland-grid` with the layout's values inline, captioned with its column width and margins.
+
+## Figma grid styles tidied (2026-10-28, Godwin: "remove the ones not in line")
+
+- Kept seven, all centred columns on the 8 grid: Mobile/sm 4x72 (360, 375), md 4x80 (390), lg 4x88 (412, 430); Tablet/sm 6x104 (768, 820), md 6x128 (912), lg 6x144 (1024); Desktop/sm 8x128 (1280 up). Mobile changed from stretch + 24 offset to the code rule's widths. Counts bound to Layout/columns-*, gutters to space tokens, column widths raw (derived, not tokens).
+- Removed: Desktop/md, Desktop/lg, the eight Dashboard styles, and the eight Dashboard demo frames on the Grid system page (rows below moved up, frame and footer follow).
+- Styles now attached to the 14 Screen templates main components (Spacing page), so every template a design starts from carries the grid; descriptions name the screens and margins.
+- Known gap: at 820 the Tablet/sm style draws 104 columns where code computes 112 (a style covers a range of screens).

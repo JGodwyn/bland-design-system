@@ -352,7 +352,7 @@ function GridPage() {
           highlight={highlight}
         />
       </Section>
-      <Section title="Tokens" note="Figma binds the Mobile, Tablet and Desktop/sm grid styles to these. The Desktop md and lg styles and the Dashboard styles stay in Figma only.">
+      <Section title="Tokens" note="Figma binds the column counts of its seven grid styles (Mobile, Tablet sm/md/lg, Desktop/sm) to these. Column widths are not tokens: they follow from the screen width.">
         <TokenTable items={layout} />
       </Section>
     </>

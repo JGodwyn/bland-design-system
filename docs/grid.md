@@ -18,12 +18,15 @@ What that gives, and the Figma frame it matches:
 
 | Screen | Columns | Margins | Figma |
 | --- | --- | --- | --- |
-| 360 / 375 / 390 / 412 / 430 | 72 / 72 / 80 / 88 / 88 | 24 / 31.5 / 23 / 18 / 27 | Mobile styles stretch their columns with a 24 margin; code keeps the column on the 8 grid instead |
+| 360 / 375 | 72 | 24 / 31.5 | Mobile/sm, exact |
+| 390 | 80 | 23 | Mobile/md, exact |
+| 412 / 430 | 88 | 18 / 27 | Mobile/lg, exact |
 | 768 | 104 | 32 | Tablet/sm, exact |
+| 820 | 112 | 34 | Tablet/sm draws 104 (margins 58): a style covers a range of screens, code works each width out |
 | 912 | 128 | 32 | Tablet/md, exact |
 | 1024 | 144 | 40 | Tablet/lg, exact |
 | 1280 / 1440 / 1536 | 128 | 72 / 152 / 200 | Desktop/sm, exact |
-| 1920 | 128 | 392 | Desktop/md (10 x 136) is Figma only |
+| 1920 / 2560 | 128 | 392 / 712 | Desktop/sm, exact |
 
 The four mobile margins land between 16 and 32 because four columns can each round down by at most 7. The minimum margins are Bland's choice (Claude 2026-10-28, from Godwin's ranges); they make the Figma tablet and desktop frames come out exactly.
 
@@ -60,16 +63,28 @@ All in Figma's `Spacing` collection, `Layout/` group, emitted to `tokens.css`:
 | `--layout-columns-tablet` | 6 | bound to the count of `Tablet/sm`, `md`, `lg` |
 | `--layout-columns-desktop` | 8 | bound to the count of `Desktop/sm` |
 | `--layout-max-width` | 1136px | eight 128 columns and seven 16 gutters: a 1440 frame minus `Layout/margin-desktop` each side |
-| `--layout-margin-mobile` | 24px | bound to the offset of the Mobile styles; not used by `.bland-grid` (code derives the margin) |
+| `--layout-margin-mobile` | 24px | not used by the grid (margins are derived); Modal's distance from the screen edge |
 | `--layout-margin-desktop` | 152px | not bound to a style; what a 1440 frame gets, and a landing page's minimum margin |
 
 Column counts are plain numbers in CSS (`--layout-columns-mobile: 4`), the one kind of FLOAT the token build emits without `px` (`scripts/tokens/core.ts`, any `Layout/columns-*`).
 
-## Not in code
+## Figma grid styles (tidied 2026-10-28)
 
-- **Desktop/md (10 columns) and Desktop/lg (14)**, drawn on 1920 and 2560 frames: Figma only. Code keeps 8 columns on every desktop width and caps the content instead (Godwin 2026-10-28).
-- **The Dashboard styles** (left/right, tight/basic/loose/wide; columns anchored to one side with a 24 offset): ignored (Godwin 2026-10-28). The area beside a Sidebar uses `.bland-grid` with `data-inset`.
-- Figma's per-frame column widths are not tokens: code works them out from the screen width by the same rule, so 104, 128 and 144 come out at 768, 912 and 1024 without a variable each.
+Seven styles, all centred columns on the 8 grid, applied to every Screen templates variant (Spacing page) and to the frames on the Grid system page:
+
+| Style | Screens | Columns | Gutter |
+| --- | --- | --- | --- |
+| Mobile/sm | 360, 375 | 4 x 72 | space-sm |
+| Mobile/md | 390 | 4 x 80 | space-sm |
+| Mobile/lg | 412, 430 | 4 x 88 | space-sm |
+| Tablet/sm | 768, 820 | 6 x 104 | space-lg |
+| Tablet/md | 912 | 6 x 128 | space-lg |
+| Tablet/lg | 1024 | 6 x 144 | space-lg |
+| Desktop/sm | 1280, 1440, 1536, 1920, 2560 | 8 x 128 | space-lg |
+
+Counts are bound to `Layout/columns-*`, gutters to the space tokens. Column widths stay raw on purpose: they follow from the screen width by the rule above, not from a token. Each description names its screens and margins.
+
+Removed in Figma (Godwin: remove what is not in line): Desktop/md (10 x 136) and Desktop/lg (14 x 128), since code keeps 8 columns of 128 on every desktop; the eight Dashboard styles and their eight demo frames (a dashboard is `.bland-grid` with a lower `--bland-grid-margin` or `data-inset`). The Mobile styles used to stretch their columns with a fixed 24 margin bound to Layout/margin-mobile; they are now centred fixed columns like the rest, so Layout/margin-mobile is bound to no grid (Modal still uses it).
 
 ## Figma audit (2026-10-27)
 

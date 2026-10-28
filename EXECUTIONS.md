@@ -1754,3 +1754,8 @@ not wrapped; rail contents centred (logo and account icon were off).
 - CSS `round(down, …, 8px)` per column gave 96 at 768: the column computes as 103.984 (layout units). A 1px slack fixed 768 but broke 375 (79.75 → 80, margin 15.5). Fix: round the columns' total to a multiple of columns x 8, then divide (exact, no slack). Probed 13 widths in Playwright with the scrollbar hidden (a classic scrollbar takes width a Figma frame doesn't have).
 - Godwin mid-task: column counts needn't be multiples of 8 (they never were; the 8 is the column width). Noted in docs.
 - Grid page frames now real `.bland-grid`s with inline values, captions from the same rule; checked each frame's measured column and margin against its caption. Spec measures 360, 768, 912, 1024, 1280, 1920.
+
+## Figma grid styles tidied (2026-10-28)
+
+- Godwin saw odd grid styles in Figma and allowed removing those out of line. Read the Grid system page: 22 Screen templates instances (main components on the Spacing page, each with a local grid, no style), 8 of them Dashboard demos.
+- Reshaped Mobile/sm, md, lg to CENTER 4 x 72 / 80 / 88 (count and gutter bound); deleted Desktop/md, Desktop/lg and 8 Dashboard styles; attached styles to the 14 main components by size; deleted the 8 Dashboard instances, set the 14 remaining instances to their styles, moved the tablet and mobile rows up 2320, shrank the frame to 4060 and moved the Footer up to its edge. Rewrote the Tablet and Desktop descriptions with their screens.
