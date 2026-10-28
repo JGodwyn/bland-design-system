@@ -1407,8 +1407,8 @@ code,
      instead of jumping.
    Transitions, so a quick toggle reverses mid-way. Exit is quicker: the content is gone in duration/xs while the
    space folds. Entry opens the space first and brings the content in a beat later. All easing/out. Used by the
-   Brand theme page's contrast result (hidden while dragging the picker, and on Bland's own palette) and its
-   breakdown table. */
+   Brand theme page's contrast results (brand, extras and each chart color; hidden while dragging the picker
+   and while nothing misses) and the breakdown table. */
 .docs-fold {
   display: grid;
   grid-template-rows: 1fr;

@@ -703,32 +703,41 @@ function ChartColor({
 }
 
 /** One chart color's problems in plain words, with Fix color when a nearby color clears them (named before you press). Nothing when it checks out. */
-function ChartColorCheck({ advice, hidden, fixed, onFix }: { advice: ChartAdvice[]; hidden: boolean; fixed?: string; onFix: () => void }) {
+function ChartColorCheck({ advice: current, hidden, fixed: currentFix, onFix }: { advice: ChartAdvice[]; hidden: boolean; fixed?: string; onFix: () => void }) {
+  // As the brand's Contrast: while hidden it keeps the last warning, so the fold plays out on what was there; each
+  // new warning (keyed) eases in.
+  const shown = useRef({ advice: current, fixed: currentFix });
+  if (!hidden) shown.current = { advice: current, fixed: currentFix };
+  const { advice, fixed } = shown.current;
   const fails = advice.some((a) => a.level === 'fail');
   return (
-    <div className="docs-brand-chart-check" hidden={hidden}>
-      {advice.length > 0 && (
-        <Banner
-          status="warning"
-          colored
-          orientation="vertical"
-          title={fails ? 'This color needs a change' : 'Close for color-blind readers'}
-          actions={
-            fixed && (
-              <Button size="sm" onClick={onFix}>
-                Fix color
-              </Button>
-            )
-          }
-        >
-          {advice.map((a) => (
-            <p key={a.text} className="docs-brand-chart-finding">
-              {a.text}
-            </p>
-          ))}
-          {fixed && <p className="docs-brand-chart-finding">Fix color changes it to {fixed.toUpperCase()}.</p>}
-        </Banner>
-      )}
+    <div className="docs-brand-chart-check docs-fold" hidden={hidden}>
+      <div className="docs-fold-inner">
+        <div key={advice.map((a) => a.text).join('|')} className="docs-brand-contrast-result">
+          {advice.length > 0 && (
+            <Banner
+              status="warning"
+              colored
+              orientation="vertical"
+              title={fails ? 'This color needs a change' : 'Close for color-blind readers'}
+              actions={
+                fixed && (
+                  <Button size="sm" onClick={onFix}>
+                    Fix color
+                  </Button>
+                )
+              }
+            >
+              {advice.map((a) => (
+                <p key={a.text} className="docs-brand-chart-finding">
+                  {a.text}
+                </p>
+              ))}
+              {fixed && <p className="docs-brand-chart-finding">Fix color changes it to {fixed.toUpperCase()}.</p>}
+            </Banner>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
