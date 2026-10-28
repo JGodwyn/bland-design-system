@@ -2221,4 +2221,5 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - (2026-10-28, Godwin) No "checks out" banner anywhere on the Brand theme page (brand, extras, chart colors): a result shows only when something misses.
 - (2026-10-28, Godwin) A chart color's warning folds in and out like the brand's and extras' (the shared `.docs-fold`, keeping the last warning while it folds away, each new warning easing in).
 - (2026-10-28, Godwin) A clash between two chart colors shows on the one you just changed (`chartAdvice(…, edited)`; the page tracks the last series you picked or fixed), then on a pick, then on the later one.
-- (2026-10-28, Godwin) Picks stay as you made them when extras change: an extra that needs a pick's slot pushes it to the next free slot (`placePins`, also in the command); the page rewrites its saved picks to match, so Reset and the CSS follow where it shows.
+- (2026-10-28, Godwin; replaced below) Picks moved on to the next free slot when an extra needed theirs.
+- (2026-10-28, Godwin) Every chart color but the brand's is editable, an extra's slot too; a pick stays in its slot over an extra (no more moving it on, `placePins` dropped) until Use Bland's pick. Each card's warning is written about that color, one line per kind of problem naming its neighbours (`localNotes`), never "Series N … pick another color for series N".

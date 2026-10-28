@@ -32,7 +32,7 @@ import {
   chartAdvice,
   checkChart,
   fixChartColor,
-  placePins,
+  localNotes,
   check,
   contrast,
   EXTRA_PAIRS,
@@ -120,12 +120,6 @@ export function BrandPage() {
   // Extra colors: up to MAX_EXTRAS, each with a name that doesn't clash, made into a scale (fixed when asked).
   const extraScales = extras.map((x) => ({ ...x, scale: x.fixed ?? generate(x.color), error: extraNameError(x.name, extras.filter((o) => o.id !== x.id).map((o) => o.name)) }));
   const validExtras = extraScales.filter((x) => !x.error).map(({ name, scale }) => ({ name, scale }));
-  // Picks keep their colors when extras come and go: one an extra now needs moves to the next free slot, and stays
-  // there (the state follows, so Reset and the CSS name the slot it shows in).
-  useEffect(() => {
-    const placed = placePins(pins, 1 + validExtras.length);
-    if (JSON.stringify(placed) !== JSON.stringify(pins)) setPins(placed);
-  }, [pins, validExtras.length]);
   // The chart palette follows the brand, the valid extras (in order) and the neutrals' page color.
   const chart = useMemo(() => generateChart(scale, validExtras, neutrals, pins), [scale, neutrals, JSON.stringify(validExtras), pins]);
   const updateExtra = (id: string, patch: Partial<ExtraState>) => setExtras((all) => all.map((x) => (x.id === id ? { ...x, ...patch } : x)));
@@ -247,7 +241,7 @@ export function BrandPage() {
                   <div className="docs-brand-extras-intro">
                     <p className="docs-note">
                       {CHART_COUNT} colors for charts, used in order. The first is your brand color and your extra colors come next; Bland picks the rest to go with
-                      them. Tap one of Bland’s picks to choose your own. Each shows its color for the theme the page is in. Bland’s components don’t use these.
+                      them. Tap any color after the first to choose your own. Each shows its color for the theme the page is in. Bland’s components don’t use these.
                     </p>
                     <Button size="sm" type="stroke" disabled={!chart.some((x) => x.from === 'pinned')} onClick={() => setPins({})}>
                       Use Bland’s picks
@@ -666,8 +660,8 @@ const SOURCES: Record<string, string> = { brand: 'Brand color', generated: 'Blan
 
 /**
  * One chart color: its token as the heading, where it comes from (or Use Bland's pick on your own), then its card.
- * Bland's picks and yours are tapped to change (the picker sets the light color; dark is made from it); the brand
- * and extras change in their own tabs, so their card has no Tap to change. The check inside is this color's own.
+ * Every color but the brand's is tapped to change (the picker sets the light color; dark is made from it); a pick
+ * on an extra's slot wins over the extra until Use Bland's pick. The check inside is this color's own, in its words.
  */
 function ChartColor({
   n,
@@ -687,7 +681,7 @@ function ChartColor({
   onUnpick: () => void;
 }) {
   const [dragging, setDragging] = useState(false);
-  const editable = series.from === 'generated' || series.from === 'pinned';
+  const editable = series.from !== 'brand'; // every color but the brand's (Godwin 2026-10-28), an extra's slot too
   const fixed = useMemo(() => (editable && advice.length ? fix() : undefined), [editable, advice, fix]);
   // Only a problem shows (Godwin 2026-10-28): no "checks out" banner on any color.
   const check = <ChartColorCheck advice={advice} hidden={dragging || advice.length === 0} fixed={fixed} onFix={() => fixed && onPick(fixed)} />;
@@ -746,7 +740,7 @@ function ChartColorCheck({ advice: current, hidden, fixed: currentFix, onFix }: 
                 )
               }
             >
-              {advice.map((a) => (
+              {localNotes(advice).map((a) => (
                 <p key={a.text} className="docs-brand-chart-finding">
                   {a.text}
                 </p>

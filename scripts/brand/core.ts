@@ -714,7 +714,7 @@ const worstNeighbours = (series: ChartSeries[]) =>
     return score < w.score ? { at: i, score } : w;
   }, { at: -1, score: Infinity });
 
-/** Colors a project chose for some series, by series number (from 1). Series held by the brand or an extra ignore it. */
+/** Colors a project chose for some series, by series number (from 2; series 1 is always the brand). A pick wins over an extra in its slot. */
 export type ChartPins = Partial<Record<number, string>>;
 
 /** The dark value for a light one: lighter by Bland's 600-to-400 gap (up to OKLCH 0.85), as colorful as sRGB allows, then until 3:1. */
@@ -737,31 +737,15 @@ export function pinnedSeries(hex: string, neutrals: Scale = blandNeutrals): Char
  * The chart palette for a brand, its extra colors (up to three), neutrals and any pinned series. Series 1 is the
  * brand and the extras follow in order (only their steps move, for contrast); the rest are Bland's picks, generated
  * from those, ordered and, where two neighbours still come too close, nudged in lightness (a few rounds, each keeping
- * a change only if it helps). A pinned series replaces Bland's pick in its slot and touches nothing else.
+ * a change only if it helps). A pinned series replaces what its slot holds (an extra or Bland's pick), never the
+ * brand, and touches nothing else.
  */
 export function generateChart(brand: Scale, extras: Extra[] = [], neutrals: Scale = blandNeutrals, pins: ChartPins = {}): ChartSeries[] {
   const fixed = [scaleSeries('brand', brand, neutrals), ...extras.slice(0, MAX_EXTRAS).map((x) => scaleSeries(x.name, x.scale, neutrals))];
-  // Picks only take their own slot (Godwin 2026-10-28): Bland's picks are made from the brand and extras alone, so
-  // changing one color never moves another. A pick that clashes with a neighbour shows in the check instead.
-  const placed = placePins(pins, fixed.length);
-  return generateAround(brand, fixed, neutrals).map((s, i) => (placed[i + 1] ? pinnedSeries(placed[i + 1]!, neutrals) : s));
-}
-
-/**
- * Picks placed after the first `taken` series (the brand and extras), keeping their colors (Godwin 2026-10-28): a
- * pick stays in its slot unless an extra now holds it, then it moves to the next free slot, in order. A pick with
- * no slot left (eight in all) is dropped.
- */
-export function placePins(pins: ChartPins, taken: number): ChartPins {
-  const out: ChartPins = {};
-  let next = taken + 1;
-  for (const n of Object.keys(pins).map(Number).sort((a, b) => a - b)) {
-    const at = Math.max(n, next);
-    if (at > CHART_COUNT || !pins[n]) continue;
-    out[at] = pins[n];
-    next = at + 1;
-  }
-  return out;
+  // A pick takes its own slot, any but the brand's, and nothing else (Godwin 2026-10-28): Bland's picks are made from
+  // the brand and extras alone, so changing one color never moves another, and a pick on an extra's slot stays
+  // there over the extra. A pick that clashes with a neighbour shows in the check instead.
+  return generateAround(brand, fixed, neutrals).map((s, i) => (i > 0 && pins[i + 1] ? pinnedSeries(pins[i + 1]!, neutrals) : s));
 }
 
 /** Bland's picks for the open slots after the brand and extras: hues in the gaps, ordered and nudged apart. */
@@ -885,8 +869,11 @@ export type ChartAdvice = {
   text: string;
   /** The series this is about, from 1: the one to change (the one just edited, a pick, then the later one), else the later one. */
   series: number;
-  /** True when that series can change here (Bland's pick or the project's); false for the brand and extras. */
+  /** True when that series can change here (any but the brand). */
   editable: boolean;
+  /** The same said from that series' own card: `{other}` stands for the neighbour it is about (see `localNotes`). */
+  local: string;
+  other?: number;
 };
 
 /**
@@ -898,9 +885,9 @@ export function chartAdvice(findings: ChartFinding[], series: ChartSeries[], edi
     const from = series[n - 1]?.from;
     return from === 'brand' ? `Series ${n} (your brand color)` : from && from !== 'generated' && from !== 'pinned' ? `Series ${n} (${from})` : `Series ${n}`;
   };
-  // Only a generated or picked series can change here: the one just edited, else a pick, else the later one.
+  // Any series but the brand can change: the one just edited, else a pick, else the later one.
   const target = (ns: number[]) => {
-    const own = ns.filter((n) => ['generated', 'pinned'].includes(series[n - 1]!.from));
+    const own = ns.filter((n) => series[n - 1]!.from !== 'brand');
     return own.find((n) => n === edited) ?? own.find((n) => series[n - 1]!.from === 'pinned') ?? own.at(-1);
   };
   const cap = (x: string) => x[0]!.toUpperCase() + x.slice(1);
@@ -923,8 +910,23 @@ export function chartAdvice(findings: ChartFinding[], series: ChartSeries[], edi
   return [...groups.values()].map((fs) => {
     const f = fs[0]!;
     const t = target(f.series);
-    return { ...say(fs), series: t ?? f.series.at(-1)!, editable: t !== undefined };
+    const owner = t ?? f.series.at(-1)!;
+    const other = f.series.find((n) => n !== owner);
+    return { ...say(fs), ...sayLocal(fs, t !== undefined), series: owner, editable: t !== undefined, ...(other ? { other } : {}) };
   });
+
+  function sayLocal(fs: ChartFinding[], editable: boolean): Pick<ChartAdvice, 'local'> {
+    const f = fs[0]!;
+    if (f.kind === 'contrast') return { local: `Too faint on the ${f.mode === 'light' ? 'white' : 'dark'} page.${editable ? '' : ' Change your brand color under Brand colors.'}` };
+    const normal = fs.filter((x) => x.vision === 'normal');
+    if (normal.length) return { local: `Looks too much like {other}${whereOf(normal)}.` };
+    const fails = fs.filter((x) => x.level === 'fail');
+    const shown = fails.length ? fails : fs;
+    const kinds = [...new Set(shown.map((x) => (x.vision === 'tritan' ? 'blue-yellow' : 'red-green')))].sort().reverse();
+    const who = `people with ${kinds.join(' or ')} color blindness`;
+    if (fails.length) return { local: `Looks the same as {other} to ${who}${whereOf(fails)}.` };
+    return { local: `Hard to tell from {other} for ${who}${whereOf(fs)}. Label the series on the chart, or pick another color.` };
+  }
 
   function say(fs: ChartFinding[]): Pick<ChartAdvice, 'level' | 'text'> {
     const f = fs[0]!;
@@ -939,6 +941,24 @@ export function chartAdvice(findings: ChartFinding[], series: ChartSeries[], edi
     if (fails.length) return { level: 'fail', text: `${pair} look the same to ${who}${whereOf(fails)}. ${cap(changeFor(f))}.` };
     return { level: 'warn', text: `${pair} are hard to tell apart for ${who}${whereOf(fs)}. Name each series on the chart (a legend or labels), or ${changeFor(f)}.` };
   }
+}
+
+/**
+ * One card's problems in its own words: the same problem with two neighbours is one line naming both
+ * ("Looks too much like --chart-5 and --chart-7.").
+ */
+export function localNotes(advice: ChartAdvice[]): { level: 'fail' | 'warn'; text: string }[] {
+  const lines = new Map<string, { level: 'fail' | 'warn'; others: number[] }>();
+  for (const a of advice) {
+    const line = lines.get(a.local) ?? { level: a.level, others: [] };
+    if (a.level === 'fail') line.level = 'fail';
+    if (a.other) line.others.push(a.other);
+    lines.set(a.local, line);
+  }
+  return [...lines].map(([local, { level, others }]) => ({
+    level,
+    text: local.replace('{other}', others.sort((a, b) => a - b).map((n) => `--chart-${n}`).join(' and ')),
+  }));
 }
 
 /**

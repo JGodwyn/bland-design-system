@@ -378,7 +378,8 @@ test('the brand page shows the chart palette in both themes, takes your own pick
   await page.keyboard.press('Escape');
   await expect(item(3).getByRole('button', { name: 'Series 3 #F4F000, change it' })).toBeVisible();
   await expect(item(3)).toContainText('This color needs a change');
-  await expect(item(3)).toContainText('Series 3 is too faint on the white page. Pick another color for series 3.');
+  await expect(item(3)).toContainText('Too faint on the white page.'); // said of this color, on this color
+  await expect(item(3).locator('.docs-brand-chart-check')).not.toContainText('Series 3');
   await expect(item(3)).not.toContainText(/ΔE|protan|deutan|tritan|:1/);
   await expect(item(3)).toContainText(/Fix color changes it to #[0-9A-F]{6}\./);
   await page.getByRole('tab', { name: 'How to use' }).click();
@@ -398,12 +399,12 @@ test('the brand page shows the chart palette in both themes, takes your own pick
   await pick(4, '#854d38');
   await pick(5, '#7a5040');
   // Visible only: a folded warning keeps its words while it leaves.
-  const clash = (n: number) => item(n).locator('.docs-brand-chart-check:visible', { hasText: 'Series 4 and series 5' });
-  await expect(clash(5)).toHaveCount(1);
-  await expect(clash(4)).toHaveCount(0);
+  const clash = (n: number, other: number) => item(n).locator('.docs-brand-chart-check:visible', { hasText: `--chart-${other}` });
+  await expect(clash(5, 4)).toHaveCount(1);
+  await expect(clash(4, 5)).toHaveCount(0);
   await pick(4, '#7d4f3c');
-  await expect(clash(4)).toHaveCount(1);
-  await expect(clash(5)).toHaveCount(0);
+  await expect(clash(4, 5)).toHaveCount(1);
+  await expect(clash(5, 4)).toHaveCount(0);
   await expect(reset).toBeEnabled();
   await reset.click();
   await expect(reset).toBeDisabled();
@@ -417,20 +418,23 @@ test('the brand page shows the chart palette in both themes, takes your own pick
   await expect(previews.first().locator('.docs-brand-chart-track').first().locator('span')).toHaveCount(8);
   await expect(previews.first().getByText('Series 8')).toBeVisible();
 
-  // An extra color takes series 2. Your pick there keeps its color, moved to the next free series, and changing the
-  // extra's color leaves it alone.
+  // An extra color goes to series 2, but your pick there stays, over it, until Use Bland's pick; changing the
+  // extra's color leaves it alone. Every color but the brand's can be picked, an extra's too.
   await pick(2, '#2b2bd0');
   await page.getByRole('tab', { name: 'Extra colors' }).click();
   await page.getByRole('button', { name: 'Add color' }).click();
   await page.getByRole('tab', { name: 'Chart colors' }).click();
-  await expect(list.getByRole('listitem').nth(1)).toContainText('Extra color accent');
-  await expect(item(3).getByRole('button', { name: 'Series 3 #2B2BD0, change it' })).toBeVisible();
+  await expect(item(2).getByRole('button', { name: 'Series 2 #2B2BD0, change it' })).toBeVisible();
+  await expect(item(2).getByRole('button', { name: 'Series 2: back to Bland’s pick' })).toBeVisible();
   await page.getByRole('tab', { name: 'Extra colors' }).click();
   await page.getByRole('button', { name: /^Extra color accent #/ }).click();
   await page.getByRole('textbox', { name: 'HEX color' }).fill('#e11d48');
   await page.keyboard.press('Escape');
   await page.getByRole('tab', { name: 'Chart colors' }).click();
-  await expect(item(3).getByRole('button', { name: 'Series 3 #2B2BD0, change it' })).toBeVisible();
+  await expect(item(2).getByRole('button', { name: 'Series 2 #2B2BD0, change it' })).toBeVisible();
+  await item(2).getByRole('button', { name: 'Series 2: back to Bland’s pick' }).click();
+  await expect(item(2)).toContainText('Extra color accent');
+  await expect(item(2)).toContainText('Tap to change');
   await page.getByRole('tab', { name: 'How to use' }).click();
   const css = page.locator('#use-in-a-project pre');
   await expect(css).toContainText('--chart-2: var(--accent-600);');
