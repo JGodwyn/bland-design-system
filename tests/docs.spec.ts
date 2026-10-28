@@ -381,7 +381,7 @@ test('the brand page shows the chart palette in both themes, takes your own pick
   await expect(item(3)).toContainText('Too faint on the white page.'); // said of this color, on this color
   await expect(item(3).locator('.docs-brand-chart-check')).not.toContainText('Series 3');
   await expect(item(3)).not.toContainText(/ΔE|protan|deutan|tritan|:1/);
-  await expect(item(3)).toContainText(/Fix color changes it to #[0-9A-F]{6}\./);
+  await expect(item(3)).toContainText(/Too faint on the white page\. (.+\. )?Fixing this color changes it to #[0-9A-F]{6}\./);
   await page.getByRole('tab', { name: 'How to use' }).click();
   await expect(page.locator('#use-in-a-project pre')).toContainText('--chart-3: #f4f000; /* picked */');
   await page.getByRole('tab', { name: 'Chart colors' }).click();

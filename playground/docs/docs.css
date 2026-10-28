@@ -1329,12 +1329,6 @@ code,
   color: var(--text-subtle);
   text-align: end;
 }
-.docs-brand-chart-finding {
-  margin: var(--space-none);
-}
-.docs-brand-chart-finding + .docs-brand-chart-finding {
-  margin-top: var(--space-2xs);
-}
 /* The preview's sample chart: stacked bars, a surface gap between segments, and a legend. */
 .docs-brand-chart-sample {
   display: flex;

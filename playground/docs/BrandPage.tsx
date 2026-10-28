@@ -740,12 +740,8 @@ function ChartColorCheck({ advice: current, hidden, fixed: currentFix, onFix }: 
                 )
               }
             >
-              {localNotes(advice).map((a) => (
-                <p key={a.text} className="docs-brand-chart-finding">
-                  {a.text}
-                </p>
-              ))}
-              {fixed && <p className="docs-brand-chart-finding">Fix color changes it to {fixed.toUpperCase()}.</p>}
+              {/* One run of sentences, not a line each (Godwin 2026-10-28). */}
+              {[...localNotes(advice).map((a) => a.text), ...(fixed ? [`Fixing this color changes it to ${fixed.toUpperCase()}.`] : [])].join(' ')}
             </Banner>
           )}
         </div>

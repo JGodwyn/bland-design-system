@@ -2223,3 +2223,4 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - (2026-10-28, Godwin) A clash between two chart colors shows on the one you just changed (`chartAdvice(…, edited)`; the page tracks the last series you picked or fixed), then on a pick, then on the later one.
 - (2026-10-28, Godwin; replaced below) Picks moved on to the next free slot when an extra needed theirs.
 - (2026-10-28, Godwin) Every chart color but the brand's is editable, an extra's slot too; a pick stays in its slot over an extra (no more moving it on, `placePins` dropped) until Use Bland's pick. Each card's warning is written about that color, one line per kind of problem naming its neighbours (`localNotes`), never "Series N … pick another color for series N".
+- (2026-10-28, Godwin) Banner messages are sentences in one run, no line per sentence (break lines only for a real list). The chart warning ends "Fixing this color changes it to #…".
