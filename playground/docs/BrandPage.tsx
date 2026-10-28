@@ -682,6 +682,13 @@ function ChartColor({
 }) {
   const [dragging, setDragging] = useState(false);
   const editable = series.from !== 'brand'; // every color but the brand's (Godwin 2026-10-28), an extra's slot too
+  // The card takes this color's own quiet tint, as an extra's card does (its surface-light steps, 50 light and 1000
+  // dark, on a scale made from the color); the brand's keeps surface-brand-light (Godwin 2026-10-28).
+  const tint = useMemo(() => {
+    const role = EXTRA_ROLES.find((r) => r.role === 'surface-light')!;
+    const scale = generate(series.light);
+    return { light: scale[role.light], dark: scale[role.dark] };
+  }, [series.light]);
   const fixed = useMemo(() => (editable && advice.length ? fix() : undefined), [editable, advice, fix]);
   // Only a problem shows (Godwin 2026-10-28): no "checks out" banner on any color.
   const check = <ChartColorCheck advice={advice} hidden={dragging || advice.length === 0} fixed={fixed} onFix={() => fixed && onPick(fixed)} />;
@@ -698,7 +705,7 @@ function ChartColor({
         )}
       </div>
       {editable ? (
-        <ColorCard label={`Series ${n}`} pickerLabel={`Pick a color for series ${n}`} color={series.light} shown={series[theme]} onChange={onPick} onDraggingChange={setDragging}>
+        <ColorCard label={`Series ${n}`} pickerLabel={`Pick a color for series ${n}`} color={series.light} shown={series[theme]} tint={tint} onChange={onPick} onDraggingChange={setDragging}>
           {check}
         </ColorCard>
       ) : (
