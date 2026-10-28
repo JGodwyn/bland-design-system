@@ -441,7 +441,7 @@ test('the brand page shows the chart palette in both themes, takes your own pick
   await expect(css).toContainText('--chart-1: var(--brand-400);');
 });
 
-test('the page grid switches columns, gutters and spans at md and xl, and nested grids start clean', async ({ page }) => {
+test('the page grid keeps columns on the 8 grid, leaves the rest to the margins, and switches at md and xl', async ({ page }) => {
   await page.goto('/#/styles/grid');
   const grid = page.locator('.docs-grid-live .bland-grid');
   const read = () =>
@@ -458,22 +458,36 @@ test('the page grid switches columns, gutters and spans at md and xl, and nested
     await page.setViewportSize({ width, height: 900 });
     await expect.poll(read).toEqual(expected);
   }
-  // A page grid at 1920: desktop margins, content capped at layout-max-width; a nested grid ignores its cell's span.
-  await page.setViewportSize({ width: 1920, height: 900 });
-  const probe = await page.evaluate(() => {
-    const outer = document.createElement('div');
-    outer.className = 'bland-grid';
-    outer.innerHTML = '<div style="--span: 2"><div class="bland-grid" data-inset><i></i></div></div><div style="--span: 12"></div>';
-    document.body.append(outer);
-    const s = (el: Element) => getComputedStyle(el);
-    const out = {
-      width: outer.getBoundingClientRect().width,
-      padding: s(outer).paddingLeft,
-      nested: s(outer.querySelector('[data-inset] > i')!).gridColumnStart,
-      cut: s(outer.children[1]!).gridColumnStart,
-    };
-    outer.remove();
-    return out;
-  });
-  expect(probe).toEqual({ width: 1440, padding: '152px', nested: 'span 8', cut: 'span 8' });
+  // A page grid at the Figma frame widths: column width and margins as in the Figma grid styles.
+  // overflow hidden, so the window's scrollbar does not take width the Figma frames don't have.
+  const measure = () =>
+    page.evaluate(() => {
+      document.documentElement.style.overflow = 'hidden';
+      const g = document.createElement('div');
+      g.className = 'bland-grid';
+      g.innerHTML = '<div style="--span: 2"><div class="bland-grid" data-inset><i></i></div></div><div style="--span: 12"></div>';
+      document.body.prepend(g);
+      const cols = getComputedStyle(g).gridTemplateColumns.split(' ');
+      const first = g.children[0]!.getBoundingClientRect();
+      const out = {
+        column: cols[0],
+        margin: first.left - document.body.getBoundingClientRect().left,
+        nested: getComputedStyle(g.querySelector('[data-inset] > i')!).gridColumnStart,
+        cut: getComputedStyle(g.children[1]!).gridColumnStart,
+      };
+      g.remove();
+      document.documentElement.style.overflow = '';
+      return out;
+    });
+  for (const [width, column, margin, all] of [
+    [360, '72px', 24, 'span 4'],
+    [768, '104px', 32, 'span 6'],
+    [912, '128px', 32, 'span 6'],
+    [1024, '144px', 40, 'span 6'],
+    [1280, '128px', 72, 'span 8'],
+    [1920, '128px', 392, 'span 8'],
+  ] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await measure()).toEqual({ column, margin, nested: all, cut: all });
+  }
 });

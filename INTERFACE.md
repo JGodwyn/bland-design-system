@@ -2235,3 +2235,11 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Column gaps only; row gaps are the page's.
 - Token build: `Layout/columns-*` FLOATs are emitted without `px`.
 - Docs site: Grid style page after Breakpoints (Columns icon from the Figma Icons page): four Figma frames (375, 768, 1440, 1920) drawn from the same tokens and scaled to fit, a live inset grid that follows the window, HTML/React/CSS usage, the Layout tokens. Layout tokens moved off the Spacing page; search sends them to Grid.
+
+## Page grid: columns on the 8 grid, margins left over (2026-10-28, Godwin)
+
+- Godwin: in Figma he sets the column width (on his 8 spacing unit) and the gutter (a spacing token), and the margin is whatever remains; margins are not variables, he likes them roomy (mobile 16 to 32, usually 20 to 24), and desktop margins depend on the page (a dashboard almost none, a landing page large). Column counts need not be multiples of anything; he prefers even ones. The first `.bland-grid` (fixed margins, fluid columns) did the opposite: off-grid columns everywhere but 1440.
+- Now: each layout sets a count, a gutter and a minimum margin (space-lg 16, space-2xl 32, space-6xl 64); columns are the widest multiple of space-sm inside it, the leftover is split by `justify-content: center`. Desktop content capped at Layout/max-width (128 columns). Reproduces Figma Tablet/sm, md, lg (768, 912, 1024) and Desktop/sm (1280, 1440, 1536) exactly; mobile margins land between 16 and 32. The minimum margins are Claude's pick from Godwin's ranges.
+- `--bland-grid-margin`, `--bland-grid-columns`, `--bland-grid-gutter` are the knobs (set inside the project's own media query). `data-inset`: minimum margin none, no cap.
+- Layout/margin-mobile and margin-desktop are no longer read by the grid (margins are derived); margin-desktop is the suggested landing-page minimum. No column-width tokens: the rule derives 104 / 128 / 144 from the screen.
+- Docs Grid page: seven frames (375, 412, 768, 1024, 1280, 1440, 1920), each a real `.bland-grid` with the layout's values inline, captioned with its column width and margins.

@@ -77,15 +77,21 @@ textarea {
 }
 
 /*
- * Page grid: docs/grid.md. Optional; components never need it. Mobile first, as the Figma grid styles:
- * mobile Layout/columns-mobile columns, space-sm gutters, Layout/margin-mobile sides; tablet (breakpoint/md)
- * Layout/columns-tablet columns, space-lg gutters; desktop (breakpoint/xl) Layout/columns-desktop columns,
- * Layout/margin-desktop sides, and no wider than Layout/max-width plus those margins, centred.
- * Columns are fluid (Figma's fixed tablet and desktop column widths are canvas aids).
+ * Page grid: docs/grid.md. Optional; components never need it. Godwin's rule (2026-10-28): the column
+ * width stays on the 8 grid, the gutters are spacing tokens, and the margins are whatever is left over.
+ * Each layout sets a column count, a gutter and a minimum margin; the columns take the widest multiple of
+ * space-sm (8) that fits inside the minimum margins, and the leftover is split between the two margins
+ * (justify-content: center). Mobile 4 columns, space-sm gutters, at least space-lg (margins land between
+ * 16 and 32); tablet (breakpoint/md) 6, space-lg, at least space-2xl; desktop (breakpoint/xl) 8, space-lg,
+ * at least space-6xl, content no wider than Layout/max-width (eight 128 columns). These reproduce the
+ * Figma Tablet sm/md/lg and Desktop/sm frames exactly.
  * A child spans --span columns (--span-md from tablet, --span-xl from desktop, each falling back to the
  * one before), the full row when none is set, and never more than the grid has.
- * data-inset keeps the columns and gutters but drops the side margins and the cap: a grid inside a card,
- * a panel or the area beside a Sidebar. The 2 is a code constant (a margin on each side), not a token.
+ * --bland-grid-margin is the minimum margin: a landing page raises it (Layout/margin-desktop), a dashboard
+ * lowers it. data-inset sets it to none and drops the cap: a grid inside a card, a panel or beside a Sidebar.
+ * The columns' total is rounded down to a multiple of columns x 8 before it is divided: dividing first
+ * gives 103.984 for an exact 104 (layout units) and would lose a whole step.
+ * The 1 and the 2 are code constants (gutters between columns, a margin on each side), not tokens.
  */
 @property --span {
   syntax: "*";
@@ -102,12 +108,24 @@ textarea {
 
 .bland-grid {
   --bland-grid-columns: var(--layout-columns-mobile);
+  --bland-grid-gutter: var(--space-sm);
+  --bland-grid-margin: var(--space-lg);
   display: grid;
-  grid-template-columns: repeat(var(--bland-grid-columns), minmax(0, 1fr));
-  column-gap: var(--space-sm);
-  padding-inline: var(--layout-margin-mobile);
+  grid-template-columns: repeat(
+    var(--bland-grid-columns),
+    calc(round(down, 100% - (var(--bland-grid-columns) - 1) * var(--bland-grid-gutter), var(--bland-grid-columns) * var(--space-sm)) / var(--bland-grid-columns))
+  );
+  justify-content: center;
+  column-gap: var(--bland-grid-gutter);
+  padding-inline: var(--bland-grid-margin);
   margin-inline: auto;
   width: 100%;
+}
+@supports not (width: round(down, 100%, 1px)) {
+  /* Browsers without round(): fluid columns inside the minimum margins. */
+  .bland-grid {
+    grid-template-columns: repeat(var(--bland-grid-columns), minmax(0, 1fr));
+  }
 }
 .bland-grid > * {
   --bland-span: var(--span, var(--bland-grid-columns));
@@ -118,7 +136,8 @@ textarea {
 @media (min-width: 768px) {
   .bland-grid {
     --bland-grid-columns: var(--layout-columns-tablet);
-    column-gap: var(--space-lg);
+    --bland-grid-gutter: var(--space-lg);
+    --bland-grid-margin: var(--space-2xl);
   }
   .bland-grid > * {
     --bland-span: var(--span-md, var(--span, var(--bland-grid-columns)));
@@ -128,8 +147,8 @@ textarea {
 @media (min-width: 1280px) {
   .bland-grid {
     --bland-grid-columns: var(--layout-columns-desktop);
-    padding-inline: var(--layout-margin-desktop);
-    max-width: calc(var(--layout-max-width) + var(--layout-margin-desktop) * 2);
+    --bland-grid-margin: var(--space-6xl);
+    max-width: calc(var(--layout-max-width) + var(--bland-grid-margin) * 2);
   }
   .bland-grid > * {
     --bland-span: var(--span-xl, var(--span-md, var(--span, var(--bland-grid-columns))));
@@ -137,6 +156,6 @@ textarea {
 }
 
 .bland-grid[data-inset] {
-  padding-inline: 0;
+  --bland-grid-margin: var(--space-none);
   max-width: none;
 }

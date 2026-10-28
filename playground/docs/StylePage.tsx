@@ -168,14 +168,36 @@ function MotionPage() {
   );
 }
 
-// The Figma frames each grid style was drawn on: Mobile at 375, Tablet at 768, Desktop/sm at 1440, and
-// 1920 to show the cap. Each frame takes the values .bland-grid uses at that width, from the same tokens.
+// Screen widths from the Figma grid frames. Each frame is a real .bland-grid with that layout's
+// count, gutter and minimum margin set inline (media queries follow the window, not the frame), so it
+// shows the column width and margins the rule gives at that width.
+const GRID_LAYOUTS = {
+  Mobile: { columns: '--layout-columns-mobile', gutter: '--space-sm', margin: '--space-lg', capped: false },
+  Tablet: { columns: '--layout-columns-tablet', gutter: '--space-lg', margin: '--space-2xl', capped: false },
+  Desktop: { columns: '--layout-columns-desktop', gutter: '--space-lg', margin: '--space-6xl', capped: true },
+} as const;
 const GRID_FRAMES = [
-  { name: 'Mobile', width: 375, columns: '--layout-columns-mobile', gutter: '--space-sm', margin: '--layout-margin-mobile', capped: false },
-  { name: 'Tablet', width: 768, columns: '--layout-columns-tablet', gutter: '--space-lg', margin: '--layout-margin-mobile', capped: false },
-  { name: 'Desktop', width: 1440, columns: '--layout-columns-desktop', gutter: '--space-lg', margin: '--layout-margin-desktop', capped: true },
-  { name: 'Wide desktop', width: 1920, columns: '--layout-columns-desktop', gutter: '--space-lg', margin: '--layout-margin-desktop', capped: true },
+  { layout: 'Mobile', width: 375 },
+  { layout: 'Mobile', width: 412 },
+  { layout: 'Tablet', width: 768 },
+  { layout: 'Tablet', width: 1024 },
+  { layout: 'Desktop', width: 1280 },
+  { layout: 'Desktop', width: 1440 },
+  { layout: 'Desktop', width: 1920 },
 ] as const;
+
+const tokenPx = (css: string) => parseFloat(tokens.find((t) => t.css === css)?.light ?? '0');
+
+/** The rule .bland-grid follows, for the captions: columns on the 8 grid, the margins take what is left. */
+function gridAt(layout: (typeof GRID_LAYOUTS)[keyof typeof GRID_LAYOUTS], width: number) {
+  const n = tokenPx(layout.columns);
+  const gutter = tokenPx(layout.gutter);
+  const step = tokenPx('--space-sm');
+  let inner = width - 2 * tokenPx(layout.margin);
+  if (layout.capped) inner = Math.min(inner, tokenPx('--layout-max-width'));
+  const column = Math.floor((inner - (n - 1) * gutter) / (n * step)) * step;
+  return { n, column, gutter, margin: (width - n * column - (n - 1) * gutter) / 2 };
+}
 
 const GRID_HTML = `<main class="bland-grid">
   <header>Full row: no span</header>
@@ -202,6 +224,20 @@ const GRID_CSS = `/* Or give the spans to your own classes. */
 /* Rows are yours: the grid sets column gaps only. */
 .results {
   row-gap: var(--space-xl);
+}
+
+/* A landing page wants roomier sides on desktop: raise the minimum margin. */
+@media (min-width: 1280px) {
+  .landing.bland-grid {
+    --bland-grid-margin: var(--layout-margin-desktop);
+  }
+}
+
+/* A dashboard wants less: lower it, or use data-inset for none. */
+@media (min-width: 1280px) {
+  .dashboard.bland-grid {
+    --bland-grid-margin: var(--space-xl);
+  }
 }`;
 
 /** Scales a fixed-width frame down to fit its column, never up. */
@@ -220,31 +256,30 @@ function useFit(width: number) {
 
 function GridFrame({ frame }: { frame: (typeof GRID_FRAMES)[number] }) {
   const { ref, zoom } = useFit(frame.width);
+  const layout = GRID_LAYOUTS[frame.layout];
+  const { n, column, gutter, margin } = gridAt(layout, frame.width);
   const style = {
-    '--frame-columns': `var(${frame.columns})`,
-    '--frame-gutter': `var(${frame.gutter})`,
-    '--frame-margin': `var(${frame.margin})`,
-    width: frame.width,
-    zoom,
+    '--bland-grid-columns': `var(${layout.columns})`,
+    '--bland-grid-gutter': `var(${layout.gutter})`,
+    '--bland-grid-margin': `var(${layout.margin})`,
+    maxWidth: layout.capped ? `calc(var(--layout-max-width) + var(${layout.margin}) * 2)` : 'none',
   } as CSSProperties;
   return (
-    <figure className="docs-grid-frame">
+    <figure className="docs-grid-frame" data-width={frame.width}>
       <div ref={ref} className="docs-grid-fit">
-        <div className="docs-grid-canvas" style={style} data-capped={frame.capped || undefined}>
-          <div className="docs-grid-columns">
-            {Array.from({ length: Number(tokens.find((t) => t.css === frame.columns)?.light ?? 0) }, (_, i) => (
+        <div className="docs-grid-canvas" style={{ width: frame.width, zoom }}>
+          <div className="bland-grid docs-grid-columns" style={style}>
+            {Array.from({ length: n }, (_, i) => (
               <span key={i} />
             ))}
           </div>
         </div>
       </div>
       <figcaption>
-        <strong>{frame.name}</strong>, {frame.width} wide: <code>{frame.columns}</code> columns, <code>{frame.gutter}</code> gutters, <code>{frame.margin}</code> sides
-        {frame.capped && (
-          <>
-            , no wider than <code>--layout-max-width</code>
-          </>
-        )}
+        <strong>
+          {frame.layout}, {frame.width}
+        </strong>
+        : {n} columns of {column}, gutters {gutter}, margins {margin}
       </figcaption>
     </figure>
   );
@@ -263,11 +298,17 @@ function GridPage() {
     <>
       <Section
         title="At each breakpoint"
-        note="The columns, gutters and side margins .bland-grid takes at each layout, drawn on the Figma grid frames. Columns stretch with the screen; from xl the grid stops growing at --layout-max-width and centres."
+        note={
+          <>
+            Columns stay on the 8 grid and gutters are spacing tokens; the margins are whatever is left. Each layout has a column count, a gutter and a minimum margin (mobile{' '}
+            <code>--space-lg</code>, tablet <code>--space-2xl</code>, desktop <code>--space-6xl</code>), and the columns take the widest multiple of 8 that fits inside it. Desktop columns stop at
+            128 (<code>--layout-max-width</code>), so wider screens get wider margins. The tablet and desktop frames match the Figma grid styles exactly.
+          </>
+        }
       >
         <div className="docs-grid-frames">
           {GRID_FRAMES.map((frame) => (
-            <GridFrame key={frame.name} frame={frame} />
+            <GridFrame key={frame.width} frame={frame} />
           ))}
         </div>
       </Section>
@@ -296,7 +337,8 @@ function GridPage() {
           <>
             Add <code>bland-grid</code> to a page’s main container. A child spans <code>--span</code> columns, <code>--span-md</code> from tablet and <code>--span-xl</code> from desktop, each
             falling back to the one before; with none it fills the row, so content stacks on mobile by default. A span larger than the grid is cut to the grid. <code>data-inset</code> drops the
-            side margins and the cap for a grid nested in a card, a panel or the area beside a Sidebar. The grid is optional: components fill whatever holds them.
+            side margins and the cap for a grid nested in a card, a panel or the area beside a Sidebar. <code>--bland-grid-margin</code> is the minimum margin: raise it for a roomy landing
+            page, lower it for a dense dashboard. The grid is optional: components fill whatever holds them.
           </>
         }
       >

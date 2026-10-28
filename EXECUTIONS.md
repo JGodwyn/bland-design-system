@@ -1746,3 +1746,11 @@ not wrapped; rail contents centred (logo and account icon were off).
 - The report showed the counts as `4px`: `core.ts` now emits `Layout/columns-*` without a unit.
 - `.bland-grid` in base.css; checked it with Stylelint as if it were component CSS (clean). Spans as unregistered custom properties would inherit into a nested grid's children; registered `--span*` with `inherits: false`.
 - Docs Grid page; checked in the browser pane at 1440, 800 and 375: column counts, gaps, margins, spans per breakpoint, nested grid not inheriting, span 9 cut to 6, the 1920 frame capped at 1440, no sideways scroll, no console errors.
+
+## Page grid redone: columns on the 8 grid (2026-10-28)
+
+- Godwin pointed out his Figma practice: column width on the 8 unit and gutter set the design, margins are what's left. Checked the first version: code columns were 115.3 at 820, 108 at 1280, only 128 at 1440 matched.
+- Modelled "widest multiple of 8 inside a minimum margin" in Python first: with minimums 16 / 32 / 64 it gives Figma's Tablet sm/md/lg and Desktop/sm frames exactly and mobile margins 18 to 31.5.
+- CSS `round(down, …, 8px)` per column gave 96 at 768: the column computes as 103.984 (layout units). A 1px slack fixed 768 but broke 375 (79.75 → 80, margin 15.5). Fix: round the columns' total to a multiple of columns x 8, then divide (exact, no slack). Probed 13 widths in Playwright with the scrollbar hidden (a classic scrollbar takes width a Figma frame doesn't have).
+- Godwin mid-task: column counts needn't be multiples of 8 (they never were; the 8 is the column width). Noted in docs.
+- Grid page frames now real `.bland-grid`s with inline values, captions from the same rule; checked each frame's measured column and margin against its caption. Spec measures 360, 768, 912, 1024, 1280, 1920.

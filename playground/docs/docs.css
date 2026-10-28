@@ -1709,16 +1709,9 @@ code,
 }
 .docs-grid-columns {
   height: 100%;
-  margin-inline: auto;
-  padding-inline: var(--frame-margin);
-  display: grid;
-  grid-template-columns: repeat(var(--frame-columns), minmax(0, 1fr));
-  column-gap: var(--frame-gutter);
-}
-.docs-grid-canvas[data-capped] .docs-grid-columns {
-  max-width: calc(var(--layout-max-width) + var(--frame-margin) * 2);
 }
 .docs-grid-columns > span {
+  grid-column: auto; /* one column each, not .bland-grid's full-row default */
   background: var(--surface-brand-light);
   box-shadow: inset 0 0 0 var(--stroke-sm) var(--border-brand);
 }
