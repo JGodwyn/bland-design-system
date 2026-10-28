@@ -491,9 +491,30 @@ test('the page grid keeps columns on the 8 grid, leaves the rest to the margins,
     [912, '128px', 32, 'span 6'],
     [1024, '144px', 40, 'span 6'],
     [1280, '128px', 72, 'span 8'],
-    [1920, '128px', 392, 'span 8'],
+    [1440, '128px', 152, 'span 8'],
+    [1536, '144px', 136, 'span 8'],
+    [1920, '160px', 264, 'span 8'],
+    [2560, '160px', 584, 'span 8'],
   ] as const) {
     await page.setViewportSize({ width, height: 900 });
     expect(await measure()).toEqual({ column, margin, nested: all, cut: all });
   }
+});
+
+test('the Grid page sits on its own grid, and Shift+G or the switch shows its columns', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/#/styles/grid');
+  const overlay = page.locator('.docs-grid-overlay');
+  await expect(overlay).toBeHidden();
+  await page.keyboard.press('Shift+G');
+  await expect(overlay).toBeVisible();
+  const columns = await overlay.locator('span').evaluateAll((spans) =>
+    spans.filter((s) => getComputedStyle(s).display !== 'none').map((s) => Math.round(s.getBoundingClientRect().left)),
+  );
+  expect(columns).toHaveLength(8);
+  // The page header, a section and a note start on the first column.
+  for (const selector of ['.docs-page-header', '.docs-grid-page > .docs-section', '.docs-grid-page .docs-section > .docs-note'])
+    expect(Math.round((await page.locator(selector).first().boundingBox())!.x)).toBe(columns[0]);
+  await page.getByRole('switch', { name: /Show this page/ }).uncheck({ force: true });
+  await expect(overlay).toBeHidden();
 });

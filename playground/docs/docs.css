@@ -1679,10 +1679,61 @@ code,
 }
 
 /* Grid page: each Figma grid frame drawn with the tokens .bland-grid uses there, scaled to fit. */
+/* The Grid page sits on the grid it documents: an inset .bland-grid in place of the docs column's flex
+   stack, sections and the frame list nested grids (same width, so their columns line up), notes at a
+   reading width. Shift+G or the switch lays the columns over the page. */
+.docs-grid-page {
+  position: relative;
+  row-gap: var(--space-5xl);
+}
+.docs-grid-page .bland-grid {
+  --bland-grid-margin: var(--space-none); /* nested grids are inset too */
+  max-width: none;
+}
+.docs-grid-page > .docs-section {
+  display: grid; /* .docs-section is a flex stack elsewhere, with one gap both ways */
+  row-gap: var(--space-xl);
+  column-gap: var(--bland-grid-gutter);
+}
+.docs-grid-page .docs-section > .docs-note {
+  --span-md: 5;
+  --span-xl: 6;
+}
+.docs-grid-switch {
+  grid-row: 2; /* right under the page header */
+}
 .docs-grid-frames {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
+  row-gap: var(--space-xl);
+}
+.docs-grid-overlay {
+  position: absolute;
+  inset: 0;
+  grid-column: 1 / -1; /* the columns' area, so the overlay lines up with them */
+  display: grid;
+  grid-template-columns: repeat(var(--bland-grid-columns), minmax(0, 1fr));
+  column-gap: var(--bland-grid-gutter);
+  pointer-events: none;
+  z-index: 1;
+}
+.docs-grid-overlay[hidden] {
+  display: none;
+}
+.docs-grid-overlay > span {
+  background: var(--surface-danger-light);
+  opacity: 0.5;
+}
+.docs-grid-overlay > span:nth-child(n + 5) {
+  display: none;
+}
+@media (min-width: 768px) {
+  .docs-grid-overlay > span:nth-child(-n + 6) {
+    display: block;
+  }
+}
+@media (min-width: 1280px) {
+  .docs-grid-overlay > span:nth-child(n) {
+    display: block;
+  }
 }
 .docs-grid-frame {
   margin: 0;

@@ -83,8 +83,8 @@ textarea {
  * space-sm (8) that fits inside the minimum margins, and the leftover is split between the two margins
  * (justify-content: center). Mobile 4 columns, space-sm gutters, at least space-lg (margins land between
  * 16 and 32); tablet (breakpoint/md) 6, space-lg, at least space-2xl; desktop (breakpoint/xl) 8, space-lg,
- * at least space-6xl, content no wider than Layout/max-width (eight 128 columns). These reproduce the
- * Figma Tablet sm/md/lg and Desktop/sm frames exactly.
+ * at least space-6xl, content no wider than Layout/max-width-sm (eight 128 columns), -md from breakpoint/2xl
+ * (144) and -lg from breakpoint/3xl (160). These reproduce the Figma Tablet and Desktop sm/md/lg frames exactly.
  * A child spans --span columns (--span-md from tablet, --span-xl from desktop, each falling back to the
  * one before), the full row when none is set, and never more than the grid has.
  * --bland-grid-margin is the minimum margin: a landing page raises it (Layout/margin-desktop), a dashboard
@@ -148,10 +148,24 @@ textarea {
   .bland-grid {
     --bland-grid-columns: var(--layout-columns-desktop);
     --bland-grid-margin: var(--space-6xl);
-    max-width: calc(var(--layout-max-width) + var(--bland-grid-margin) * 2);
+    --bland-grid-max: var(--layout-max-width-sm);
+    max-width: calc(var(--bland-grid-max) + var(--bland-grid-margin) * 2);
   }
   .bland-grid > * {
     --bland-span: var(--span-xl, var(--span-md, var(--span, var(--bland-grid-columns))));
+  }
+}
+
+/* Desktop/md and Desktop/lg: the same eight columns, wider (144, then 160). */
+@media (min-width: 1536px) {
+  .bland-grid {
+    --bland-grid-max: var(--layout-max-width-md);
+  }
+}
+
+@media (min-width: 1920px) {
+  .bland-grid {
+    --bland-grid-max: var(--layout-max-width-lg);
   }
 }
 

@@ -1,7 +1,8 @@
 // Style pages, generated from tokens/tokens.json. Samples use the CSS variables themselves,
 // so they follow the theme switch and always show what the generated CSS really holds.
-import { useEffect, useRef, useState, type CSSProperties, type ReactElement } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactElement, type ReactNode } from 'react';
 import { Button } from '../../src/components/button/Button';
+import { Toggle } from '../../src/components/toggle/Toggle';
 import { CodeSnippet } from '../../src/components/code-snippet/CodeSnippet';
 import { Icon } from '../../src/components/icon/Icon';
 import * as BlandIcons from '../../src/icons';
@@ -16,7 +17,7 @@ const px = (t: Token) => parseFloat(t.light);
 export function StylePage({ id }: { id: StylePageId }) {
   const title = stylePages.find((p) => p.id === id)!.title;
   const Page = pages[id];
-  return (
+  const content = (
     <>
       <PageHeader title={title} href={`#/styles/${id}`}>
         {leads[id]}
@@ -27,6 +28,8 @@ export function StylePage({ id }: { id: StylePageId }) {
       </p>
     </>
   );
+  // The Grid page is laid out on the grid it documents (inset: the docs column has its own padding).
+  return id === 'grid' ? <GridLayout>{content}</GridLayout> : content;
 }
 
 const pages: Record<StylePageId, () => ReactElement> = {
@@ -172,18 +175,23 @@ function MotionPage() {
 // count, gutter and minimum margin set inline (media queries follow the window, not the frame), so it
 // shows the column width and margins the rule gives at that width.
 const GRID_LAYOUTS = {
-  Mobile: { columns: '--layout-columns-mobile', gutter: '--space-sm', margin: '--space-lg', capped: false },
-  Tablet: { columns: '--layout-columns-tablet', gutter: '--space-lg', margin: '--space-2xl', capped: false },
-  Desktop: { columns: '--layout-columns-desktop', gutter: '--space-lg', margin: '--space-6xl', capped: true },
+  'Mobile/sm': { columns: '--layout-columns-mobile', gutter: '--space-sm', margin: '--space-lg', cap: undefined },
+  'Mobile/lg': { columns: '--layout-columns-mobile', gutter: '--space-sm', margin: '--space-lg', cap: undefined },
+  'Tablet/sm': { columns: '--layout-columns-tablet', gutter: '--space-lg', margin: '--space-2xl', cap: undefined },
+  'Tablet/lg': { columns: '--layout-columns-tablet', gutter: '--space-lg', margin: '--space-2xl', cap: undefined },
+  'Desktop/sm': { columns: '--layout-columns-desktop', gutter: '--space-lg', margin: '--space-6xl', cap: '--layout-max-width-sm' },
+  'Desktop/md': { columns: '--layout-columns-desktop', gutter: '--space-lg', margin: '--space-6xl', cap: '--layout-max-width-md' },
+  'Desktop/lg': { columns: '--layout-columns-desktop', gutter: '--space-lg', margin: '--space-6xl', cap: '--layout-max-width-lg' },
 } as const;
 const GRID_FRAMES = [
-  { layout: 'Mobile', width: 375 },
-  { layout: 'Mobile', width: 412 },
-  { layout: 'Tablet', width: 768 },
-  { layout: 'Tablet', width: 1024 },
-  { layout: 'Desktop', width: 1280 },
-  { layout: 'Desktop', width: 1440 },
-  { layout: 'Desktop', width: 1920 },
+  { layout: 'Mobile/sm', width: 375 },
+  { layout: 'Mobile/lg', width: 412 },
+  { layout: 'Tablet/sm', width: 768 },
+  { layout: 'Tablet/lg', width: 1024 },
+  { layout: 'Desktop/sm', width: 1280 },
+  { layout: 'Desktop/sm', width: 1440 },
+  { layout: 'Desktop/md', width: 1536 },
+  { layout: 'Desktop/lg', width: 1920 },
 ] as const;
 
 const tokenPx = (css: string) => parseFloat(tokens.find((t) => t.css === css)?.light ?? '0');
@@ -194,7 +202,7 @@ function gridAt(layout: (typeof GRID_LAYOUTS)[keyof typeof GRID_LAYOUTS], width:
   const gutter = tokenPx(layout.gutter);
   const step = tokenPx('--space-sm');
   let inner = width - 2 * tokenPx(layout.margin);
-  if (layout.capped) inner = Math.min(inner, tokenPx('--layout-max-width'));
+  if (layout.cap) inner = Math.min(inner, tokenPx(layout.cap));
   const column = Math.floor((inner - (n - 1) * gutter) / (n * step)) * step;
   return { n, column, gutter, margin: (width - n * column - (n - 1) * gutter) / 2 };
 }
@@ -262,10 +270,10 @@ function GridFrame({ frame }: { frame: (typeof GRID_FRAMES)[number] }) {
     '--bland-grid-columns': `var(${layout.columns})`,
     '--bland-grid-gutter': `var(${layout.gutter})`,
     '--bland-grid-margin': `var(${layout.margin})`,
-    maxWidth: layout.capped ? `calc(var(--layout-max-width) + var(${layout.margin}) * 2)` : 'none',
+    maxWidth: layout.cap ? `calc(var(${layout.cap}) + var(${layout.margin}) * 2)` : 'none',
   } as CSSProperties;
   return (
-    <figure className="docs-grid-frame" data-width={frame.width}>
+    <figure className="docs-grid-frame" data-width={frame.width} style={{ '--span-md': 3, '--span-xl': 4 } as CSSProperties}>
       <div ref={ref} className="docs-grid-fit">
         <div className="docs-grid-canvas" style={{ width: frame.width, zoom }}>
           <div className="bland-grid docs-grid-columns" style={style}>
@@ -285,6 +293,37 @@ function GridFrame({ frame }: { frame: (typeof GRID_FRAMES)[number] }) {
   );
 }
 
+/**
+ * The Grid page's own layout: an inset .bland-grid with a switch (and Shift+G, as in Figma) that lays
+ * the columns over the page.
+ */
+function GridLayout({ children }: { children: ReactNode }) {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const typing = e.target instanceof HTMLElement && e.target.closest('input, textarea, [contenteditable="true"]');
+      if (e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey && e.key.toLowerCase() === 'g' && !typing) setShow((v) => !v);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+  return (
+    <div className="bland-grid docs-grid-page" data-inset="">
+      {children}
+      <div className="docs-grid-switch">
+        <Toggle checked={show} onCheckedChange={setShow} aria-keyshortcuts="Shift+G">
+          Show this page’s columns (Shift+G)
+        </Toggle>
+      </div>
+      <div className="docs-grid-overlay" aria-hidden="true" hidden={!show}>
+        {Array.from({ length: 8 }, (_, i) => (
+          <span key={i} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function GridPage() {
   const layout = tokens.filter((t) => t.name.startsWith('Layout/'));
   const cells = [
@@ -297,22 +336,24 @@ function GridPage() {
   return (
     <>
       <Section
+        className="bland-grid"
         title="At each breakpoint"
         note={
           <>
             Columns stay on the 8 grid and gutters are spacing tokens; the margins are whatever is left. Each layout has a column count, a gutter and a minimum margin (mobile{' '}
             <code>--space-lg</code>, tablet <code>--space-2xl</code>, desktop <code>--space-6xl</code>), and the columns take the widest multiple of 8 that fits inside it. Desktop columns stop at
-            128 (<code>--layout-max-width</code>), so wider screens get wider margins. The tablet and desktop frames match the Figma grid styles exactly.
+            128 (<code>--layout-max-width-sm</code>), 144 from 1536 (<code>-md</code>) and 160 from 1920 (<code>-lg</code>); past that the margins grow. Every frame matches its Figma grid style.
           </>
         }
       >
-        <div className="docs-grid-frames">
+        <div className="docs-grid-frames bland-grid">
           {GRID_FRAMES.map((frame) => (
             <GridFrame key={frame.width} frame={frame} />
           ))}
         </div>
       </Section>
       <Section
+        className="bland-grid"
         title="Live"
         note={
           <>
@@ -332,6 +373,7 @@ function GridPage() {
         </div>
       </Section>
       <Section
+        className="bland-grid"
         title="Usage"
         note={
           <>
@@ -352,7 +394,7 @@ function GridPage() {
           highlight={highlight}
         />
       </Section>
-      <Section title="Tokens" note="Figma binds the column counts of its seven grid styles (Mobile, Tablet sm/md/lg, Desktop/sm) to these. Column widths are not tokens: they follow from the screen width.">
+      <Section className="bland-grid" title="Tokens" note="Figma binds the column counts of its seven grid styles (Mobile, Tablet sm/md/lg, Desktop/sm) to these. Column widths are not tokens: they follow from the screen width.">
         <TokenTable items={layout} />
       </Section>
     </>

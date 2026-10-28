@@ -124,3 +124,7 @@ Two Motion variables added in Figma for the Sidebar's hover intent, through the 
 ## Sync of 2026-10-28 (page grid)
 
 Four Spacing variables added in Figma for the page grid (`docs/grid.md`): `Layout/columns-mobile` 4, `Layout/columns-tablet` 6, `Layout/columns-desktop` 8 and `Layout/max-width` 1136. Synced through the drift check (4 added) and `--apply`; checksum 635 variables, `e33ab92a`, equal in Figma and the repo. The column counts are the first unitless FLOATs: the build emits `Layout/columns-*` as plain numbers (`--layout-columns-mobile: 4`). 583 tokens emitted.
+
+## Sync of 2026-10-28 (Desktop md and lg grids)
+
+`breakpoint/3xl` 1920 and `Layout/max-width-md` 1264 / `-lg` 1392 added; `Layout/max-width` renamed `Layout/max-width-sm` (so `--layout-max-width` became `--layout-max-width-sm`; nothing outside the grid used it); `breakpoint/2xl`'s description now names the grid. Through the drift check (3 added, 2 changed) and `--apply`; checksum 638 variables, `4a186ff6`, equal in Figma and the repo. 586 tokens emitted.

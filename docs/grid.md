@@ -1,6 +1,6 @@
 # Page grid
 
-`.bland-grid` is Bland's page grid in code: the columns, gutters and side margins of the Figma grid styles, switching at the breakpoints, mobile first. It ships in `bland/base.css`. It is **optional**: components fill whatever holds them, so a page can use the grid, plain flex, or both. The docs site's Grid page shows it at each breakpoint and live.
+`.bland-grid` is Bland's page grid in code: the columns, gutters and side margins of the Figma grid styles, switching at the breakpoints, mobile first. It ships in `bland/base.css`. It is **optional**: components fill whatever holds them, so a page can use the grid, plain flex, or both. The docs site's Grid page shows it at each breakpoint and live, and is itself laid out on an inset `.bland-grid`: Shift+G (as in Figma) or its switch lays the columns over the page.
 
 ## What it does
 
@@ -12,7 +12,9 @@ Each layout sets a column count, a gutter and a **minimum margin**. The columns 
 | --- | --- | --- | --- | --- | --- |
 | Mobile | 0 | `--layout-columns-mobile` (4) | `--space-sm` (8) | `--space-lg` (16) | none |
 | Tablet | `breakpoint/md` 768 | `--layout-columns-tablet` (6) | `--space-lg` (16) | `--space-2xl` (32) | none |
-| Desktop | `breakpoint/xl` 1280 | `--layout-columns-desktop` (8) | `--space-lg` (16) | `--space-6xl` (64) | 128: content at most `--layout-max-width` (1136) |
+| Desktop sm | `breakpoint/xl` 1280 | `--layout-columns-desktop` (8) | `--space-lg` (16) | `--space-6xl` (64) | 128: content at most `--layout-max-width-sm` (1136) |
+| Desktop md | `breakpoint/2xl` 1536 | 8 | 16 | 64 | 144: `--layout-max-width-md` (1264) |
+| Desktop lg | `breakpoint/3xl` 1920 | 8 | 16 | 64 | 160: `--layout-max-width-lg` (1392) |
 
 What that gives, and the Figma frame it matches:
 
@@ -25,8 +27,9 @@ What that gives, and the Figma frame it matches:
 | 820 | 112 | 34 | Tablet/sm draws 104 (margins 58): a style covers a range of screens, code works each width out |
 | 912 | 128 | 32 | Tablet/md, exact |
 | 1024 | 144 | 40 | Tablet/lg, exact |
-| 1280 / 1440 / 1536 | 128 | 72 / 152 / 200 | Desktop/sm, exact |
-| 1920 / 2560 | 128 | 392 / 712 | Desktop/sm, exact |
+| 1280 / 1440 | 128 | 72 / 152 | Desktop/sm, exact |
+| 1536 | 144 | 136 | Desktop/md, exact |
+| 1920 / 2560 | 160 | 264 / 584 | Desktop/lg, exact |
 
 The four mobile margins land between 16 and 32 because four columns can each round down by at most 7. The minimum margins are Bland's choice (Claude 2026-10-28, from Godwin's ranges); they make the Figma tablet and desktop frames come out exactly.
 
@@ -61,8 +64,11 @@ All in Figma's `Spacing` collection, `Layout/` group, emitted to `tokens.css`:
 | --- | --- | --- |
 | `--layout-columns-mobile` | 4 | bound to the count of `Mobile/sm`, `md`, `lg` |
 | `--layout-columns-tablet` | 6 | bound to the count of `Tablet/sm`, `md`, `lg` |
-| `--layout-columns-desktop` | 8 | bound to the count of `Desktop/sm` |
-| `--layout-max-width` | 1136px | eight 128 columns and seven 16 gutters: a 1440 frame minus `Layout/margin-desktop` each side |
+| `--layout-columns-desktop` | 8 | bound to the count of `Desktop/sm`, `md`, `lg` |
+| `--layout-max-width-sm` | 1136px | eight 128 columns and seven 16 gutters (Desktop/sm); renamed from `Layout/max-width` 2026-10-28 |
+| `--layout-max-width-md` | 1264px | eight 144 columns (Desktop/md), from `breakpoint/2xl` 1536 |
+| `--layout-max-width-lg` | 1392px | eight 160 columns (Desktop/lg), from `breakpoint/3xl` 1920 |
+| `--breakpoint-3xl` | 1920px | added 2026-10-28 for Desktop/lg; media queries may use 1920 |
 | `--layout-margin-mobile` | 24px | not used by the grid (margins are derived); Modal's distance from the screen edge |
 | `--layout-margin-desktop` | 152px | not bound to a style; what a 1440 frame gets, and a landing page's minimum margin |
 
@@ -70,7 +76,7 @@ Column counts are plain numbers in CSS (`--layout-columns-mobile: 4`), the one k
 
 ## Figma grid styles (tidied 2026-10-28)
 
-Seven styles, all centred columns on the 8 grid, applied to every Screen templates variant (Spacing page) and to the frames on the Grid system page:
+Nine styles (Desktop md and lg added back 2026-10-28 as wider eight-column grids, Godwin), all centred columns on the 8 grid, applied to every Screen templates variant (Spacing page) and to the frames on the Grid system page:
 
 | Style | Screens | Columns | Gutter |
 | --- | --- | --- | --- |
@@ -80,11 +86,13 @@ Seven styles, all centred columns on the 8 grid, applied to every Screen templat
 | Tablet/sm | 768, 820 | 6 x 104 | space-lg |
 | Tablet/md | 912 | 6 x 128 | space-lg |
 | Tablet/lg | 1024 | 6 x 144 | space-lg |
-| Desktop/sm | 1280, 1440, 1536, 1920, 2560 | 8 x 128 | space-lg |
+| Desktop/sm | 1280, 1440 | 8 x 128 | space-lg |
+| Desktop/md | 1536 | 8 x 144 | space-lg |
+| Desktop/lg | 1920, 2560 | 8 x 160 | space-lg |
 
 Counts are bound to `Layout/columns-*`, gutters to the space tokens. Column widths stay raw on purpose: they follow from the screen width by the rule above, not from a token. Each description names its screens and margins.
 
-Removed in Figma (Godwin: remove what is not in line): Desktop/md (10 x 136) and Desktop/lg (14 x 128), since code keeps 8 columns of 128 on every desktop; the eight Dashboard styles and their eight demo frames (a dashboard is `.bland-grid` with a lower `--bland-grid-margin` or `data-inset`). The Mobile styles used to stretch their columns with a fixed 24 margin bound to Layout/margin-mobile; they are now centred fixed columns like the rest, so Layout/margin-mobile is bound to no grid (Modal still uses it).
+Removed in Figma (Godwin: remove what is not in line): the old Desktop/md (10 x 136) and Desktop/lg (14 x 128); the eight Dashboard styles and their eight demo frames (a dashboard is `.bland-grid` with a lower `--bland-grid-margin` or `data-inset`). The Mobile styles used to stretch their columns with a fixed 24 margin bound to Layout/margin-mobile; they are now centred fixed columns like the rest, so Layout/margin-mobile is bound to no grid (Modal still uses it).
 
 ## Figma audit (2026-10-27)
 

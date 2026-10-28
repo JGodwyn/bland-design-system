@@ -1765,3 +1765,10 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Godwin: edit the color, Fix contrast, visit another page, come back: the warning is back.
 - Cause: the fixed scale and tint lived only in component state; on return the page rebuilt the scale from the color alone (and the color only from an applied brand).
 - Fix: a draft {color, tint, fixed} saved to sessionStorage and read on mount; falls back to the applied palette. Docs spec leaves and returns after the fix; it fails without the change.
+
+## Desktop md/lg grids and the Grid page on its grid (2026-10-28)
+
+- Asked Godwin for md/lg widths and switch points (AskUserQuestion): md 144 from 1536, lg 160 from 1920.
+- Figma: breakpoint/3xl, Layout/max-width-md/-lg, renamed max-width to -sm, Desktop/md and lg styles, attached to the 1536/1920/2560 templates and Grid page frames. `moveLocalGridStyleAfter` refused across folders ("Desktop/" vs "Tablet/"); styles group by name prefix anyway, so no reorder needed.
+- Sync: fresh check.js for localHash, records for the 5 changed variables, `--apply`, checksum 638 4a186ff6 both sides. Lint picked up 1920 from tokens.json.
+- Grid page: first pass the section grids inherited `.docs-section`'s 24px gap (columns 872 wide vs 816); set column-gap to the grid gutter. Overlay columns were 0 wide (absolutely positioned without horizontal insets) and columns 7 and 8 stayed hidden (the xl reveal had lower specificity than the nth-child hide). Checked at 1440, 800, 375; spec covers 1440 to 2560 and the overlay.
