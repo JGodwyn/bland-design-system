@@ -9,7 +9,7 @@
 //
 // Both also make the chart palette (--chart-1 … --chart-8: the brand, the extras, then generated hues) from the final
 // colors, check it (3:1 on the page, neighbours apart under normal and color-blind vision) and write it with the rest.
-// `--chart 4=#hex` (repeatable) picks a series' color yourself; the others are generated around it. On check, a file
+// `--chart 4=#hex` (repeatable) picks a series' color yourself; the other series stay as they are. On check, a file
 // that carries its own chart block is checked as it is, unless --chart or --fix asks for a new one (its picked
 // colors, marked /* picked */, stay).
 //
