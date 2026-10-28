@@ -2,12 +2,13 @@
 // so they follow the theme switch and always show what the generated CSS really holds.
 import { useEffect, useRef, useState, type CSSProperties, type ReactElement, type ReactNode } from 'react';
 import { Button } from '../../src/components/button/Button';
-import { Toggle } from '../../src/components/toggle/Toggle';
 import { CodeSnippet } from '../../src/components/code-snippet/CodeSnippet';
 import { Icon } from '../../src/components/icon/Icon';
 import * as BlandIcons from '../../src/icons';
 import { groupBy, inCollection, tokens, stylePages, tokensExportedAt, type StylePageId, type Token } from './data';
 import { highlight } from './highlight';
+import { ArrowFatUpIcon } from './icons';
+import { isApple } from './Search';
 import { leads } from './leads';
 import { PageHeader, Section, TokenName, TokenTable } from './parts';
 
@@ -310,10 +311,23 @@ function GridLayout({ children }: { children: ReactNode }) {
   return (
     <div className="bland-grid docs-grid-page" data-inset="">
       {children}
+      {/* Drawn like the toolbar's Search Bland button: a label and the shortcut's keys. */}
       <div className="docs-grid-switch">
-        <Toggle checked={show} onCheckedChange={setShow} aria-keyshortcuts="Shift+G">
-          Show this page’s columns (Shift+G)
-        </Toggle>
+        <button type="button" className="docs-search-trigger bland-focus-ring bland-smooth" aria-pressed={show} aria-keyshortcuts="Shift+G" onClick={() => setShow((v) => !v)}>
+          <span className="docs-search-label bland-smooth">Show columns</span>
+          <span className="docs-keys" aria-hidden="true">
+            <kbd className="docs-key bland-smooth">
+              {isApple ? (
+                <Icon size="md">
+                  <ArrowFatUpIcon />
+                </Icon>
+              ) : (
+                'Shift'
+              )}
+            </kbd>
+            <kbd className="docs-key bland-smooth">G</kbd>
+          </span>
+        </button>
       </div>
       <div className="docs-grid-overlay" aria-hidden="true" hidden={!show}>
         {Array.from({ length: 8 }, (_, i) => (

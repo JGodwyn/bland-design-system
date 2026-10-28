@@ -179,6 +179,13 @@ export const ListMagnifyingGlassIcon = (p: P) => (
   </svg>
 );
 
+/** Figma: ArrowFatUp (6080:105755). Shift in the Grid page's shortcut. */
+export const ArrowFatUpIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M3 11.25L12 2.25L21 11.25H16.5V19.5C16.5 19.6989 16.421 19.8897 16.2803 20.0303C16.1397 20.171 15.9489 20.25 15.75 20.25H8.25C8.05109 20.25 7.86032 20.171 7.71967 20.0303C7.57902 19.8897 7.5 19.6989 7.5 19.5V11.25H3Z" />
+  </svg>
+);
+
 /** Figma: Command (6080:105638). The search shortcut. */
 export const CommandIcon = (p: P) => (
   <svg {...stroked} {...p}>
