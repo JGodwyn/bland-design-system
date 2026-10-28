@@ -256,3 +256,11 @@ test('fixing one chart color: the nearest color that clears its problems, said o
     assert.deepEqual(chartAdvice(checkChart(fixed), fixed).filter((a) => a.series === n && a.level === 'fail'), [], `series ${n} after the fix`);
   }
 });
+
+test('a clash between two picks shows on the one just changed', () => {
+  const chart = generateChart(blandScale, [], blandNeutrals, { 4: '#854d38', 5: '#7a5040' });
+  const on = (edited?: number) => chartAdvice(checkChart(chart), chart, edited).filter((a) => a.text.startsWith('Series 4 and series 5')).map((a) => a.series);
+  assert.deepEqual(on(5), [5]);
+  assert.deepEqual(on(4), [4]);
+  assert.deepEqual(on(), [4], 'without an edit, the earlier pick (both are yours)');
+});

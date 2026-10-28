@@ -389,9 +389,21 @@ test('the brand page shows the chart palette in both themes, takes your own pick
   await expect(item(3).getByRole('button', { name: /^Series 3 #/ })).not.toHaveAccessibleName('Series 3 #F4F000, change it');
   await item(3).getByRole('button', { name: 'Series 3: back to Bland’s pick' }).click();
   await expect(item(3)).toContainText('Bland’s pick');
-  await item(4).getByRole('button', { name: /^Series 4 #/ }).click();
-  await page.getByRole('textbox', { name: 'HEX color' }).fill('#2b2bd0');
-  await page.keyboard.press('Escape');
+  // A clash between two of your colors shows on the one you just changed.
+  const pick = async (n: number, hex: string) => {
+    await item(n).getByRole('button', { name: new RegExp(`^Series ${n} #`) }).click();
+    await page.getByRole('textbox', { name: 'HEX color' }).fill(hex);
+    await page.keyboard.press('Escape');
+  };
+  await pick(4, '#854d38');
+  await pick(5, '#7a5040');
+  // Visible only: a folded warning keeps its words while it leaves.
+  const clash = (n: number) => item(n).locator('.docs-brand-chart-check:visible', { hasText: 'Series 4 and series 5' });
+  await expect(clash(5)).toHaveCount(1);
+  await expect(clash(4)).toHaveCount(0);
+  await pick(4, '#7d4f3c');
+  await expect(clash(4)).toHaveCount(1);
+  await expect(clash(5)).toHaveCount(0);
   await expect(reset).toBeEnabled();
   await reset.click();
   await expect(reset).toBeDisabled();

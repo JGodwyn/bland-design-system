@@ -865,21 +865,25 @@ function themedCss(comment: string, lines: (mode: Mode) => string[]): string {
 export type ChartAdvice = {
   level: 'fail' | 'warn';
   text: string;
-  /** The series this is about, from 1: the one to change (a pick first, then the later one), else the later one. */
+  /** The series this is about, from 1: the one to change (the one just edited, a pick, then the later one), else the later one. */
   series: number;
   /** True when that series can change here (Bland's pick or the project's); false for the brand and extras. */
   editable: boolean;
 };
 
-export function chartAdvice(findings: ChartFinding[], series: ChartSeries[]): ChartAdvice[] {
+/**
+ * `edited` is the series just changed (the page passes the last one you picked or fixed): a problem it is part of
+ * shows on it, whichever side it is on, so the warning appears where you are working.
+ */
+export function chartAdvice(findings: ChartFinding[], series: ChartSeries[], edited?: number): ChartAdvice[] {
   const name = (n: number) => {
     const from = series[n - 1]?.from;
     return from === 'brand' ? `Series ${n} (your brand color)` : from && from !== 'generated' && from !== 'pinned' ? `Series ${n} (${from})` : `Series ${n}`;
   };
-  // Only a generated or picked series can change here; prefer the one the project picked, then the later one.
+  // Only a generated or picked series can change here: the one just edited, else a pick, else the later one.
   const target = (ns: number[]) => {
     const own = ns.filter((n) => ['generated', 'pinned'].includes(series[n - 1]!.from));
-    return own.find((n) => series[n - 1]!.from === 'pinned') ?? own.at(-1);
+    return own.find((n) => n === edited) ?? own.find((n) => series[n - 1]!.from === 'pinned') ?? own.at(-1);
   };
   const cap = (x: string) => x[0]!.toUpperCase() + x.slice(1);
   const whereOf = (fs: ChartFinding[]) => {

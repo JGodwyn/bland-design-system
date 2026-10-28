@@ -82,6 +82,8 @@ export function BrandPage() {
   const [dragging, setDragging] = useState(false);
   const [extras, setExtras] = useState<ExtraState[]>(savedExtras);
   const [pins, setPins] = useState<ChartPins>(savedPins);
+  // The chart color you last picked or fixed: a clash it is in shows on it.
+  const [edited, setEdited] = useState<number>();
   const [tab, setTab] = useState('brand');
   useEffect(() => saveExtras(extras), [extras]);
   useEffect(() => savePins(pins), [pins]);
@@ -244,7 +246,16 @@ export function BrandPage() {
                       Use Bland’s picks
                     </Button>
                   </div>
-                  <ChartColors chart={chart} neutrals={neutrals} onPick={(n, hex) => setPins((p) => ({ ...p, [n]: normalHex(hex) }))} onUnpick={(n) => setPins(({ [n]: _, ...p }) => p)} />
+                  <ChartColors
+                    chart={chart}
+                    neutrals={neutrals}
+                    edited={edited}
+                    onPick={(n, hex) => {
+                      setPins((p) => ({ ...p, [n]: normalHex(hex) }));
+                      setEdited(n);
+                    }}
+                    onUnpick={(n) => setPins(({ [n]: _, ...p }) => p)}
+                  />
                 </div>
               ),
             },
@@ -623,9 +634,9 @@ function usePageTheme(): 'light' | 'dark' {
 }
 
 /** The chart colors, one block each, laid out as an extra color's: its token, its card, its own check inside. */
-function ChartColors({ chart, neutrals, onPick, onUnpick }: { chart: ChartSeries[]; neutrals: Scale; onPick: (n: number, hex: string) => void; onUnpick: (n: number) => void }) {
+function ChartColors({ chart, neutrals, edited, onPick, onUnpick }: { chart: ChartSeries[]; neutrals: Scale; edited?: number; onPick: (n: number, hex: string) => void; onUnpick: (n: number) => void }) {
   const theme = usePageTheme();
-  const advice = useMemo(() => chartAdvice(checkChart(chart, neutrals), chart), [chart, neutrals]);
+  const advice = useMemo(() => chartAdvice(checkChart(chart, neutrals), chart, edited), [chart, neutrals, edited]);
   return (
     <ol className="docs-brand-extras-list docs-brand-chart-list" aria-label="Chart colors">
       {chart.map((s, i) => (
