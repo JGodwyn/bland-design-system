@@ -1703,7 +1703,7 @@ code,
   grid-row: 2; /* right under the page header */
   display: flex; /* the button hugs its label and keys */
 }
-.docs-grid-switch [aria-pressed="true"] .docs-search-label {
+.docs-grid-switch [data-on] .docs-search-label {
   background: var(--surface-brand-light);
   color: var(--text-brand);
 }

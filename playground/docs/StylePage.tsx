@@ -313,8 +313,9 @@ function GridLayout({ children }: { children: ReactNode }) {
       {children}
       {/* Drawn like the toolbar's Search Bland button: a label and the shortcut's keys. */}
       <div className="docs-grid-switch">
-        <button type="button" className="docs-search-trigger bland-focus-ring bland-smooth" aria-pressed={show} aria-keyshortcuts="Shift+G" onClick={() => setShow((v) => !v)}>
-          <span className="docs-search-label bland-smooth">Show columns</span>
+        <button type="button" className="docs-search-trigger bland-focus-ring bland-smooth" data-on={show || undefined} aria-keyshortcuts="Shift+G" onClick={() => setShow((v) => !v)}>
+          {/* The label says what a press does, so no aria-pressed (a pressed state and a changing name contradict). */}
+          <span className="docs-search-label bland-smooth">{show ? 'Hide columns' : 'Show columns'}</span>
           <span className="docs-keys" aria-hidden="true">
             <kbd className="docs-key bland-smooth">
               {isApple ? (

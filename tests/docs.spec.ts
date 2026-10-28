@@ -515,9 +515,9 @@ test('the Grid page sits on its own grid, and Shift+G or the switch shows its co
   // The page header, a section and a note start on the first column.
   for (const selector of ['.docs-page-header', '.docs-grid-page > .docs-section', '.docs-grid-page .docs-section > .docs-note'])
     expect(Math.round((await page.locator(selector).first().boundingBox())!.x)).toBe(columns[0]);
-  const button = page.getByRole('button', { name: 'Show columns' });
-  await expect(button).toHaveAttribute('aria-pressed', 'true');
-  await button.click();
-  await expect(button).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.getByRole('button', { name: 'Show columns' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Hide columns' }).click();
   await expect(overlay).toBeHidden();
+  await page.getByRole('button', { name: 'Show columns' }).click();
+  await expect(overlay).toBeVisible();
 });
