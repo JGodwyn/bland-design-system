@@ -735,13 +735,20 @@ export function pinnedSeries(hex: string, neutrals: Scale = blandNeutrals): Char
 
 /**
  * The chart palette for a brand, its extra colors (up to three), neutrals and any pinned series. Series 1 is the
- * brand and the extras follow in order (only their steps move, for contrast); pinned series keep their place and
- * color; the rest are generated around them, ordered and, where two neighbours still come too close, nudged in
- * lightness (a few rounds, each keeping a change only if it helps).
+ * brand and the extras follow in order (only their steps move, for contrast); the rest are Bland's picks, generated
+ * from those, ordered and, where two neighbours still come too close, nudged in lightness (a few rounds, each keeping
+ * a change only if it helps). A pinned series replaces Bland's pick in its slot and touches nothing else.
  */
 export function generateChart(brand: Scale, extras: Extra[] = [], neutrals: Scale = blandNeutrals, pins: ChartPins = {}): ChartSeries[] {
   const fixed = [scaleSeries('brand', brand, neutrals), ...extras.slice(0, MAX_EXTRAS).map((x) => scaleSeries(x.name, x.scale, neutrals))];
-  const slots = Array.from({ length: CHART_COUNT }, (_, i) => fixed[i] ?? (pins[i + 1] ? pinnedSeries(pins[i + 1]!, neutrals) : undefined));
+  // Picks only take their own slot (Godwin 2026-10-28): Bland's picks are made from the brand and extras alone, so
+  // changing one color never moves another. A pick that clashes with a neighbour shows in the check instead.
+  return generateAround(brand, fixed, neutrals).map((s, i) => (i >= fixed.length && pins[i + 1] ? pinnedSeries(pins[i + 1]!, neutrals) : s));
+}
+
+/** Bland's picks for the open slots after the brand and extras: hues in the gaps, ordered and nudged apart. */
+function generateAround(brand: Scale, fixed: ChartSeries[], neutrals: Scale): ChartSeries[] {
+  const slots = Array.from({ length: CHART_COUNT }, (_, i) => fixed[i]);
   const hues = chartHues(
     slots.flatMap((s) => (s ? [toOklch(s.light).h] : [])),
     slots.filter((s) => !s).length,
@@ -913,7 +920,8 @@ export function chartAdvice(findings: ChartFinding[], series: ChartSeries[]): Ch
 }
 
 /**
- * The nearest color to series `n`'s (lightness moved up to 0.35, hue turned up to 30°, chroma kept) that clears
+ * The nearest color to series `n`'s (lightness moved up to 0.35, hue turned in 5° steps to 30° then 10° steps all the
+ * way round, chroma kept; nearest first) that clears
  * every problem it is in: 3:1 on both pages and apart from both neighbours, near misses too when it can, else the
  * misses only. Undefined when nothing nearby does. The fix becomes a pick for that series.
  */
@@ -935,7 +943,7 @@ export function fixChartColor(series: ChartSeries[], n: number, neutrals: Scale 
   };
   const candidates: { hex: string; d: number }[] = [];
   for (let dl = -0.35; dl <= 0.35 + 1e-9; dl += 0.01) {
-    for (let dh = -30; dh <= 30; dh += 5) {
+    for (const dh of [0, ...Array.from({ length: 36 }, (_, k) => (k < 6 ? (k + 1) * 5 : 30 + (k - 5) * 10)).flatMap((d) => [d, -d])].filter((d) => d <= 180)) {
       const hex = fromOklch({ l: Math.min(0.97, Math.max(0.15, base.l + dl)), c: base.c, h: (base.h + dh + 360) % 360 });
       candidates.push({ hex, d: deltaE(hex, series[i]!.light) });
     }

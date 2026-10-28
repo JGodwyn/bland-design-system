@@ -263,7 +263,8 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   await page.keyboard.press('Escape');
   await expect(picker).toBeHidden();
   await page.getByRole('button', { name: 'Fix contrast' }).click();
-  await expect(page.getByText('Contrast checks out')).toBeVisible();
+  await expect(result).toBeHidden(); // nothing misses: no banner at all, not a "checks out" one
+  await expect(page.getByText('Contrast checks out')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /^Brand color #FFCC00/ })).toBeVisible(); // the fix never changes the entered color
   await apply.click();
   await expect(page.getByRole('button', { name: 'Applied to site' })).toBeDisabled();
@@ -361,8 +362,8 @@ test('the brand page shows the chart palette in both themes, takes your own pick
   await expect(item(1)).toContainText(/--chart-1\s*Brand color\s*You can’t change this\s*#0062FF/, { useInnerText: true });
   await expect(item(1)).not.toContainText('Tap to change'); // the brand changes under Brand colors
   await expect(item(2)).toContainText('Tap to change');
-  // Nothing to report on Bland's own colors (as the brand's result): the check shows once there is something to say.
-  await expect(list.getByText('This color checks out').filter({ visible: true })).toHaveCount(0);
+  // Only a problem shows: no "checks out" banner on any color.
+  await expect(list.locator('.docs-brand-chart-check:visible')).toHaveCount(0);
   const reset = page.getByRole('button', { name: 'Use Bland’s picks' });
   await expect(reset).toBeDisabled();
   // The swatch shows the color for the page's theme.
@@ -384,7 +385,7 @@ test('the brand page shows the chart palette in both themes, takes your own pick
   await expect(page.locator('#use-in-a-project pre')).toContainText('--chart-3: #f4f000; /* picked */');
   await page.getByRole('tab', { name: 'Chart colors' }).click();
   await item(3).getByRole('button', { name: 'Fix color' }).click();
-  await expect(item(3)).toContainText('This color checks out');
+  await expect(item(3).locator('.docs-brand-chart-check')).toBeHidden();
   await expect(item(3).getByRole('button', { name: /^Series 3 #/ })).not.toHaveAccessibleName('Series 3 #F4F000, change it');
   await item(3).getByRole('button', { name: 'Series 3: back to Bland’s pick' }).click();
   await expect(item(3)).toContainText('Bland’s pick');

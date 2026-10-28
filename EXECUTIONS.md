@@ -1731,3 +1731,9 @@ not wrapped; rail contents centred (logo and account icon were off).
 - ColorCard split: `PickSwatch` (swatch + picker) used by ColorCard and the chart tiles; `Swatch` takes `compact`.
 - Picker typing in the browser pane was flaky after scrolls (stale refs); tested picks there by seeding sessionStorage, and through the docs spec.
 - (later) Godwin's design pass: Light/Dark rows dropped (swatches follow the page theme through a `usePageTheme` hook on data-theme and the system scheme), a block per color like ExtraColor, per-color check with Fix color (`fixChartColor`: nearest of lightness ±0.35 and hue ±30° that clears its problems, near misses too if it can). `ChartAdvice` now carries the series it belongs to. Fixing a Bland's pick pins it, so the other picks are made again around it; the check reruns.
+
+## Chart picks decoupled, success banners dropped (2026-10-28)
+
+- Godwin: editing one chart color changed the others. Cause: `chartHues` took the picks as taken hues, so each pick reshaped the gaps and `arrange` reordered every generated series. Now `generateChart` builds Bland's picks from brand + extras only (`generateAround`) and overlays pins slot by slot. Test asserts every other series equals the unpinned palette.
+- Side effect: a yellow pick beside Bland's gold had no fix within ±30° hue; `fixChartColor` now searches hue all the way round (nearest first, ~2.5k candidates, well under 100 ms).
+- "Contrast checks out" and "This color checks out" removed; Contrast hides when nothing misses (brand and extras), the chart check when a color has no advice.

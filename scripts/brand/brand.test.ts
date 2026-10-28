@@ -210,14 +210,15 @@ test('the chart tokens go in the override file, and an extra can’t be called c
   assert.match(extraNameError('chart')!, /chart palette/);
 });
 
-test('a picked chart color keeps its place and value; the rest are generated around it', () => {
+test('a picked chart color keeps its place and value, and changes no other series', () => {
   const chart = generateChart(blandScale, [], blandNeutrals, { 4: '#2B2BD0', 1: '#ff0000' });
   assert.equal(chart[0]!.from, 'brand', 'series 1 is always the brand');
   assert.deepEqual([chart[3]!.from, chart[3]!.light], ['pinned', '#2b2bd0']);
   assert.ok(toOklch(chart[3]!.dark).l > toOklch(chart[3]!.light).l && contrast(chart[3]!.dark, bg('dark')) >= CHART_CONTRAST);
   assert.equal(chart.filter((s) => s.from === 'generated').length, 6);
-  // Generated hues avoid the picked one: none within 30° of its blue.
-  for (const s of chart.filter((x) => x.from === 'generated')) assert.ok(turn(toOklch(s.light).h, toOklch('#2b2bd0').h) > 30, s.light);
+  // A pick touches nothing else: every other series is as it was without it.
+  const plain = generateChart(blandScale);
+  chart.forEach((s, i) => i !== 3 && assert.deepEqual(s, plain[i], `series ${i + 1}`));
   assert.deepEqual(chartPins(chart), { 4: '#2b2bd0' });
 });
 
@@ -247,7 +248,7 @@ test('the chart check in plain words: who, where, and what to do', () => {
 test('fixing one chart color: the nearest color that clears its problems, said on that color', () => {
   const chart = generateChart(blandScale, [], blandNeutrals, { 4: '#1458e8', 5: '#0a50e0', 6: '#f4f000' });
   const advice = chartAdvice(checkChart(chart), chart);
-  assert.deepEqual(advice.map((a) => [a.series, a.editable]).sort(), [[4, true], [6, true]], JSON.stringify(advice));
+  assert.deepEqual([...new Set(advice.map((a) => `${a.series} ${a.editable}`))].sort(), ['4 true', '6 true'], JSON.stringify(advice));
   for (const n of [4, 6]) {
     const hex = fixChartColor(chart, n)!;
     assert.ok(hex, `series ${n} has a fix`);

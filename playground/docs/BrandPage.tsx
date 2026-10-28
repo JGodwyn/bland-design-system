@@ -166,7 +166,7 @@ export function BrandPage() {
                   >
                     <ColorCard label="Brand color" pickerLabel="Pick a brand color" color={input} onChange={edit} onDraggingChange={setDragging}>
                       {/* Bland's own palette has nothing to report (hidden, so it leaves with its exit); a project's palette shows its result. */}
-                      <Contrast misses={misses} keep={keep} hidden={dragging || (brandIsBland && misses.length === 0)} canFix={!same(fixedScale, scale)} onFix={() => setFixed(fixedScale)} />
+                      <Contrast misses={misses} keep={keep} hidden={dragging || misses.length === 0} canFix={!same(fixedScale, scale)} onFix={() => setFixed(fixedScale)} />
                     </ColorCard>
                     <ScaleRow label="Brand steps" scale={scale} />
                   </Section>
@@ -498,7 +498,7 @@ function ExtraColor({
         onDraggingChange={setDragging}
         tint={{ light: scale[lightRole.light], dark: scale[lightRole.dark] }}
       >
-        <Contrast misses={misses} keep={keep} hidden={dragging} total={EXTRA_PAIRS.length * 2} canFix={!same(fixed, scale)} onFix={() => onChange({ fixed })} />
+        <Contrast misses={misses} keep={keep} hidden={dragging || misses.length === 0} total={EXTRA_PAIRS.length * 2} canFix={!same(fixed, scale)} onFix={() => onChange({ fixed })} />
       </ColorCard>
       <ScaleRow label={`${label} steps`} scale={scale} />
       <RoleRow name={error ? 'name' : extra.name} scale={scale} />
@@ -671,9 +671,8 @@ function ChartColor({
   const [dragging, setDragging] = useState(false);
   const editable = series.from === 'generated' || series.from === 'pinned';
   const fixed = useMemo(() => (editable && advice.length ? fix() : undefined), [editable, advice, fix]);
-  // As the brand's result: nothing to say on a color Bland made (or the brand's and extras', checked in their tabs)
-  // while it checks out; a color you picked says so.
-  const check = <ChartColorCheck advice={advice} hidden={dragging || (advice.length === 0 && series.from !== 'pinned')} fixed={fixed} onFix={() => fixed && onPick(fixed)} />;
+  // Only a problem shows (Godwin 2026-10-28): no "checks out" banner on any color.
+  const check = <ChartColorCheck advice={advice} hidden={dragging || advice.length === 0} fixed={fixed} onFix={() => fixed && onPick(fixed)} />;
   return (
     <li className="docs-brand-extra">
       <div className="docs-brand-extra-head">
@@ -703,16 +702,12 @@ function ChartColor({
   );
 }
 
-/** One chart color's check in plain words, with Fix color when a nearby color clears it (named before you press). */
+/** One chart color's problems in plain words, with Fix color when a nearby color clears them (named before you press). Nothing when it checks out. */
 function ChartColorCheck({ advice, hidden, fixed, onFix }: { advice: ChartAdvice[]; hidden: boolean; fixed?: string; onFix: () => void }) {
   const fails = advice.some((a) => a.level === 'fail');
   return (
     <div className="docs-brand-chart-check" hidden={hidden}>
-      {advice.length === 0 ? (
-        <Banner status="success" colored>
-          This color checks out
-        </Banner>
-      ) : (
+      {advice.length > 0 && (
         <Banner
           status="warning"
           colored
@@ -819,11 +814,8 @@ function Contrast({ misses: current, keep, hidden, total = PAIRS.length * 2, can
     <div className="docs-brand-contrast docs-fold" hidden={hidden}>
       <div className="docs-fold-inner">
       <div key={result} className="docs-brand-contrast-result">
-        {misses.length === 0 ? (
-          <Banner status="success" colored>
-            Contrast checks out
-          </Banner>
-        ) : (
+        {/* Only a miss shows (Godwin 2026-10-28): no "checks out" banner; the result folds away once nothing misses. */}
+        {misses.length > 0 && (
           <Banner
             status="warning"
             colored
