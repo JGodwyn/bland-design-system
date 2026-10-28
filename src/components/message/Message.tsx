@@ -7,7 +7,7 @@ import { IconButton } from '../button/IconButton';
 import { Icon } from '../icon/Icon';
 import './message.css';
 
-/** Figma `Status`, shared by the four feedback sets. info uses the brand tokens. */
+/** Shared by the four feedback sets. info uses the brand tokens. */
 export type MessageStatus = 'info' | 'danger' | 'success' | 'warning';
 export type MessageOrientation = 'horizontal' | 'vertical';
 

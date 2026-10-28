@@ -155,7 +155,7 @@ function ExpandableTable({ size = 'sm' }: { size?: TableSize }) {
   );
 }
 
-function Group({ label, children }: { label: string; children: ReactNode }) {
+function Group({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
     <div className="pg-stack">
       <span className="pg-label">{label}</span>
@@ -167,7 +167,13 @@ function Group({ label, children }: { label: string; children: ReactNode }) {
 export default {
   title: 'Table',
   description:
-    'Rows and columns of data. Size sets the row and header height (table/sm, md, lg: 32, 40, 48). Header cells are body-lg-bold on one line and truncate; sortable headers swap the sort icon for the direction. Body cells hold a label between optional Leading and Trailing slots; checkbox and radio columns select rows (selected rows take the brand tint), expand and option columns hold ghost Icon Buttons. Width is table/width (640); use Fill container in layouts, and basic cells fill the row. In code it is a native table: th scope="col", sortable headers hold a button and set aria-sort, and a table wider than its container scrolls sideways with the edge fade and a visible scrollbar.',
+    'Rows and columns of data that people read, compare, sort and select.',
+  usage: [
+    'Name it with `aria-label` or `aria-labelledby`.',
+    'Set `selectionMode` to add a checkbox or radio column for picking rows.',
+    'Make a column sortable with `onSort` and `sort` on its header cell.',
+    'A table wider than its container scrolls sideways. Under long tables, use PaginationTable.',
+  ],
   components: ['Table', 'TableHead', 'TableBody', 'TableRow', 'TableHeaderCell', 'TableCell', 'TableExpandCell', 'TableOptionCell'],
   demo: {
     component: 'Table',
@@ -238,7 +244,7 @@ export default {
         </Table>
       </Group>
 
-      <Group label="Every row selected: select all is checked and the header takes the selected fill">
+      <Group label="Every row selected: select all is checked">
         <Table aria-label="All selected" selectionMode="multiple" defaultSelectedKeys={people.map((p) => p.key)}>
           <Head />
           <TableBody>
@@ -264,16 +270,16 @@ export default {
         </Table>
       </Group>
 
-      <Group label="Sortable headers: a button in the th, aria-sort on the sorted column; ArrowsDownUp until sorted">
+      <Group label={<>Sortable headers with <code>onSort</code> and <code>sort</code></>}>
         <SortableTable />
       </Group>
 
-      <Group label="Expand and option columns (ghost Icon Buttons; the option button opens a Menu); blank header above the expand column; a disabled row">
+      <Group label={<>TableExpandCell and TableOptionCell (its button opens a menu); a <code>disabled</code> row</>}>
         <ExpandableTable />
         <ExpandableTable size="lg" />
       </Group>
 
-      <Group label="Slots and states: icon and avatar leading, trailing text; a disabled cell">
+      <Group label={<><code>leading</code> with an icon or avatar, <code>trailing</code> text; a <code>disabled</code> cell</>}>
         <Table aria-label="Slots">
           <TableHead>
             <TableRow>
@@ -299,7 +305,7 @@ export default {
         </Table>
       </Group>
 
-      <Group label="Overflow: basic columns keep table/cell-width (128), so a narrow container scrolls sideways with the fade and a visible scrollbar; labels that do not fit end in an ellipsis">
+      <Group label="A table wider than its container scrolls sideways; labels that don't fit end in an ellipsis">
         <div style={{ maxWidth: 360 }} data-testid="narrow">
           <Table aria-label="Wide table">
             <TableHead>
@@ -324,7 +330,7 @@ export default {
         </div>
       </Group>
 
-      <Group label="Focused: the ring shows on keyboard focus (:focus-visible), inset on headers because cells touch; forced on here to show it">
+      <Group label="Keyboard focus: the ring shows when people tab to it (turned on here to show it)">
         <div className="pg-focus">
           <Table aria-label="Focused" selectionMode="multiple">
             <Head sortable />

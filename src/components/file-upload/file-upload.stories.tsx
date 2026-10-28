@@ -112,7 +112,13 @@ function Live() {
 export default {
   title: 'File Upload',
   description:
-    'A drop zone plus the list of added files. People click the zone or drag files onto it; the app uploads them and passes each one back as a row. Drop zone states: rest, hover, drag-over (files are being dragged over it), disabled; disabled hides the file list. Rows: uploading (progress bar; the close button cancels), uploaded (the close button removes the file), success, danger (the description says why; the close button removes the file). The filename stays on one line and truncates. Added files and finished uploads are announced. Fills its container; Figma\'s master width is file-upload/width.',
+    'A drop zone where people pick or drag files, and the list of the files they added. Your app does the upload and passes each file back as a row.',
+  usage: [
+    '`onFilesAdd` gets the picked or dropped files. Files that don\'t match `accept` go to `onFilesReject`.',
+    'Show each file in `files` with its `status`: `uploading` (with `progress`), `uploaded`, `success`, or `danger` with the reason in its `description`.',
+    '`onRemove` gets the file\'s id when people remove it or cancel its upload.',
+    'Say which file types and sizes work in `fileTypes`.',
+  ],
   components: ['FileUpload'],
   demo: {
     component: 'FileUpload',
@@ -150,33 +156,33 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Rest: title and file types (Figma's default)</span>
+        <span className="pg-label"><code>title</code> and <code>fileTypes</code></span>
         <div style={frame}>
           <FileUpload title="Upload file" fileTypes="SVG, PNG, JPG, or GIF" />
         </div>
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">description; no file types</span>
+        <span className="pg-label"><code>description</code>, no <code>fileTypes</code></span>
         <div style={frame}>
           <FileUpload title="Attachments" description="Add the files your reviewer needs" />
         </div>
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">No title: name it with aria-label</span>
+        <span className="pg-label">No <code>title</code>: name it with <code>aria-label</code></span>
         <div style={frame}>
           <FileUpload aria-label="Upload file" fileTypes="PDF up to 10 MB" />
         </div>
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Drag-over: files are being dragged over the zone</span>
+        <span className="pg-label">While files are dragged over the zone</span>
         <DragOver />
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">files: uploading, uploaded, success and danger</span>
+        <span className="pg-label"><code>files</code>: <code>uploading</code>, <code>uploaded</code>, <code>success</code>, <code>danger</code></span>
         <div style={frame}>
           <FileUpload title="Upload file" fileTypes="SVG, PNG, JPG, or GIF" files={rows} onRemove={() => {}} />
         </div>
@@ -190,19 +196,19 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">disabled: the file list is hidden (Figma)</span>
+        <span className="pg-label"><code>disabled</code> also hides the file list</span>
         <div style={frame}>
           <FileUpload title="Upload file" fileTypes="SVG, PNG, JPG, or GIF" files={rows} disabled />
         </div>
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Live: pick or drop images (accept image/png and .jpg)</span>
+        <span className="pg-label">Try it: pick or drop PNG or JPG images</span>
         <Live />
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus; forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-focus" style={frame}>
           <FileUpload title="Upload file" files={rows.slice(1, 2)} onRemove={() => {}} />
         </div>

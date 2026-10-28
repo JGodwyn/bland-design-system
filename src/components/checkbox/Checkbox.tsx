@@ -20,11 +20,11 @@ export const CheckboxGroupContext = createContext<{ size?: CheckboxSize }>({});
 
 export interface CheckboxProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size' | 'checked' | 'defaultChecked' | 'children'> {
-  /** Figma `✏️ Label`, clickable. Leave it out (Figma `👀 Label` off) and give the checkbox an `aria-label`. */
+  /** Clickable. Leave it out and give the checkbox an `aria-label`. */
   children?: ReactNode;
-  /** Figma `Size`. sm: a 16 box in a 24 hit area, body-md label (default, as in Figma). md: 20 in 32, body-lg. Inside a CheckboxGroup, the group's size. */
+  /** sm: a 16 box in a 24 hit area, body-md label (default). md: 20 in 32, body-lg. Inside a CheckboxGroup, the group's size. */
   size?: CheckboxSize;
-  /** Figma `Checked`, controlled: `true`, `false` or `'mixed'` (a parent whose children are partly selected; the native `indeterminate`). */
+  /** Controlled: `true`, `false` or `'mixed'` (a parent whose children are partly selected; the native `indeterminate`). */
   checked?: CheckboxChecked;
   /** Starting state when `checked` is left out. `'mixed'` clears on the first click, as a native checkbox does. */
   defaultChecked?: CheckboxChecked;

@@ -68,7 +68,13 @@ const trailingCode = {
 export default {
   title: 'List item',
   description:
-    'Row for lists, menus and settings. Lines sets 1, 2 or 3+ lines of text: title (with optional alt text on the right) and description. Flush drops the resting fill and radius so rows sit edge to edge inside a container. Leading slot takes an Avatar, icon or coin (24 on 1 line rows, 40 otherwise); Trailing slot hugs its content, such as a button, toggle or value. Width defaults to list/width; use Fill container in layouts. In code a row with href or onClick is one link or button; a row whose trailing slot holds its own control stays a plain row.',
+    'A row in a list, with a title, an optional description and slots at either end. Use it for settings, contacts, search results and similar lists.',
+  usage: [
+    'Put rows in your own `<ul>` or `<ol>`.',
+    'Give the row `href` or `onClick` to make the whole row one link or button.',
+    'When the trailing slot holds its own control, such as a Toggle, leave out `href` and `onClick`, so one control never sits inside another.',
+    'The description stays on one line; `lines="3+"` lets it wrap. `flush` drops the resting fill for rows inside a card.',
+  ],
   components: ['ListItem'],
   demo: {
     component: 'ListItem',
@@ -125,7 +131,7 @@ export default {
       {[false, true].map((flush) => (
         <div key={String(flush)} className="pg-stack">
           <span className="pg-label">
-            {flush ? 'flush: no resting fill, no radius' : 'Default'}: 1 line 32, 2 lines, 3+ lines; rest, then disabled
+            {flush ? <><code>flush</code>: no resting fill or rounding</> : 'Default'}: one line, <code>lines="2"</code>, <code>lines="3+"</code>; then <code>disabled</code>
           </span>
           <Rows>
             <ListItem flush={flush} title="The Title" />
@@ -139,7 +145,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">Slots and alt text: leading 24 on 1 line rows, 40 otherwise; trailing hugs its content</span>
+        <span className="pg-label"><code>leading</code>, <code>trailing</code> and <code>altText</code></span>
         <Rows>
           <ListItem title="Profile" leading={<Icon><UserIcon /></Icon>} trailing={<Icon><CaretRightIcon /></Icon>} />
           <ListItem title="Ada Lovelace" leading={<Avatar initials="AL" size="sm" />} altText="2m" />
@@ -170,7 +176,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Plain rows with their own control in the trailing slot (not a button, so controls never nest)</span>
+        <span className="pg-label">Plain rows with a control in <code>trailing</code> (no <code>href</code> or <code>onClick</code>, so controls never nest)</span>
         <Rows label="Settings">
           <ListItem title="Notifications" description="Push and email" trailing={<Toggle aria-label="Notifications" defaultChecked />} />
           <ListItem title="Sounds" trailing={<Toggle aria-label="Sounds" />} />
@@ -179,7 +185,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Button and link rows: hover and pressed fills, focusable</span>
+        <span className="pg-label">Rows with <code>onClick</code> or <code>href</code>: try hovering and pressing</span>
         <Rows label="Actions">
           <CountedRow id="Counter" description="A button row" />
           <CountedRow id="Disabled counter" disabled />
@@ -190,7 +196,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-stack pg-focus">
           <Rows>
             <ListItem title="Default row" description={description} onClick={() => {}} />
@@ -202,7 +208,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Text that does not fit ends in an ellipsis: the title always, the description on 2 line rows</span>
+        <span className="pg-label">Text that doesn't fit ends in an ellipsis: the title always, the description on two-line rows</span>
         <Rows>
           <ListItem title="A title far too long for the row it sits in, so it gives way" altText="Yesterday" />
           <ListItem title="A title far too long for the row it sits in, so it gives way" description={long} />

@@ -15,9 +15,9 @@ interface RadioGroupBaseProps extends Omit<FieldsetHTMLAttributes<HTMLFieldSetEl
   defaultValue?: string;
   /** Called with the newly selected radio's value. */
   onValueChange?: (value: string) => void;
-  /** Figma `Size`, passed to every Radio inside that sets none. Default sm, as in Figma. */
+  /** Passed to every Radio inside that sets none. Default sm. */
   size?: RadioSize;
-  /** Figma `Orientation`. Vertical rows touch (no gap); horizontal items sit space-lg (16) apart and wrap. */
+  /** Vertical rows touch (no gap); horizontal items sit space-lg (16) apart and wrap. */
   orientation?: RadioGroupOrientation;
   /** Disables every radio inside (the native fieldset `disabled`). */
   disabled?: boolean;

@@ -59,7 +59,7 @@ const paragraphs = Array.from({ length: 12 }, (_, i) => (
 const icons = { none: undefined, InfoIcon: <InfoIcon />, WarningOctagonIcon: <WarningOctagonIcon /> } as const;
 const iconCode = { none: undefined, InfoIcon: '<InfoIcon />', WarningOctagonIcon: '<WarningOctagonIcon />' } as const;
 
-function Row({ label, children }: { label: string; children: ReactNode }) {
+function Row({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
     <div className="pg-stack">
       <span className="pg-label">{label}</span>
@@ -117,7 +117,13 @@ function FormModal() {
 export default {
   title: 'Modal',
   description:
-    'Dialog that asks for a decision or shows focused content above the page. Size sets the width: sm 384, md 512; a layout can make it wider. Title, body and action bar can each be hidden. The dialog takes focus when it opens, keeps it inside while open, closes on Escape and returns focus to the trigger. Put the primary action first in actions; right alignment draws it last, on the trailing edge, and on narrow screens the actions stack with the primary on top.',
+    'A dialog over the page that asks for a decision or holds a short, focused task. The page behind it can\'t be used until it closes.',
+  usage: [
+    'Use it sparingly, for decisions and tasks that need full attention. For a message, use Banner or Toast.',
+    'Give it a `title`. Without one, name it with `aria-label`.',
+    'List the primary action first in `actions`, whatever `actionsAlign` is: Bland places the buttons in order on screen.',
+    'It closes on Escape and on a press outside it. Set `dismissable={false}` when people must choose an action.',
+  ],
   components: ['Modal'],
   demo: {
     component: 'Modal',
@@ -161,12 +167,12 @@ export default {
   },
   render: () => (
     <>
-      <Row label="size: sm (modal/width-sm, 384) and md (modal/width-md, 512); actions left, primary first">
+      <Row label={<><code>size</code>: <code>sm</code> and <code>md</code>; actions on the left, primary first</>}>
         <Panel title="Discard changes?" description={description} actions={two} />
         <Panel size="md" title="Discard changes?" description={description} actions={two} />
       </Row>
 
-      <Row label="icon, titleDivider and actionsDivider; body align center with no close button">
+      <Row label={<><code>icon</code>, <code>titleDivider</code> and <code>actionsDivider</code>; <code>align="center"</code> with no close button</>}>
         <Panel
           icon={<InfoIcon />}
           title="A title long enough to wrap onto a second line beside its icon"
@@ -178,21 +184,21 @@ export default {
         <Panel title="Saved" closeButton={false} align="center" description="Your file is saved." actions={<Button>Done</Button>} actionsAlign="fill" />
       </Row>
 
-      <Row label="actionsAlign: left (primary first), right (primary last, on the trailing edge), fill">
+      <Row label={<><code>actionsAlign</code>: <code>left</code>, <code>right</code> (the primary on the trailing edge), <code>fill</code></>}>
         <Panel title="Left" actions={three} />
         <Panel title="Right" actions={three} actionsAlign="right" />
         <Panel title="Fill" actions={two} actionsAlign="fill" />
       </Row>
 
-      <Row label="actionsOrientation vertical (auto below breakpoint/sm): full width, primary on top; one button">
+      <Row label={<><code>actionsOrientation="vertical"</code> (the default on small screens): full width, primary on top; one button</>}>
         <Panel title="Vertical" actions={three} actionsOrientation="vertical" />
         <Panel title="One action" description={description} actions={<Button>Got it</Button>} />
       </Row>
 
-      <Row label="top and children slots (Figma 🧩 Top / 🧩 Bottom); no title, close only; no actions">
+      <Row label={<><code>top</code> and <code>children</code>; no title, a close button only; no actions</>}>
         <Panel
           title="Invite people"
-          top={<div className="pg-label">Top slot: an image or a summary</div>}
+          top={<div className="pg-label">The top slot: an image or a summary</div>}
           description="They will get an email with a link to this file."
           actions={two}
           actionsAlign="right"
@@ -203,14 +209,14 @@ export default {
         <Panel title="No actions" description={description} />
       </Row>
 
-      <Row label="Long content: the body scrolls (fade and thumb) between a fixed title and action bar (drawn here at 320 high)">
+      <Row label="Long content: the body scrolls between a fixed title and action bar">
         <Panel title="Terms" titleDivider actions={two} actionsDivider style={{ maxHeight: 320 }}>
           {paragraphs}
         </Panel>
       </Row>
 
       <div className="pg-stack">
-        <span className="pg-label">Real modals: press a trigger, or focus it and press Enter. The alert dims the page with backdrop bold, the others subtle (tests/modal.spec.ts screenshots them open)</span>
+        <span className="pg-label">Try it: press a trigger, or focus it and press Enter. The alert dims the page with <code>backdrop="bold"</code>, the others with the default</span>
         <div className="pg-row">
           <Modal
             title="Discard changes?"

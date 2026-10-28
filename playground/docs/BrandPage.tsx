@@ -137,8 +137,8 @@ export function BrandPage() {
     <>
       <PageHeader title="Brand theme" href={brandPage.href}>
         <p>
-          Bland’s brand is 13 color steps every brand-colored token is built on. Pick a project’s color to make a set from it, check its contrast, preview it in both themes
-          and apply it across this site. Projects ship the result as a small CSS file loaded after Bland’s tokens. The same tool runs as <code>npm run brand</code>.
+          Pick your project’s brand color and Bland makes the 13 shades its components use, then checks that text and icons on them stay readable. Preview them in both
+          themes, apply them to this site, and copy the small CSS file your project loads after Bland’s tokens. Developers can run the same tool as <code>npm run brand</code>.
         </p>
       </PageHeader>
 
@@ -270,9 +270,9 @@ export function BrandPage() {
               panel: (
                 <Section title="Use in a project" toc={false} className="docs-brand-section">
                   <p className="docs-note">
-                    Load it after Bland’s tokens. It overrides the brand and neutral steps at :root, and every brand-colored and neutral token follows in both themes. Extra colors
-                    add their steps and their roles (<code>--name-surface</code>, <code>--name-text</code> and so on), which your own CSS uses. The chart palette,
-                    <code>--chart-1</code> to <code>--chart-{CHART_COUNT}</code>, comes last.
+                    Save this as a CSS file and load it after Bland’s tokens. It replaces the brand and neutral shades, and every component follows in both themes. Extra colors
+                    add their shades and their roles (<code>--name-surface</code>, <code>--name-text</code> and so on) for your own CSS. The chart colors,
+                    <code>--chart-1</code> to <code>--chart-{CHART_COUNT}</code>, come last.
                   </p>
                   <CodeSnippet
                     code={{ css: toCss(scale, isBland ? 'Bland’s own blue' : `made from ${input}, neutrals ${tint === 'none' ? 'pure gray' : `${tint} tint`}`, neutrals, validExtras, chart) }}
@@ -762,7 +762,7 @@ function ChartColorCheck({ advice: current, hidden, fixed: currentFix, onFix }: 
               status="warning"
               colored
               orientation="vertical"
-              title={fails ? 'This color needs a change' : 'Close for color-blind readers'}
+              title={fails ? 'This color needs a change' : 'Hard to tell apart for some readers'}
               actions={
                 fixed && (
                   <Button size="sm" onClick={onFix}>
@@ -884,8 +884,8 @@ function Contrast({ misses: current, keep, hidden, total = PAIRS.length * 2, can
             }
           >
             {canFix
-              ? `${misses.length} of ${total} pairings miss their minimum. Fix contrast moves the steps named, or keep a miss on purpose.`
-              : `${misses.length} of ${total} pairings ${misses.length === 1 ? 'misses its' : 'miss their'} minimum on your color itself, which stays exactly as you picked it. Keep ${misses.length === 1 ? 'the miss' : 'them'}, or pick another color.`}
+              ? `${misses.length} of ${total} color pairs are harder to read than they should be. Fix contrast adjusts the shades named in the breakdown, or keep a pair as it is on purpose.`
+              : `${misses.length} of ${total} color ${misses.length === 1 ? 'pair is' : 'pairs are'} harder to read than ${misses.length === 1 ? 'it' : 'they'} should be because of your color itself, which stays exactly as you picked it. Keep ${misses.length === 1 ? 'it' : 'them'}, or pick another color.`}
           </Banner>
         )}
       </div>
@@ -903,7 +903,7 @@ function Contrast({ misses: current, keep, hidden, total = PAIRS.length * 2, can
 
 function Findings({ items, keep }: { items: Finding[]; keep?: Step }) {
   return (
-    <Table size="md" className="docs-data bland-smooth" aria-label="Pairings below their minimum">
+    <Table size="md" className="docs-data bland-smooth" aria-label="Color pairs that are hard to read">
       <TableHead>
         <TableRow>
           <TableHeaderCell>Theme</TableHeaderCell>

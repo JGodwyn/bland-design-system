@@ -54,7 +54,13 @@ const long =
 export default {
   title: 'Chat bubble',
   description:
-    'Chat message bubble. Who: receiver (left, neutral) or sender (right, brand). Type: text, audio, audio-playing (pause icon, bars up to the playhead in the played wave color, elapsed time), image, video, document, typing (the dots lift and brighten in turn, one wave per duration/typing, looping). The bubble hugs its text up to chat-bubble/max-width and wraps; image, video and document bubbles take the full width. Tail and bubble align to the bottom, so the curved tail joins the bubble\'s bottom corner. Bubbles are flat. Replying shows the quoted message. Time and delivery status sit under the bubble. In code each bubble is an li: put them in an ol inside a role="log" element.',
+    'One message in a conversation: text, a voice note, an image, a video, a document, or the typing dots. `who` puts it on the left for the other person (`receiver`) or on the right for you (`sender`).',
+  usage: [
+    'Render bubbles as items of an `<ol>` inside an element with `role="log"`, so new messages are announced.',
+    'Show `time` under each bubble, and `status` (`sent`, `delivered`, `seen`) on your own messages.',
+    'Quote the message being answered with `reply`.',
+    'Your app plays the audio: Bland draws the player and reports presses through `onPlayingChange`.',
+  ],
   components: ['ChatBubble'],
   demo: {
     component: 'ChatBubble',
@@ -114,7 +120,7 @@ export default {
     <>
       {(['receiver', 'sender'] as const).map((who) => (
         <div key={who} className="pg-stack">
-          <span className="pg-label">{who}: text, audio, image, video, document, typing (the dots lift and brighten in turn)</span>
+          <span className="pg-label"><code>{who}</code>: text, audio, image, video, document, typing</span>
           <Log label={`${who} types`}>
             {types.map((type) => example(type, who))}
             <ChatBubble who={who} type="typing" typingLabel={who === 'receiver' ? 'Jane is typing' : 'You are typing'} />
@@ -124,13 +130,13 @@ export default {
 
       {(['receiver', 'sender'] as const).map((who) => (
         <div key={who} className="pg-stack">
-          <span className="pg-label">{who}, replying: the quoted message on top</span>
+          <span className="pg-label"><code>{who}</code> with <code>reply</code>: the quoted message on top</span>
           <Log label={`${who} replies`}>{types.map((type) => example(type, who, { reply }))}</Log>
         </div>
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">Audio playing: pause icon, played bars up to the playhead, elapsed time</span>
+        <span className="pg-label"><code>playing</code>: the pause icon, the played part of the wave and the time so far</span>
         <Log label="Playing">
           <ChatBubble type="audio" playing progress={0.5} duration="0:14" time="09:41" />
           <ChatBubble who="sender" type="audio" playing progress={0.5} duration="0:14" time="09:41" status="sent" />
@@ -138,7 +144,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Delivery status on sender bubbles: sent, delivered, seen</span>
+        <span className="pg-label"><code>status</code> on your own messages: <code>sent</code>, <code>delivered</code>, <code>seen</code></span>
         <Log label="Statuses">
           <ChatBubble who="sender" time="09:41" status="sent">Sent</ChatBubble>
           <ChatBubble who="sender" time="09:42" status="delivered">Delivered</ChatBubble>
@@ -147,7 +153,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Wrapping: hugs short text, wraps long text at chat-bubble/max-width; long file names end in an ellipsis</span>
+        <span className="pg-label">Short text hugs, long text wraps; long file names end in an ellipsis</span>
         <Log label="Wrapping">
           <ChatBubble time="09:41">Hi</ChatBubble>
           <ChatBubble time="09:41">{long}</ChatBubble>
@@ -159,7 +165,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Interactive parts: the play button, a document link, the video play button</span>
+        <span className="pg-label">Try it: the play button, a document link, the video play button</span>
         <Log label="Interactive">
           <VoiceMessage time="09:41" data-testid="voice" />
           <ChatBubble who="sender" type="document" href="#/components/chat-bubble" fileType="PDF" fileSize="1 MB" time="09:41" status="delivered">
@@ -169,7 +175,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); white inside a sender bubble; forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring is white inside your own bubbles (turned on here to show it)</span>
         <div className="pg-focus">
           <Log label="Focused">
             <ChatBubble type="audio" duration="0:28" time="09:41" />

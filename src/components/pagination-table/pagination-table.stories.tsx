@@ -7,7 +7,12 @@ const sizes: PaginationTableSize[] = ['sm', 'md', 'lg'];
 export default {
   title: 'Pagination-table',
   description:
-    'Table footer pagination: a summary of the items shown and page navigation. Navigation simple uses Pagination; advanced uses a page jump field, the page count and previous and next arrows, for long tables. The summary and the page count can be hidden or replaced. It fills its container (pagination/width is the Figma frame).',
+    'The footer of a table: how many items are shown, and the page navigation.',
+  usage: [
+    'Pass `total` and `pageSize`; the number of pages follows.',
+    '`navigation="advanced"` adds a field to jump to a page, for long tables.',
+    'Replace or hide the summary with `summary`, and the page count with `pagesLabel`.',
+  ],
   components: ['PaginationTable'],
   demo: {
     component: 'PaginationTable',
@@ -34,7 +39,7 @@ export default {
     <>
       {(['simple', 'advanced'] as const).map((navigation) => (
         <div key={navigation} className="pg-stack">
-          <span className="pg-label">navigation="{navigation}": sm, md, lg (100 items)</span>
+          <span className="pg-label"><code>navigation="{navigation}"</code>: <code>sm</code>, <code>md</code>, <code>lg</code></span>
           {sizes.map((size) => (
             <PaginationTable
               key={size}
@@ -48,7 +53,7 @@ export default {
         </div>
       ))}
       <div className="pg-stack">
-        <span className="pg-label">Summary and page count hidden (summary and pagesLabel false); custom text</span>
+        <span className="pg-label"><code>summary</code> and <code>pagesLabel</code> set to <code>false</code>, then to your own text</span>
         <PaginationTable navigation="advanced" total={100} summary={false} pagesLabel={false} navLabel="Bare pagination" pageInputLabel="Bare page" />
         <PaginationTable
           navigation="advanced"
@@ -61,12 +66,12 @@ export default {
         />
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Disabled</span>
+        <span className="pg-label"><code>disabled</code></span>
         <PaginationTable total={100} defaultPage={2} disabled navLabel="Disabled simple" />
         <PaginationTable navigation="advanced" total={100} defaultPage={2} disabled navLabel="Disabled advanced" pageInputLabel="Disabled page" />
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-focus">
           <PaginationTable navigation="advanced" total={100} defaultPage={2} navLabel="Focused pagination" pageInputLabel="Focused page" />
         </div>

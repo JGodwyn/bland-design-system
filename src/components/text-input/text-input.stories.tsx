@@ -33,7 +33,13 @@ function Controlled() {
 export default {
   title: 'Text Input',
   description:
-    'Single-line text field with a label, the input and helper text. Status sets the border, the helper text color and a status icon: default, danger, success or warning. Danger marks the input invalid for screen readers; put the error in the helper text. Sizes are 32, 40 and 48 tall with body-lg text. Optional leading and trailing add-ons, start and end icons, and alt text such as a unit. Keyboard focus shows a 2px ring offset 2px from the field.',
+    'A field for one line of text, such as a name, an email address or an amount.',
+  usage: [
+    'Give it a `label`, and put help or an error in `helperText`.',
+    'When the value is invalid, set `status="danger"` and say why in `helperText`; screen readers hear the field as invalid.',
+    'Use `leading` and `trailing` for add-ons such as a currency or a domain, and `altText` for a unit.',
+    'Don\'t use `placeholder` as the label: it disappears once people type.',
+  ],
   components: ['TextInput'],
   demo: {
     component: 'TextInput',
@@ -78,7 +84,7 @@ export default {
     <>
       {sizes.map((size) => (
         <div key={size} className="pg-stack">
-          <span className="pg-label">size={size}: empty (placeholder), filled, disabled</span>
+          <span className="pg-label"><code>size="{size}"</code>: empty with a <code>placeholder</code>, filled, <code>disabled</code></span>
           <div style={column}>
             <TextInput size={size} label="Label" placeholder="Placeholder" helperText="Helper text" />
             <TextInput size={size} label="Label" defaultValue="User input" helperText="Helper text" />
@@ -88,7 +94,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">status: default, danger, success, warning; then each disabled</span>
+        <span className="pg-label"><code>status</code>: <code>default</code>, <code>danger</code>, <code>success</code>, <code>warning</code>; then each <code>disabled</code></span>
         <div style={column}>
           {statuses.map((status) => (
             <TextInput key={status} status={status} label={status} defaultValue="User input" helperText={helper[status]} />
@@ -100,7 +106,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows while the input has focus; forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring goes around the field (turned on here to show it)</span>
         <div className="pg-focus" style={column}>
           <TextInput label="Focused" placeholder="Placeholder" />
           <TextInput label="Focused danger" status="danger" defaultValue="User input" helperText={helper.danger} />
@@ -108,7 +114,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Icons, alt text and add-ons (empty, filled, disabled) at each size</span>
+        <span className="pg-label"><code>iconStart</code>, <code>iconEnd</code>, <code>altText</code>, <code>leading</code> and <code>trailing</code> at each size</span>
         <div style={column}>
           <TextInput label="Icons" iconStart={<UserIcon />} iconEnd={<XIcon />} placeholder="Name" />
           <TextInput label="Alt text" altText="kg" defaultValue="72" inputMode="decimal" />
@@ -131,7 +137,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Behaviour (used by the tests)</span>
+        <span className="pg-label">Try it</span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           <div style={column}>
             <TextInput label="Uncontrolled" placeholder="Type here" helperText="Read with the input" data-testid="uncontrolled" leading="@" />

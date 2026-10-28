@@ -11,13 +11,13 @@ export type TimePickerSize = DateFieldSize;
 export type TimePickerStatus = DateFieldStatus;
 
 export interface TimePickerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
-  /** Figma `Size`: the field height (input/*, 32, 40, 48). Default sm, as in Figma. */
+  /** The field height (input/*, 32, 40, 48). Default sm. */
   size?: TimePickerSize;
-  /** Figma `Status` on the exposed Text Input: border, helper color and status icon. A time out of bounds shows danger by itself. */
+  /** Sets the border, helper text color and status icon. A time out of bounds turns the field to danger on its own. */
   status?: TimePickerStatus;
-  /** Figma `✏️ Label` on the exposed Text Input. Leave it out and give an `aria-label`. */
+  /** The field's label. Leave it out and give an `aria-label`. */
   label?: ReactNode;
-  /** Figma `✏️ Helper text`, under the field and read with it. */
+  /** Under the field and read with it. */
   helperText?: ReactNode;
   /** The time, 24-hour `"14:30"` (`"14:30:15"` with seconds), controlled (`null` for empty). Pair it with `onValueChange`. */
   value?: string | null;
@@ -26,7 +26,7 @@ export interface TimePickerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'd
   /** Called with the time, 24-hour `"14:30"`, once it is complete (`null` when cleared). */
   onValueChange?: (value: string | null) => void;
   /**
-   * 12 shows hours 1 to 12 and an AM / PM segment in Figma's trailing add-on (`👀 Trailing input`); 24 shows
+   * 12 shows hours 1 to 12 and an AM / PM segment in the trailing add-on; 24 shows
    * 00 to 23 and no add-on. Default from the locale (12 in en-US, 24 in en-GB). The value is 24-hour either way.
    */
   hourCycle?: 12 | 24;

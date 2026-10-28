@@ -21,17 +21,17 @@ import './sidebar.css';
 export interface SidebarItem {
   /** Unique key: compared with `current` and the expanded groups. */
   id: string;
-  /** Figma `✏️ Label`. Also the accessible name in the minimized rail, where it is hidden. */
+  /** Also the accessible name in the minimized rail, where it is hidden. */
   label: string;
-  /** Figma `🌟 Leading icon` (`👀 Leading icon` off = leave it out). The minimized rail shows only this. */
+  /** The minimized rail shows only this. */
   icon?: ReactNode;
   /** The destination's URL. Every row except a group header is a link. */
   href?: string;
-  /** Figma `👀 Count` / `✏️ Count`: a small box after the label, e.g. unread items. */
+  /** A small box after the label, e.g. unread items. */
   count?: ReactNode;
-  /** Figma `🌟 Trailing icon` / `👀 Trailing icon`: any SVG after the label (and the count). */
+  /** Any SVG after the label (and the count). */
   trailing?: ReactNode;
-  /** Figma `State=disabled`: the row is drawn in the minimal tokens and cannot be used. */
+  /** The row is drawn in the minimal tokens and cannot be used. */
   disabled?: boolean;
   /**
    * Nested rows, which make this row an expandable group (Figma `Expandable`): its header becomes a button that
@@ -71,10 +71,10 @@ type Slot = ReactNode | ((state: SidebarSlotState) => ReactNode);
 export interface SidebarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   /** The rows, top to bottom. A row with `items` is an expandable group. */
   items: SidebarItem[];
-  /** Figma `Size`: row height sidebar/item-sm 24, md 32, lg 40, xl 48. Defaults to sm (Figma's). */
+  /** Row height: sm 24, md 32, lg 40, xl 48. Defaults to sm. */
   size?: 'sm' | 'md' | 'lg' | 'xl';
   /**
-   * The `id` of the page the user is on (Figma `Selected`), controlled: that row gets `aria-current="page"`.
+   * The `id` of the page the user is on, controlled: that row gets `aria-current="page"`.
    * Pair it with `onCurrentChange`, or set it from your router.
    */
   current?: string;
@@ -82,14 +82,14 @@ export interface SidebarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
   defaultCurrent?: string;
   /** Called with a row's `id` when it is pressed, before the link is followed. */
   onCurrentChange?: (id: string) => void;
-  /** The open groups' ids (Figma `Expanded`), controlled. Pair it with `onExpandedChange`. */
+  /** The open groups' ids, controlled. Pair it with `onExpandedChange`. */
   expanded?: string[];
   /** The open groups at first, when `expanded` is left out. Defaults to the group holding the current row. */
   defaultExpanded?: string[];
   /** Called with the open groups' ids when a group header is pressed. */
   onExpandedChange?: (ids: string[]) => void;
   /**
-   * Figma `Minimized`: the icon rail, controlled. While the pointer is over the rail (or keyboard focus is in it)
+   * The icon rail, controlled. While the pointer is over the rail (or keyboard focus is in it)
    * the full sidebar opens over the page; it closes when the pointer or focus leaves, or on Escape.
    */
   minimized?: boolean;
@@ -98,27 +98,27 @@ export interface SidebarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
   /** Called when the collapse or expand button is pressed. */
   onMinimizedChange?: (minimized: boolean) => void;
   /**
-   * Figma `👀 Collapse`: the collapse button at the top right, and in the open rail the expand button (the same
+   * The collapse button at the top right, and in the open rail the expand button (the same
    * icon mirrored) that pins the sidebar open.
    */
   collapsible?: boolean;
   /**
-   * How long, in ms, the pointer rests on the rail before it opens. Defaults to duration/sidebar-peek-delay;
+   * How long, in ms, the pointer rests on the rail before it opens. Defaults to 200;
    * moving restarts the wait, so passing over the rail never opens it.
    */
   peekDelay?: number;
-  /** How long, in ms, the open rail waits after the pointer leaves before it closes. Defaults to duration/sidebar-peek-close-delay. */
+  /** How long, in ms, the open rail waits after the pointer leaves before it closes. Defaults to 300. */
   peekCloseDelay?: number;
   /** Accessible name of the collapse button. */
   collapseLabel?: string;
   /** Accessible name of the expand button. */
   expandLabel?: string;
   /**
-   * Figma `🧩 Top slot` (`👀 Top slot`): the logo or workspace switcher, fixed above the list. A function gets
+   * The logo or workspace switcher, fixed above the list. A function gets
    * `{ rail }`, so it can draw a narrower version in the rail. It brings its own padding.
    */
   top?: Slot;
-  /** Figma `🧩 Bottom slot` (`👀 Bottom slot`): the plan, account or settings, fixed under the list. As `top`. */
+  /** The plan, account or settings, fixed under the list. As `top`. */
   bottom?: Slot;
   /**
    * Renders each link, so any router works: `(props, item) => <Link to={props.href} {...props} />`. Defaults to a

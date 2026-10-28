@@ -10,7 +10,7 @@ import { highlight } from './highlight';
 import { ArrowFatUpIcon } from './icons';
 import { isApple } from './Search';
 import { leads } from './leads';
-import { PageHeader, Section, TokenName, TokenTable } from './parts';
+import { PageHeader, Prose, Section, TokenName, TokenTable } from './parts';
 
 const v = (t: Token) => `var(${t.css})`;
 const px = (t: Token) => parseFloat(t.light);
@@ -21,11 +21,13 @@ export function StylePage({ id }: { id: StylePageId }) {
   const content = (
     <>
       <PageHeader title={title} href={`#/styles/${id}`}>
-        {leads[id]}
+        <p>
+          <Prose>{leads[id]}</Prose>
+        </p>
       </PageHeader>
       <Page />
       <p className="docs-footnote">
-        Generated from <code>tokens/tokens.json</code>, exported from Figma {new Date(tokensExportedAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}. Copy a token name with the button beside it.
+        Token values as of {new Date(tokensExportedAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}. Copy a token name with the button beside it.
       </p>
     </>
   );
@@ -67,7 +69,7 @@ const pages: Record<StylePageId, () => ReactElement> = {
           ))}
         </div>
       </Section>
-      <Section title="Elevation geometry" note="The offsets, blurs and spreads the styles are built from.">
+      <Section title="Elevation geometry" note="The offsets, blurs and spreads the elevation styles are made of.">
         <TokenTable items={inCollection('Effects')} />
       </Section>
     </>
@@ -102,15 +104,15 @@ function ColorsPage() {
         title="Brand"
         note={
           <>
-            The 13 brand steps every brand-colored token is built on, in both themes. A project brings its own by overriding them at <code>:root</code> in a stylesheet loaded after Bland’s;
-            components never use them directly. <code>npm run brand</code> makes a starting set from one color and checks the contrast (docs/brand.md).
+            The 13 steps every brand-colored token is built on. A project swaps in its own brand by overriding them; make a set from one color on the{' '}
+            <a href="#/brand">Brand theme</a> page. Components never use the steps directly.
           </>
         }
       >
         <TokenTable items={inCollection('Brand')} sampleLabel="Color" sample={(t) => <span className="docs-swatch bland-smooth" style={{ background: v(t) }} />} />
       </Section>
       {ordered.map(([group, items], i) => (
-        <Section key={group} title={group} note={i === semantic.length ? 'Component colors follow. Each component has its own tokens so it can change without touching the others.' : undefined}>
+        <Section key={group} title={group} note={i === semantic.length ? 'Component colors follow. Each component has its own, so one can change without touching the others.' : undefined}>
           <TokenTable items={items} sampleLabel="Color" sample={(t) => <span className="docs-swatch bland-smooth" style={{ background: v(t) }} />} />
         </Section>
       ))}
@@ -138,7 +140,7 @@ function TypographyPage() {
           ))}
         </div>
       </Section>
-      <Section title="Line height and letter spacing" note="Each text style's line height and letter spacing on their own. The font shorthand can't set letter spacing, so set it beside the style; use a line height to size something by lines of text. The raw type scale is a primitive in Figma and is not emitted.">
+      <Section title="Line height and letter spacing" note="Each text style's line height and letter spacing on their own. The font shorthand can't set letter spacing, so set it beside the style. Use a line height to size something by lines of text.">
         <TokenTable items={parts} />
       </Section>
     </>
@@ -162,10 +164,10 @@ function MotionPage() {
           Play all
         </Button>
       </div>
-      <Section title="Durations" note="Each dot travels with easing-out over the duration.">
+      <Section title="Durations" note="Press Play all: each dot moves over its duration with the out easing.">
         <TokenTable items={durations} sample={(t) => track({ animationDuration: v(t), animationTimingFunction: 'var(--easing-out)' })} />
       </Section>
-      <Section title="Easings" note="Each dot travels over duration-xl with the easing.">
+      <Section title="Easings" note="Each dot moves over 400ms with its easing.">
         <TokenTable items={easings} sample={(t) => track({ animationDuration: 'var(--duration-xl)', animationTimingFunction: v(t) })} />
       </Section>
     </>
@@ -355,9 +357,8 @@ function GridPage() {
         title="At each breakpoint"
         note={
           <>
-            Columns stay on the 8 grid and gutters are spacing tokens; the margins are whatever is left. Each layout has a column count, a gutter and a minimum margin (mobile{' '}
-            <code>--space-lg</code>, tablet <code>--space-2xl</code>, desktop <code>--space-6xl</code>), and the columns take the widest multiple of 8 that fits inside it. Desktop columns stop at
-            128 (<code>--layout-max-width-sm</code>), 144 from 1536 (<code>-md</code>) and 160 from 1920 (<code>-lg</code>); past that the margins grow. Every frame matches its Figma grid style.
+            Mobile has 4 columns, tablet 6 and desktop 8. Columns are as wide as fits in steps of 8px, inside a minimum side margin (16px on mobile, 32px on tablet, 64px on
+            desktop); the margins take what is left. Desktop columns stop growing at 128px, at 144px from 1536 wide and at 160px from 1920; past that the margins grow.
           </>
         }
       >
@@ -372,7 +373,7 @@ function GridPage() {
         title="Live"
         note={
           <>
-            A real <code>.bland-grid</code> with <code>data-inset</code> (no side margins, as inside a card), following this window: resize it to see the spans change at md and xl.
+            A real <code>bland-grid</code> with <code>data-inset</code> (no side margins, as inside a card). Resize the window to see the spans change at tablet and desktop widths.
             Each label reads mobile / tablet / desktop span.
           </>
         }
@@ -409,7 +410,7 @@ function GridPage() {
           highlight={highlight}
         />
       </Section>
-      <Section className="bland-grid" title="Tokens" note="Figma binds the column counts of its seven grid styles (Mobile, Tablet sm/md/lg, Desktop/sm) to these. Column widths are not tokens: they follow from the screen width.">
+      <Section className="bland-grid" title="Tokens" note="The column count for each layout. Column widths aren’t tokens: they follow from the screen width.">
         <TokenTable items={layout} />
       </Section>
     </>

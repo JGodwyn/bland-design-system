@@ -5,11 +5,11 @@ import './toast.css';
 export type ToastStatus = MessageStatus;
 
 export interface ToastProps extends HTMLAttributes<HTMLDivElement> {
-  /** Figma `Status`: the solid surface-{status}-strong fill and the matching tinted elevation. Content is white in both modes. */
+  /** The solid surface-{status}-strong fill and the matching tinted elevation. Content is white in both modes. */
   status?: ToastStatus;
-  /** Figma `✏️ Label`: the message. Wraps at toast/max-width (384). */
+  /** The message. Wraps at 384px. */
   children: ReactNode;
-  /** Figma `👀 Icon`: `true` shows the status icon, `false` hides it, or pass any SVG to replace it. */
+  /** `true` shows the status icon, `false` hides it, or pass any SVG to replace it. */
   icon?: MessageIcon;
 }
 

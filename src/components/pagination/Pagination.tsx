@@ -24,13 +24,13 @@ export interface PaginationLinkProps {
 export interface PaginationProps extends Omit<HTMLAttributes<HTMLElement>, 'onChange'> {
   /** How many pages there are. */
   pageCount: number;
-  /** The current page, from 1 (Figma `Selected` on its item), controlled. Pair it with `onPageChange`. */
+  /** The current page, from 1, controlled. Pair it with `onPageChange`. */
   page?: number;
   /** The current page at first, when `page` is left out. Defaults to 1. */
   defaultPage?: number;
   /** Called with the page to show when an item, previous or next is pressed. */
   onPageChange?: (page: number) => void;
-  /** Figma `Size`: items control/xs, control/sm, control/md (24, 32, 40). Default sm, Figma's. */
+  /** Items 24, 32 or 40 tall. Default sm. */
   size?: PaginationSize;
   /** Disables every item. */
   disabled?: boolean;

@@ -6,7 +6,12 @@ const rows = Array.from({ length: 24 }, (_, i) => `Row ${i + 1}`);
 export default {
   title: 'Scroll area',
   description:
-    'Every scroll area that overflows shows an edge fade, and a scrollbar while it scrolls (it fades out a second after scrolling stops). The fade appears only on edges with hidden content. Use the sm fade in compact areas such as Menu. Truncated text is not overflow: it ends in an ellipsis.',
+    'A scrolling container with an edge fade and a scrollbar that shows only while it scrolls. Every scrolling part of Bland\'s components uses it.',
+  usage: [
+    'Use it for any area of your own that scrolls: `axis="y"` (the default) or `axis="x"`.',
+    'Use `fadeSize="sm"` in compact areas such as menus.',
+    'Text that is cut short isn\'t overflow: it ends in an ellipsis instead.',
+  ],
   components: ['ScrollArea'],
   demo: {
     component: 'ScrollArea',
@@ -25,7 +30,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Vertical, overflowing (fade/md)</span>
+        <span className="pg-label"><code>axis="y"</code>, overflowing</span>
         <ScrollArea style={{ height: 240, border: 'var(--stroke-sm) solid var(--border-subtle)', borderRadius: 'var(--rad-md)' }} data-testid="scroll-y" viewportProps={{ tabIndex: 0, 'aria-label': 'Rows' }}>
           <ul style={{ margin: 0, padding: 'var(--space-sm) var(--space-lg)', listStyle: 'none' }}>
             {rows.map((r) => (
@@ -35,7 +40,7 @@ export default {
         </ScrollArea>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Horizontal, compact (fade/sm)</span>
+        <span className="pg-label"><code>axis="x"</code> with <code>fadeSize="sm"</code></span>
         <ScrollArea axis="x" fadeSize="sm" style={{ border: 'var(--stroke-sm) solid var(--border-subtle)', borderRadius: 'var(--rad-md)' }} data-testid="scroll-x" viewportProps={{ tabIndex: 0, 'aria-label': 'Chips' }}>
           <div style={{ display: 'flex', gap: 'var(--space-sm)', padding: 'var(--space-lg)', width: 'max-content' }}>
             {rows.map((r) => (
@@ -45,7 +50,7 @@ export default {
         </ScrollArea>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Fits: no scrollbar, no fade</span>
+        <span className="pg-label">Content that fits: no scrollbar, no fade</span>
         <ScrollArea style={{ height: 120, border: 'var(--stroke-sm) solid var(--border-subtle)', borderRadius: 'var(--rad-md)' }} data-testid="scroll-fits">
           <p style={{ margin: 0, padding: 'var(--space-lg)' }}>Short content.</p>
         </ScrollArea>

@@ -15,22 +15,22 @@ import { Icon } from '../icon/Icon';
 import { ProgressBar } from '../progress-bar/ProgressBar';
 import './file-upload.css';
 
-/** Figma `_file-upload-progress` `Status`. */
+/** `Status`. */
 export type FileUploadStatus = 'uploading' | 'uploaded' | 'success' | 'danger';
 
 /** One row of the file list (Figma `_file-upload-progress`). */
 export interface FileUploadFile {
   /** Stable key, passed back to `onRemove`. */
   id: string;
-  /** Figma `✏️ Filename`: one line, truncated with an ellipsis. */
+  /** One line, truncated with an ellipsis. */
   name: string;
   /**
-   * Figma `Status`: uploading shows a progress bar and the close button cancels; uploaded shows the close button
+   * uploading shows a progress bar and the close button cancels; uploaded shows the close button
    * to remove the file; success shows a check and no close button; danger shows a warning, a danger border and
    * description, and the close button removes the file. Defaults to uploaded.
    */
   status?: FileUploadStatus;
-  /** Figma `✏️ Description` (shown with `👀 Description`): under the name, such as the size, or why the upload failed. */
+  /** Under the name, such as the size, or why the upload failed. */
   description?: ReactNode;
   /** Upload progress from 0 to 100, shown while `status` is uploading. */
   progress?: number;
@@ -47,11 +47,11 @@ export interface FileUploadAnnouncements {
 }
 
 interface FileUploadBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'onDrop'> {
-  /** Figma `✏️ Description` (shown with `👀 Description`): under the title. */
+  /** Under the title. */
   description?: ReactNode;
-  /** Figma `✏️ File types` (shown with `👀 File types`): the small line in the drop zone, such as "SVG, PNG, JPG, or GIF". */
+  /** The small line in the drop zone, such as "SVG, PNG, JPG, or GIF". */
   fileTypes?: ReactNode;
-  /** The drop zone's instruction. Defaults to Figma's "Drag and drop files here or / click to upload", on two lines. */
+  /** The drop zone's instruction. Defaults to "Drag and drop files here or / click to upload", on two lines. */
   instruction?: ReactNode;
   /** Native `accept`: filters the file picker, and dropped files that don't match go to `onFilesReject`. */
   accept?: string;
@@ -62,13 +62,13 @@ interface FileUploadBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'titl
    * input is cleared after each pick, so the same file can be picked again.
    */
   name?: string;
-  /** Figma `State=disabled`: the drop zone takes no files, and the file list is hidden (Figma). */
+  /** The drop zone takes no files, and the file list is hidden. */
   disabled?: boolean;
   /** Called with the files people pick or drop. Adding them to `files` and uploading them is the app's job. */
   onFilesAdd?: (files: File[]) => void;
   /** Called with dropped files that don't match `accept`. */
   onFilesReject?: (files: File[]) => void;
-  /** Figma `👀 Files`: the rows under the drop zone. The list shows while it has rows. */
+  /** The rows under the drop zone. The list shows while it has rows. */
   files?: FileUploadFile[];
   /** Called when a row's close button is pressed: cancel the upload (uploading) or remove the file. */
   onRemove?: (id: string) => void;
@@ -86,7 +86,7 @@ interface FileUploadBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'titl
 export type FileUploadProps = FileUploadBaseProps &
   (
     | {
-        /** Figma `✏️ Title` (shown with `👀 Title`): above the drop zone, and the file input's accessible name. */
+        /** Above the drop zone, and the file input's accessible name. */
         title: ReactNode;
       }
     | { title?: undefined; 'aria-label': string }
@@ -308,7 +308,7 @@ export function FileUpload({
   );
 }
 
-/** Figma `_file-upload-progress`: one file, with its icon, name, description, progress and close button. */
+/** One file, with its icon, name, description, progress and close button. */
 function FileRow({
   file,
   onRemove,

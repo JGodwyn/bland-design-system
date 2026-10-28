@@ -24,7 +24,12 @@ const stamp = <time dateTime="2026-10-18T09:41">9:41 AM</time>;
 export default {
   title: 'Notification',
   description:
-    'Toast that reports the result of an action or a system event. Status sets the icon, colors and shadow: info, success, warning, danger. Colored uses the tinted status surface and border; uncolored uses surface-100 with border-bold. Horizontal is a single line with optional inline actions and an optional title above the description (👀 Title, off by default); vertical adds a title, timestamp and up to two actions. Width comes from notification/width (384) and text wraps inside it. Close and icon are optional.',
+    'A message that floats over the page to report the result of an action or a system event, with an optional title, timestamp, actions and close button.',
+  usage: [
+    '`status` sets the icon and colors. `colored` (on by default) tints the surface.',
+    'Add up to two `actions` and an `onClose`. Add a `timestamp` when the time matters.',
+    'For a quick confirmation that goes away on its own, use Toast.',
+  ],
   components: ['Notification'],
   demo: {
     component: 'Notification',
@@ -65,7 +70,7 @@ export default {
     <>
       {([true, false] as const).map((colored) => (
         <div key={String(colored)} className="pg-stack">
-          <span className="pg-label">colored={String(colored)}: horizontal, then vertical</span>
+          <span className="pg-label"><code>colored={String(colored)}</code>: horizontal, then vertical</span>
           {statuses.map((status) => (
             <div key={status} className="pg-row" style={{ alignItems: 'flex-start' }}>
               <Notification status={status} colored={colored} onClose={() => {}}>
@@ -80,7 +85,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">Actions (xs inline when horizontal, md below when vertical), timestamp, a horizontal title, no close, no icon</span>
+        <span className="pg-label"><code>actions</code>, <code>timestamp</code>, a <code>title</code> on horizontal, no close, no icon</span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           <div className="pg-stack">
             <Notification status="success" actions={actionsFor('horizontal', 1)} timestamp={stamp}>
@@ -103,7 +108,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the actions and close button take keyboard focus; forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the actions and close button take focus (turned on here to show it)</span>
         <div className="pg-row pg-focus">
           <Notification status="warning" actions={actionsFor('horizontal', 1)} onClose={() => {}}>
             Storage almost full

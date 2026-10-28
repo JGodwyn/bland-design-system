@@ -56,14 +56,14 @@ const defaultLabels: ChatMessageBarLabels = {
 };
 
 export interface ChatMessageBarReply {
-  /** Figma `✏️ Replying to…`: who wrote the quoted message. One line, ellipsis. */
+  /** Who wrote the quoted message. One line, ellipsis. */
   name: ReactNode;
-  /** Figma `✏️ Reply`: the quoted message. One line, ellipsis. */
+  /** The quoted message. One line, ellipsis. */
   message: ReactNode;
 }
 
 export interface ChatMessageBarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
-  /** Figma `✏️ Message`: the text, controlled. Pair it with `onValueChange`. */
+  /** The text, controlled. Pair it with `onValueChange`. */
   value?: string;
   /** The text at first, uncontrolled. */
   defaultValue?: string;
@@ -71,21 +71,21 @@ export interface ChatMessageBarProps extends Omit<HTMLAttributes<HTMLDivElement>
   onValueChange?: (value: string) => void;
   /** Called with the text when the send button or Enter sends it (Shift+Enter starts a new line). Uncontrolled, the field then clears. */
   onSend?: (value: string) => void;
-  /** Shown while the field is empty. Default "Type here" (Figma's). */
+  /** Shown while the field is empty. Default "Type here". */
   placeholder?: string;
-  /** Figma `Replying` + `✏️ Replying to…` and `✏️ Reply`: the quoted message above the field. */
+  /** The quoted message above the field. */
   reply?: ChatMessageBarReply;
   /** The reply panel's close button; shown with `reply`. */
   onReplyClose?: () => void;
-  /** Figma's Smiley: shows the emoji button. */
+  /** Shows the emoji button. */
   onEmoji?: () => void;
-  /** Figma's Sticker: shows the sticker button. */
+  /** Shows the sticker button. */
   onSticker?: () => void;
-  /** Figma's PlusCircle: shows the attach button. */
+  /** Shows the attach button. */
   onAttach?: () => void;
-  /** Figma `State=rest`: while the field is empty the send button becomes the record button (Microphone). Without it, send is disabled while empty. */
+  /** While the field is empty the send button becomes the record button (Microphone). Without it, send is disabled while empty. */
   onRecordStart?: () => void;
-  /** Figma `State=recording-audio`: the field shows a delete button, the recording label and the timer Chip. */
+  /** The field shows a delete button, the recording label and the timer Chip. */
   recording?: boolean;
   /** The timer in the recording Chip, such as "1:00". */
   recordingTime?: ReactNode;

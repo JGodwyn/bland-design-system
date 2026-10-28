@@ -115,7 +115,13 @@ const sizes = ['sm', 'md', 'lg', 'xl'] as const;
 export default {
   title: 'Sidebar',
   description:
-    'App sidebar navigation. Size sets the item row height (24, 32, 40, 48). Minimized is the icon rail: once the pointer rests on it (or keyboard focus is in it) the full sidebar opens over the page, and the expand button pins it open. The top slot holds the logo or workspace switcher, the bottom slot the plan, account or settings; both stay fixed while the list between them scrolls with a fade. The collapse button minimizes it. A group header shows or hides its nested items, which indent under its label. In code: a nav of links with aria-current="page" on the current one.',
+    'The main navigation of an app, down the side of the screen. It can shrink to a rail of icons.',
+  usage: [
+    'Pass `items`; every row is a link (`renderLink` renders your router\'s). A row with its own `items` opens and folds a group.',
+    'Turn on `collapsible` to let people shrink it to the rail. Resting the pointer on the rail opens it over the page.',
+    'Put the logo or workspace switcher in `top`, and the account or settings in `bottom`.',
+    'On mobile, hide it and use TabBar.',
+  ],
   components: ['Sidebar'],
   demo: {
     component: 'Sidebar',
@@ -154,7 +160,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Sizes sm, md, lg, xl; Projects is open because Mobile app is current</span>
+        <span className="pg-label"><code>size</code>: <code>sm</code>, <code>md</code>, <code>lg</code>, <code>xl</code>; Projects is open because Mobile app is current</span>
         <div className="pg-stack">
           {sizes.map((size) => (
             <Frame key={size}>
@@ -164,7 +170,7 @@ export default {
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Minimized: the icon rail at each size, with the expand button in the logo's place; pointer over it or keyboard focus in it opens the full sidebar over the page</span>
+        <span className="pg-label"><code>minimized</code>: the icon rail at each size; rest the pointer on it, or tab into it, to open the full sidebar over the page</span>
         <div className="pg-stack">
           {sizes.map((size) => (
             <Frame key={size} height="var(--sidebar-height)">
@@ -174,7 +180,7 @@ export default {
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Top and bottom slots with the collapse button beside the logo; the list scrolls between them with the fade</span>
+        <span className="pg-label"><code>top</code> and <code>bottom</code> with <code>collapsible</code>; the list scrolls between them</span>
         <div className="pg-stack">
           <Frame height="var(--sidebar-height)">
             <Sidebar
@@ -189,7 +195,7 @@ export default {
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">States: current, disabled (Reports), current and disabled, a count on the current row, a closed group</span>
+        <span className="pg-label">Current, <code>disabled</code> (Reports), current and disabled, a <code>count</code> on the current row, a closed group</span>
         <div className="pg-stack">
           <Frame height="var(--sidebar-height)">
             <Sidebar aria-label="Current inbox" items={items.slice(0, 6)} defaultCurrent="inbox" />
@@ -204,7 +210,7 @@ export default {
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-focus pg-stack">
           <Frame height="var(--sidebar-height)">
             <Sidebar aria-label="Focused" items={items.slice(0, 4)} collapsible top={({ rail }) => <Logo rail={rail} />} />

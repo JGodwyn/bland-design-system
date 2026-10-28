@@ -44,7 +44,12 @@ function Triggers() {
 export default {
   title: 'Toast',
   description:
-    'Short, transient status message that floats above the page and dismisses on its own. Solid surface-{status}-strong fill with white content in both modes, and an elevation tinted to the status. Status: info, danger, success, warning. The text wraps at toast/max-width. For messages with a title, actions or a close button, use Notification.',
+    'A short message that floats above the page and goes away on its own, such as Saved or Message sent.',
+  usage: [
+    'Wrap your app in `Toaster`, then show toasts with `useToaster()`.',
+    'Keep it to one short sentence. People can miss a toast, so never put something they must act on in one.',
+    'For a message with a title, actions or a close button, use Notification.',
+  ],
   components: ['Toast', 'Toaster'],
   demo: {
     component: 'Toast',
@@ -55,7 +60,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Status: info, danger, success, warning</span>
+        <span className="pg-label"><code>status</code>: <code>info</code>, <code>danger</code>, <code>success</code>, <code>warning</code></span>
         {statuses.map((status) => (
           <Toast key={status} status={status}>
             Toasts display information only ({status})
@@ -64,7 +69,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Without the icon, another icon, and long text wrapping at toast/max-width (384)</span>
+        <span className="pg-label"><code>icon={false}</code>, another icon, and long text wrapping</span>
         <Toast status="success" icon={false}>
           Copied
         </Toast>
@@ -75,7 +80,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Toaster: stacks toasts at the bottom of the screen, announces them and times them out (paused on hover and focus)</span>
+        <span className="pg-label">Try it: Toaster stacks toasts at the bottom of the screen, announces them and hides them after a few seconds (not while hovered or focused)</span>
         <Toaster>
           <Triggers />
         </Toaster>

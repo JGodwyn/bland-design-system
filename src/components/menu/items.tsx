@@ -9,19 +9,19 @@ export type MenuSize = 'sm' | 'md' | 'lg';
 export interface MenuItemData {
   /** Unique key: what `onAction`, `value` and `selectedKeys` report. */
   id: string;
-  /** Figma `✏️ Text`. Wraps onto more lines when it is long. */
+  /** Wraps onto more lines when it is long. */
   label: ReactNode;
   /** The text typeahead and screen readers use. Needed when `label` is not a string. */
   textValue?: string;
-  /** Figma `🧩 Leading` (shown with `👀 Leading`): an icon or an Avatar in the 24px leading slot. */
+  /** An icon or an Avatar in the 24px leading slot. */
   leading?: ReactNode;
-  /** Figma `🧩 Trailing` (shown with `👀 Trailing`): a shortcut, a caret or a Badge. Keep it non-interactive. */
+  /** A shortcut, a caret or a Badge. Keep it non-interactive. */
   trailing?: ReactNode;
-  /** Figma `Danger=true`: a destructive action, label in `text-danger`. */
+  /** A destructive action, label in `text-danger`. */
   danger?: boolean;
-  /** Figma `State=disabled`: shown, skipped by the keyboard, cannot be chosen. */
+  /** Shown, skipped by the keyboard, cannot be chosen. */
   disabled?: boolean;
-  /** Figma `👀 Divider`: a line along the row's bottom edge, to separate it from the next group. */
+  /** A line along the row's bottom edge, to separate it from the next group. */
   divider?: boolean;
 }
 
@@ -49,7 +49,7 @@ interface MenuRowProps extends HTMLAttributes<HTMLLIElement> {
   ref?: Ref<HTMLLIElement>;
 }
 
-/** Figma `_menu-item`: the row a Menu item or a Dropdown option renders; the hooks give it its role and props. */
+/** The row a Menu item or a Dropdown option renders; the hooks give it its role and props. */
 export function MenuRow({ item, size, mark, selected = false, focusVisible, pressed, disabled, labelProps, className, ref, ...rest }: MenuRowProps) {
   const checkbox = mark === 'checkbox';
   const check = mark === 'check' && selected;

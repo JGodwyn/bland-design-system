@@ -7,25 +7,25 @@ export type ProgressBarSize = 'sm' | 'md';
 export type ProgressBarStatus = 'default' | 'success' | 'danger';
 
 interface ProgressBarBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-  /** The current value, from `min` to `max`. Figma shows quarters; code takes any value. */
+  /** The current value, from `min` to `max`. Any value works, not only quarters. */
   value: number;
   /** The value at which the bar is full. Defaults to 100. */
   max?: number;
   /** The value at which the bar is empty. Defaults to 0. */
   min?: number;
-  /** Figma `Size`: sm has a 4px track (default, as in Figma), md 8px. */
+  /** sm has a 4px track (default), md 8px. */
   size?: ProgressBarSize;
   /**
-   * Figma `Status`: default while in progress; success and danger when it has finished, with a status icon
+   * default while in progress; success and danger when it has finished, with a status icon
    * after the value. Say what happened in `helperText`: the icon is decorative.
    */
   status?: ProgressBarStatus;
-  /** Figma `👀 Value`: the percentage after the track, in a fixed column so the track never changes length. */
+  /** The percentage after the track, in a fixed column so the track never changes length. */
   showValue?: boolean;
-  /** Figma `✏️ Helper text` (shown with `👀 Helper text`): below the bar, colored by the status. */
+  /** Below the bar, colored by the status. */
   helperText?: ReactNode;
   /**
-   * Figma `👀 Cancel`: shows a close button after the value (default status only) and is called when it is pressed.
+   * Shows a close button after the value (default status only) and is called when it is pressed.
    * Stopping the work is the app's job.
    */
   onCancel?: (event: MouseEvent<HTMLButtonElement>) => void;
@@ -37,7 +37,7 @@ interface ProgressBarBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chi
 export type ProgressBarProps = ProgressBarBaseProps &
   (
     | {
-        /** Figma `✏️ Label` (shown with `👀 Label`): above the bar, and the progress bar's accessible name. */
+        /** Above the bar, and the progress bar's accessible name. */
         label: ReactNode;
       }
     | { label?: undefined; 'aria-label': string }

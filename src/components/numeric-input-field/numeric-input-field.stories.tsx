@@ -28,7 +28,13 @@ function Controlled() {
 export default {
   title: 'Numeric Input Field',
   description:
-    'Row of square digit boxes for one-time codes and PINs, with a label and helper text. Shows 4 boxes, or 6. Typing fills a box and moves to the next, Backspace moves back, the arrow keys move between boxes, and pasting a code (or the keyboard offering one) fills every box. Status sets every box border and the helper text color. On mobile, use sm for 6 digits: md and lg rows are wider than a 312px column. Keyboard focus shows a 2px ring offset 2px from the box.',
+    'A row of boxes for a one-time code or PIN, one digit per box.',
+  usage: [
+    '`length`: 4 or 6 digits. On mobile, use `size="sm"` for 6: the larger rows are wider than a phone screen\'s column.',
+    '`onComplete` runs once every box is filled.',
+    'Pasting a code, or the phone offering one from a text message, fills every box.',
+    'Give it a `label`, or an `aria-label`.',
+  ],
   components: ['NumericInputField'],
   demo: {
     component: 'NumericInputField',
@@ -51,7 +57,7 @@ export default {
     <>
       {sizes.map((size) => (
         <div key={size} className="pg-stack">
-          <span className="pg-label">size={size}: empty with a placeholder, partly filled, filled, disabled</span>
+          <span className="pg-label"><code>size="{size}"</code>: empty with a <code>placeholder</code>, partly filled, filled, <code>disabled</code></span>
           <NumericInputField size={size} label="Code" placeholder="0" />
           <NumericInputField size={size} aria-label={`Partly filled ${size}`} defaultValue="27" />
           <NumericInputField size={size} aria-label={`Filled ${size}`} defaultValue="2741" />
@@ -60,12 +66,12 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">6 digits (sm fits a mobile column)</span>
+        <span className="pg-label"><code>length={6}</code> (<code>sm</code> fits a phone screen)</span>
         <NumericInputField length={6} label="Six digits" defaultValue="274" />
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">status: default, danger, success, warning; then disabled</span>
+        <span className="pg-label"><code>status</code>: <code>default</code>, <code>danger</code>, <code>success</code>, <code>warning</code>; then <code>disabled</code></span>
         {statuses.map((status) => (
           <NumericInputField key={status} status={status} label={status} defaultValue="2741" helperText={helper[status]} />
         ))}
@@ -73,14 +79,14 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on the focused box; forced on every box here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring goes around the focused box (turned on for every box here)</span>
         <div className="pg-focus">
           <NumericInputField aria-label="Focused" defaultValue="2" />
         </div>
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Behaviour (used by the tests)</span>
+        <span className="pg-label">Try it</span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           <NumericInputField label="Uncontrolled" helperText="Check your messages" data-testid="uncontrolled" name="otp" />
           <Controlled />

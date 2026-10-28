@@ -22,14 +22,15 @@ export interface DateRangePickerProps extends DatePickerBaseProps {
   defaultValue?: DateRange | null;
   /** Called with the range once both dates are complete (`null` when cleared). */
   onValueChange?: (value: DateRange | null) => void;
-  /** The start field's label (Figma `✏️ Label` on the start Text Input). Default "Start date". */
+  /** The start field's label. Default "Start date". */
   startLabel?: ReactNode;
   /** The end field's label. Default "End date". */
   endLabel?: ReactNode;
-  /** Names the pair for screen readers (Figma shows no label over both). Default "Date range". */
+  /** Names the pair for screen readers. Default "Date range". */
   'aria-label'?: string;
   /** Form field names: hidden inputs submit each date as `"2024-11-09"`. */
   startName?: string;
+  /** The end date's form field name. */
   endName?: string;
   /** Accessible name of the calendar buttons. Default React Aria's ("Calendar"). */
   calendarLabel?: string;

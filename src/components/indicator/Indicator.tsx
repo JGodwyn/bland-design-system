@@ -6,19 +6,19 @@ export type IndicatorEmotion = 'brand' | 'neutral' | 'success' | 'danger' | 'war
 export type IndicatorType = 'primary' | 'secondary';
 
 export interface IndicatorProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
-  /** Figma `Size`. sm 8 and md 12 are dots; lg 16, xl 20 and 2xl 24 hold a label and grow into a pill. */
+  /** sm 8 and md 12 are dots; lg 16, xl 20 and 2xl 24 hold a label and grow into a pill. */
   size?: IndicatorSize;
-  /** Figma `Emotion`: the color family. */
+  /** The color family. */
   emotion?: IndicatorEmotion;
-  /** Figma `Type`: primary is a solid fill, secondary a soft tint. */
+  /** primary is a solid fill, secondary a soft tint. */
   type?: IndicatorType;
   /**
-   * Figma `✏️ Label`, usually a count. Shown at lg and up; sm and md are dots and ignore it.
-   * Omit it for an empty circle (Figma `👀 Label` off).
+   * Usually a count. Shown at lg and up; sm and md are dots and ignore it.
+   * Omit it for an empty circle.
    */
   children?: ReactNode;
   /**
-   * Figma `👀 Ring`: a 2px surface-100 outline that separates the Indicator from an Avatar or image under it.
+   * A 2px surface-100 outline that separates the Indicator from an Avatar or image under it.
    * Off by default, since the set description says to turn it on only there.
    */
   ring?: boolean;

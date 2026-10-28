@@ -26,7 +26,12 @@ const demoSteps = (count: number, description: boolean) =>
 export default {
   title: 'Progress-wizard',
   description:
-    'Multi-step progress (stepper). Layout: inline, centered or stacked steps; Style: bar (top bar per step) or connector (line between markers). Steps before current are done, the current step is bold with aria-current="step", the rest are next. Each step is progress/step-width wide, so the wizard hugs its steps, and shrinks to share a narrower row; fill stretches the wizard across its container with equal steps. In an inline connector step a long title truncates with an ellipsis, so the line keeps at least space-xl. Not interactive.',
+    'Shows the steps of a multi-step flow and where people are in it. It shows progress only; it isn\'t navigation.',
+  usage: [
+    'Pass `steps` and the `current` step\'s index; the steps before it show as done. Set `current` to `steps.length` when every step is done.',
+    '`layout` and `style` set how the steps are drawn. `fill` stretches them across the container.',
+    'Keep step titles to a word or two.',
+  ],
   components: ['ProgressWizard'],
   demo: {
     component: 'ProgressWizard',
@@ -56,7 +61,7 @@ export default {
     <>
       {styles.map((style) => (
         <div key={style} className="pg-stack">
-          <span className="pg-label">style="{style}": inline, centered, stacked; step 2 of 5 current</span>
+          <span className="pg-label"><code>style="{style}"</code>: layouts <code>inline</code>, <code>centered</code>, <code>stacked</code></span>
           {layouts.map((layout) => (
             <ProgressWizard
               key={layout}
@@ -71,14 +76,14 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">2, 3 and 4 steps; every step done (current = steps.length)</span>
+        <span className="pg-label">2, 3 and 4 steps; every step done (<code>current</code> set to <code>steps.length</code>)</span>
         <ProgressWizard steps={stepsOf(2)} current={1} aria-label="Two steps" />
         <ProgressWizard steps={stepsOf(3)} current={1} style="connector" layout="centered" aria-label="Three steps" />
         <ProgressWizard steps={stepsOf(4)} current={4} style="connector" aria-label="All done" />
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">disabled: every step, both styles</span>
+        <span className="pg-label"><code>disabled</code>: every step, both styles</span>
         {styles.map((style) => (
           <ProgressWizard
             key={style}
@@ -93,7 +98,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">fill: the steps share the container's width (here 960)</span>
+        <span className="pg-label"><code>fill</code>: the steps share the container's width</span>
         {styles.map((style) => (
           <div key={style} style={{ width: 960, maxWidth: '100%' }}>
             <ProgressWizard fill style={style} steps={stepsOf(3)} current={1} aria-label={`Fill ${style}`} />
@@ -102,7 +107,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">A title too long for an inline connector step truncates; the line keeps its space-xl (24) minimum</span>
+        <span className="pg-label">A long title in an inline connector step ends in an ellipsis, so the line stays visible</span>
         <ProgressWizard
           style="connector"
           steps={[{ title: 'Billing and shipping address' }, { title: 'Payment' }, { title: 'Review' }]}

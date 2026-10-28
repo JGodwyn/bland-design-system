@@ -7,20 +7,20 @@ export type BadgeEmotion = 'brand' | 'neutral' | 'success' | 'danger' | 'warning
 export type BadgeType = 'primary' | 'secondary' | 'outline';
 
 interface BadgeBaseProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
-  /** Figma `Emotion`: the color family. */
+  /** The color family. */
   emotion?: BadgeEmotion;
-  /** Figma `Type`: primary is a solid fill, secondary a soft tint, outline a border only. */
+  /** primary is a solid fill, secondary a soft tint, outline a border only. */
   type?: BadgeType;
 }
 
 export interface BadgeLabelProps extends BadgeBaseProps {
-  /** Figma `Size`: sm 16 (default), md 20, lg 24, xl 32. */
+  /** sm 16 (default), md 20, lg 24, xl 32. */
   size?: BadgeSize;
-  /** Figma `✏️ Label`. */
+  /** The label. */
   children: ReactNode;
-  /** Figma `🌟 Leading icon` (shown with `👀 Leading icon`): any SVG, sized and colored by the badge. */
+  /** Any SVG, sized and colored by the badge. */
   iconStart?: ReactNode;
-  /** Figma `🌟 Trailing icon` (shown with `👀 Trailing icon`). */
+  /** Any SVG after the label. */
   iconEnd?: ReactNode;
   icon?: never;
 }
@@ -28,7 +28,7 @@ export interface BadgeLabelProps extends BadgeBaseProps {
 export interface BadgeIconOnlyProps extends BadgeBaseProps {
   /** Icon only starts at md (its default), since a 12px icon in a 16px circle is too small to read. */
   size?: Exclude<BadgeSize, 'sm'>;
-  /** Figma `Icon only`: a circle holding this icon and no label. */
+  /** A circle holding this icon and no label. */
   icon: ReactNode;
   /** Required for an icon-only badge: what the icon means. */
   'aria-label': string;

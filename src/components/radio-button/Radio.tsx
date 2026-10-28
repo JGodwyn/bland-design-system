@@ -13,13 +13,13 @@ export const RadioGroupContext = createContext<{
 } | null>(null);
 
 export interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size' | 'value' | 'children'> {
-  /** Figma `✏️ Label`, clickable. Leave it out (Figma `👀 Label` off) and give the radio an `aria-label`. */
+  /** Clickable. Leave it out and give the radio an `aria-label`. */
   children?: ReactNode;
   /** The value this option submits, and what RadioGroup's `value` matches. */
   value: string;
-  /** Figma `Size`. sm: a 16 circle in a 24 hit area, body-md label (default, as in Figma). md: 20 in 32, body-lg. Inside a RadioGroup, the group's size. */
+  /** sm: a 16 circle in a 24 hit area, body-md label (default). md: 20 in 32, body-lg. Inside a RadioGroup, the group's size. */
   size?: RadioSize;
-  /** Figma `Checked`, controlled. Inside a RadioGroup, leave it out: the group's `value` decides. */
+  /** Checked, controlled. Inside a RadioGroup, leave it out: the group's `value` decides. */
   checked?: boolean;
   /** Reaches the native `<input>`, for form libraries. */
   ref?: Ref<HTMLInputElement>;

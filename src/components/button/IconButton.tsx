@@ -4,7 +4,7 @@ import { ButtonSpinner, guardLoading, useButtonSize, type ButtonBaseProps } from
 import './button.css';
 
 export interface IconButtonProps extends ButtonBaseProps {
-  /** Figma `🌟 Icon`: any SVG, sized and colored by the button. */
+  /** Any SVG, sized and colored by the button. */
   icon: ReactNode;
   /** Accessible name. Required: an Icon Button has no visible label. */
   'aria-label': string;

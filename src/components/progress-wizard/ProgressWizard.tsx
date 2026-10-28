@@ -8,33 +8,32 @@ export type ProgressWizardStyle = 'bar' | 'connector';
 export type ProgressWizardProgress = 'done' | 'current' | 'next';
 
 export interface ProgressWizardStep {
-  /** Figma `✏️ Title`. */
+  /** The step's name. */
   title: ReactNode;
-  /** Figma `✏️ Description` (shown with `👀 Description`). */
+  /** A line under the title. */
   description?: ReactNode;
-  /** Figma `State=disabled` for this step only. */
+  /** For this step only. */
   disabled?: boolean;
 }
 
 export interface ProgressWizardProps extends Omit<OlHTMLAttributes<HTMLOListElement>, 'children' | 'style'> {
-  /** The steps, in order. Figma shows 2 to 5. */
+  /** The steps, in order, usually 2 to 5. */
   steps: ProgressWizardStep[];
   /**
    * Index of the current step, from 0. Steps before it are done, steps after it are next.
    * Pass `steps.length` when every step is done.
    */
   current: number;
-  /** Figma `Layout`: inline (marker beside the text, default), centered (marker above, centered) or stacked (marker above, left aligned). */
+  /** inline (marker beside the text, default), centered (marker above, centered) or stacked (marker above, left aligned). */
   layout?: ProgressWizardLayout;
-  /** Figma `Style`: bar (a 2px bar on top of each step, default) or connector (a line between markers). The native style attribute is `htmlStyle`. */
+  /** bar (a 2px bar on top of each step, default) or connector (a line between markers). The native style attribute is `htmlStyle`. */
   style?: ProgressWizardStyle;
-  /** The native `style` attribute, renamed because Figma's `Style` owns the name. */
+  /** The native `style` attribute, renamed because `style` sets the look of the steps. */
   htmlStyle?: CSSProperties;
-  /** Figma `State=disabled` for every step. */
+  /** For every step. */
   disabled?: boolean;
   /**
-   * Stretch the wizard across its container, the steps sharing the width equally (Figma: wizard and steps set to
-   * Fill container). Off, each step is progress/step-width wide and the wizard hugs them.
+   * Stretch the wizard across its container, the steps sharing the width equally. Off, each step is 152px wide and the wizard hugs them.
    */
   fill?: boolean;
   /** What a screen reader hears for each step's marker. Defaults to "Completed", "Current" and "Not started". */

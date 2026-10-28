@@ -27,7 +27,13 @@ function Controlled() {
 export default {
   title: 'Date Range Picker',
   description:
-    'Start and end date fields (exposed Text Inputs labelled Start date and End date, each with a CalendarBlank button) sharing one Range calendar under the start field. The first press in the calendar picks the start, the second the end. Set Status per picker; one helper text sits under both fields. Fills its container (Figma 582 is its frame) and both fields share it equally. Values are { start, end } ISO dates.',
+    'Two date fields, a start and an end, that share one calendar. The first press in the calendar picks the start, the second the end.',
+  usage: [
+    'The value is `{ start, end }`, each an ISO string such as `"2024-11-09"`.',
+    'Name the pair with `aria-label` (Date range by default), and each field with `startLabel` and `endLabel`.',
+    'An end before the start turns the fields to `danger` on their own.',
+    'In a form, `startName` and `endName` name the two values.',
+  ],
   components: ['DateRangePicker'],
   demo: {
     component: 'DateRangePicker',
@@ -62,13 +68,13 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Open (defaultOpen): the Range calendar (md by default) opens under the start field, over what is below</span>
+        <span className="pg-label"><code>defaultOpen</code>: the calendar opens under the start field, over what is below</span>
         <div style={stage}>
           <DateRangePicker locale="en-US" aria-label="Open" defaultValue={stay} defaultOpen />
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Sizes sm, md, lg: empty, then filled</span>
+        <span className="pg-label"><code>size</code>: <code>sm</code>, <code>md</code>, <code>lg</code>; empty, then filled</span>
         {sizes.map((size) => (
           <div key={size} style={{ ...row, display: 'grid', gap: 16 }}>
             <DateRangePicker size={size} locale="en-GB" aria-label={`Empty ${size}`} />
@@ -77,7 +83,7 @@ export default {
         ))}
       </div>
       <div className="pg-stack">
-        <span className="pg-label">helperText with status; an end before the start turns danger by itself; disabled; controlled</span>
+        <span className="pg-label"><code>helperText</code> with <code>status</code>; an end before the start turns <code>danger</code> on its own; <code>disabled</code>; controlled</span>
         <div style={{ ...row, display: 'grid', gap: 16 }}>
           <DateRangePicker locale="en-GB" aria-label="Warning" status="warning" helperText="Check-out is a Sunday" defaultValue={stay} />
           <DateRangePicker locale="en-GB" aria-label="Reversed" helperText="The end comes before the start" defaultValue={{ start: '2024-11-20', end: '2024-11-09' }} />

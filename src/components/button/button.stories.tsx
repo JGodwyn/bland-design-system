@@ -30,7 +30,14 @@ const icons = { none: undefined, PlusIcon: <PlusIcon />, CaretDownIcon: <CaretDo
 export default {
   title: 'Button',
   description:
-    'Triggers an action. Use primary for the main action in a view, secondary for supporting actions, ghost for low-emphasis actions in dense areas, and stroke when a button needs an edge without a fill. Emotion signals intent: brand for most actions, danger for destructive ones, success and warning for actions tied to those states. xs is for dense desktop UI only. For buttons without a label, use Icon Button.',
+    'Starts an action, such as saving, sending or opening a dialog. Use one primary button for the main action in a view.',
+  usage: [
+    '`type`: `primary` for the main action, `secondary` for supporting actions, `ghost` for low-emphasis actions in dense areas, `stroke` when a button needs an edge without a fill.',
+    '`emotion`: `brand` for most actions, `danger` for destructive ones, `success` and `warning` for actions tied to those states.',
+    'Set `loading` while the action runs: the button shows a spinner and ignores presses.',
+    '`xs` is smaller than a comfortable touch target; keep it for dense desktop UI.',
+    'For a button without a label, use IconButton and give it an `aria-label`. To go to another page, use a link.',
+  ],
   components: ['Button', 'IconButton'],
   demo: {
     component: 'Button',
@@ -53,7 +60,7 @@ export default {
     <>
       {types.map((type) => (
         <div key={type} className="pg-stack">
-          <span className="pg-label">type="{type}": rest, then disabled</span>
+          <span className="pg-label"><code>type="{type}"</code>: rest, then <code>disabled</code></span>
           {emotions.map((emotion) => (
             <div key={emotion} className="pg-row">
               <Button type={type} emotion={emotion} iconStart={<PlusIcon />}>
@@ -70,7 +77,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">Sizes: lg 56, md 40 (default), sm 32, xs 24</span>
+        <span className="pg-label"><code>size</code>: <code>lg</code>, <code>md</code> (default), <code>sm</code>, <code>xs</code></span>
         {sizes.map((size) => (
           <div key={size} className="pg-row">
             <Button size={size} iconStart={<PlusIcon />} iconEnd={<CaretDownIcon />}>
@@ -86,7 +93,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-row pg-focus">
           {types.map((type) => (
             <Button key={type} type={type} iconStart={<PlusIcon />}>
@@ -100,7 +107,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Loading: the spinner replaces the icon on that side</span>
+        <span className="pg-label"><code>loading</code>: a spinner replaces the icon on that side</span>
         <div className="pg-row">
           <Button loading iconStart={<PlusIcon />}>
             Saving
@@ -117,7 +124,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Click counts (used by the behaviour tests)</span>
+        <span className="pg-label">Try it: each press adds one</span>
         <div className="pg-row">
           <ClickCounter id="Counter" />
           <ClickCounter id="Loading counter" loading />

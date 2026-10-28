@@ -25,7 +25,7 @@ import type { Control, Story } from '../story';
 import { componentDocs, type PropDoc } from './data';
 import { highlight } from './highlight';
 import { storyDescription } from './pages';
-import { PageHeader, Section } from './parts';
+import { PageHeader, Prose, Section } from './parts';
 
 type Args = Record<string, unknown>;
 
@@ -34,12 +34,25 @@ export function ComponentPage({ id, story }: { id: string; story: Story }) {
   return (
     <>
       <PageHeader title={story.title} href={`#/components/${id}`}>
-        {storyDescription(id)}
+        <p>
+          <Prose>{storyDescription(id)}</Prose>
+        </p>
         {names.length > 0 && (
           <CodeText size="lg" copyable className="docs-import">{`import { ${names.join(', ')} } from 'bland';`}</CodeText>
         )}
       </PageHeader>
       {story.demo && <Demo key={story.title} demo={story.demo} />}
+      {story.usage && (
+        <Section id="usage" title="Usage">
+          <ul className="docs-usage">
+            {story.usage.map((rule) => (
+              <li key={rule}>
+                <Prose>{rule}</Prose>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
       <Section id="variants" title="Variants">
         <Variants>{story.render()}</Variants>
       </Section>
@@ -50,7 +63,7 @@ export function ComponentPage({ id, story }: { id: string; story: Story }) {
   );
 }
 
-/** The demo's label for a prop: `children` reads as `label`, as Figma names the text. */
+/** The demo's label for a prop: `children` reads as `label`, the name designers know the text by. */
 const controlLabel = (name: string) => (name === 'children' ? 'label' : name);
 
 function Demo({ demo }: { demo: NonNullable<Story['demo']> }) {
@@ -86,7 +99,7 @@ function Demo({ demo }: { demo: NonNullable<Story['demo']> }) {
               {focusable && (
                 <>
                   <ControlRow name="focused" control={{ kind: 'boolean' }} value={focused} onChange={(v) => setFocused(Boolean(v))} />
-                  <p className="docs-control-note">focused previews the keyboard focus ring; in code it is :focus-visible, not a prop.</p>
+                  <p className="docs-control-note">focused previews the keyboard focus ring. It isn’t a prop: the ring shows on its own when people tab to the component.</p>
                 </>
               )}
             </div>
@@ -410,6 +423,24 @@ function example(component: string, args: Args, props: PropDoc[]) {
   return `import { ${names.join(', ')} } from 'bland';\n\nexport function Example() {\n${body}\n}\n`;
 }
 
+/**
+ * A prop's description with its own values in backticks, so `sm` and `primary` read as code where the text lists
+ * them: a value followed by punctuation, a number, "or", "and" or the end. A value word inside a sentence ("an image
+ * that fails") stays prose. Words that are plain English on their own (default, none, auto) and bare numbers are
+ * left to the description to mark.
+ */
+function codeValues(p: PropDoc) {
+  const values = (p.options ?? []).filter((o) => !['default', 'none', 'auto', 'true', 'false'].includes(o) && !/^\d+\+?$/.test(o));
+  if (!values.length) return p.description;
+  const escaped = values.map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).sort((x, y) => y.length - x.length);
+  const word = new RegExp(`(?<![\\w\`/.-])(${escaped.join('|')})(?=[:,.;)]|\\s\\(|\\s\\d|\\s(?:or|and)\\b|$)`, 'g');
+  // Only outside existing code spans: split on them and mark the plain parts.
+  return p.description
+    .split(/(`[^`]*`)/)
+    .map((part) => (part.startsWith('`') ? part : part.replace(word, '`$1`')))
+    .join('');
+}
+
 function PropsTable({ name }: { name: string }) {
   const doc = componentDocs[name];
   const id = `props-${name}`;
@@ -451,7 +482,9 @@ function PropsTable({ name }: { name: string }) {
                 </span>
               </TableCell>
               <TableCell>{p.default !== undefined ? <CodeText size="lg">{p.default}</CodeText> : <span className="docs-muted">–</span>}</TableCell>
-              <TableCell>{p.description}</TableCell>
+              <TableCell>
+                <Prose>{codeValues(p)}</Prose>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -34,14 +34,14 @@ export interface TooltipProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
    * It gets the hover and focus handlers and, while the tooltip is open, `aria-describedby`.
    */
   children: ReactElement;
-  /** Figma `✏️ Text`: the hint. Keep it to one or two short lines; it wraps at `tooltip/max-width`. */
+  /** The hint. Keep it to one or two short lines; it wraps at 256px. */
   text: ReactNode;
   /**
-   * Figma `🧩 Slot` (shown with `👀 Slot`): extra content under the text, such as a keyboard shortcut.
+   * Extra content under the text, such as a keyboard shortcut.
    * The tooltip never takes focus, so nothing in it can be clicked or tabbed to: keep it non-interactive.
    */
   extra?: ReactNode;
-  /** Figma `Placement`. Flips to the other side and shifts along the edge when it would leave the screen. Default `top-start`, as in Figma. */
+  /** Flips to the other side and shifts along the edge when it would leave the screen. Default `top-start`. */
   placement?: TooltipPlacement;
   /** Open, controlled. Pair it with `onOpenChange`. */
   open?: boolean;
@@ -49,9 +49,9 @@ export interface TooltipProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
   defaultOpen?: boolean;
   /** Called with the new open state: hover, focus, blur, Escape, a press on the trigger. */
   onOpenChange?: (open: boolean) => void;
-  /** Hover time in ms before it opens. Default: the `duration/tooltip-delay` token (500ms). Keyboard focus opens it at once. */
+  /** Hover time in ms before it opens. Default 500. Keyboard focus opens it at once. */
   delay?: number;
-  /** Time in ms it stays after the pointer leaves the trigger or the tooltip. Default: the `duration/tooltip-close-delay` token (100ms). */
+  /** Time in ms it stays after the pointer leaves the trigger or the tooltip. Default 100. */
   closeDelay?: number;
   /** `focus` opens it on keyboard focus only, never on hover. */
   trigger?: 'focus';

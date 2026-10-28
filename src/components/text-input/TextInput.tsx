@@ -17,23 +17,23 @@ export type TextInputSize = 'sm' | 'md' | 'lg';
 export type TextInputStatus = 'default' | 'danger' | 'success' | 'warning';
 
 export interface TextInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  /** Figma `Size`. sm 32 (default, as in Figma), md 40, lg 48 (input/*). The text is body-lg at every size. */
+  /** sm 32 (default), md 40, lg 48. The text is body-lg at every size. */
   size?: TextInputSize;
-  /** Figma `Status`: the border, the helper text color and a status icon. danger also sets `aria-invalid`. */
+  /** The border, the helper text color and a status icon. danger also sets `aria-invalid`. */
   status?: TextInputStatus;
-  /** Figma `✏️ Label`, a `<label>` tied to the input. Leave it out (Figma `👀 Label` off) and give the input an `aria-label`. */
+  /** A `<label>` tied to the input. Leave it out and give the input an `aria-label`. */
   label?: ReactNode;
-  /** Figma `✏️ Helper text`, under the field and read with the input (`aria-describedby`). Put the error message here for danger. */
+  /** Under the field and read with the input (`aria-describedby`). Put the error message here for danger. */
   helperText?: ReactNode;
-  /** Figma `🌟 Icon ( L )`: any SVG at the start of the field, sized and colored by the field. */
+  /** Any SVG at the start of the field, sized and colored by the field. */
   iconStart?: ReactNode;
-  /** Figma `🌟 Icon ( R )`: any SVG at the end of the field. */
+  /** Any SVG at the end of the field. */
   iconEnd?: ReactNode;
-  /** Figma `✏️ Alt text`: short text at the end of the field, such as a unit or a shortcut. */
+  /** Short text at the end of the field, such as a unit or a shortcut. */
   altText?: ReactNode;
-  /** Figma `👀 Leading input`: an add-on before the field, cut off by a divider. Text, an `<Icon>` or any slot. */
+  /** An add-on before the field, cut off by a divider. Text, an `<Icon>` or any slot. */
   leading?: ReactNode;
-  /** Figma `👀 Trailing input`: an add-on after the field, cut off by a divider. */
+  /** An add-on after the field, cut off by a divider. */
   trailing?: ReactNode;
   /** Reaches the native `<input>`, for form libraries and for components that wrap Text Input. */
   ref?: Ref<HTMLInputElement>;

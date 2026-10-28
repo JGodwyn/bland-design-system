@@ -12,7 +12,12 @@ const withPanels = (items: PillTabItem[]) =>
 export default {
   title: 'Pill tab',
   description:
-    'A row of tabs drawn as Pills (one pill look across filters and tabs), space-xs apart. Tabs sets the number of pills; the first is selected and takes the Control/checked fill. In code the pills here are tabs (role="tab", aria-selected), unlike filter Pills (aria-pressed). The row scrolls sideways when the pills do not fit, with the fade alone.',
+    'Tabs drawn as pills, for switching between views of the same content.',
+  usage: [
+    'Pass `items`, each with an `id` and a `label`. Give an item a `panel` to show its content under the row.',
+    'Name the row with `aria-label`.',
+    'For filters people combine, use Pill: these are tabs, so one is always selected.',
+  ],
   components: ['PillTabs'],
   demo: {
     component: 'PillTabs',
@@ -42,7 +47,7 @@ export default {
     <>
       {sizes.map((size) => (
         <div key={size} className="pg-stack">
-          <span className="pg-label">size={size}: selected, rest, icon, count, icon only, disabled</span>
+          <span className="pg-label"><code>size="{size}"</code>: selected, rest, <code>icon</code>, <code>count</code>, icon only, <code>disabled</code></span>
           <PillTabs
             aria-label={`Topics ${size}`}
             size={size}
@@ -58,21 +63,21 @@ export default {
         </div>
       ))}
       <div className="pg-stack">
-        <span className="pg-label">The whole row disabled</span>
+        <span className="pg-label">The whole row <code>disabled</code></span>
         <PillTabs aria-label="Disabled row" disabled items={tabs(3, { count: 2 })} />
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Overflow: eight pills in 320px scroll sideways; the fade shows there is more (no scrollbar)</span>
+        <span className="pg-label">Pills that don't fit scroll sideways; the fade shows there is more</span>
         <div style={{ maxWidth: 320 }}>
           <PillTabs aria-label="Overflowing" items={tabs(8)} />
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">With panels (used by the behaviour tests)</span>
+        <span className="pg-label">Try it: tabs with a <code>panel</code> each</span>
         <PillTabs aria-label="With panels" data-testid="panels" items={withPanels(tabs(3))} />
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-focus">
           <PillTabs aria-label="Focused" items={tabs(2)} />
         </div>

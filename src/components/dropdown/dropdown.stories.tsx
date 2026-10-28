@@ -59,7 +59,13 @@ function Controlled() {
 export default {
   title: 'Dropdown',
   description:
-    'A field that opens a menu of options to pick from. Type basic picks one option from a button, filterable types into the field to narrow the options, and multi-select picks several, shown as Chips in the field with a checkbox on each option. The field is built like Text Input: Size sets its height (32, 40, 48), Status colors the border, helper text and status icon, and disabled uses the disabled colors. The menu opens 4px under the field, as wide as it, with rows of Menu size md; the chosen option shows a Check. Arrow keys move through the options, Escape closes the menu.',
+    'A field that opens a list of options to choose from. Use it when there are too many options for radios or a segmented bar.',
+  usage: [
+    '`type`: `basic` picks one option, `filterable` lets people type to narrow a long list, `multi-select` picks several and shows them as chips.',
+    'Give it a `label`, and put help or an error in `helperText` with `status`.',
+    'Keep options short and in a predictable order, such as alphabetical.',
+    'For a list of actions rather than values, use Menu.',
+  ],
   components: ['Dropdown'],
   demo: {
     component: 'Dropdown',
@@ -116,7 +122,7 @@ export default {
     <>
       {types.map((type) => (
         <div key={type} className="pg-stack">
-          <span className="pg-label">type={type} at each size: empty, filled, disabled</span>
+          <span className="pg-label"><code>type="{type}"</code> at each size: empty, filled, <code>disabled</code></span>
           <div className="pg-row" style={{ alignItems: 'flex-start' }}>
             {sizes.map((size) => (
               <div key={size} style={column}>
@@ -139,7 +145,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">status: default, danger, success, warning (filled); then each disabled</span>
+        <span className="pg-label"><code>status</code>: <code>default</code>, <code>danger</code>, <code>success</code>, <code>warning</code>; then each <code>disabled</code></span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           <div style={column}>
             {statuses.map((status) => (
@@ -155,7 +161,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows while the field has keyboard focus; forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring goes around the field (turned on here to show it)</span>
         <div className="pg-focus" style={column}>
           <Dropdown label="Focused" items={fruits} />
           <Dropdown type="filterable" label="Focused filterable" items={fruits} />
@@ -163,7 +169,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Icon, leading add-on, many chips (they wrap), long value, no visible label</span>
+        <span className="pg-label"><code>icon</code>, <code>leading</code>, many chips (they wrap), a long value, no visible label</span>
         <div style={column}>
           <Dropdown label="Icon" icon={<UserIcon />} items={fruits} />
           <Dropdown label="Leading add-on" leading="Fruit" items={fruits} defaultValue="fig" />
@@ -174,7 +180,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Behaviour (used by the tests; open menus are screenshotted by tests/dropdown.spec.ts)</span>
+        <span className="pg-label">Try it</span>
         <Controlled />
       </div>
     </>

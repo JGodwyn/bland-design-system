@@ -26,7 +26,12 @@ function Controlled() {
 export default {
   title: 'Section tab',
   description:
-    'Underline tabs that switch between sections of a page. Tabs sets the number of items; the first is selected. Selected shows a 2px brand underline that covers the 1px border-subtle divider under the row; hover adds a surface-200 fill; disabled uses minimal text and icon. Items take an icon and a count (a square box to match the tab corners). The row fills its container and scrolls sideways when the tabs do not fit, with the fade alone. The underline slides to a pressed tab. In code: role="tablist" with role="tab" and aria-selected; arrow keys move between tabs.',
+    'Underlined tabs that switch between sections of a page or panel.',
+  usage: [
+    'Pass `items`, each with an `id` and a `label`. Give an item a `panel` to show its content under the row.',
+    'Add an `icon` or a `count` to an item. `hideLabel` shows the icon alone; the label stays as its name.',
+    'Name the row with `aria-label`. Tabs that don\'t fit scroll sideways.',
+  ],
   components: ['SectionTabs'],
   demo: {
     component: 'SectionTabs',
@@ -56,7 +61,7 @@ export default {
     <>
       {sizes.map((size) => (
         <div key={size} className="pg-stack">
-          <span className="pg-label">size={size}: selected, rest, with icon and count, disabled</span>
+          <span className="pg-label"><code>size="{size}"</code>: selected, rest, with <code>icon</code> and <code>count</code>, <code>disabled</code></span>
           <SectionTabs
             aria-label={`Sections ${size}`}
             size={size}
@@ -70,7 +75,7 @@ export default {
         </div>
       ))}
       <div className="pg-stack">
-        <span className="pg-label">The whole row disabled (the selected tab keeps a grey underline), and an icon only tab</span>
+        <span className="pg-label">The whole row <code>disabled</code>, and a tab with <code>hideLabel</code></span>
         <SectionTabs aria-label="Disabled row" disabled items={tabs(3)} />
         <SectionTabs
           aria-label="Icon only"
@@ -81,17 +86,17 @@ export default {
         />
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Overflow: eight tabs in 320px scroll sideways; the fade shows there is more (no scrollbar)</span>
+        <span className="pg-label">Tabs that don't fit scroll sideways; the fade shows there is more</span>
         <div style={{ maxWidth: 320 }}>
           <SectionTabs aria-label="Overflowing" data-testid="overflow" items={tabs(8)} />
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">With panels, controlled (used by the behaviour tests)</span>
+        <span className="pg-label">Try it: tabs with a <code>panel</code> each</span>
         <Controlled />
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-focus">
           <SectionTabs aria-label="Focused" items={tabs(2)} />
         </div>

@@ -638,6 +638,29 @@ code,
   font: var(--type-body-lg);
   color: var(--text-bold);
 }
+/* Prop names and values in a caption are <code> in the story (so the raw story shows them too), drawn as Code text lg. */
+.docs-variant-caption code {
+  --bland-radius: var(--rad-sm);
+  padding: var(--space-none) var(--space-xs);
+  font: var(--type-code-body-lg);
+  letter-spacing: var(--type-code-body-lg-letter-spacing);
+  color: var(--text-bold);
+  background-color: var(--surface-200);
+  border-radius: var(--bland-radius);
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-xs) var(--border-subtle);
+}
+
+/* ---- Usage: a component's few rules, one per line ---- */
+.docs-usage {
+  max-width: 720px; /* the lead's measure */
+  margin: 0;
+  padding-inline-start: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  font: var(--type-body-lg);
+  color: var(--text-bold);
+}
 
 /* ---- Data tables in Bland's Table: props and tokens ---- */
 .docs-data {

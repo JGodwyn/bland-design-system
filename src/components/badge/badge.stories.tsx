@@ -12,7 +12,13 @@ const icons = { none: undefined, CheckIcon: <CheckIcon />, PlusIcon: <PlusIcon /
 export default {
   title: 'Badge',
   description:
-    'Badge labels a status, category or count next to content. It is static and not interactive. Emotion sets the color family and Type the weight: primary is a solid fill, secondary a soft tint, outline a border only. Icon only makes a circle that holds an icon and no label; it starts at md, since a 12px icon in a 16px circle is too small to read. Sizes sm 16, md 20, lg 24, xl 32. Colors alias the Indicator tokens, so badges and indicators always match. For a dot or a count on an avatar, use Indicator instead.',
+    'A small label for a status, category or count next to content. Badges are static: nothing happens when people press one.',
+  usage: [
+    '`emotion` sets the color family. `type` sets the weight: `primary` is a solid fill, `secondary` a soft tint, `outline` a border only.',
+    'Keep labels to a word or two.',
+    'An icon-only badge needs an `aria-label`. It starts at size `md`, where the icon is large enough to read.',
+    'For a dot or count on an avatar or icon, use Indicator. For a filter people press, use Pill; for a removable value, use Chip.',
+  ],
   components: ['Badge'],
   demo: {
     component: 'Badge',
@@ -34,7 +40,7 @@ export default {
     <>
       {types.map((type) => (
         <div key={type} className="pg-stack">
-          <span className="pg-label">type="{type}": label, with icons, icon only</span>
+          <span className="pg-label"><code>type="{type}"</code>: label, with icons, icon only</span>
           {emotions.map((emotion) => (
             <div key={emotion} className="pg-row">
               <Badge type={type} emotion={emotion}>
@@ -53,7 +59,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">Sizes: sm 16 (default), md 20, lg 24, xl 32; icon only from md</span>
+        <span className="pg-label"><code>size</code>: <code>sm</code> (default), <code>md</code>, <code>lg</code>, <code>xl</code>; icon only from <code>md</code></span>
         {sizes.map((size) => (
           <div key={size} className="pg-row">
             <Badge size={size}>Badge {size}</Badge>
@@ -69,7 +75,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Optical padding: with one icon, the bare side steps up from 8 to 12 (sm, md, lg; xl keeps 16)</span>
+        <span className="pg-label">With one icon, the side without it gets a little more room, so the label looks centred</span>
         {sizes.map((size) => (
           <div key={size} className="pg-row">
             <Badge size={size} type="secondary" data-testid={`plain-${size}`}>

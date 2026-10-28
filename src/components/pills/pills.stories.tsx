@@ -26,7 +26,12 @@ function Controlled() {
 export default {
   title: 'Pills',
   description:
-    'Selectable pill for filters and quick choices. Size sm, md, lg (32, 40, 48 high, never narrower than high). Selected uses the Control/checked tokens with white content in both modes. States rest, hover, disabled; focus shows the 2px ring. Optional leading icon and a count badge (an Indicator). In code: a toggle button with aria-pressed.',
+    'A pill people press to turn a filter or a quick choice on and off.',
+  usage: [
+    'Use `selected` or `defaultSelected`; `onSelectedChange` reports each press.',
+    'Add an `icon` or a `count`. An icon-only pill needs an `aria-label`.',
+    'For switching between views, use PillTabs. For a value people remove, use Chip.',
+  ],
   components: ['Pill'],
   demo: {
     component: 'Pill',
@@ -55,7 +60,7 @@ export default {
     <>
       {[false, true].map((selected) => (
         <div key={String(selected)} className="pg-stack">
-          <span className="pg-label">selected={String(selected)}: rest, icon, count, icon only, then disabled</span>
+          <span className="pg-label"><code>selected={String(selected)}</code>: plain, <code>icon</code>, <code>count</code>, icon only, then <code>disabled</code></span>
           {sizes.map((size) => (
             <div key={size} className="pg-row">
               <Pill size={size} selected={selected}>
@@ -77,7 +82,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-row pg-focus">
           <Pill>Focused</Pill>
           <Pill selected size="md">
@@ -88,7 +93,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Toggling (used by the behaviour tests)</span>
+        <span className="pg-label">Try it: press to turn on and off</span>
         <div className="pg-row">
           <Pill data-testid="uncontrolled">Uncontrolled</Pill>
           <Controlled />

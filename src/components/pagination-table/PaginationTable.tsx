@@ -22,20 +22,20 @@ export interface PaginationTableProps extends Omit<HTMLAttributes<HTMLDivElement
   defaultPage?: number;
   /** Called with the page to show. */
   onPageChange?: (page: number) => void;
-  /** Figma `Size`: 32, 40 or 48 high. Default sm, Figma's. */
+  /** 32, 40 or 48 high. Default sm. */
   size?: PaginationTableSize;
   /**
-   * Figma `Navigation`. `simple`: page numbers (Pagination). `advanced`: a field to type a page into, the page
+   * `simple`: page numbers (Pagination). `advanced`: a field to type a page into, the page
    * count and previous and next, for long tables. Default simple.
    */
   navigation?: PaginationTableNavigation;
   /**
-   * Figma `✏️ Items` (`👀 Items`): the summary of the items shown. Defaults to "1-10 of 100 items"; pass your own
+   * The summary of the items shown. Defaults to "1-10 of 100 items"; pass your own
    * text (translated, say), or `false` to hide it.
    */
   summary?: ReactNode;
   /**
-   * Figma `✏️ Pages` (`👀 Pages`), advanced only: the page count after the field. Defaults to "of 10 pages";
+   * advanced only: the page count after the field. Defaults to "of 10 pages";
    * pass your own text, or `false` to hide it.
    */
   pagesLabel?: ReactNode;

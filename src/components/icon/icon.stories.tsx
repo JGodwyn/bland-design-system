@@ -17,7 +17,12 @@ const glyphs = { CheckIcon: <CheckIcon />, XIcon: <XIcon />, PlusIcon: <PlusIcon
 export default {
   title: 'Icon',
   description:
-    'Sizes and colors one icon from any icon pack. Stroked icons get the 1.5 stroke at every size; filled icons keep their own weight. Color follows the text around it. Give it a label only when it carries meaning on its own.',
+    'Sizes and colors one icon from any icon pack. Bland ships no icon set: use the pack your project prefers.',
+  usage: [
+    '`size`: `xs` 12, `sm` 16, `md` 20, `lg` 24. Icons passed to a component\'s icon prop don\'t need it: the component sizes them.',
+    'The icon takes the color of the text around it.',
+    'Give it a `label` only when it carries meaning on its own. Without one it is hidden from screen readers.',
+  ],
   components: ['Icon'],
   demo: {
     component: 'Icon',
@@ -32,7 +37,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Stroked (Bland icons): stroke-md at every size</span>
+        <span className="pg-label">Stroked icons: one stroke weight at every size</span>
         <div className="pg-row">
           {sizes.map((s) => (
             <Icon key={s} size={s}>
@@ -47,7 +52,7 @@ export default {
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Filled (any pack): keeps its own weight</span>
+        <span className="pg-label">Filled icons keep their own weight</span>
         <div className="pg-row">
           {sizes.map((s) => (
             <Icon key={s} size={s}>
@@ -57,7 +62,7 @@ export default {
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Color follows the text</span>
+        <span className="pg-label">The color follows the text</span>
         <div className="pg-row" style={{ color: 'var(--icon-brand)' }}>
           <Icon size="lg" label="Add">
             <PlusIcon />

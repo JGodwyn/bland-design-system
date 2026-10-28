@@ -31,7 +31,13 @@ function Backdrop({ color, children }: { color: LogoColor; children: ReactNode }
 export default {
   title: 'Logo',
   description:
-    'Bland wordmark. Color default uses text-bold and follows light and dark mode; on-color is white in both modes, for brand fills such as the doc Header and Footer. Turn on Mark and drop a project logomark into Mark to brand it. Code: the wordmark is live text that names the product; pass href to make it the home link.',
+    'The product\'s wordmark, with an optional logomark before it. Pass `href` to make it the link home.',
+  usage: [
+    '`children` replaces the Bland wordmark with your product\'s name.',
+    'Put your logomark in `mark`.',
+    'Use `color="on-color"` on brand fills: it is white in both themes. Use your logomark\'s white version there too.',
+    '`size="sm"` fits top bars; `lg` is the default.',
+  ],
   components: ['Logo'],
   demo: {
     component: 'Logo',
@@ -50,7 +56,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Sizes: lg (default, heading-md) and sm (title-md, for top bars)</span>
+        <span className="pg-label"><code>size</code>: <code>lg</code> (default) and <code>sm</code> (for top bars)</span>
         <div className="pg-row">
           {sizes.map((size) => (
             <Logo key={size} size={size} data-testid={`logo-${size}`} />
@@ -59,7 +65,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Color: default (text-bold, follows the theme) and on-color (white in both, on surface-brand-strong)</span>
+        <span className="pg-label"><code>color</code>: <code>default</code> (follows the theme) and <code>on-color</code> (white in both, for brand fills)</span>
         <div className="pg-row">
           {colors.map((color) => (
             <Backdrop key={color} color={color}>
@@ -70,7 +76,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Mark: a project logomark before the wordmark, sized logo/mark-lg (40) or -sm (24); on a brand fill, the project's white version</span>
+        <span className="pg-label"><code>mark</code>: your logomark before the wordmark; on a brand fill, its white version</span>
         <div className="pg-row">
           {sizes.map((size) => (
             <Logo key={size} size={size} mark={<ProjectMark />} data-testid={`mark-${size}`} />
@@ -82,14 +88,14 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">A project's product name in place of Bland (code only)</span>
+        <span className="pg-label">Your product name as <code>children</code></span>
         <div className="pg-row">
           <Logo mark={<ProjectMark />}>Northwind</Logo>
         </div>
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: with href it is the home link (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: with <code>href</code> it is the link home (turned on here to show it)</span>
         <div className="pg-row pg-focus">
           {sizes.map((size) => (
             <Logo key={size} size={size} href="#/" onClick={(e) => e.preventDefault()} />

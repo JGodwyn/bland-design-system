@@ -37,7 +37,7 @@ export interface FieldShellProps extends Omit<HTMLAttributes<HTMLDivElement>, 'c
   children: ReactNode;
   /** At the end of the main row: the calendar button or the clock icon. */
   end?: ReactNode;
-  /** Figma `👀 Trailing input`: the Time Picker's AM / PM add-on. */
+  /** The Time Picker's AM / PM add-on. */
   trailing?: ReactNode;
   /** After the field, outside the box (so its presses never reach the box): the calendar popover, hidden inputs. */
   after?: ReactNode;

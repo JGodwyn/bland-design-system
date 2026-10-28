@@ -19,7 +19,7 @@ export type SliderSize = 'sm' | 'md' | 'lg';
 export type SliderType = 'single' | 'double';
 
 interface SliderBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
-  /** Figma `Size`: the thumb (slider/thumb-*, 16, 20, 24) and the row it sits in (control/xs, sm, md). Default sm, as in Figma. */
+  /** The thumb, 16, 20 or 24, and the row it sits in, 24, 32 or 40. Default sm. */
   size?: SliderSize;
   /** The lowest value. Default 0. */
   min?: number;
@@ -28,7 +28,7 @@ interface SliderBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultV
   /** The distance between values a thumb can take. Default 1. */
   step?: number;
   /**
-   * Figma `👀 Labels`: the scale under the track. `true` (default, as in Figma) shows five values from `min` to
+   * The scale under the track. `true` (default) shows five values from `min` to
    * `max`, a number from 2 to 5 shows that many, an array shows exactly those values; `false` hides it.
    * Each label sits on its value; the ones at `min` and `max` line up with the track's ends.
    */
@@ -40,26 +40,26 @@ interface SliderBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultV
    */
   snap?: boolean | readonly number[];
   /**
-   * Figma `👀 Input field`: a value field (Text Input, slider/input-width wide) to type a value into, committed
+   * A value field to type a value into, committed
    * on Enter or blur. A range gets two, the start before the track and the end after it.
    */
   inputField?: boolean;
-  /** Figma `👀 Tooltip` on each thumb: the value over a thumb while it is hovered, focused from the keyboard or dragged. Default true. */
+  /** Shows the value over a thumb while it is hovered, focused from the keyboard or dragged. Default true. */
   tooltip?: boolean;
   /** How values read in the tooltip, the labels, the fields and to screen readers, as `Intl.NumberFormat` options (`{ style: 'percent' }` expects 0 to 1). */
   formatOptions?: Intl.NumberFormatOptions;
-  /** Figma `State=disabled`: no dragging, no focus, the disabled colors. */
+  /** No dragging, no focus, the disabled colors. */
   disabled?: boolean;
   /** The form field name, given to each thumb's range input (a range submits two values under it). */
   name?: string;
-  /** Names the slider (Figma has no visible label). Use this or `aria-labelledby`. */
+  /** Names the slider, which has no visible label. Use this or `aria-labelledby`. */
   'aria-label'?: string;
   /** Names the slider by a visible element's id. */
   'aria-labelledby'?: string;
 }
 
 export interface SliderSingleProps extends SliderBaseProps {
-  /** Figma `Type`: one thumb for a value (default), or two for a range. */
+  /** One thumb for a value (default), or two for a range. */
   type?: 'single';
   /** The value, controlled. Pair it with `onValueChange`. */
   value?: number;
@@ -72,7 +72,7 @@ export interface SliderSingleProps extends SliderBaseProps {
 }
 
 export interface SliderDoubleProps extends SliderBaseProps {
-  /** Figma `Type`: one thumb for a value (default), or two for a range. */
+  /** One thumb for a value (default), or two for a range. */
   type: 'double';
   /** The range `[start, end]`, controlled. Pair it with `onValueChange`. */
   value?: readonly [number, number];

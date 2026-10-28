@@ -20,29 +20,29 @@ export interface ChatListItemLinkProps {
 }
 
 export interface ChatListItemProps extends Omit<LiHTMLAttributes<HTMLLIElement>, 'onClick'> {
-  /** Figma `✏️ Name`: the person or group. One line, ellipsis. */
+  /** The person or group. One line, ellipsis. */
   name: ReactNode;
-  /** Figma `✏️ Date`: when the last message came, such as "09:41" or "Yesterday". Never truncated. */
+  /** When the last message came, such as "09:41" or "Yesterday". Never truncated. */
   date?: ReactNode;
-  /** Figma `✏️ Message`: the last message. One line, ellipsis. */
+  /** The last message. One line, ellipsis. */
   message?: ReactNode;
-  /** Figma `Type`: who wrote the last message. receiver (the other person) can show `unread`; sender (you) shows `status`. */
+  /** Who wrote the last message. receiver (the other person) can show `unread`; sender (you) shows `status`. */
   type?: ChatListItemType;
-  /** Figma `👀 Unread` (receiver): a brand dot after the message. Off by default (Figma draws it on). */
+  /** A brand dot after the message. Off by default. */
   unread?: boolean;
   /** The words read for the unread dot. Default "Unread". */
   unreadLabel?: string;
-  /** Delivery status of your last message (sender): one check, two checks, or two in brand. Default delivered (Figma's). */
+  /** Delivery status of your last message (sender): one check, two checks, or two in brand. Default delivered. */
   status?: MessageStatus;
   /** Words read for each `status`. Default Sent, Delivered, Seen. */
   statusLabels?: Partial<MessageStatusLabels>;
-  /** Figma's Avatar (lg, 40): pass `<Avatar size="lg" … />` without `alt`, since the name is shown next to it. */
+  /** Pass `<Avatar size="lg" … />` without `alt`, since the name is shown next to it. */
   avatar?: ReactNode;
   /** Makes the row a link to the chat. Rendered as `<a>` unless `renderLink` is given. */
   href?: string;
   /** Makes the row a button that opens the chat. */
   onClick?: MouseEventHandler<HTMLElement>;
-  /** The chat that is open: `aria-current` on the row and Figma's Selected fill (Messaging/surface-list-selected). */
+  /** The chat that is open: `aria-current` on the row and the selected fill. */
   current?: boolean;
   /** Renders a link row with the project's router link. Default: a plain `<a>`. */
   renderLink?: (props: ChatListItemLinkProps) => ReactNode;

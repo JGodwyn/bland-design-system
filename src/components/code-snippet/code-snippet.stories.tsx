@@ -152,7 +152,13 @@ const bodyType: Record<CodeTextSize, string> = {
 export default {
   title: 'Code snippet',
   description:
-    'Block of code with optional file tabs, action bar and line numbers. Collapsed clips the code to code-snippet/height-collapsed (18 lines) and shows a Show more button; expanded shows every line with Show less; fullscreen has square corners and no toggle. The action bar picks the language with a dropdown (with an optional description), Section tabs or Pill tabs, and has a copy button that announces "Copied". Syntax colors use the Code/* tokens; Bland ships no highlighter, so pass highlight. Code text is the inline version, inside running text. In code: pre > code, a tablist for the files, line numbers aria-hidden, the toggle a button with aria-expanded; long lines scroll sideways while the line numbers stay.',
+    'A block of code with a copy button, and optionally line numbers, file tabs and a language switcher. For code inside a sentence, use CodeText.',
+  usage: [
+    'Pass `code` as a string, or as `{ [language]: string }` to offer the same code in several languages.',
+    'Pass `files` to show several files, each in its own tab.',
+    'Bland ships no syntax highlighter: pass `highlight` to color the code with Prism, Shiki, highlight.js or your own.',
+    'Long code collapses behind Show more. Turn that off with `collapsible={false}`, or use `fullscreen` when the snippet fills a panel of its own.',
+  ],
   components: ['CodeSnippet', 'CodeText'],
   demo: {
     component: 'CodeSnippet',
@@ -201,7 +207,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Collapsed (Figma default): file tabs, dropdown switcher with a description, copy, Show more</span>
+        <span className="pg-label">Collapsed (the default): file tabs, a language dropdown with a <code>description</code>, copy, Show more</span>
         <Frame>
           <CodeSnippet
             data-testid="collapsed"
@@ -213,7 +219,7 @@ export default {
         </Frame>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Expanded: every line, Show less</span>
+        <span className="pg-label"><code>expanded</code>: every line, Show less</span>
         <Frame>
           <CodeSnippet
             data-testid="expanded"
@@ -226,14 +232,14 @@ export default {
         </Frame>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Fullscreen: square corners, fills its container (here 384 tall) and scrolls, no toggle</span>
+        <span className="pg-label"><code>fullscreen</code>: square corners, fills its container and scrolls inside</span>
         <Frame height="var(--code-snippet-height-collapsed)">
           <CodeSnippet data-testid="fullscreen" files={files} languages={languages} fullscreen highlight={demoHighlight} />
         </Frame>
       </div>
       {switchers.map((switcher) => (
         <div key={switcher} className="pg-stack">
-          <span className="pg-label">Switcher {switcher}, no file tabs, short code (no toggle)</span>
+          <span className="pg-label"><code>switcher="{switcher}"</code>, no file tabs, short code</span>
           <Frame>
             <CodeSnippet
               data-testid={`switcher-${switcher}`}
@@ -246,7 +252,7 @@ export default {
         </div>
       ))}
       <div className="pg-stack">
-        <span className="pg-label">One language: a label, no menu; long lines scroll sideways</span>
+        <span className="pg-label">One language shows as a label; long lines scroll sideways</span>
         <Frame>
           <CodeSnippet
             data-testid="single"
@@ -257,13 +263,13 @@ export default {
         </Frame>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">No action bar, no line numbers, no highlighter (plain Code/text)</span>
+        <span className="pg-label"><code>actionBar={false}</code>, no line numbers, no <code>highlight</code></span>
         <Frame>
           <CodeSnippet data-testid="plain" code={short} actionBar={false} lineNumbers={false} />
         </Frame>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Focused: copy button</span>
+        <span className="pg-label">Keyboard focus on the copy button</span>
         <Frame>
           <div className="pg-focus">
             <CodeSnippet code={short} highlight={demoHighlight} />
@@ -271,11 +277,11 @@ export default {
         </Frame>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Controlled: the page holds the language and expanded state; the line under it reports them</span>
+        <span className="pg-label">Controlled <code>language</code> and <code>expanded</code>; the line under it reports them</span>
         <Controlled />
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Code text: sm, md and lg in body-sm, -md and -lg text, then with copy</span>
+        <span className="pg-label">CodeText: <code>sm</code>, <code>md</code>, <code>lg</code>, then <code>copyable</code></span>
         {sizes.map((size) => (
           <p key={size} style={{ font: bodyType[size], color: 'var(--text-bold)', margin: 0 }}>
             Install it with <CodeText size={size}>npm install bland</CodeText> and import{' '}

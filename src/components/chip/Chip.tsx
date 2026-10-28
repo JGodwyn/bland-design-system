@@ -6,19 +6,19 @@ import './chip.css';
 export type ChipSize = 'sm' | 'md' | 'lg';
 
 export interface ChipProps extends HTMLAttributes<HTMLSpanElement> {
-  /** Figma `✏️ Label`: the value, filter or attribute. Truncates with an ellipsis. */
+  /** The value, filter or attribute. Truncates with an ellipsis. */
   children: ReactNode;
-  /** Figma `Size`. sm 20 (default, as in Figma), md 24, lg 32 high. */
+  /** sm 20 (default), md 24, lg 32 high. */
   size?: ChipSize;
-  /** Figma `🧩 Slot` (shown with `👀 Slot`): one leading Avatar or Indicator. */
+  /** One leading Avatar or Indicator. */
   leading?: ReactNode;
   /**
-   * Figma `Type=countable` and `✏️ Count`: the number in the count box after the label.
+   * The number in the count box after the label.
    * Takes a number or any node.
    */
   count?: ReactNode;
   /**
-   * Figma `Type=cancellable`: shows the close button and is called when it is pressed.
+   * Shows the close button and is called when it is pressed.
    * The chip does not hide itself; remove it from your list here.
    */
   onRemove?: (event: MouseEvent<HTMLButtonElement>) => void;

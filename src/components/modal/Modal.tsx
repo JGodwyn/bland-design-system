@@ -30,7 +30,7 @@ export type ModalActionsOrientation = 'auto' | 'horizontal' | 'vertical';
 export type ModalBackdrop = 'minimal' | 'subtle' | 'bold';
 
 export interface ModalProps extends Omit<DialogHTMLAttributes<HTMLDialogElement>, 'title' | 'open' | 'children'> {
-  /** Figma `Size`: the width, sm (modal/width-sm, 384) or md (modal/width-md, 512). Override it with CSS for a wider layout. */
+  /** The width, sm (384) or md (512). Override it with CSS for a wider layout. */
   size?: ModalSize;
   /** Whether it is open (controlled). */
   open?: boolean;
@@ -43,42 +43,42 @@ export interface ModalProps extends Omit<DialogHTMLAttributes<HTMLDialogElement>
    * returns to it on close. It must forward `ref` and DOM props. Leave it out and drive `open` yourself.
    */
   trigger?: ReactElement;
-  /** Figma `✏️ Title` (`👀 Title` off = none: then give `aria-label`). Names the dialog. */
+  /** Names the dialog. */
   title?: ReactNode;
   /** The title's element. Defaults to `h2`. */
   titleAs?: ModalTitleAs;
-  /** Figma `🌟 Icon` (`👀 Icon`): any SVG before the title, icon/md in icon-bold. Decorative. */
+  /** Any SVG before the title. Decorative. */
   icon?: ReactNode;
-  /** Figma `👀 Close`: the close button in the title row. Default true. */
+  /** The close button in the title row. Default true. */
   closeButton?: boolean;
   /** The close button's accessible name. Default "Close". */
   closeLabel?: string;
-  /** Figma `_modal-title` `👀 Divider`: a line under the title row. */
+  /** `👀 Divider`: a line under the title row. */
   titleDivider?: boolean;
-  /** Figma `✏️ Description` (`👀 Description`): the body text, which also describes the dialog (`aria-describedby`). */
+  /** The body text, which also describes the dialog (`aria-describedby`). */
   description?: ReactNode;
-  /** Figma `🧩 Top slot` (`👀 Top slot`): any content above the description, such as an image. */
+  /** Any content above the description, such as an image. */
   top?: ReactNode;
-  /** Figma `🧩 Bottom slot` (`👀 Bottom slot`): any content under the description, such as a form or a list. */
+  /** Any content under the description, such as a form or a list. */
   children?: ReactNode;
-  /** Figma `_modal-body` `Alignment`: left, or center for short confirmations. */
+  /** `Alignment`: left, or center for short confirmations. */
   align?: ModalAlign;
   /**
-   * Figma `👀 Actions`: up to three md Buttons, **primary first**. Use the danger emotion on the primary for a
+   * Up to three md Buttons, **primary first**. Use the danger emotion on the primary for a
    * destructive action. Pass a function to get `close`, for a Cancel that only closes. A
    * `<Button htmlType="submit" form="…">` can submit a form in the body.
    */
   actions?: ReactNode | ((close: () => void) => ReactNode);
   /**
-   * Figma `_modal-action-bar` `Alignment`: left (primary first, on the leading edge), right (primary last, on the
+   * `Alignment`: left (primary first, on the leading edge), right (primary last, on the
    * trailing edge; the DOM order follows) or fill (equal widths, primary first).
    */
   actionsAlign?: ModalActionsAlign;
-  /** Figma `Orientation`. `auto` (default) stacks the actions full width, primary on top, below breakpoint/sm. */
+  /** `auto` (default) stacks the actions full width, primary on top, on screens narrower than 640px. */
   actionsOrientation?: ModalActionsOrientation;
-  /** Figma `_modal-action-bar` `👀 Divider`: a line over the actions. */
+  /** `👀 Divider`: a line over the actions. */
   actionsDivider?: boolean;
-  /** How much the page behind dims (Modal/backdrop-*): minimal, subtle (default) or bold, for a decision that needs full attention. */
+  /** How much the page behind dims: minimal, subtle (default) or bold, for a decision that needs full attention. */
   backdrop?: ModalBackdrop;
   /** Whether a press on the backdrop closes it. Default true; false for a decision that needs an answer. Escape always closes. */
   dismissable?: boolean;

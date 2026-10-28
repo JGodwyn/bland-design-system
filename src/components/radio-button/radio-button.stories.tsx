@@ -25,7 +25,12 @@ function Controlled() {
 export default {
   title: 'Radio Button',
   description:
-    'Lets people select exactly one option from a set. Small is a 16px circle in a 24px hit area with a body-md label. Medium is a 20px circle in a 32px hit area with a body-lg label. Keyboard focus shows a 2px ring offset 2px from the circle. Use Radio Button Group for lists of options: in vertical lists the hit areas touch, so rows have no extra gap.',
+    'Lets people pick exactly one option from a set they can see all at once.',
+  usage: [
+    'Put radios in a RadioGroup, and name it with `aria-label` or `aria-labelledby`.',
+    'Pick a default with `defaultValue` when one option suits most people.',
+    'For more than about seven options, use Dropdown. When people can pick several, use Checkbox.',
+  ],
   components: ['Radio', 'RadioGroup'],
   demo: {
     component: 'Radio',
@@ -44,7 +49,7 @@ export default {
     <>
       {sizes.map((size) => (
         <div key={size} className="pg-stack">
-          <span className="pg-label">size={size}: false, true; then disabled; then without a label</span>
+          <span className="pg-label"><code>size="{size}"</code>: unchecked, checked; then <code>disabled</code>; then without a label</span>
           <div className="pg-row">
             {[false, true].map((c) => (
               <Radio key={String(c)} value={String(c)} size={size} checked={c} readOnly>
@@ -64,7 +69,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-row pg-focus">
           <Radio value="a" name="focus-a">
             Focused
@@ -77,7 +82,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Radio Button Group: vertical sm and md (rows touch), horizontal sm and md (16 apart)</span>
+        <span className="pg-label">RadioGroup: vertical and horizontal, <code>sm</code> and <code>md</code></span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           {sizes.map((size) => (
             <RadioGroup key={size} size={size} defaultValue="one" aria-label={`Vertical ${size}`}>
@@ -102,7 +107,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Behaviour (used by the tests): uncontrolled and controlled groups</span>
+        <span className="pg-label">Try it: uncontrolled and controlled groups</span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           <RadioGroup aria-label="Size" data-testid="uncontrolled">
             <Radio value="s">Small</Radio>

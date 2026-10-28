@@ -40,9 +40,9 @@ export interface CodeSnippetLanguage {
 export type CodeSnippetSwitcher = 'dropdown' | 'tabs' | 'pills';
 
 export interface CodeSnippetProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-  /** Figma `✏️ Code`, for a snippet without file tabs: a string, or `{ [languageId]: string }`. Ignored when `files` is set. */
+  /** For a snippet without file tabs: a string, or `{ [languageId]: string }`. Ignored when `files` is set. */
   code?: CodeSource;
-  /** Figma `👀 Tabs`: the files, one File tab each. Without it the snippet has no tabs and shows `code`. */
+  /** The files, one File tab each. Without it the snippet has no tabs and shows `code`. */
   files?: CodeSnippetFile[];
   /** The shown file (controlled). */
   file?: string;
@@ -61,11 +61,11 @@ export interface CodeSnippetProps extends Omit<HTMLAttributes<HTMLDivElement>, '
   defaultLanguage?: string;
   /** Called with a language's id when the switcher picks it. */
   onLanguageChange?: (id: string) => void;
-  /** Figma `_code-action-bar` `Switcher`: how the language is picked. dropdown (default, as in Figma), tabs or pills. */
+  /** `Switcher`: how the language is picked. dropdown (default), tabs or pills. */
   switcher?: CodeSnippetSwitcher;
-  /** Figma `✏️ Description` (shown with `👀 Description`): text at the start of the action bar, dropdown switcher only. */
+  /** text at the start of the action bar, dropdown switcher only. */
   description?: ReactNode;
-  /** Figma `👀 Copy`: the copy button in the action bar. Default true. */
+  /** The copy button in the action bar. Default true. */
   copyable?: boolean;
   /** The copy button's accessible name. Defaults to "Copy code". */
   copyLabel?: string;
@@ -73,9 +73,9 @@ export interface CodeSnippetProps extends Omit<HTMLAttributes<HTMLDivElement>, '
   copiedLabel?: string;
   /** Called with the copied code after a successful copy. */
   onCopied?: (code: string) => void;
-  /** Figma `👀 Action bar`: the bar above the code. Default true; it hides by itself when it has nothing to show. */
+  /** The bar above the code. Default true; it hides by itself when it has nothing to show. */
   actionBar?: boolean;
-  /** Figma `👀 Line numbers`: the line number gutter. Default true. */
+  /** The line number gutter. Default true. */
   lineNumbers?: boolean;
   /**
    * Turns the code into nodes with your highlighter (Bland ships none). Its token classes take the Code colors:
@@ -84,13 +84,13 @@ export interface CodeSnippetProps extends Omit<HTMLAttributes<HTMLDivElement>, '
    */
   highlight?: (code: string, language: string | undefined) => ReactNode;
   /**
-   * Figma `👀 Show more`: the Show more / Show less button, shown when the code is taller than
-   * code-snippet/height-collapsed. Default true. Without it a long snippet stays collapsed and scrolls.
+   * The Show more / Show less button, shown when the code is taller than
+   * 18 lines. Default true. Without it a long snippet stays collapsed and scrolls.
    */
   collapsible?: boolean;
-  /** Figma `View` expanded (controlled): every line shows. */
+  /** Expanded (controlled): every line shows. */
   expanded?: boolean;
-  /** Starts expanded (uncontrolled). Figma's default is collapsed. */
+  /** Starts expanded (uncontrolled). Collapsed by default. */
   defaultExpanded?: boolean;
   /** Called when Show more or Show less is pressed. */
   onExpandedChange?: (expanded: boolean) => void;
@@ -98,7 +98,7 @@ export interface CodeSnippetProps extends Omit<HTMLAttributes<HTMLDivElement>, '
   showMoreLabel?: string;
   /** The toggle's label while expanded. Defaults to "Show less". */
   showLessLabel?: string;
-  /** Figma `View=fullscreen`: square corners, fills its container's height and scrolls inside, no toggle. */
+  /** Square corners, fills its container's height and scrolls inside, no toggle. */
   fullscreen?: boolean;
   /** Names the file tab list. Defaults to "Files". */
   filesLabel?: string;

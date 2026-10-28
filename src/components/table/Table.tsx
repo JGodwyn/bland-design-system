@@ -59,10 +59,10 @@ const RowContext = createContext<{ disabled: boolean }>({ disabled: false });
 export interface TableProps extends TableHTMLAttributes<HTMLTableElement> {
   /** The table's sections: a `TableHead` and a `TableBody`. */
   children: ReactNode;
-  /** Figma `Size`: row and header height, table/sm 32 (default, as in Figma), md 40, lg 48. */
+  /** Row and header height: sm 32 (default), md 40, lg 48. */
   size?: TableSize;
   /**
-   * Figma Table-row `👀 Checkbox` / `👀 Radio`. `multiple` adds a Checkbox column with a select all Checkbox in the
+   * `multiple` adds a Checkbox column with a select all Checkbox in the
    * header (mixed while some rows are selected); `single` adds a Radio column. Rows need a `rowKey`.
    */
   selectionMode?: TableSelectionMode;
@@ -212,7 +212,7 @@ export interface TableRowProps extends HTMLAttributes<HTMLTableRowElement> {
   children: ReactNode;
   /** Identifies a body row for selection. Required when the Table has a `selectionMode`. */
   rowKey?: string;
-  /** Figma `State=disabled` on the row's cells: muted text, and its controls are disabled. */
+  /** Mutes the row's text and disables its controls. */
   disabled?: boolean;
   /** Accessible name of the row's selection Checkbox or Radio, such as "Select Ada Lovelace". */
   selectLabel?: string;
@@ -301,20 +301,20 @@ function CellContent({ leading, children, trailing }: { leading?: ReactNode; chi
 }
 
 export interface TableHeaderCellProps extends ThHTMLAttributes<HTMLTableCellElement> {
-  /** Figma `✏️ Label`: one line in body-lg-bold, ending in an ellipsis when it does not fit. */
+  /** One line in body-lg-bold, ending in an ellipsis when it does not fit. */
   children?: ReactNode;
-  /** Figma `🧩 Leading` (`👀 Leading`): a box of table/slot-sm, md or lg (20, 24, 32) before the label. */
+  /** A box of 20, 24 or 32 (by table size) before the label. */
   leading?: ReactNode;
-  /** Figma `🧩 Trailing` (`👀 Trailing`), after the label. Not shown on a sortable header, whose sort icon sits there. */
+  /** After the label. Not shown on a sortable header, whose sort icon sits there. */
   trailing?: ReactNode;
   /**
-   * Figma `Structure=sortable`: the current sort of this column. With `onSort` the header is a button, and the th
+   * The current sort of this column. With `onSort` the header is a button, and the th
    * sets `aria-sort` while it is `ascending` or `descending`.
    */
   sort?: TableSort;
-  /** Makes the header a sort button (Figma `Structure=sortable`). Called on press; set the next `sort` yourself. */
+  /** Makes the header a sort button. Called on press; set the next `sort` yourself. */
   onSort?: MouseEventHandler<HTMLButtonElement>;
-  /** Figma `🌟 Sort icon`: replaces the icon that shows the sort (ArrowUp, ArrowDown, or ArrowsDownUp unsorted). */
+  /** Replaces the icon that shows the sort (ArrowUp, ArrowDown, or ArrowsDownUp unsorted). */
   sortIcon?: ReactNode;
 }
 
@@ -349,13 +349,13 @@ export function TableHeaderCell({ children, leading, trailing, sort = 'none', on
 }
 
 export interface TableCellProps extends TdHTMLAttributes<HTMLTableCellElement> {
-  /** Figma `✏️ Label`: one line in body-lg, ending in an ellipsis when it does not fit. Any node: text, a link, a Badge. */
+  /** One line in body-lg, ending in an ellipsis when it does not fit. Any node: text, a link, a Badge. */
   children?: ReactNode;
-  /** Figma `🧩 Leading` (`👀 Leading`): an Avatar, an `<Icon>`, in a box of at least table/slot-sm, md or lg (20, 24, 32). */
+  /** An Avatar, an `<Icon>`, in a box of at least 20, 24 or 32 (by table size). */
   leading?: ReactNode;
-  /** Figma `🧩 Trailing` (`👀 Trailing`), after the label. */
+  /** After the label. */
   trailing?: ReactNode;
-  /** Figma `State=disabled` for this cell alone (muted text). A disabled `TableRow` disables all its cells. */
+  /** For this cell alone (muted text). A disabled `TableRow` disables all its cells. */
   disabled?: boolean;
 }
 
@@ -400,7 +400,7 @@ export interface TableExpandCellProps extends Omit<TdHTMLAttributes<HTMLTableCel
 }
 
 /**
- * Figma `_table-cell` `Structure=expand`: a square cell with a ghost Icon Button (CaretDown) that shows or hides the
+ * `Structure=expand`: a square cell with a ghost Icon Button (CaretDown) that shows or hides the
  * row's details, with `aria-expanded`. In a `TableHead` it is Figma's blank `empty` header above that column.
  */
 export function TableExpandCell({ expanded = false, onExpandedChange, label = 'Show details', controls, className, ...rest }: TableExpandCellProps) {
@@ -448,7 +448,7 @@ export interface TableOptionCellProps extends Omit<TdHTMLAttributes<HTMLTableCel
 }
 
 /**
- * Figma `Structure=option` (Table-row `👀 Option`): a square cell at the end of the row with a ghost Icon Button
+ * A square cell at the end of the row with a ghost Icon Button
  * (DotsThree), in the head and the body alike. With `items`, the button opens a Menu of the row's actions.
  */
 export function TableOptionCell({

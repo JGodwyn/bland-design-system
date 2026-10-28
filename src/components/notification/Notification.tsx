@@ -6,25 +6,25 @@ export type NotificationStatus = MessageStatus;
 export type NotificationOrientation = MessageOrientation;
 
 export interface NotificationProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
-  /** Figma `Status`: sets the icon, and when colored the surface, border and shadow. */
+  /** Sets the icon, and when colored the surface, border and shadow. */
   status?: NotificationStatus;
-  /** Figma `Orientation`: horizontal is one line with inline actions; vertical adds a title, timestamp and actions under the text. */
+  /** horizontal is one line with inline actions; vertical adds a title, timestamp and actions under the text. */
   orientation?: NotificationOrientation;
-  /** Figma `Colored`: the tinted status surface and border. `false` is surface-100 with border-bold and a neutral shadow. */
+  /** The tinted status surface and border. `false` is surface-100 with border-bold and a neutral shadow. */
   colored?: boolean;
-  /** Figma `✏️ Title` (on horizontal, `👀 Title`): shown above the description. */
+  /** Shown above the description. */
   title?: ReactNode;
-  /** Figma `✏️ Description` (`👀 Description` off = no children). */
+  /** The description. */
   children?: ReactNode;
-  /** Figma `✏️ Timestamp` (`👀 Timestamp`): next to the title on vertical, after the text on horizontal. A `<time>` element works well. */
+  /** Next to the title on vertical, after the text on horizontal. A `<time>` element works well. */
   timestamp?: ReactNode;
-  /** Figma `👀 Btn` / `👀 Btn (2nd)`: one or two Buttons, size xs on horizontal, md on vertical (primary, then secondary). */
+  /** One or two Buttons, size xs on horizontal, md on vertical (primary, then secondary). */
   actions?: ReactNode;
-  /** Figma `👀 Close btn`: shows a close button that calls this. In a Toaster, pass the dismiss function. */
+  /** Shows a close button that calls this. In a Toaster, pass the dismiss function. */
   onClose?: () => void;
   /** Accessible name of the close button. */
   closeLabel?: string;
-  /** Figma `👀 Icon`: `true` shows the status icon, `false` hides it, or pass any SVG to replace it. */
+  /** `true` shows the status icon, `false` hides it, or pass any SVG to replace it. */
   icon?: MessageIcon;
 }
 

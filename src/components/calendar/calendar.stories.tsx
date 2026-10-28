@@ -11,7 +11,13 @@ const nov = '2024-11-01';
 export default {
   title: 'Calendar',
   description:
-    'Date calendar. Type day (7-column grid with a weekday row), month or year (3 x 4 grids); the title toggle switches from days to months to years, and picking a year or a month goes back down. Range shows a selected start and end with in-range days. Days outside the month and dates that cannot be picked are drawn disabled; today is underlined. Slot holds extra content under the grid; Action-bar adds Cancel and Apply. Values are ISO dates ("2024-11-09").',
+    'A month grid for picking a date or a date range, placed on the page. For a field with a calendar that opens from it, use Date Picker or Date Range Picker.',
+  usage: [
+    'Values are ISO strings: `"2024-11-09"` for a date, or `{ start, end }` with `range`.',
+    'People press the title to move from days to months to years.',
+    'Limit what can be picked with `minValue`, `maxValue` and `isDateUnavailable`.',
+    'Add Cancel and Apply with `actions`, and content under the grid with `extra`.',
+  ],
   components: ['Calendar'],
   demo: {
     component: 'Calendar',
@@ -70,7 +76,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Type day: sm, md, lg (today underlined)</span>
+        <span className="pg-label"><code>size</code>: <code>sm</code>, <code>md</code>, <code>lg</code> (today is underlined)</span>
         <div className="pg-row">
           {sizes.map((size) => (
             <Calendar key={size} size={size} defaultFocusedValue={nov} aria-label={`Day ${size}`} />
@@ -78,7 +84,7 @@ export default {
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">range: a start, an end and the days between; a single date selected</span>
+        <span className="pg-label"><code>range</code>: a start, an end and the days between; then a single date</span>
         <div className="pg-row">
           {sizes.map((size) => (
             <Calendar key={size} size={size} range defaultValue={{ start: '2024-11-09', end: '2024-11-20' }} aria-label={`Range ${size}`} />
@@ -87,7 +93,7 @@ export default {
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">defaultView="month" and "year": sm, md, lg</span>
+        <span className="pg-label"><code>defaultView="month"</code> and <code>"year"</code>: <code>sm</code>, <code>md</code>, <code>lg</code></span>
         <div className="pg-row">
           {sizes.map((size) => (
             <Calendar key={size} size={size} defaultView="month" defaultFocusedValue={nov} aria-label={`Month ${size}`} />
@@ -100,7 +106,7 @@ export default {
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">minValue and maxValue (5 to 25 November), isDateUnavailable (weekends), disabled</span>
+        <span className="pg-label"><code>minValue</code> and <code>maxValue</code> (5 to 25 November), <code>isDateUnavailable</code> (weekends), <code>disabled</code></span>
         <div className="pg-row">
           <Calendar minValue="2024-11-05" maxValue="2024-11-25" defaultValue="2024-11-12" aria-label="Bounded" />
           <Calendar
@@ -112,7 +118,7 @@ export default {
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">actions (Figma _calendar-action-bar) sm, md, lg; extra (Figma 🧩 Slot); titleDivider and actionsDivider (Figma 👀 Divider, off by default)</span>
+        <span className="pg-label"><code>actions</code> at <code>sm</code>, <code>md</code>, <code>lg</code>; <code>extra</code>; <code>titleDivider</code> and <code>actionsDivider</code> (off by default)</span>
         <div className="pg-row">
           {sizes.map((size) => (
             <Calendar
@@ -148,7 +154,7 @@ export default {
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">locale="en-GB" (weeks start on Monday) and "de-DE"</span>
+        <span className="pg-label"><code>locale="en-GB"</code> (weeks start on Monday) and <code>"de-DE"</code></span>
         <div className="pg-row">
           <Calendar locale="en-GB" defaultValue="2024-11-20" aria-label="British" />
           <Calendar locale="de-DE" defaultValue="2024-11-20" aria-label="German" />

@@ -22,7 +22,13 @@ function Stepper() {
 export default {
   title: 'Progress-bar',
   description:
-    'Linear progress bar. Status: default (in progress), success and danger (complete). Size sm has a 4px track, md 8px. Width comes from progress/width and never exceeds its container; set the width to fill a layout. The value sits in a fixed column so the track never changes length. Cancel shows a close button (24px hit area) on default. Value, Label and Helper text are optional. Figma draws quarters; code takes any value.',
+    'Shows how far a task has come, such as an upload or an import.',
+  usage: [
+    'Pass `value` from 0 to 100, or set your own `min` and `max`.',
+    'Set `status` to `success` or `danger` when the task ends.',
+    'Give it a `label`, or an `aria-label`. Add `onCancel` when people can stop the task.',
+    'For the steps of a flow, use ProgressWizard.',
+  ],
   components: ['ProgressBar'],
   demo: {
     component: 'ProgressBar',
@@ -45,7 +51,7 @@ export default {
     <>
       {sizes.map((size) => (
         <div key={size} className="pg-stack">
-          <span className="pg-label">size="{size}": 0, 25, 50, 75 and 100%</span>
+          <span className="pg-label"><code>size="{size}"</code>: 0, 25, 50, 75 and 100%</span>
           {values.map((value) => (
             <ProgressBar key={value} size={size} value={value} aria-label={`Progress ${value}`} />
           ))}
@@ -53,7 +59,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">status: success and danger, with their icon and helper color</span>
+        <span className="pg-label"><code>status</code>: <code>success</code> and <code>danger</code></span>
         {sizes.map((size) => (
           <div key={size} className="pg-row">
             <ProgressBar size={size} status="success" value={100} label="Upload" helperText="Upload complete" />
@@ -63,7 +69,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Label, helper text, no value, and any value between quarters</span>
+        <span className="pg-label"><code>label</code>, <code>helperText</code>, <code>showValue={false}</code>, and any value</span>
         <div className="pg-row">
           <ProgressBar value={62} label="Installing updates" helperText="About 2 minutes left" />
           <ProgressBar value={62} showValue={false} label="No value" />
@@ -72,7 +78,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">onCancel: a close button after the value</span>
+        <span className="pg-label"><code>onCancel</code>: a cancel button after the value</span>
         <div className="pg-row">
           {sizes.map((size) => (
             <ProgressBar key={size} size={size} value={50} label="Uploading" onCancel={() => {}} />
@@ -81,14 +87,14 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused cancel button: the ring shows on keyboard focus; forced on here to show it</span>
+        <span className="pg-label">Keyboard focus on the cancel button (turned on here to show it)</span>
         <div className="pg-row pg-focus">
           <ProgressBar value={50} label="Uploading" onCancel={() => {}} />
         </div>
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">The fill slides between values (used by the behaviour tests)</span>
+        <span className="pg-label">Try it: the fill slides between values</span>
         <Stepper />
       </div>
     </>

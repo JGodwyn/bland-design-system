@@ -18,7 +18,12 @@ function Controlled() {
 export default {
   title: 'Toggle',
   description:
-    'Switches a single setting on or off and takes effect immediately. Use it for binary settings; use Checkbox when the choice is submitted with a form. Small is a 40 by 24 track, medium 56 by 32. States: rest, hover and disabled. Keyboard focus shows a 2px ring offset 2px, matching Button. The checked track is Brand600 and the unchecked track is Neutral500 in both modes, so the white knob holds at least 4.2:1 on either. Keep the label short.',
+    'Turns a single setting on or off, and takes effect at once.',
+  usage: [
+    'Use it for settings that apply immediately. In a form people submit, use Checkbox.',
+    'Name the setting, not the action: Notifications, not Turn on notifications.',
+    'Without a visible label, give it an `aria-label`.',
+  ],
   components: ['Toggle'],
   demo: {
     component: 'Toggle',
@@ -36,7 +41,7 @@ export default {
     <>
       {sizes.map((size) => (
         <div key={size} className="pg-stack">
-          <span className="pg-label">size={size}: off, on; then disabled; then without a label</span>
+          <span className="pg-label"><code>size="{size}"</code>: off, on; then <code>disabled</code>; then without a label</span>
           <div className="pg-row">
             {states.map((c) => (
               <Toggle key={String(c)} size={size} checked={c} readOnly>
@@ -56,7 +61,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-row pg-focus">
           <Toggle>Focused</Toggle>
           <Toggle size="md" defaultChecked>
@@ -67,7 +72,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Behaviour (used by the tests): uncontrolled, controlled, disabled</span>
+        <span className="pg-label">Try it: uncontrolled, controlled, <code>disabled</code></span>
         <div className="pg-row">
           <Toggle data-testid="uncontrolled">Uncontrolled</Toggle>
           <Controlled />
@@ -81,7 +86,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">A long label wraps beside the track, first line centred on it</span>
+        <span className="pg-label">A long label wraps beside the track</span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           {sizes.map((size) => (
             <div key={size} style={{ maxWidth: 240 }}>

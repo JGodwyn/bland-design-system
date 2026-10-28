@@ -32,7 +32,13 @@ function Dismissible() {
 export default {
   title: 'Banner',
   description:
-    'Persistent message that sits in the page layout, usually full width under a header, and stays until the user dismisses it or the condition clears. No elevation, so it reads as part of the page. Status sets the icon and its color: info, danger, success, warning. Title shows on vertical; on horizontal it is optional (👀 Title, off by default) and sits above the description. Set the instance to Fill container in layouts. For floating messages use Notification; for transient ones use Toast.',
+    'A message that sits in the page layout, usually across the top of a page or section, and stays until it is dismissed or the condition clears.',
+  usage: [
+    '`status` sets the icon and its color. Turn on `colored` when the message needs more weight than the default neutral surface.',
+    'Add up to two `actions` (Buttons, primary first). Add `onClose` to let people dismiss it; a banner never hides itself.',
+    '`orientation="vertical"` gives the title its own line and puts the actions under the text.',
+    'For a message that floats over the page, use Notification. For a short confirmation, use Toast.',
+  ],
   components: ['Banner'],
   demo: {
     component: 'Banner',
@@ -60,7 +66,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">orientation="horizontal": status info, danger, success, warning</span>
+        <span className="pg-label"><code>orientation="horizontal"</code>: <code>status</code> <code>info</code>, <code>danger</code>, <code>success</code>, <code>warning</code></span>
         {statuses.map((status) => (
           <Banner key={status} status={status}>
             Banners display important announcements ({status})
@@ -69,7 +75,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">orientation="vertical": a title over the description</span>
+        <span className="pg-label"><code>orientation="vertical"</code>: a title over the description</span>
         {statuses.map((status) => (
           <Banner key={status} status={status} orientation="vertical" title="Banner title">
             Banners display important announcements ({status})
@@ -78,7 +84,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">colored: the tinted status surface and border, horizontal then vertical</span>
+        <span className="pg-label"><code>colored</code>: a tinted surface and border, horizontal then vertical</span>
         {statuses.map((status) => (
           <Banner key={status} status={status} colored>
             Banners display important announcements ({status})
@@ -92,7 +98,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Actions (Buttons default to sm: inline when horizontal, below when vertical) and close</span>
+        <span className="pg-label"><code>actions</code> (inline when horizontal, under the text when vertical) and <code>onClose</code></span>
         <Banner status="info" actions={actionsFor('horizontal', 2)} onClose={() => {}}>
           A new version is available
         </Banner>
@@ -109,7 +115,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the actions and close button take keyboard focus; forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the actions and close button take focus (turned on here to show it)</span>
         <div className="pg-focus">
           <Banner status="info" actions={actionsFor('horizontal', 1)} onClose={() => {}}>
             A new version is available

@@ -7,10 +7,10 @@ export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 export type AvatarType = 'image' | 'placeholder' | 'initials';
 
 export interface AvatarProps extends HTMLAttributes<HTMLSpanElement> {
-  /** Figma `Size`: avatar/* xs 16, sm 24, md 32 (default), lg 40, xl 48, 2xl 64, 3xl 80. */
+  /** xs 16, sm 24, md 32 (default), lg 40, xl 48, 2xl 64, 3xl 80. */
   size?: AvatarSize;
   /**
-   * Figma `Type`. Omit it to pick from what you pass: `src` gives image, `initials` gives initials, else placeholder.
+   * Omit it to pick from what you pass: `src` gives image, `initials` gives initials, else placeholder.
    * An image that is missing or fails to load falls back to the initials, or to the placeholder without them.
    */
   type?: AvatarType;
@@ -21,11 +21,11 @@ export interface AvatarProps extends HTMLAttributes<HTMLSpanElement> {
    * so screen readers don't hear it twice; the avatar is then decorative.
    */
   alt?: string;
-  /** Figma `✏️ Initials`. xs shows the first character only; other sizes show up to two. */
+  /** xs shows the first character only; other sizes show up to two. */
   initials?: string;
-  /** Figma `🧩 Top slot`: top-right on the circle edge. Put a count Indicator here (lg and up). */
+  /** Top-right on the circle edge. Put a count Indicator here (lg and up). */
   topSlot?: ReactNode;
-  /** Figma `🧩 Bottom slot`: bottom-right on the circle edge. Put a status Indicator here, with its ring on. */
+  /** Bottom-right on the circle edge. Put a status Indicator here, with its ring on. */
   bottomSlot?: ReactNode;
   /** Props for the `<img>`, such as `srcSet`, `loading` or `referrerPolicy`. */
   imgProps?: Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt'>;

@@ -36,11 +36,11 @@ export interface MenuProps extends Omit<HTMLAttributes<HTMLDivElement>, 'childre
    * press and keyboard handlers, `aria-haspopup` and `aria-expanded`.
    */
   children: ReactElement;
-  /** The rows, top to bottom (Figma's nested `_menu-item` instances). */
+  /** The rows, top to bottom. */
   items: MenuItemData[];
   /** Called with an item's `id` when it is chosen (a press, Enter or Space). The menu then closes. */
   onAction?: (id: string) => void;
-  /** Figma `Size`: the row size. sm 32 (default, as in Figma), md 40, lg 48 with one line. */
+  /** The row size. sm 32 (default), md 40, lg 48 with one line. */
   size?: MenuSize;
   /** Where the menu opens, in Floating UI's names. Default `bottom-start`; flips when there is no room. */
   placement?: MenuPlacement;

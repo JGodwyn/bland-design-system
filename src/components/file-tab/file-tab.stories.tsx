@@ -41,7 +41,12 @@ function Closable() {
 export default {
   title: 'File tab',
   description:
-    'Editor or browser style tabs. Tabs sets the number of tabs (1 to 8); the first is selected. Tabs are separated by a 1px border-subtle gap. The selected tab uses surface-100 so it joins the content below the row; unselected tabs are surface-300 like the bar, hover surface-400. The slot holds leading content such as a file-type icon. Minimized is a square tab that shows only the slot. Close: a pointer button on the tab, or Delete on a focused tab. The row scrolls sideways when the tabs do not fit, with the fade alone. In code: role="tab" with aria-selected.',
+    'Tabs for open files or documents, as in a code editor or a browser. People switch between them and can close them.',
+  usage: [
+    'Pass `onClose` to let people close tabs, with the close button or Delete. The closed tab\'s neighbour is selected. Set `closable: false` on a tab that must stay.',
+    'Put a file-type icon in each item\'s `leading`. A `minimized` tab shows only that.',
+    'Name the row with `aria-label`. Tabs that don\'t fit scroll sideways.',
+  ],
   components: ['FileTabs'],
   demo: {
     component: 'FileTabs',
@@ -72,7 +77,7 @@ export default {
     <>
       {sizes.map((size) => (
         <div key={size} className="pg-stack">
-          <span className="pg-label">size={size}: minimized, selected, rest, no close, disabled, minimized disabled</span>
+          <span className="pg-label"><code>size="{size}"</code>: <code>minimized</code>, selected, rest, not <code>closable</code>, <code>disabled</code></span>
           <FileTabs
             aria-label={`Files ${size}`}
             size={size}
@@ -90,21 +95,21 @@ export default {
         </div>
       ))}
       <div className="pg-stack">
-        <span className="pg-label">The whole row disabled: the selected tab stays surface-100</span>
+        <span className="pg-label">The whole row <code>disabled</code></span>
         <FileTabs aria-label="Disabled row" disabled onClose={noop} items={tabs(3)} />
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Overflow: eight tabs in 400px scroll sideways; the fade shows there is more (no scrollbar)</span>
+        <span className="pg-label">Tabs that don't fit scroll sideways; the fade shows there is more</span>
         <div style={{ maxWidth: 400 }}>
           <FileTabs aria-label="Overflowing" items={tabs(8, { leading: <FileIcon /> })} />
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Closing (used by the behaviour tests): the selected tab's neighbour takes over</span>
+        <span className="pg-label">Try it: close the selected tab and its neighbour takes over</span>
         <Closable />
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-focus">
           <FileTabs aria-label="Focused" onClose={noop} items={tabs(2)} />
         </div>

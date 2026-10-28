@@ -36,7 +36,7 @@ export interface ToasterProps extends Omit<HTMLAttributes<HTMLElement>, 'childre
   children?: ReactNode;
   /**
    * Default time on screen in milliseconds; `null` keeps toasts until dismissed. Omitted, it is the
-   * `--duration-toast-visible` token (Figma `duration/toast-visible`, 5000ms), read where the Toaster sits.
+   * `--duration-toast-visible` token (5000ms), read where the Toaster sits.
    * Paused while the pointer is over the stack, focus is inside it or the page is hidden.
    */
   duration?: number | null;

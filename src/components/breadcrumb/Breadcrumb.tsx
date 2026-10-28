@@ -6,13 +6,13 @@ import './breadcrumb.css';
 
 /** One page in the trail. The last item is the current page. */
 export interface BreadcrumbItem {
-  /** Figma `✏️ Label`: the page name. Also the accessible name when the label is hidden. */
+  /** The page name. Also the accessible name when the label is hidden. */
   label: string;
   /** The page's URL. Ignored on the last item, the current page, which is never a link. */
   href?: string;
-  /** Figma `🌟 Icon` (`👀 Icon` on): any SVG before the label, sized icon/md. */
+  /** Any SVG before the label. */
   icon?: ReactNode;
-  /** Figma `👀 Label` off: show the icon alone; the label stays as its accessible name. Needs `icon`. */
+  /** Show the icon alone; the label stays as its accessible name. Needs `icon`. */
   hideLabel?: boolean;
 }
 
@@ -25,7 +25,7 @@ export interface BreadcrumbLinkProps {
 }
 
 export interface BreadcrumbProps extends HTMLAttributes<HTMLElement> {
-  /** The trail from the top level down to the current page (the last item). Figma `Crumbs` is its length. */
+  /** The trail from the top level down to the current page (the last item). */
   items: BreadcrumbItem[];
   /**
    * Collapse the trail when it has more items than this: the first item and the last two stay, and an

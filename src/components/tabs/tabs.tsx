@@ -14,11 +14,11 @@ import './tabs.css';
 export interface TabItemBase {
   /** Unique key: what `value` and `onValueChange` report. */
   id: string;
-  /** Figma `✏️ Label` (or `✏️ Name`): the tab's text. */
+  /** The tab's text. */
   label: ReactNode;
   /** The text screen readers and typeahead use. Needed when `label` is not a string. */
   textValue?: string;
-  /** Figma `State=disabled`: shown, skipped by the arrow keys, cannot be selected. */
+  /** Shown, skipped by the arrow keys, cannot be selected. */
   disabled?: boolean;
   /**
    * The content shown under the tabs while this tab is selected, in a `role="tabpanel"` the tab points at.
@@ -31,7 +31,7 @@ export interface TabItemBase {
 export interface TabsSelectionProps {
   /** The selected tab's `id`, controlled. Pair it with `onValueChange`. */
   value?: string;
-  /** The tab selected at first, uncontrolled. Defaults to the first tab that is not disabled (Figma: the first is selected). */
+  /** The tab selected at first, uncontrolled. Defaults to the first tab that is not disabled. */
   defaultValue?: string;
   /** Called with the newly selected tab's `id`. */
   onValueChange?: (id: string) => void;

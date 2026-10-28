@@ -21,25 +21,25 @@ export function useButtonSize(size: ButtonSize | undefined): ButtonSize {
 
 /** Props shared by Button and IconButton. */
 export interface ButtonBaseProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-  /** Figma `Size`. lg 56, md 40, sm 32, xs 24 (dense desktop UI only, below the comfortable touch target). Default md, or the size a component sets for its action slot (Banner: sm). */
+  /** lg 56, md 40, sm 32, xs 24 (dense desktop UI only, below the comfortable touch target). Default md, or the size a component sets for its action slot (Banner: sm). */
   size?: ButtonSize;
-  /** Figma `Emotion`: brand for most actions, danger for destructive ones. */
+  /** brand for most actions, danger for destructive ones. */
   emotion?: ButtonEmotion;
-  /** Figma `Type`: primary, secondary, ghost or stroke. The native button type is `htmlType`. */
+  /** primary, secondary, ghost or stroke. The native button type is `htmlType`. */
   type?: ButtonType;
   /** The native `type` attribute. Defaults to `button`, so a Button inside a form never submits by accident. */
   htmlType?: 'button' | 'submit' | 'reset';
 }
 
 export interface ButtonProps extends ButtonBaseProps {
-  /** Figma `✏️ Label`. For a button without a label, use IconButton. */
+  /** For a button without a label, use IconButton. */
   children: ReactNode;
-  /** Figma `🌟 Icon (L)`: any SVG, sized and colored by the button. */
+  /** Any SVG, sized and colored by the button. */
   iconStart?: ReactNode;
-  /** Figma `🌟 Icon (R)`. */
+  /** Any SVG after the label. */
   iconEnd?: ReactNode;
   /**
-   * Figma `👀 Loading (L)` / `(R)`: a spinner replaces the icon on that side (`true` means start).
+   * A spinner replaces the icon on that side (`true` means start).
    * The button keeps its label and colors, sets `aria-busy`, and ignores clicks until loading ends.
    */
   loading?: boolean | 'start' | 'end';

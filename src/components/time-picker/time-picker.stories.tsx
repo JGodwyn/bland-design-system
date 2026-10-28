@@ -29,7 +29,12 @@ function Controlled() {
 export default {
   title: 'Time Picker',
   description:
-    'Time field. The field is an exposed Text Input (right icon Clock; Status, label and helper text) with editable hh:mm segments: type the digits or step them with the arrow keys. In 12-hour time the AM / PM segment sits in the trailing add-on (Figma Trailing input); 24-hour time has none. No time list panel yet. Fills its container (Figma 287 is its frame). Values are 24-hour strings ("14:30").',
+    'A field for a time of day. People type the hours and minutes, or step them with the arrow keys.',
+  usage: [
+    'Values are 24-hour strings, such as `"14:30"` (`"14:30:15"` with seconds), whatever the field shows.',
+    '`hourCycle={12}` adds an AM/PM switch; by default the field follows `locale`.',
+    'Limit the times with `minValue` and `maxValue`.',
+  ],
   components: ['TimePicker'],
   demo: {
     component: 'TimePicker',
@@ -55,7 +60,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Sizes sm, md, lg: empty, filled (AM / PM add-on), disabled</span>
+        <span className="pg-label"><code>size</code>: <code>sm</code>, <code>md</code>, <code>lg</code>; empty, filled with AM/PM, <code>disabled</code></span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           {sizes.map((size) => (
             <div key={size} style={column}>
@@ -67,7 +72,7 @@ export default {
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">status with helperText; hourCycle 24, seconds, out of bounds (minValue 09:00), controlled</span>
+        <span className="pg-label"><code>status</code> with <code>helperText</code>; <code>hourCycle={24}</code>, seconds, a time before <code>minValue</code>, controlled</span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           <div style={column}>
             {statuses.map((status) => (

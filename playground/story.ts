@@ -12,8 +12,13 @@ export type Control =
  */
 export interface Story {
   title: string;
-  /** What the component is for, in Figma's words. Falls back to the component's JSDoc. */
+  /**
+   * The page's lead: what the component is and when to use it, in one to three short sentences. Wrap prop names
+   * and values in backticks (`size`, `sm`): they render as code text. Falls back to the component's JSDoc.
+   */
   description?: string;
+  /** The Usage section: a few rules a designer, developer or agent needs, each one sentence, backticks as above. */
+  usage?: string[];
   /** Export names whose props tables appear on the page, e.g. ['Button', 'IconButton']. */
   components?: string[];
   /** Live demo: controls built from `component`'s props, starting at `args`. */

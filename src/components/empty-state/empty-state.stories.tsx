@@ -86,7 +86,14 @@ const actionCode = {
 export default {
   title: 'Empty State',
   description:
-    'Shows that a view, list or panel has no content yet and what the user can do next. Size sm for cards, panels and table bodies; lg for full pages. Use Fill container for width in layouts. Put any illustration, icon or image in the Illustration slot; Bland ships none, so without one the slot is empty. The title is required; the description and up to two stacked actions (primary first) are optional. Keep the title short and the description to one or two lines that say how to fill the space.',
+    'Fills a view, list or panel that has no content yet, and tells people what they can do next.',
+  usage: [
+    '`size="sm"` for cards, panels and table bodies; `lg` for a whole page.',
+    'Keep `title` short, and the `description` to a line or two that says how to fill the space.',
+    'Add one or two `actions`, primary first.',
+    'Pick the heading level with `titleAs` (`h2` by default) to fit the page\'s outline.',
+    'Bland ships no illustration: pass your own in `illustration`, or leave it out.',
+  ],
   components: ['EmptyState'],
   demo: {
     component: 'EmptyState',
@@ -116,7 +123,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Sizes: sm (default) for cards and panels, lg for full pages, with a project's illustration (Bland ships none)</span>
+        <span className="pg-label"><code>size</code>: <code>sm</code> (default) for cards and panels, <code>lg</code> for whole pages, with your own illustration</span>
         <Row>
           {sizes.map((size) => (
             <Frame key={size} size={size}>
@@ -127,7 +134,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Actions: one, or two stacked (primary first), each the full width; the second row has no illustration</span>
+        <span className="pg-label"><code>actions</code>: one, or two stacked with the primary first; the second has no illustration</span>
         <Row>
           {sizes.map((size) => (
             <Frame key={size} size={size}>
@@ -145,7 +152,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: only the actions take focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: only the actions take it (turned on here to show it)</span>
         <Row>
           <Frame size="sm">
             <div className="pg-focus">
@@ -156,7 +163,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Illustration: none (the default) or an icon; a title-only state (titleAs h3)</span>
+        <span className="pg-label">No <code>illustration</code>, or an icon; a title alone (<code>titleAs="h3"</code>)</span>
         <Row>
           <Frame size="sm">
             <EmptyState title="No results" description="Try another search or clear the filters." data-testid="no-illustration" />

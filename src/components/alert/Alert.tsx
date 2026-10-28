@@ -5,11 +5,11 @@ import './alert.css';
 export type AlertStatus = MessageStatus;
 
 export interface AlertProps extends HTMLAttributes<HTMLDivElement> {
-  /** Figma `Status`: sets the icon and the text color. info is neutral text with the brand icon. */
+  /** Sets the icon and the text color. info is neutral text with the brand icon. */
   status?: AlertStatus;
-  /** Figma `✏️ Label`: the message. Wraps at alert/max-width (384). */
+  /** The message. Wraps at 384px. */
   children: ReactNode;
-  /** Figma `👀 Icon`: `true` shows the status icon, `false` hides it, or pass any SVG to replace it. */
+  /** `true` shows the status icon, `false` hides it, or pass any SVG to replace it. */
   icon?: MessageIcon;
   /**
    * Defaults to `alert` for danger (announced at once, for an error that appears after an action)

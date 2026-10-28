@@ -40,7 +40,12 @@ const long = 'A last message far too long for the row it sits in, so it ends in 
 export default {
   title: 'Chat list item',
   description:
-    'Row in a list of chats. Type: receiver (last message from the other person, shows Unread) or sender (last message from you, shows its delivery status). State rest or hover; current marks the open chat with the selected fill (Figma Selected); the focus ring is inset because rows touch. Name and message truncate to one line. Width chat-list-item/width; use Fill container in layouts. No elevation. In code a li with a link or button; aria-current on the open chat.',
+    'A row in a list of conversations, with the other person\'s avatar, name, last message and date. Pressing it opens the chat.',
+  usage: [
+    'Give it `href` (a link) or `onClick` (a button), and set `current` on the open chat.',
+    '`type="receiver"` when the last message came from the other person (it can show `unread`); `sender` when it came from you (it shows the delivery `status`).',
+    'Put rows in a `<ul>`. They sit edge to edge, so the focus ring is drawn inside the row.',
+  ],
   components: ['ChatListItem'],
   demo: {
     component: 'ChatListItem',
@@ -81,7 +86,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">receiver: unread, read; sender: sent, delivered, seen</span>
+        <span className="pg-label"><code>receiver</code>: <code>unread</code>, read; <code>sender</code>: <code>sent</code>, <code>delivered</code>, <code>seen</code></span>
         <Chats label="Types">
           <ChatListItem name="Jane Doe" date="09:41" message="Here is a brief message" unread avatar={avatar} onClick={() => {}} />
           <ChatListItem name="Ada Lovelace" date="Yesterday" message="Here is a brief message" avatar={<Avatar size="lg" initials="AL" />} onClick={() => {}} />
@@ -92,7 +97,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Selected (current): the open chat, receiver and sender; hover deepens the fill</span>
+        <span className="pg-label"><code>current</code>: the open chat, receiver and sender</span>
         <Chats label="Selected">
           <ChatListItem current name="Jane Doe" date="09:41" message="Here is a brief message" unread avatar={avatar} onClick={() => {}} />
           <ChatListItem current type="sender" status="seen" name="Ada Lovelace" date="Yesterday" message="Here is a brief message" avatar={<Avatar size="lg" initials="AL" />} onClick={() => {}} />
@@ -108,7 +113,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Button and link rows: hover fill; press one to make it the open chat</span>
+        <span className="pg-label">Try it: press a row to make it the open chat</span>
         <OpenableChats />
         <Chats label="Links">
           <ChatListItem name="Jane Doe" date="09:41" message="A link row" href="#/components/chat-list-item" avatar={avatar} />
@@ -116,7 +121,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the inset ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring is drawn inside the row (turned on here to show it)</span>
         <div className="pg-focus">
           <Chats label="Focused">
             <ChatListItem name="Jane Doe" date="09:41" message="Here is a brief message" unread avatar={avatar} onClick={() => {}} />

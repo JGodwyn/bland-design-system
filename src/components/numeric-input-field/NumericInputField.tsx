@@ -17,15 +17,15 @@ export type NumericInputFieldSize = 'sm' | 'md' | 'lg';
 export type NumericInputFieldStatus = TextInputStatus;
 
 export interface NumericInputFieldProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
-  /** Figma `Size`: square boxes of digit/sm 40 (default, as in Figma), md 56, lg 72. On mobile, use sm for 6 digits. */
+  /** Square boxes of sm 40 (default), md 56, lg 72. On mobile, use sm for 6 digits. */
   size?: NumericInputFieldSize;
-  /** Figma `Status`: every box's border and the helper text color. danger also sets `aria-invalid`. */
+  /** Every box's border and the helper text color. danger also sets `aria-invalid`. */
   status?: NumericInputFieldStatus;
-  /** Number of boxes. Figma shows 4, or 6 with `👀 6 digits`. */
+  /** Number of boxes: 4 or 6. */
   length?: 4 | 6;
-  /** Figma `✏️ Label`, names the group of boxes. Leave it out (Figma `👀 Label` off) and give the field an `aria-label`. */
+  /** Names the group of boxes. Leave it out and give the field an `aria-label`. */
   label?: ReactNode;
-  /** Figma `✏️ Helper text`, under the boxes and read with each of them (`aria-describedby`). */
+  /** Under the boxes and read with each of them (`aria-describedby`). */
   helperText?: ReactNode;
   /** The code, controlled: a string of digits, up to `length` long. */
   value?: string;

@@ -27,7 +27,12 @@ const prevent = { onClick: (e: { preventDefault(): void }) => e.preventDefault()
 export default {
   title: 'Tab bar',
   description:
-    'Mobile bottom navigation. Tabs sets the number of items (2 to 5) and Selected picks the current one, shown with an icon-brand icon and a text-brand bold label. Items share the width equally. A 1px border-subtle divider runs along the top. The indicator is a small danger dot with a ring on the icon for new activity. Sits in the page layout, so no elevation, and no hover state (touch). In code: a nav of links with aria-current="page" on the current one.',
+    'Bottom navigation for mobile apps: two to five destinations, each with an icon and a label.',
+  usage: [
+    'Pass `items` with an `href` each; `renderLink` renders your router\'s links.',
+    'Set `indicator` on an item for new activity.',
+    'On larger screens, use Sidebar.',
+  ],
   components: ['TabBar'],
   demo: {
     component: 'TabBar',
@@ -59,17 +64,17 @@ export default {
     <>
       {[2, 3, 4, 5].map((n) => (
         <div key={n} className="pg-stack" style={{ maxWidth: 384 }} {...prevent}>
-          <span className="pg-label">{n} items; the first is current, press another to move it{n >= 4 ? ', Inbox has the indicator' : ''}</span>
+          <span className="pg-label">{n} items; press one to make it current{n >= 4 ? ', Inbox has an indicator' : ''}</span>
           <TabBar aria-label={`Bar ${n}`} items={all.slice(0, n)} />
         </div>
       ))}
       <div className="pg-stack" style={{ maxWidth: 384 }} {...prevent}>
-        <span className="pg-label">Another current item, and icons only (the labels stay as accessible names)</span>
+        <span className="pg-label">Another current item, and icons only with <code>hideLabel</code> (the labels stay as names)</span>
         <TabBar aria-label="Inbox current" data-testid="inbox" defaultCurrent="inbox" items={all} />
         <TabBar aria-label="Icons only" defaultCurrent="search" items={all.map((i) => ({ ...i, hideLabel: true }))} />
       </div>
       <div className="pg-stack" style={{ maxWidth: 384 }} {...prevent}>
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-focus">
           <TabBar aria-label="Focused" items={all.slice(0, 3)} />
         </div>

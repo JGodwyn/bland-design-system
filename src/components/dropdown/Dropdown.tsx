@@ -33,21 +33,21 @@ export type DropdownItem = MenuItemData;
 interface DropdownBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
   /** The options, top to bottom. */
   items: DropdownItem[];
-  /** Figma `Size`: the field height. sm 32 (default, as in Figma), md 40, lg 48 (input/*). */
+  /** The field height. sm 32 (default), md 40, lg 48. */
   size?: DropdownSize;
-  /** Figma `Status`: the border, the helper text color and a status icon. danger also sets `aria-invalid`. */
+  /** The border, the helper text color and a status icon. danger also sets `aria-invalid`. */
   status?: DropdownStatus;
-  /** Figma `✏️ Label`, tied to the field. Leave it out (Figma `👀 Label` off) and give an `aria-label`. */
+  /** Tied to the field. Leave it out and give an `aria-label`. */
   label?: ReactNode;
-  /** Figma `✏️ Helper text`, under the field and read with it (`aria-describedby`). */
+  /** Under the field and read with it (`aria-describedby`). */
   helperText?: ReactNode;
-  /** Figma `✏️ User input` while empty. Default "Select…", or "Type to filter…" when filterable. */
+  /** While empty. Default "Select…", or "Type to filter…" when filterable. */
   placeholder?: string;
-  /** Figma `🌟 Icon` (shown with `👀 Icon`): any SVG at the start of the field. */
+  /** Any SVG at the start of the field. */
   icon?: ReactNode;
-  /** Figma `👀 Leading input`: an add-on before the field, cut off by a divider (text or an `<Icon>`). */
+  /** An add-on before the field, cut off by a divider (text or an `<Icon>`). */
   leading?: ReactNode;
-  /** The size of the menu's rows. Default md at every field size, as Figma draws it. */
+  /** The size of the menu's rows. Default md at every field size. */
   menuSize?: MenuSize;
   /** Stops it from opening; the field draws the disabled colors. */
   disabled?: boolean;
@@ -59,7 +59,7 @@ interface DropdownBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaul
   defaultInputValue?: string;
   /** Filterable only: called with the input's text as it changes. */
   onInputChange?: (value: string) => void;
-  /** Filterable only: accessible name of the clear button (Figma `👀 Clear`), shown while the input has text. Default "Clear". */
+  /** Filterable only: accessible name of the clear button, shown while the input has text. Default "Clear". */
   clearLabel?: string;
   /** Reaches the trigger: the button (basic, multi-select) or the input (filterable). */
   ref?: Ref<HTMLElement>;
@@ -68,7 +68,7 @@ interface DropdownBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaul
 }
 
 export interface DropdownSingleProps extends DropdownBaseProps {
-  /** Figma `Type`: basic picks one option from a button; filterable types into an input to narrow the options. */
+  /** basic picks one option from a button; filterable types into an input to narrow the options. */
   type?: 'basic' | 'filterable';
   /** The chosen option's id, controlled (`null` for none). Pair it with `onValueChange`. */
   value?: string | null;
@@ -79,7 +79,7 @@ export interface DropdownSingleProps extends DropdownBaseProps {
 }
 
 export interface DropdownMultipleProps extends DropdownBaseProps {
-  /** Figma `Type=multi-select`: options with checkboxes; the chosen ones show as Chips in the field. */
+  /** Options with checkboxes; the chosen ones show as Chips in the field. */
   type: 'multi-select';
   /** The chosen option ids, controlled. Pair it with `onValueChange`. */
   value?: string[];

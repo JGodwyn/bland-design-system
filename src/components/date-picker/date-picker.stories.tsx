@@ -33,7 +33,13 @@ function Controlled() {
 export default {
   title: 'Date Picker',
   description:
-    'Date field with a calendar popover. The field is an exposed Text Input (Status, label and helper text; right icon CalendarBlank) with editable segments: type the digits or step them with the arrow keys; their order and placeholder follow the locale. The CalendarBlank button opens the Calendar under the field; picking a date fills it. Fills its container (Figma 287 is its frame); the calendar keeps its own width. Values are ISO dates ("2024-11-09").',
+    'A date field with a calendar that opens from it. People can type the date or pick it.',
+  usage: [
+    'Values are ISO strings such as `"2024-11-09"`. The field shows them in the order `locale` uses (09/11/2024 in `en-GB`).',
+    'Give it a `label`, and put help or an error in `helperText`.',
+    'Limit the dates with `minValue` and `maxValue`. A date outside them turns the field to `danger` on its own.',
+    'Set `confirm` to add Cancel and Apply, so a pick only counts once it is applied.',
+  ],
   components: ['DatePicker'],
   demo: {
     component: 'DatePicker',
@@ -64,13 +70,13 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Open (defaultOpen) with confirm: the calendar (md by default) opens over what is under the field, with Cancel and Apply</span>
+        <span className="pg-label"><code>defaultOpen</code> with <code>confirm</code>: the calendar opens over what is under the field, with Cancel and Apply</span>
         <div style={stage}>
           <DatePicker locale="en-US" label="Label" defaultValue="2024-11-20" defaultOpen confirm />
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Sizes sm, md, lg: empty, filled, disabled</span>
+        <span className="pg-label"><code>size</code>: <code>sm</code>, <code>md</code>, <code>lg</code>; empty, filled, <code>disabled</code></span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           {sizes.map((size) => (
             <div key={size} style={column}>
@@ -82,7 +88,7 @@ export default {
         </div>
       </div>
       <div className="pg-stack">
-        <span className="pg-label">status with helperText; out of bounds turns danger by itself (minValue 2024-11-10)</span>
+        <span className="pg-label"><code>status</code> with <code>helperText</code>; a date before <code>minValue</code> turns <code>danger</code> on its own</span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           <div style={column}>
             {statuses.map((status) => (

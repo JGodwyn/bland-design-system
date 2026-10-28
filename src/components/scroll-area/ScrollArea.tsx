@@ -7,13 +7,13 @@ export interface ScrollAreaProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   /** Scroll direction. Defaults to vertical. */
   axis?: 'y' | 'x';
-  /** Fade length: md (fade/md, 32) by default, sm (fade/sm, 16) for compact areas such as Menu. */
+  /** Fade length: md (32) by default, sm (16) for compact areas such as Menu. */
   fadeSize?: 'sm' | 'md';
   /** Extra props for the scrolling element, e.g. a role or an aria-label. */
   viewportProps?: HTMLAttributes<HTMLDivElement>;
   /**
-   * Draws the thumb, which shows while the area scrolls (Godwin, 2026-10-22). Default true, as the overflow
-   * rule asks; tab rows turn it off and show more content with the fade alone (Godwin, 2026-10-19).
+   * Draws the thumb, which shows while the area scrolls. Default true; tab rows turn it off and show more
+   * content with the fade alone.
    */
   scrollbar?: boolean;
 }

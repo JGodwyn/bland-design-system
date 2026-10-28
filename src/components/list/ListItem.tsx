@@ -13,25 +13,25 @@ export interface ListItemLinkProps {
 }
 
 export interface ListItemProps extends Omit<LiHTMLAttributes<HTMLLIElement>, 'title' | 'onClick'> {
-  /** Figma `✏️ Title`: one line, ending in an ellipsis when it does not fit. */
+  /** One line, ending in an ellipsis when it does not fit. */
   title: ReactNode;
-  /** Figma `✏️ Description`, under the title. Without one the row is Figma's `Lines=1`. */
+  /** Under the title. Without one the row has a single line. */
   description?: ReactNode;
-  /** Figma `Lines` for a row with a description. `2` (default): the description is one line with an ellipsis. `3+`: it wraps onto as many lines as it needs. */
+  /** For a row with a description. `2` (default): the description is one line with an ellipsis. `3+`: it wraps onto as many lines as it needs. */
   lines?: ListItemLines;
-  /** Figma `✏️ Alt text` (`👀 Alt text`): a short value on the right of the title, such as a time. Never truncated; the title gives way. */
+  /** A short value on the right of the title, such as a time. Never truncated; the title gives way. */
   altText?: ReactNode;
-  /** Figma `🧩 Leading` (`👀 Leading`): an Avatar, an `<Icon>` or a coin, in a list/slot-sm (24) box on 1 line rows and list/slot-lg (40) otherwise. */
+  /** An Avatar, an `<Icon>` or a coin, in a 24px box on one-line rows and 40px otherwise. */
   leading?: ReactNode;
-  /** Figma `🧩 Trailing` (`👀 Trailing`): hugs its content, such as a value, a Badge, a Toggle or a Checkbox. On a row with `href` or `onClick`, keep it non-interactive. */
+  /** Hugs its content, such as a value, a Badge, a Toggle or a Checkbox. On a row with `href` or `onClick`, keep it non-interactive. */
   trailing?: ReactNode;
-  /** Figma `Flush`: no resting fill and no radius, so rows sit edge to edge inside a container. */
+  /** No resting fill and no radius, so rows sit edge to edge inside a container. */
   flush?: boolean;
-  /** Makes the whole row a link (Figma's hover and pressed fills, focusable). Rendered as `<a>` unless `renderLink` is given. */
+  /** Makes the whole row a link (hover and pressed fills, focusable). Rendered as `<a>` unless `renderLink` is given. */
   href?: string;
-  /** Makes the whole row a button (Figma's hover and pressed fills, focusable). */
+  /** Makes the whole row a button (hover and pressed fills, focusable). */
   onClick?: MouseEventHandler<HTMLElement>;
-  /** Figma `State=disabled`: muted text; a button row is natively disabled and a link row loses its `href`. */
+  /** Muted text; a button row is natively disabled and a link row loses its `href`. */
   disabled?: boolean;
   /** Renders a link row with the project's router link. Default: a plain `<a>`. */
   renderLink?: (props: ListItemLinkProps) => ReactNode;

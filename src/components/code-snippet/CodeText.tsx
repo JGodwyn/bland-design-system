@@ -7,15 +7,15 @@ import './code-text.css';
 export type CodeTextSize = 'sm' | 'md' | 'lg';
 
 export interface CodeTextProps extends HTMLAttributes<HTMLSpanElement> {
-  /** Figma `✏️ Code`: the code, set in Geist Mono. */
+  /** The code, set in Geist Mono. */
   children: ReactNode;
   /**
-   * Figma `Size`: match the surrounding text. sm (default, as in Figma) next to body-sm, md next to body-md, lg next
+   * Match the surrounding text. sm (default) next to body-sm, md next to body-md, lg next
    * to body-lg.
    */
   size?: CodeTextSize;
   /**
-   * Figma `👀 Copy`: a copy button after the code. Off by default; its target is under 24px, so prefer a Code
+   * A copy button after the code. Off by default; its target is under 24px, so prefer a Code
    * snippet's copy button for longer code.
    */
   copyable?: boolean;

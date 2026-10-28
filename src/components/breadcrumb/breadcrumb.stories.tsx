@@ -18,7 +18,13 @@ const prevent = { onClick: (e: { preventDefault(): void }) => e.preventDefault()
 export default {
   title: 'Breadcrumb',
   description:
-    'Shows where the current page sits in the site hierarchy. Crumbs is the total number of items shown, including the current page. Place it above the page title. For deep trails or narrow screens, keep the first item and the last two, and replace the middle with an overflow crumb.',
+    'Shows where the current page sits in the site\'s hierarchy and links back up through it. Place it above the page title.',
+  usage: [
+    'List `items` from the top level down. The last one is the current page and isn\'t a link.',
+    'Set `maxItems` for deep trails: Bland keeps the first item and the last two, and folds the rest into a menu.',
+    'Pass `renderLink` to render your router\'s link component.',
+    'Don\'t use it on flat sites, or as a page\'s only navigation.',
+  ],
   components: ['Breadcrumb'],
   demo: {
     component: 'Breadcrumb',
@@ -38,17 +44,17 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Crumbs: 2 to 7; the last item is the current page</span>
+        <span className="pg-label">2 to 7 <code>items</code>; the last is the current page</span>
         {[2, 3, 4, 5, 6, 7].map((n) => (
           <Breadcrumb key={n} {...prevent} aria-label={`Breadcrumb ${n}`} items={trail(n)} />
         ))}
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Collapsed (maxItems 4): first item, overflow, last two; press … for a menu of the rest</span>
+        <span className="pg-label"><code>maxItems={4}</code>: the first item, the last two, and … for a menu of the rest</span>
         <Breadcrumb {...prevent} data-testid="collapsed" aria-label="Collapsed breadcrumb" items={trail(7)} maxItems={4} />
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Icons: with a label, and icon only (the label is its accessible name)</span>
+        <span className="pg-label"><code>icon</code> with a label, and <code>hideLabel</code> (the label stays as its name)</span>
         <Breadcrumb
           {...prevent}
           aria-label="Breadcrumb with icons"
@@ -60,7 +66,7 @@ export default {
         />
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-focus">
           <Breadcrumb {...prevent} aria-label="Focused breadcrumb" items={trail(7)} maxItems={4} />
         </div>

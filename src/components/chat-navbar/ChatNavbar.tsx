@@ -33,31 +33,31 @@ const defaultLabels: ChatNavbarLabels = {
 };
 
 export interface ChatNavbarProps extends HTMLAttributes<HTMLElement> {
-  /** Figma `✏️ Name`: who the chat is with. One line, ellipsis. */
+  /** Who the chat is with. One line, ellipsis. */
   name: ReactNode;
-  /** The name's element. Default h2 (Figma's note); pick the level that fits the page outline. */
+  /** The name's element. Default h2; pick the level that fits the page outline. */
   nameAs?: Heading;
-  /** Figma `✏️ Description`: a status line such as "Online" or "Typing…". One line, ellipsis. */
+  /** A status line such as "Online" or "Typing…". One line, ellipsis. */
   description?: ReactNode;
-  /** Figma's Avatar (md, 32): pass `<Avatar size="md" … />` without `alt`, since the name is shown next to it. */
+  /** Pass `<Avatar size="md" … />` without `alt`, since the name is shown next to it. */
   avatar?: ReactNode;
-  /** Figma `👀 Back` (for mobile; off on desktop): shows the back button and is called when it is pressed. */
+  /** Shows the back button and is called when it is pressed. */
   onBack?: () => void;
-  /** Figma `👀 Search`: shows the search button. */
+  /** Shows the search button. */
   onSearch?: () => void;
-  /** Figma `👀 Voice-call`: shows the voice call button. */
+  /** Shows the voice call button. */
   onVoiceCall?: () => void;
-  /** Figma `👀 Video-call`: shows the video call button. */
+  /** Shows the video call button. */
   onVideoCall?: () => void;
-  /** Figma `👀 More`: shows the more button, a plain button. With `moreItems` it opens a Menu instead. */
+  /** Shows the more button, a plain button. With `moreItems` it opens a Menu instead. */
   onMore?: () => void;
-  /** Figma `👀 More`: the more button opens a Menu of these (Menu's `items`). */
+  /** The more button opens a Menu of these (Menu's `items`). */
   moreItems?: MenuItemData[];
   /** Called with a `moreItems` id when it is chosen. */
   onMoreAction?: (id: string) => void;
   /** Where the more Menu opens. Default bottom-end. */
   morePlacement?: MenuPlacement;
-  /** Figma `👀 Close`: shows the close button. */
+  /** Shows the close button. */
   onClose?: () => void;
   /** The buttons' names. Default Back, Search, Voice call, Video call, More, Close. */
   labels?: Partial<ChatNavbarLabels>;

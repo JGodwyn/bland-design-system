@@ -8,16 +8,16 @@ import './tab-bar.css';
 export interface TabBarItem {
   /** Unique key: compared with the bar's `current`. */
   id: string;
-  /** Figma `✏️ Label`. Also the accessible name when the label is hidden. */
+  /** Also the accessible name when the label is hidden. */
   label: string;
-  /** Figma `🌟 Icon`: any SVG, sized icon/lg. */
+  /** Any SVG, sized icon/lg. */
   icon: ReactNode;
   /** The destination's URL. */
   href: string;
-  /** Figma `👀 Label` off: show the icon alone; `label` stays as its accessible name. */
+  /** Show the icon alone; `label` stays as its accessible name. */
   hideLabel?: boolean;
   /**
-   * Figma `👀 Indicator`: a small danger dot with a ring on the icon, for new activity. `true` shows it; a string
+   * A small danger dot with a ring on the icon, for new activity. `true` shows it; a string
    * shows it and is read out after the label ("Inbox, new messages").
    */
   indicator?: boolean | string;
@@ -38,10 +38,10 @@ export interface TabBarLinkProps {
 }
 
 export interface TabBarProps extends HTMLAttributes<HTMLElement> {
-  /** The destinations, 2 to 5 in Figma (`Tabs`). They share the width equally. */
+  /** The destinations, 2 to 5. They share the width equally. */
   items: TabBarItem[];
   /**
-   * The `id` of the page the user is on (Figma `Selected`), controlled: it gets `aria-current="page"`. Pair it
+   * The `id` of the page the user is on, controlled: it gets `aria-current="page"`. Pair it
    * with `onCurrentChange`, or set it from your router.
    */
   current?: string;

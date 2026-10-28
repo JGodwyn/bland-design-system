@@ -8,7 +8,12 @@ const statuses: AlertStatus[] = ['info', 'danger', 'success', 'warning'];
 export default {
   title: 'Alert',
   description:
-    'Inline message tied to a field or element, such as validation feedback. Status sets the icon and its color: info, danger, success, warning. The text wraps at alert/max-width; set the instance to Fill container to match the width of the element it describes. Has no surface or elevation.',
+    'A short inline message tied to a field or element, such as validation feedback. It sits right next to what it describes and has no surface of its own.',
+  usage: [
+    '`status` sets the icon and text color: `info`, `danger`, `success` or `warning`.',
+    'Link it to the field it describes with `aria-describedby`, so screen readers read the two together.',
+    'For a message about a whole page or section, use Banner. For feedback after an action, use Toast or Notification.',
+  ],
   components: ['Alert'],
   demo: {
     component: 'Alert',
@@ -19,7 +24,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Status: info, danger, success, warning</span>
+        <span className="pg-label"><code>status</code>: <code>info</code>, <code>danger</code>, <code>success</code>, <code>warning</code></span>
         {statuses.map((status) => (
           <Alert key={status} status={status}>
             Alerts display messages about an element ({status})
@@ -28,7 +33,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Without the icon, and with another icon in its place</span>
+        <span className="pg-label"><code>icon={false}</code>, and another icon in its place</span>
         <Alert status="success" icon={false}>
           Username is available
         </Alert>
@@ -38,14 +43,14 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Long text wraps at alert/max-width (384)</span>
+        <span className="pg-label">Long text wraps at 384px</span>
         <Alert status="danger">
           The password needs at least twelve characters, one number and one symbol, and it cannot match any of your last five passwords.
         </Alert>
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Under the element it describes, linked with aria-describedby</span>
+        <span className="pg-label">Under the field it describes, linked with <code>aria-describedby</code></span>
         <div className="pg-stack" style={{ maxWidth: 320 }}>
           <TextInput label="Email" aria-describedby="alert-email-error" aria-invalid defaultValue="name@" />
           <Alert id="alert-email-error" status="danger">

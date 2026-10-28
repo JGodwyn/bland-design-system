@@ -43,7 +43,13 @@ const all = { onBack: () => {}, onSearch: () => {}, onVoiceCall: () => {}, onVid
 export default {
   title: 'Chat navbar',
   description:
-    'Header of an open chat: Back (a ghost Icon Button with CaretLeft, for mobile; turn it off on desktop), avatar, name and status line, then ghost Icon Buttons for search, voice call, video call, more and close, each on its own boolean. Width chat-navbar/width; use Fill container in layouts. The bottom divider is a row divider. In code a header with an h2 for the name; each button shows when its handler is given and has an aria-label.',
+    'The header of an open chat: the other person\'s avatar, name and status, with buttons for the chat\'s actions.',
+  usage: [
+    'Each button shows when you pass its handler: `onBack`, `onSearch`, `onVoiceCall`, `onVideoCall`, `onMore`, `onClose`.',
+    'Show Back on mobile, where the chat replaces the list. Leave it out on desktop.',
+    'Pass `moreItems` and `onMoreAction` to make More open a menu.',
+    'The name is an `h2` by default; change it with `nameAs` to fit the page\'s headings.',
+  ],
   components: ['ChatNavbar'],
   demo: {
     component: 'ChatNavbar',
@@ -88,7 +94,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Every button (mobile, with Back)</span>
+        <span className="pg-label">Every button, with Back for mobile</span>
         <Frame>
           <ChatNavbar name="Jane Doe" description="Online" avatar={<Avatar size="md" src={portrait} />} {...all} />
         </Frame>
@@ -121,12 +127,12 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Buttons: More opens a Menu</span>
+        <span className="pg-label">Try it: More opens a menu (<code>moreItems</code>)</span>
         <Pressed />
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-focus">
           <Frame>
             <ChatNavbar name="Jane Doe" description="Online" avatar={<Avatar size="md" src={portrait} />} onBack={() => {}} onClose={() => {}} />

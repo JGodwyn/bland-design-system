@@ -229,11 +229,11 @@ test('the brand page makes a scale from a picked color with tinted or gray neutr
   await expect(page.getByRole('group', { name: 'Brand steps' })).toContainText('400#ff5a1f');
   await expect(page.getByText('Contrast warning')).toBeVisible();
   await page.getByRole('button', { name: 'Show breakdown' }).click();
-  await expect(page.getByRole('table', { name: 'Pairings below their minimum' })).toContainText('Progress fill');
+  await expect(page.getByRole('table', { name: 'Color pairs that are hard to read' })).toContainText('Progress fill');
   // The only miss is the entered color's own: the fix may not move it.
-  await expect(page.getByRole('table', { name: 'Pairings below their minimum' })).toContainText('Step 400 is your color');
+  await expect(page.getByRole('table', { name: 'Color pairs that are hard to read' })).toContainText('Step 400 is your color');
   await expect(page.getByRole('button', { name: 'Fix contrast' })).toHaveCount(0);
-  await expect(page.getByText('on your color itself, which stays exactly as you picked it')).toBeVisible();
+  await expect(page.getByText('because of your color itself, which stays exactly as you picked it')).toBeVisible();
 
   // The field switches format (kept for the next visit) and reads what is typed in it.
   await page.getByRole('button', { name: /^Brand color #/ }).click();

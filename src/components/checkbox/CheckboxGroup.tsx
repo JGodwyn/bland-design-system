@@ -7,9 +7,9 @@ export type CheckboxGroupOrientation = 'vertical' | 'horizontal';
 interface CheckboxGroupBaseProps extends FieldsetHTMLAttributes<HTMLFieldSetElement> {
   /** The Checkbox elements. */
   children: ReactNode;
-  /** Figma `Size`, passed to every Checkbox inside that sets none. Default sm, as in Figma. */
+  /** Passed to every Checkbox inside that sets none. Default sm. */
   size?: CheckboxSize;
-  /** Figma `Orientation`. Vertical rows touch (no gap); horizontal items sit space-lg (16) apart and wrap. */
+  /** Vertical rows touch (no gap); horizontal items sit space-lg (16) apart and wrap. */
   orientation?: CheckboxGroupOrientation;
   /** Disables every checkbox inside (the native fieldset `disabled`). */
   disabled?: boolean;

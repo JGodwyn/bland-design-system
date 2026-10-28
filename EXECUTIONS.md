@@ -1772,3 +1772,14 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Figma: breakpoint/3xl, Layout/max-width-md/-lg, renamed max-width to -sm, Desktop/md and lg styles, attached to the 1536/1920/2560 templates and Grid page frames. `moveLocalGridStyleAfter` refused across folders ("Desktop/" vs "Tablet/"); styles group by name prefix anyway, so no reorder needed.
 - Sync: fresh check.js for localHash, records for the 5 changed variables, `--apply`, checksum 638 4a186ff6 both sides. Lint picked up 1920 from tokens.json.
 - Grid page: first pass the section grids inherited `.docs-section`'s 24px gap (columns 872 wide vs 816); set column-gap to the grid gutter. Overlay columns were 0 wide (absolutely positioned without horizontal insets) and columns 7 and 8 stayed hidden (the xl reveal had lower specificity than the nth-child hide). Checked at 1440, 800, 375; spec covers 1440 to 2560 and the overlay.
+
+## Docs site copy review (2026-10-28)
+
+- Mapped where visible copy lives: story `description` (50), variant captions (`pg-label` spans and Modal/Table `label` props, ~270), prop JSDoc via props.json (734 props, 323 mentioning Figma), style page leads (`leads.ts`), notes in StylePage/BrandPage/Overview, Brand contrast banner. Token descriptions (from Figma) had no Figma wording; left alone (generated).
+- Plumbing first: `Prose` in parts.tsx (backticks → CodeText lg), `plain()` in pages.tsx for search, `usage?: string[]` on Story rendered as a Usage section after Playground, caption `<code>` styled as CodeText in docs.css. Lead wrapped in `<p>`: the lead is a flex column, so loose text and code nodes would each become a flex item.
+- Wrote all 50 descriptions and usage lists by hand (script in the session scratchpad applied them). Checked facts against the props (SearchInput `clearable` default false, Modal `actionsAlign` default left, Toaster wraps the app).
+- Captions: one replacement table per story; Table `Group` and Modal `Row` labels became ReactNode for `<code>`.
+- Prop JSDoc: a regex stripped the `Figma \`…\`:` prefixes (323 → 71). Dead ends: it also ate ", controlled" ("Pair it with onOpenChange.") and " on X" ("Figma `Status` on the exposed Text Input" → "The exposed Text Input:"), and left 8 empty `/** */`; fixed by hand, then the other 71 and 39 token-path descriptions by hand.
+- First auto-code of option values marked prose ("An `image` that fails") and missed `2xl` (filtered as a number); now only a value followed by punctuation, a number, or/and, or the end.
+- Port 5180 was held by an existing dev server; used it (HMR) instead of starting one.
+- docs.spec: updated the Brand table name and banner text assertions; 80 passed. visual.spec: every story differed, only in caption text (checked the icon diff); re-baselined, then `npm test`.

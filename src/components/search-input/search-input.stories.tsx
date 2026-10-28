@@ -29,7 +29,11 @@ function Controlled() {
 export default {
   title: 'Search Input',
   description:
-    'Search field with a search icon and an optional clear button, which shows while the field has a value. Escape clears it from the keyboard. Sizes are 32, 40 and 48 tall. It is named "Search" for screen readers unless given its own label. Keyboard focus shows a 2px ring offset 2px from the field.',
+    'A text field for search terms, with a search icon and an optional button that clears the field.',
+  usage: [
+    'It is named Search for screen readers. Give it an `aria-label` that says what it searches, such as Search orders.',
+    'Turn on `clearable` to show the clear button while there is text. Escape clears the field too.',
+  ],
   components: ['SearchInput'],
   demo: {
     component: 'SearchInput',
@@ -46,7 +50,7 @@ export default {
     <>
       {sizes.map((size) => (
         <div key={size} className="pg-stack">
-          <span className="pg-label">size={size}: empty, filled with clear, disabled</span>
+          <span className="pg-label"><code>size="{size}"</code>: empty, filled with <code>clearable</code>, <code>disabled</code></span>
           <div style={column}>
             <SearchInput size={size} placeholder="Search here" />
             <SearchInput size={size} placeholder="Search here" defaultValue="Design tokens" clearable />
@@ -56,14 +60,14 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows while the input has focus; forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring goes around the field (turned on here to show it)</span>
         <div className="pg-focus" style={column}>
           <SearchInput placeholder="Search here" defaultValue="Design tokens" clearable />
         </div>
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Behaviour (used by the tests)</span>
+        <span className="pg-label">Try it</span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           <div style={column}>
             <SearchInput placeholder="Search here" clearable data-testid="uncontrolled" />

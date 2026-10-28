@@ -24,7 +24,12 @@ function Controlled() {
 export default {
   title: 'Segmented bar',
   description:
-    'A row of 2 to 4 equal segments on a track (Segment/track, rad-md, space-2xs inset); Selected picks the selected one. Selected: Segment/selected fill, Elevation/neutral/near, bold label. Unselected hover: Segment/hover fill. Disabled: minimal text and icon. It fills its container; the selected segment slides to a pressed one. In code: a radio group (native radios), or tabs when the segments switch panels.',
+    'Two to four equal segments for picking one option, or switching views, in a small space.',
+  usage: [
+    'Without panels it is a radio group: give it a `name` for forms. Give the items a `panel` and it becomes tabs.',
+    'Keep labels to a word each, or show icons with `hideLabel`.',
+    'For more than four options, use Dropdown or tabs.',
+  ],
   components: ['SegmentedBar'],
   demo: {
     component: 'SegmentedBar',
@@ -53,7 +58,7 @@ export default {
     <>
       {sizes.map((size) => (
         <div key={size} className="pg-stack" style={{ maxWidth: 384 }}>
-          <span className="pg-label">size={size}: 2, 3 and 4 segments, then icons, a disabled segment, the whole bar disabled</span>
+          <span className="pg-label"><code>size="{size}"</code>: 2, 3 and 4 segments, then icons, a disabled segment, the whole bar <code>disabled</code></span>
           <SegmentedBar aria-label={`Two ${size}`} size={size} items={segments(2)} />
           <SegmentedBar aria-label={`Three ${size}`} size={size} items={segments(3)} defaultValue="week" />
           <SegmentedBar aria-label={`Four ${size}`} size={size} items={segments(4)} defaultValue="year" />
@@ -70,11 +75,11 @@ export default {
         </div>
       ))}
       <div className="pg-stack" style={{ maxWidth: 384 }}>
-        <span className="pg-label">Radio group, controlled (used by the behaviour tests)</span>
+        <span className="pg-label">Try it: as a radio group</span>
         <Controlled />
       </div>
       <div className="pg-stack" style={{ maxWidth: 384 }}>
-        <span className="pg-label">Tabs: segments with panels</span>
+        <span className="pg-label">As tabs: segments with a <code>panel</code> each</span>
         <SegmentedBar
           aria-label="Views"
           data-testid="tabs"
@@ -82,7 +87,7 @@ export default {
         />
       </div>
       <div className="pg-stack" style={{ maxWidth: 384 }}>
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-focus">
           <SegmentedBar aria-label="Focused" items={segments(2)} />
         </div>

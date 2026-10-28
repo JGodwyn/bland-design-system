@@ -6,21 +6,21 @@ import './accordion.css';
 export type AccordionSize = 'sm' | 'md';
 
 export interface AccordionProps extends Omit<DetailsHTMLAttributes<HTMLDetailsElement>, 'title' | 'open' | 'children'> {
-  /** Figma `✏️ Title`: the header label. Bold while open. Wraps onto more lines when it is long. */
+  /** The header label. Bold while open. Wraps onto more lines when it is long. */
   title: ReactNode;
-  /** Figma `✏️ Description` and `🧩 Slot`: the content shown while open. Text or any nodes, stacked space-lg apart. */
+  /** The content shown while open. Text or any nodes, stacked space-lg apart. */
   children?: ReactNode;
-  /** Figma `Size`. sm: a 32px header (default, as in Figma). md: a 40px header. */
+  /** sm: a 32px header (default). md: a 40px header. */
   size?: AccordionSize;
-  /** Figma `Flush`: no header fill and no side padding, so the item lines up with surrounding content; the title underlines on hover. */
+  /** No header fill and no side padding, so the item lines up with surrounding content; the title underlines on hover. */
   flush?: boolean;
-  /** Figma `Expanded`, controlled. Pair it with `onOpenChange`. */
+  /** Open or closed, controlled. Pair it with `onOpenChange`. */
   open?: boolean;
   /** Starting state when `open` is left out. Rendered as the native `open` attribute, so it works before scripts load. */
   defaultOpen?: boolean;
   /** Called with the new open state, from a click, Enter or Space, or the browser (find in page, another item in the same `name` group opening). */
   onOpenChange?: (open: boolean) => void;
-  /** Figma `State=disabled`: the header stops responding and leaves the Tab order; an open item stays open. */
+  /** The header stops responding and leaves the Tab order; an open item stays open. */
   disabled?: boolean;
   /** Native `name`: items sharing one name form a group where only one is open at a time (the browser closes the others). */
   name?: string;

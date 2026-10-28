@@ -26,7 +26,13 @@ function RemovableList() {
 export default {
   title: 'Chip',
   description:
-    'Compact label for a value, filter or attribute. Size sm, md, lg (20, 24, 32 high). Type default shows the label only; cancellable adds a close button; countable adds a count box matching the close box. A leading slot holds one Avatar or Indicator. The close button is smaller than a 24px target on sm and md, so in code its hit area is extended to 24.',
+    'A compact label for a value, such as a picked filter, a tag or a person. Add `onRemove` to give it a remove button.',
+  usage: [
+    '`count` adds a number after the label, such as how many results a filter matches.',
+    'Put an Avatar or Indicator in `leading`.',
+    'The remove button is named Remove plus the label; change it with `removeLabel`.',
+    'For a filter people turn on and off, use Pill. For a status, use Badge.',
+  ],
   components: ['Chip'],
   demo: {
     component: 'Chip',
@@ -46,7 +52,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Sizes sm 20 (default), md 24, lg 32: default, countable, cancellable</span>
+        <span className="pg-label"><code>size</code>: <code>sm</code> (default), <code>md</code>, <code>lg</code>; plain, with <code>count</code>, with <code>onRemove</code></span>
         {sizes.map((size) => (
           <div key={size} className="pg-row">
             <Chip size={size}>Chip {size}</Chip>
@@ -64,7 +70,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Leading slot: one Avatar or Indicator</span>
+        <span className="pg-label"><code>leading</code>: an Avatar or an Indicator</span>
         {sizes.map((size) => (
           <div key={size} className="pg-row">
             <Chip size={size} leading={<Avatar size="xs" initials="GJ" />}>
@@ -78,7 +84,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused close button: the ring shows on keyboard focus; forced on here to show it</span>
+        <span className="pg-label">Keyboard focus on the remove button (turned on here to show it)</span>
         <div className="pg-row pg-focus">
           {sizes.map((size) => (
             <Chip key={size} size={size} onRemove={() => {}}>
@@ -89,7 +95,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Pressing a close button removes that chip (used by the behaviour tests)</span>
+        <span className="pg-label">Try it: the remove button removes that chip</span>
         <RemovableList />
       </div>
 

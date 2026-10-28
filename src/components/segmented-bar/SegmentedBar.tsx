@@ -7,18 +7,18 @@ export type SegmentedBarSize = 'md' | 'lg';
 
 /** One segment (Figma `_segmented-bar-item`). */
 export interface SegmentedBarItem extends TabItemBase {
-  /** Figma `🌟 Icon` (shown with `👀 Icon`): any SVG before the label, icon/sm in md, icon/md in lg. */
+  /** Any SVG before the label, icon/sm in md, icon/md in lg. */
   icon?: ReactNode;
-  /** Figma `👀 Label` off: show the icon alone; `label` stays as its accessible name. Needs `icon`. */
+  /** Show the icon alone; `label` stays as its accessible name. Needs `icon`. */
   hideLabel?: boolean;
 }
 
 export interface SegmentedBarProps
   extends TabsSelectionProps,
     Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
-  /** The segments, in order, 2 to 4 in Figma (`Tabs`). Give each a `panel` to make the bar tabs. */
+  /** The segments, in order, 2 to 4. Give each a `panel` to make the bar tabs. */
   items: SegmentedBarItem[];
-  /** Figma `Size`: the bar height. md 32 (default, as in Figma), lg 40. */
+  /** The bar height. md 32 (default), lg 40. */
   size?: SegmentedBarSize;
   /** Disables every segment. */
   disabled?: boolean;

@@ -9,23 +9,23 @@ export type PillTabsSize = 'sm' | 'md' | 'lg';
 
 /** One pill tab (a Figma `Pills` instance inside `Pill-tab`). */
 export interface PillTabItem extends TabItemBase {
-  /** Figma `🌟 Icon` (shown with `👀 Icon`): any SVG before the label, sized icon/md. */
+  /** Any SVG before the label. */
   icon?: ReactNode;
   /**
-   * Figma `👀 Number`: the count after the label. A number or string becomes an Indicator xl secondary, brand on
+   * The count after the label. A number or string becomes an Indicator xl secondary, brand on
    * the selected tab and neutral otherwise (and when disabled), as on a Pill; any other node is shown as is.
    */
   count?: ReactNode;
-  /** Figma `👀 Label` off: show the icon alone; `label` stays as its accessible name. Needs `icon`. */
+  /** Show the icon alone; `label` stays as its accessible name. Needs `icon`. */
   hideLabel?: boolean;
 }
 
 export interface PillTabsProps
   extends TabsSelectionProps,
     Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
-  /** The tabs, in order. Figma `Tabs` is their number. */
+  /** The tabs, in order. */
   items: PillTabItem[];
-  /** Figma `Size`: the pill height. sm 32 (default, as in Figma), md 40, lg 48. */
+  /** The pill height. sm 32 (default), md 40, lg 48. */
   size?: PillTabsSize;
   /** Disables every tab. */
   disabled?: boolean;

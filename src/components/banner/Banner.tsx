@@ -6,23 +6,23 @@ export type BannerStatus = MessageStatus;
 export type BannerOrientation = MessageOrientation;
 
 export interface BannerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
-  /** Figma `Status`: sets the icon and its color, and when `colored` the surface and border. */
+  /** Sets the icon and its color, and when `colored` the surface and border. */
   status?: BannerStatus;
-  /** Figma `Colored`: the tinted status surface and border. Default `false` (Figma's): surface-100 with border-bold. */
+  /** The tinted status surface and border. Default `false`: surface-100 with border-bold. */
   colored?: boolean;
-  /** Figma `Orientation`: horizontal is one row with inline actions; vertical puts a title over the text and actions under it. */
+  /** horizontal is one row with inline actions; vertical puts a title over the text and actions under it. */
   orientation?: BannerOrientation;
-  /** Figma `✏️ Title` (on horizontal, `👀 Title`): shown above the description. */
+  /** Shown above the description. */
   title?: ReactNode;
-  /** Figma `✏️ Description` (`👀 Description` off = no children). */
+  /** The description. */
   children?: ReactNode;
-  /** Figma `👀 Btn` / `👀 Btn (2nd)`: one or two Buttons (primary, then secondary). They default to size sm in both orientations; a Button's own `size` wins. */
+  /** One or two Buttons (primary, then secondary). They default to size sm in both orientations; a Button's own `size` wins. */
   actions?: ReactNode;
-  /** Figma `👀 Close`: shows a close button that calls this. The banner never hides itself. */
+  /** Shows a close button that calls this. The banner never hides itself. */
   onClose?: () => void;
   /** Accessible name of the close button. */
   closeLabel?: string;
-  /** Figma `👀 Icon`: `true` shows the status icon, `false` hides it, or pass any SVG to replace it. */
+  /** `true` shows the status icon, `false` hides it, or pass any SVG to replace it. */
   icon?: MessageIcon;
 }
 

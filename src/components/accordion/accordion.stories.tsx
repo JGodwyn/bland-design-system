@@ -40,7 +40,13 @@ function Controlled() {
 export default {
   title: 'Accordion',
   description:
-    'Accordion item: a header button that shows or hides a content region. Flush removes the header fill and side padding so the item lines up with surrounding content; on hover its title underlines. Size sm has a 32px header, md a 40px header. States rest, hover and disabled. Expanded shows the description and an optional slot for custom content. Use Fill container for width in layouts.',
+    'A header that shows or hides a section of content. Use accordions to shorten pages where people need only some of the sections, such as FAQs or settings.',
+  usage: [
+    'Keep `title` short: it is what people scan. It wraps when it has to.',
+    'Use `flush` inside cards and panels, where the item should line up with the content around it.',
+    'Give a set of items the same `name` to keep only one open at a time.',
+    'Don\'t hide content people need to finish a task; put it on the page instead.',
+  ],
   components: ['Accordion'],
   demo: {
     component: 'Accordion',
@@ -67,7 +73,7 @@ export default {
       {[false, true].map((flush) => (
         <div key={String(flush)} className="pg-stack">
           <span className="pg-label">
-            {flush ? 'flush: no fill, no side padding' : 'Default'}: sm 32 and md 40 headers, closed then open
+            {flush ? <><code>flush</code>: no fill or side padding</> : 'Default'}: <code>sm</code> and <code>md</code>, closed then open
           </span>
           {sizes.map((size) => (
             <Row key={size}>
@@ -87,7 +93,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">Disabled: closed and open, default and flush</span>
+        <span className="pg-label"><code>disabled</code>: closed and open, default and <code>flush</code></span>
         <Row>
           <Frame>
             <Accordion title="Disabled" disabled data-testid="disabled">
@@ -108,7 +114,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <Row>
           <div className="pg-focus">
             <Frame>
@@ -126,7 +132,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Slot: any content below the description</span>
+        <span className="pg-label"><code>children</code> can hold any content, not only text</span>
         <Frame>
           <Accordion title="With a slot" size="md" defaultOpen>
             <p style={{ margin: 0 }}>{description}</p>
@@ -141,7 +147,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">A group with one name: opening one closes the others</span>
+        <span className="pg-label">Items with the same <code>name</code>: opening one closes the others</span>
         <Frame>
           <div className="pg-stack" style={{ gap: 'var(--space-xs)' }}>
             {['First', 'Second', 'Third'].map((label, i) => (
@@ -154,7 +160,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Controlled (used by the behaviour tests)</span>
+        <span className="pg-label">Controlled with <code>open</code> and <code>onOpenChange</code></span>
         <Controlled />
       </div>
 

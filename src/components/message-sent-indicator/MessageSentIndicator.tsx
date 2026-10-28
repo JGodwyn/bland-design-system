@@ -10,7 +10,7 @@ export type MessageStatusLabels = Record<MessageStatus, string>;
 export const defaultStatusLabels: MessageStatusLabels = { sent: 'Sent', delivered: 'Delivered', seen: 'Seen' };
 
 /**
- * Figma `_message-sent-indicator` (internal): one check for sent, two for delivered, two in brand for seen, at icon/xs.
+ * One check for sent, two for delivered, two in brand for seen, at icon/xs.
  * The icon is decorative; the status is a visually hidden word, so it reads with the time or the chat row.
  */
 export function MessageSentIndicator({ status, labels = defaultStatusLabels }: { status: MessageStatus; labels?: Partial<MessageStatusLabels> }) {

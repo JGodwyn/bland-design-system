@@ -7,6 +7,26 @@ import { CaretLeftIcon, CaretRightIcon } from '../../src/icons';
 import type { Token } from './data';
 import { docsPages } from './pages';
 
+/**
+ * Docs text with code in it: each `backtick` pair becomes Code text, so prop names and values read as code.
+ * Story descriptions, usage rules, prop descriptions and style page leads are written this way.
+ */
+export function Prose({ children }: { children: string }) {
+  return (
+    <>
+      {children.split(/`([^`]+)`/).map((part, i) =>
+        i % 2 ? (
+          <CodeText key={i} size="lg">
+            {part}
+          </CodeText>
+        ) : (
+          part
+        ),
+      )}
+    </>
+  );
+}
+
 /** A CSS variable name as Code text, with its copy button. */
 export function TokenName({ css }: { css: string }) {
   return (

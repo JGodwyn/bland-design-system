@@ -6,20 +6,20 @@ import './pills.css';
 export type PillSize = 'sm' | 'md' | 'lg';
 
 export interface PillProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-  /** Figma `✏️ Label`. Leave it out (Figma `👀 Label` off) for an icon-only pill, and give it an `aria-label`. */
+  /** Leave it out for an icon-only pill, and give it an `aria-label`. */
   children?: ReactNode;
-  /** Figma `Size`. sm 32 (default, as in Figma), md 40, lg 48 high; never narrower than high. */
+  /** sm 32 (default), md 40, lg 48 high; never narrower than high. */
   size?: PillSize;
-  /** Figma `Selected`, controlled. Sets `aria-pressed`. Leave it out to let the pill keep its own state. */
+  /** Selected, controlled. Leave it out to let the pill keep its own state. */
   selected?: boolean;
   /** Starting state when `selected` is left out. */
   defaultSelected?: boolean;
   /** Called with the new state when the pill is pressed. */
   onSelectedChange?: (selected: boolean) => void;
-  /** Figma `🌟 Icon` (shown with `👀 Icon`): any SVG before the label, sized icon/md. */
+  /** Any SVG before the label. */
   icon?: ReactNode;
   /**
-   * Figma `👀 Number`: the count badge after the label. A number or string becomes an Indicator xl
+   * The count badge after the label. A number or string becomes an Indicator xl
    * secondary, brand when selected and neutral otherwise (and when disabled); any other node is shown as is.
    */
   count?: ReactNode;

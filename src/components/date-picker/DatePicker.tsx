@@ -18,13 +18,13 @@ export const actionButtonSize = { sm: 'xs', md: 'sm', lg: 'md' } as const;
 
 /** Props Date Picker and Date Range Picker share. */
 export interface DatePickerBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
-  /** Figma `Size`: the field (input/*, 32, 40, 48). Default sm, as in Figma. */
+  /** The field height: sm 32, md 40, lg 48. Default sm. */
   size?: DatePickerSize;
-  /** The calendar's size (Calendar `size`), whatever the field's. Default md (Godwin 2026-10-20). */
+  /** The calendar's size (Calendar `size`), whatever the field's. Default md. */
   calendarSize?: CalendarSize;
-  /** Figma `Status` on the exposed Text Input: border, helper color and status icon. A date out of bounds or unavailable shows danger by itself. */
+  /** Sets the border, helper text color and status icon. A date out of bounds or unavailable turns the field to danger on its own. */
   status?: DatePickerStatus;
-  /** Figma `✏️ Helper text`, under the field and read with it. Put the error message here for danger. */
+  /** Under the field and read with it. Put the error message here for danger. */
   helperText?: ReactNode;
   /** The earliest date that can be entered or picked, `"2024-01-01"`. */
   minValue?: string;
@@ -33,8 +33,8 @@ export interface DatePickerBaseProps extends Omit<HTMLAttributes<HTMLDivElement>
   /** Marks single dates as not available: drawn disabled in the calendar, invalid when typed. Called with `"2024-11-09"`. */
   isDateUnavailable?: (date: string) => boolean;
   /**
-   * Figma `👀 Action-bar` on the calendar: Cancel and Apply under the grid. A picked date waits for Apply;
-   * Cancel, Escape or a press outside drop it. Off by default (as in Figma): a picked date applies at once and
+   * The calendar: Cancel and Apply under the grid. A picked date waits for Apply;
+   * Cancel, Escape or a press outside drop it. Off by default: a picked date applies at once and
    * closes the calendar.
    */
   confirm?: boolean;
@@ -66,7 +66,7 @@ export interface DatePickerBaseProps extends Omit<HTMLAttributes<HTMLDivElement>
 }
 
 export interface DatePickerProps extends DatePickerBaseProps {
-  /** Figma `✏️ Label` on the exposed Text Input. Leave it out and give an `aria-label`. */
+  /** The field's label. Leave it out and give an `aria-label`. */
   label?: ReactNode;
   /** The date, `"2024-11-09"`, controlled (`null` for empty). Pair it with `onValueChange`. */
   value?: string | null;

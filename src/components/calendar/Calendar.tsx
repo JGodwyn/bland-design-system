@@ -46,15 +46,15 @@ import '../pagination/pagination.css';
 import './calendar.css';
 
 export type CalendarSize = 'sm' | 'md' | 'lg';
-/** Figma `Type`: the days of a month, the months of a year, or a page of years. */
+/** The days of a month, the months of a year, or a page of years. */
 export type CalendarView = 'day' | 'month' | 'year';
 export type { DateRange } from './dates';
 
 interface CalendarBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
-  /** Figma `Size`: cells control/xs, sm, md (24, 32, 40), calendar/width-* wide. Default md (Godwin 2026-10-20; Figma sm). */
+  /** Day cells of 24, 32 or 40px. Default md. */
   size?: CalendarSize;
   /**
-   * Figma `Type`: the view it opens on. day (default) shows a month of days; the title toggle switches to the
+   * The view it opens on. day (default) shows a month of days; the title toggle switches to the
    * months of the year, and from there to a page of twelve years. Picking a year shows its months, picking a
    * month shows its days.
    */
@@ -77,16 +77,16 @@ interface CalendarBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaul
   readOnly?: boolean;
   /** Moves focus to the selected (or focused) day when it mounts. */
   autoFocus?: boolean;
-  /** Figma `🧩 Slot` (shown with `👀 Slot`): any content under the grid, space-sm below it. */
+  /** Any content under the grid, space-sm below it. */
   extra?: ReactNode;
   /**
-   * Figma `👀 Action-bar`: buttons under the grid, sharing the width equally (Figma: Cancel secondary, then
-   * Apply primary). Use Buttons xs on a sm calendar, sm on md, md on lg.
+   * Buttons under the grid, sharing the width equally (Cancel secondary, then Apply primary).
+   * Use Buttons xs on a sm calendar, sm on md, md on lg.
    */
   actions?: ReactNode;
-  /** Figma `👀 Divider` on `_calendar-title-bar`: a line under the title bar. Default false, as in Figma. */
+  /** A line under the title bar. Default false. */
   titleDivider?: boolean;
-  /** Figma `👀 Divider` on `_calendar-action-bar`: a line over the actions. Default false, as in Figma. */
+  /** A line over the actions. Default false. */
   actionsDivider?: boolean;
   /** Names the calendar's grid for screen readers, before the month it shows. */
   'aria-label'?: string;
@@ -94,7 +94,7 @@ interface CalendarBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaul
 }
 
 export interface CalendarSingleProps extends CalendarBaseProps {
-  /** Figma `Range`: false picks one date (default), true picks a start and an end. */
+  /** false picks one date (default), true picks a start and an end. */
   range?: false;
   /** The selected date, `"2024-11-09"`, controlled (`null` for none). Pair it with `onValueChange`. */
   value?: string | null;
@@ -105,7 +105,7 @@ export interface CalendarSingleProps extends CalendarBaseProps {
 }
 
 export interface CalendarRangeProps extends CalendarBaseProps {
-  /** Figma `Range`: false picks one date (default), true picks a start and an end. */
+  /** false picks one date (default), true picks a start and an end. */
   range: true;
   /** The selected range, `{ start, end }` as ISO dates, controlled (`null` for none). Pair it with `onValueChange`. */
   value?: DateRange | null;
@@ -220,7 +220,7 @@ interface BodyProps extends Omit<CalendarChromeProps, 'disabled' | 'readOnly' | 
   gridRef: Ref<HTMLDivElement>;
 }
 
-/** The first year of the page of twelve that holds `year`: pages start on a decade (2020 – 2031, as in Figma). */
+/** The first year of the page of twelve that holds `year`: pages start on a decade (2020 – 2031). */
 const pageStart = (year: number) => Math.floor(year / 10) * 10;
 
 function CalendarBody({

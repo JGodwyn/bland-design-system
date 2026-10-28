@@ -25,7 +25,13 @@ const extraCode = { none: undefined, shortcut: '<span>Shortcut: Ctrl + C</span>'
 export default {
   title: 'Tooltip',
   description:
-    'Short, non-interactive hint shown on hover or focus of a trigger. Placement follows Floating UI naming: the side of the trigger the tooltip sits on, then start, center or end alignment; the pointer sits on the opposite edge, aimed at the trigger. Colors come from Tooltip/surface and Tooltip/text: near black in light mode, a raised neutral in dark mode, white text in both. Content wraps at tooltip/max-width. Keep text to one or two short lines in body-md. Turn on the slot (extra) for richer content.',
+    'A short hint that appears when people hover over or focus a control, such as the name of an icon-only button.',
+  usage: [
+    'Wrap one focusable element, such as an IconButton, and pass the hint in `text`.',
+    'Keep it to a line or two. Never put links or buttons in a tooltip: it can\'t take focus.',
+    'Don\'t hide information people need in a tooltip; touch screens can\'t hover.',
+    '`placement` picks the side (`top-start` by default); it flips when there isn\'t room.',
+  ],
   components: ['Tooltip'],
   demo: {
     component: 'Tooltip',
@@ -54,7 +60,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">placement: all twelve; hover or Tab to a trigger to open its tooltip (the pointer aims at the trigger)</span>
+        <span className="pg-label">Try it: all twelve <code>placement</code>s; hover or tab to a trigger</span>
         {placementRows.map((row) => (
           <div key={row[0]} className="pg-row">
             {row.map((placement) => (
@@ -69,7 +75,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Long text wraps at tooltip/max-width; extra holds a slot under the text (hover to open)</span>
+        <span className="pg-label">Long text wraps; <code>extra</code> holds more content under the text (hover to open)</span>
         <div className="pg-row">
           <Tooltip
             text="Saves a copy of this file to your device, with every comment and version kept"
@@ -84,7 +90,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the trigger takes focus and shows the ring; the tooltip never does</span>
+        <span className="pg-label">Keyboard focus stays on the trigger; the tooltip never takes it</span>
         <div className="pg-row pg-focus">
           <Tooltip text="Add a member">
             <IconButton icon={<PlusIcon />} aria-label="Add" />
@@ -93,7 +99,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Closed until hover or keyboard focus (used by the behaviour tests)</span>
+        <span className="pg-label">Closed until hover or keyboard focus</span>
         <div className="pg-row">
           <Tooltip text="First hint" placement="top">
             <Button type="secondary" data-testid="first">

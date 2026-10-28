@@ -78,7 +78,13 @@ function Composer() {
 export default {
   title: 'Chat message bar',
   description:
-    'Composer at the bottom of a chat. State: rest (empty, the send button shows a microphone), filled (send), recording-audio (delete, label and a timer Chip). Replying shows the quoted message above the field, with a close button. The focus ring is the 2px ring on the field. Width message-bar/width; use Fill container in layouts. In code a textarea with a label and icon buttons with aria-labels; the send button switches to record while the field is empty. Enter sends, Shift+Enter starts a new line.',
+    'The composer at the bottom of a chat: a text field that grows with its text, and a send button that turns into a record button while the field is empty.',
+  usage: [
+    '`onSend` gets the text when people press send or Enter. Shift+Enter starts a new line.',
+    'Pass `onRecordStart` to offer voice notes. While `recording` is on, the bar shows a timer with cancel and send.',
+    'Show the message being answered with `reply`, and let people drop it with `onReplyClose`.',
+    'Each field button (`onEmoji`, `onSticker`, `onAttach`) shows only when you pass its handler.',
+  ],
   components: ['ChatMessageBar'],
   demo: {
     component: 'ChatMessageBar',
@@ -115,7 +121,7 @@ export default {
     <>
       {[false, true].map((replying) => (
         <div key={String(replying)} className="pg-stack">
-          <span className="pg-label">{replying ? 'Replying: ' : ''}rest (record), filled (send), recording-audio</span>
+          <span className="pg-label">{replying ? <><code>reply</code>: </> : ''}empty (record), with text (send), <code>recording</code></span>
           <Frame>
             <div className="pg-stack">
               <ChatMessageBar {...tools} reply={replying ? reply : undefined} onReplyClose={() => {}} />
@@ -135,7 +141,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">Long text grows the field; a long reply ends in an ellipsis; without onRecordStart send stays (disabled while empty)</span>
+        <span className="pg-label">Long text grows the field; a long reply ends in an ellipsis; without <code>onRecordStart</code> the send button stays, off while empty</span>
         <Frame>
           <div className="pg-stack">
             <ChatMessageBar
@@ -150,19 +156,19 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Disabled</span>
+        <span className="pg-label"><code>disabled</code></span>
         <Frame>
           <ChatMessageBar {...tools} disabled />
         </Frame>
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Working: type and press Enter, record, cancel the reply</span>
+        <span className="pg-label">Try it: type and press Enter, record, cancel the reply</span>
         <Composer />
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the buttons' rings, forced on here to show them; the field shows the same ring while its text field has focus</span>
+        <span className="pg-label">Keyboard focus: the buttons and the field (turned on here to show it)</span>
         <div className="pg-focus">
           <Frame>
             <ChatMessageBar {...tools} reply={reply} onReplyClose={() => {}} />

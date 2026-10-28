@@ -34,6 +34,9 @@ const styleIcons: Record<StylePageId, ComponentType> = {
   icons: ShapesIcon,
 };
 
+/** Docs text without its backticks (see `Prose`), where only plain text fits: search results. */
+export const plain = (text: string) => text.replace(/`([^`]+)`/g, '$1');
+
 /** A component page's description: the story's own, else the first component's JSDoc. */
 export function storyDescription(id: string) {
   const story = stories.find((s) => s.id === id)?.story;
@@ -46,28 +49,28 @@ export const overviewPage: DocsPage = {
   href: '#/',
   title: 'Overview',
   kind: 'overview',
-  description: 'Bland is a reusable UI kit: light and dark themes, a brand color swapped per project, Inter and Geist Mono, and components built only on tokens.',
+  description: 'Bland is a reusable UI kit: light and dark themes, a brand color you set per project, Inter and Geist Mono, and components built only on tokens.',
   icon: WarehouseIcon,
 };
 export const brandPage: DocsPage = {
   href: '#/brand',
   title: 'Brand theme',
   kind: 'brand',
-  description: 'Make a project’s 13 brand steps from one color, check their contrast, preview them in both themes and apply them across this site.',
+  description: 'Make a project’s brand colors from one color, check that text on them stays readable, preview them in both themes and apply them across this site.',
   icon: PaletteIcon,
 };
 export const stylePageList: DocsPage[] = stylePages.map((p) => ({
   href: `#/styles/${p.id}`,
   title: p.title,
   kind: 'style',
-  description: leads[p.id],
+  description: plain(leads[p.id]),
   icon: styleIcons[p.id],
 }));
 export const componentPageList: DocsPage[] = stories.map((s) => ({
   href: `#/components/${s.id}`,
   title: s.story.title,
   kind: 'component',
-  description: storyDescription(s.id),
+  description: plain(storyDescription(s.id)),
 }));
 export const docsPages = [overviewPage, brandPage, ...stylePageList, ...componentPageList];
 
@@ -127,7 +130,7 @@ export function search(query: string): SearchResults {
     const names = s.story.components ?? (s.story.demo ? [s.story.demo.component] : []);
     for (const name of names)
       for (const prop of componentDocs[name]?.props ?? [])
-        if (all(`${name} ${prop.name}`)) add({ href: `#/components/${s.id}`, title: s.story.title, detail: `${name} ${prop.name}: ${prop.description}` });
+        if (all(`${name} ${prop.name}`)) add({ href: `#/components/${s.id}`, title: s.story.title, detail: `${name} ${prop.name}: ${plain(prop.description)}` });
   }
   for (const t of tokens) {
     const page = t.name.startsWith('Layout/') ? 'grid' : tokenPage[t.collection];

@@ -15,20 +15,20 @@ export type SectionTabsSize = 'sm' | 'md' | 'lg';
 
 /** One section tab (Figma `_section-tab-item`). */
 export interface SectionTabItem extends TabItemBase {
-  /** Figma `🌟 Icon` (shown with `👀 Icon`): any SVG before the label, sized icon/md. */
+  /** Any SVG before the label. */
   icon?: ReactNode;
-  /** Figma `✏️ Count` (shown with `👀 Count`): a number or short text in a square box after the label. */
+  /** A number or short text in a square box after the label. */
   count?: ReactNode;
-  /** Figma `👀 Label` off: show the icon alone; `label` stays as its accessible name. Needs `icon`. */
+  /** Show the icon alone; `label` stays as its accessible name. Needs `icon`. */
   hideLabel?: boolean;
 }
 
 export interface SectionTabsProps
   extends TabsSelectionProps,
     Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
-  /** The tabs, in order. Figma `Tabs` is their number. */
+  /** The tabs, in order. */
   items: SectionTabItem[];
-  /** Figma `Size`: the tab height. sm 40 (default, as in Figma), md 48, lg 56. */
+  /** The tab height. sm 40 (default), md 48, lg 56. */
   size?: SectionTabsSize;
   /** Disables every tab. */
   disabled?: boolean;

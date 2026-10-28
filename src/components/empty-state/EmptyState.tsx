@@ -6,25 +6,25 @@ export type EmptyStateSize = 'sm' | 'lg';
 export type EmptyStateTitleAs = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p';
 
 export interface EmptyStateProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
-  /** Figma `Size`: sm for cards, panels and table bodies; lg for full pages. */
+  /** sm for cards, panels and table bodies; lg for full pages. */
   size?: EmptyStateSize;
-  /** Figma `✏️ Title` (required): short, says what is empty. */
+  /** Short, says what is empty. */
   title: ReactNode;
   /**
    * The title's element. Defaults to `h2`; set the level that fits where the empty state sits
    * (an `h3` inside a panel under an `h2`), or `p` when the view already has its heading.
    */
   titleAs?: EmptyStateTitleAs;
-  /** Figma `✏️ Description` (`👀 Description` off = none): one or two lines on how to fill the space. */
+  /** One or two lines on how to fill the space. */
   description?: ReactNode;
   /**
-   * Figma `🧩 Illustration` (`👀 Illustration`): any node (an image, an SVG, an icon), centered above
+   * Any node (an image, an SVG, an icon), centered above
    * the title and drawn as is, so the project sizes and colors it. Omit it for none: Bland ships no
-   * default (Figma's `_empty-illustration` is a placeholder). Usually decorative: give an image an
+   * default. Usually decorative: give an image an
    * empty `alt` and an icon no label, since the title carries the meaning.
    */
   illustration?: ReactNode;
-  /** Figma `👀 Btn` / `👀 Btn ( 2nd )`: up to two Buttons, primary first, stacked at full width. */
+  /** Up to two Buttons, primary first, stacked at full width. */
   actions?: ReactNode;
 }
 

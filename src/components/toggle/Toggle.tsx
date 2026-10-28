@@ -5,11 +5,11 @@ export type ToggleSize = 'sm' | 'md';
 
 export interface ToggleProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'role' | 'size' | 'children'> {
-  /** Figma `✏️ Label`, clickable, beside the track. Leave it out (Figma `👀 Label` off) and give the toggle an `aria-label`. */
+  /** Clickable, beside the track. Leave it out and give the toggle an `aria-label`. */
   children?: ReactNode;
-  /** Figma `Size`. sm: a 40 x 24 track with a 16 knob (default, as in Figma). md: 56 x 32 with a 24 knob. The label is body-lg in both. */
+  /** sm: a 40 x 24 track with a 16 knob (default). md: 56 x 32 with a 24 knob. The label is body-lg in both. */
   size?: ToggleSize;
-  /** Figma `Checked`, controlled. */
+  /** On or off, controlled. */
   checked?: boolean;
   /** Starting state when `checked` is left out. */
   defaultChecked?: boolean;

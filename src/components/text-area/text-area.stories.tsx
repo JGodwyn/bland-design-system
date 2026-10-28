@@ -26,7 +26,13 @@ function Controlled() {
 export default {
   title: 'Text Area',
   description:
-    'Multi-line text field with a label, the input, a resize handle and helper text. Status sets the border and the helper text color: default, danger, success or warning. Danger marks the field invalid for screen readers; put the error in the helper text. The field shows rows lines (4 by default); longer text scrolls with an edge fade and a visible scrollbar, and the handle in the corner drags it taller. Keyboard focus shows a 2px ring offset 2px from the field.',
+    'A field for text that runs over several lines, such as a comment or a description.',
+  usage: [
+    'Give it a `label`, and put help or an error in `helperText`.',
+    'When the text is invalid, set `status="danger"` and say why in `helperText`.',
+    '`rows` sets the starting height (4 lines). People can drag it taller unless `resizable={false}`.',
+    'For a single line, use TextInput.',
+  ],
   components: ['TextArea'],
   demo: {
     component: 'TextArea',
@@ -46,7 +52,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Empty (placeholder), filled, overflowing (fade and scrollbar), disabled</span>
+        <span className="pg-label">Empty with a <code>placeholder</code>, filled, overflowing, <code>disabled</code></span>
         <div style={column}>
           <TextArea label="Label" placeholder="Placeholder" helperText="Helper text" />
           <TextArea label="Label" defaultValue="User input" helperText="Helper text" />
@@ -56,7 +62,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">status: default, danger, success, warning; then each disabled</span>
+        <span className="pg-label"><code>status</code>: <code>default</code>, <code>danger</code>, <code>success</code>, <code>warning</code>; then each <code>disabled</code></span>
         <div style={column}>
           {statuses.map((status) => (
             <TextArea key={status} status={status} label={status} defaultValue="User input" helperText={helper[status]} rows={2} />
@@ -68,14 +74,14 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows while the field has focus; forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring goes around the field (turned on here to show it)</span>
         <div className="pg-focus" style={column}>
           <TextArea label="Focused" placeholder="Placeholder" rows={2} />
         </div>
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Without the handle, without a label (aria-label), one row</span>
+        <span className="pg-label"><code>resizable={false}</code>, no visible label (<code>aria-label</code>), <code>rows={1}</code></span>
         <div style={column}>
           <TextArea label="Not resizable" defaultValue="User input" resizable={false} rows={2} />
           <TextArea aria-label="No visible label" placeholder="No label: aria-label instead" rows={1} />
@@ -83,7 +89,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Behaviour (used by the tests)</span>
+        <span className="pg-label">Try it</span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           <div style={column}>
             <TextArea label="Uncontrolled" placeholder="Type here" helperText="Read with the field" data-testid="uncontrolled" rows={2} />

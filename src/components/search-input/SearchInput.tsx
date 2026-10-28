@@ -8,9 +8,9 @@ export type SearchInputSize = TextInputSize;
 
 export interface SearchInputProps
   extends Omit<TextInputProps, 'type' | 'status' | 'label' | 'helperText' | 'iconStart' | 'iconEnd' | 'altText' | 'leading' | 'trailing'> {
-  /** Figma `Size`. sm 32 (default, as in Figma), md 40, lg 48. */
+  /** sm 32 (default), md 40, lg 48. */
   size?: SearchInputSize;
-  /** Figma `👀 Clear`: a clear button shows while the field has a value. Escape clears too. */
+  /** A clear button shows while the field has a value. Escape clears too. */
   clearable?: boolean;
   /** Called after the clear button (or Escape) empties the field. `onChange` fires as well, with the empty value. */
   onClear?: () => void;

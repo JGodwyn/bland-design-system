@@ -8,23 +8,23 @@ export type FileTabsSize = 'sm' | 'md' | 'lg';
 
 /** One file tab (Figma `_file-tab-item`). */
 export interface FileTabItem extends TabItemBase {
-  /** Figma `🧩 Slot` (shown with `👀 Slot`): leading content such as a file-type icon, sized icon/sm, md or lg by size. */
+  /** Leading content such as a file-type icon, sized icon/sm, md or lg by size. */
   leading?: ReactNode;
   /**
-   * Figma `Minimized`: a square tab that shows only `leading` (a pinned tab). `label` stays as its accessible
+   * A square tab that shows only `leading` (a pinned tab). `label` stays as its accessible
    * name. Needs `leading`; a minimized tab has no close button.
    */
   minimized?: boolean;
-  /** Figma `👀 Close`: whether this tab shows the close button. Defaults to true when the row has `onClose`. */
+  /** Whether this tab shows the close button. Defaults to true when the row has `onClose`. */
   closable?: boolean;
 }
 
 export interface FileTabsProps
   extends TabsSelectionProps,
     Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
-  /** The tabs, in order. Figma `Tabs` is their number. */
+  /** The tabs, in order. */
   items: FileTabItem[];
-  /** Figma `Size`: the tab height. sm 32 (default, as in Figma), md 40, lg 48. */
+  /** The tab height. sm 32 (default), md 40, lg 48. */
   size?: FileTabsSize;
   /**
    * Called with a tab's `id` when its close button is pressed, or Delete is pressed on it. Remove it from

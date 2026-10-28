@@ -18,15 +18,15 @@ import './text-area.css';
 export type TextAreaStatus = TextInputStatus;
 
 export interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-  /** Figma `Status`: the border and the helper text color. danger also sets `aria-invalid`. */
+  /** The border and the helper text color. danger also sets `aria-invalid`. */
   status?: TextAreaStatus;
-  /** Figma `✏️ Label`, a `<label>` tied to the text area. Leave it out (Figma `👀 Label` off) and give it an `aria-label`. */
+  /** A `<label>` tied to the text area. Leave it out and give it an `aria-label`. */
   label?: ReactNode;
-  /** Figma `✏️ Helper text`, under the field and read with it (`aria-describedby`). */
+  /** Under the field and read with it (`aria-describedby`). */
   helperText?: ReactNode;
   /** Visible lines before the field scrolls. Defaults to 4. */
   rows?: number;
-  /** Figma's resize handle: drag it to make the field taller or shorter. Defaults to true. */
+  /** The resize handle: drag it to make the field taller or shorter. Defaults to true. */
   resizable?: boolean;
   /** Reaches the native `<textarea>`, for form libraries. */
   ref?: Ref<HTMLTextAreaElement>;

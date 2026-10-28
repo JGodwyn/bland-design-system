@@ -65,7 +65,12 @@ function demoSlots({ topSlot, topEmotion, topCount, bottomSlot, bottomEmotion, b
 export default {
   title: 'Avatar',
   description:
-    'Shows a person or entity as an image, a placeholder icon or initials. Sizes xs to 3xl are bound to avatar/* tokens (16 to 80) and the placeholder icon to avatar/icon-* (half the avatar size). Use initials when there is no image; xs shows a single initial. Two slots, Top slot and Bottom slot, are centred on the circle edge at 45 degrees on the right side and sized by avatar/slot-* (8 to 24), which fits the matching Indicator: put a count badge in the top slot and a status dot in the bottom slot, with the Indicator Ring on. Avatar is not interactive on its own; wrap it in a button or link when it needs focus.',
+    'Shows a person or entity as a photo, their initials or a placeholder icon. Pass `src` and `initials` together: if the photo fails to load, the initials show instead.',
+  usage: [
+    'Use `topSlot` for a count and `bottomSlot` for a status, each an Indicator with `ring` on.',
+    'Give it `alt` when it stands alone. Leave `alt` out next to a visible name, so the name isn\'t read twice.',
+    'Avatar isn\'t interactive. Wrap it in a button or link when pressing it should do something.',
+  ],
   components: ['Avatar'],
   demo: {
     component: 'Avatar',
@@ -115,7 +120,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">type: image, placeholder, initials at every size (xs shows one initial)</span>
+        <span className="pg-label"><code>type</code>: <code>image</code>, <code>placeholder</code>, <code>initials</code> at every size (<code>xs</code> shows one initial)</span>
         {(['image', 'placeholder', 'initials'] as const).map((type) => (
           <div key={type} className="pg-row">
             {sizes.map((size) => (
@@ -126,7 +131,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">An image that fails falls back to the initials, or to the placeholder without them</span>
+        <span className="pg-label">A photo that fails to load shows the initials, or the placeholder without them</span>
         <div className="pg-row">
           <Avatar size="xl" src={broken} initials="GJ" alt="Godwin John" data-testid="fallback-initials" />
           <Avatar size="xl" src={broken} alt="Unknown person" data-testid="fallback-placeholder" />
@@ -135,7 +140,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Next to a visible name, omit alt: the avatar is decorative</span>
+        <span className="pg-label">Next to a visible name, leave out <code>alt</code></span>
         <div className="pg-row">
           <span className="pg-row" style={{ gap: 'var(--space-sm)' }}>
             <Avatar initials="AL" data-testid="decorative" />
@@ -145,7 +150,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Slots: count at the top, status at the bottom, sized by avatar/slot-*</span>
+        <span className="pg-label"><code>topSlot</code> for a count, <code>bottomSlot</code> for a status</span>
         <div className="pg-row">
           {sizes.map((size) => (
             <Avatar

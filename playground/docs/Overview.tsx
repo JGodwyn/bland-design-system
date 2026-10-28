@@ -28,8 +28,10 @@ export function Overview() {
   return (
     <>
       <PageHeader title="Bland Design System" href={overviewPage.href}>
-        Bland is a reusable UI kit: light and dark themes, a brand color swapped per project, Inter and Geist Mono, and components built only on tokens.
-        Figma is the source of truth; everything here is generated from the code.
+        <p>
+          Bland is a reusable UI kit: light and dark themes, a brand color you set per project, Inter and Geist Mono, and components built only on tokens. Every page here
+          renders Bland’s own code, so what you see is what ships.
+        </p>
       </PageHeader>
       <div className="docs-hero">
         <ul className="docs-stats docs-dots bland-smooth">

@@ -35,7 +35,13 @@ function SelectAll() {
 export default {
   title: 'Checkbox',
   description:
-    'Lets people select any number of options from a set. Checked is false, true, or mixed for a parent whose children are partly selected. Small is a 16px box in a 24px hit area with a body-md label. Medium is a 20px box in a 32px hit area with a body-lg label. Keyboard focus shows a 2px ring offset 2px from the box. Use Checkbox Group for lists of options: in vertical lists the hit areas touch, so rows have no extra gap.',
+    'Lets people pick any number of options from a set, or turn a single option on or off in a form.',
+  usage: [
+    'Use CheckboxGroup for a list of options, and name the group with `aria-label` or `aria-labelledby`.',
+    'Set `checked="mixed"` on a parent whose children are only partly checked.',
+    'Write labels that say what checking the box means.',
+    'When only one option can be picked, use Radio. For a setting that takes effect at once, use Toggle.',
+  ],
   components: ['Checkbox', 'CheckboxGroup'],
   demo: {
     component: 'Checkbox',
@@ -53,7 +59,7 @@ export default {
     <>
       {sizes.map((size) => (
         <div key={size} className="pg-stack">
-          <span className="pg-label">size={size}: false, true, mixed; then disabled; then without a label</span>
+          <span className="pg-label"><code>size="{size}"</code>: unchecked, checked, <code>mixed</code>; then <code>disabled</code>; then without a label</span>
           <div className="pg-row">
             {states.map((c) => (
               <Checkbox key={String(c)} size={size} checked={c} readOnly>
@@ -73,7 +79,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-row pg-focus">
           <Checkbox>Focused</Checkbox>
           <Checkbox size="md" defaultChecked>
@@ -84,7 +90,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Checkbox Group: vertical sm and md (rows touch), horizontal sm and md (16 apart)</span>
+        <span className="pg-label">CheckboxGroup: vertical and horizontal, <code>sm</code> and <code>md</code></span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           {sizes.map((size) => (
             <CheckboxGroup key={size} size={size} aria-label={`Vertical ${size}`}>
@@ -112,7 +118,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Behaviour (used by the tests): uncontrolled, and a parent that is mixed</span>
+        <span className="pg-label">Try it: a parent that is <code>mixed</code> while its children are partly checked</span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           <Checkbox data-testid="uncontrolled">Uncontrolled</Checkbox>
           <Checkbox defaultChecked="mixed" data-testid="default-mixed">

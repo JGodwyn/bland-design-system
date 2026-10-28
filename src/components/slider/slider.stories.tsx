@@ -12,7 +12,13 @@ const labelsArg = (labels: unknown) => labelOptions[String(labels) as keyof type
 export default {
   title: 'Slider',
   description:
-    'Slider for picking a value (single) or a range (double) on a track. Size sm, md, lg sets the thumb (16, 20, 24) and the touch row height (control/xs, sm, md). Each thumb shows its value in a tooltip while hovered, focused or dragged. Labels shows the scale under the track; Input field shows a value field (two for a range, one each side). Width defaults to slider/width (256), capped at its container.',
+    'Picks a number, or a range with two thumbs, by dragging along a track.',
+  usage: [
+    '`type="double"` picks a range; the value is then `[start, end]`.',
+    'Name it with `aria-label` or `aria-labelledby`.',
+    'Turn on `inputField` when people need an exact value. `labels` shows the scale under the track.',
+    'Use `snap` to keep the thumbs on set values.',
+  ],
   components: ['Slider'],
   demo: {
     component: 'Slider',
@@ -44,19 +50,19 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">type="single": sm, md, lg</span>
+        <span className="pg-label"><code>type="single"</code>: <code>sm</code>, <code>md</code>, <code>lg</code></span>
         {sizes.map((size) => (
           <Slider key={size} size={size} defaultValue={50} aria-label={`Single ${size}`} />
         ))}
       </div>
       <div className="pg-stack">
-        <span className="pg-label">type="double": sm, md, lg</span>
+        <span className="pg-label"><code>type="double"</code>: <code>sm</code>, <code>md</code>, <code>lg</code></span>
         {sizes.map((size) => (
           <Slider key={size} type="double" size={size} defaultValue={[25, 75]} aria-label={`Double ${size}`} />
         ))}
       </div>
       <div className="pg-stack">
-        <span className="pg-label">labels: 4, 3, 2, false; an array with formatOptions (percent)</span>
+        <span className="pg-label"><code>labels</code>: 4, 3, 2, <code>false</code>; an array with <code>formatOptions</code> (percent)</span>
         <Slider labels={4} defaultValue={35} aria-label="Four labels" />
         <Slider labels={3} defaultValue={70} aria-label="Three labels" />
         <Slider labels={2} defaultValue={0} aria-label="Two labels" />
@@ -72,26 +78,26 @@ export default {
         />
       </div>
       <div className="pg-stack">
-        <span className="pg-label">inputField: single sm, md, lg; double (a field each side, labels 3: five crowd the shorter track)</span>
+        <span className="pg-label"><code>inputField</code>: single at each size; double, with a field each side</span>
         {sizes.map((size) => (
           <Slider key={size} size={size} inputField defaultValue={50} aria-label={`Field ${size}`} />
         ))}
         <Slider type="double" inputField labels={3} defaultValue={[20, 80]} aria-label="Price" />
       </div>
       <div className="pg-stack">
-        <span className="pg-label">snap: to the labels (single, range of 4, with a field); to an array</span>
+        <span className="pg-label"><code>snap</code>: to the labels, and to an array of values</span>
         <Slider snap defaultValue={50} aria-label="Snap single" />
         <Slider type="double" snap labels={4} defaultValue={[0, 100]} aria-label="Snap range" />
         <Slider snap labels={3} inputField defaultValue={50} aria-label="Snap field" />
         <Slider snap={[0, 10, 20, 50, 100]} labels={[0, 10, 20, 50, 100]} defaultValue={20} aria-label="Snap array" />
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Disabled</span>
+        <span className="pg-label"><code>disabled</code></span>
         <Slider disabled defaultValue={50} aria-label="Disabled single" />
         <Slider type="double" disabled inputField labels={3} defaultValue={[25, 75]} aria-label="Disabled double" />
       </div>
       <div className="pg-stack">
-        <span className="pg-label">Focused: the ring shows on keyboard focus (:focus-visible); forced on here to show it</span>
+        <span className="pg-label">Keyboard focus: the ring shows when people tab to it (turned on here to show it)</span>
         <div className="pg-focus">
           <Slider size="md" defaultValue={50} labels={false} aria-label="Focused" />
         </div>

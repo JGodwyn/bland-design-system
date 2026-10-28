@@ -18,7 +18,12 @@ const corner = { position: 'absolute', right: 0, bottom: 0 } as const;
 export default {
   title: 'Indicator',
   description:
-    'Status dot or count badge. sm and md are dots; lg, xl and 2xl carry a label and grow into a pill as the label gets longer. Height and min width use the same indicator size, so a single character stays a circle. Emotion sets the color family and Type sets emphasis: primary is a solid fill, secondary a soft tint. Label colors meet 4.5:1 in Light and Dark. Turn on ring when the Indicator sits on an Avatar or an image: it adds a 2px surface-100 outline that separates it from the content underneath.',
+    'A status dot or a small count, often on an avatar or icon. Sizes `sm` and `md` are dots; larger sizes hold a short label.',
+  usage: [
+    'Turn on `ring` when it sits on an Avatar or an image, so it stands out from what is underneath.',
+    'A dot has no text, so give it an `aria-label` when its meaning isn\'t shown nearby.',
+    'For a label beside content, use Badge.',
+  ],
   components: ['Indicator'],
   demo: {
     component: 'Indicator',
@@ -30,7 +35,7 @@ export default {
     <>
       {types.map((type) => (
         <div key={type} className="pg-stack">
-          <span className="pg-label">type="{type}": sm, md, lg, xl, 2xl</span>
+          <span className="pg-label"><code>type="{type}"</code>: <code>sm</code>, <code>md</code>, <code>lg</code>, <code>xl</code>, <code>2xl</code></span>
           {emotions.map((emotion) => (
             <div key={emotion} className="pg-row">
               {sizes.map((size) => (
@@ -38,14 +43,14 @@ export default {
                   {size === '2xl' ? 12 : 3}
                 </Indicator>
               ))}
-              <span className="pg-label">{emotion}</span>
+              <span className="pg-label"><code>{emotion}</code></span>
             </div>
           ))}
         </div>
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label">Longer labels grow into a pill; no label leaves an empty circle</span>
+        <span className="pg-label">Longer labels grow into a pill; without a label it is a plain circle</span>
         <div className="pg-row">
           {(['lg', 'xl', '2xl'] as const).map((size) => (
             <span key={size} className="pg-row">
@@ -62,7 +67,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">ring: a surface-100 outline on top of an avatar or image</span>
+        <span className="pg-label"><code>ring</code>: an outline that separates it from an avatar or image</span>
         <div className="pg-row">
           {sizes.map((size) => (
             <span key={size} style={swatch}>

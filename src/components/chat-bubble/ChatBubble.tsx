@@ -14,31 +14,31 @@ export type ChatBubbleType = 'text' | 'audio' | 'image' | 'video' | 'document' |
 export type ChatBubbleWaveLevel = 1 | 2 | 3 | 4 | 5;
 
 export interface ChatBubbleReply {
-  /** Figma `✏️ Re:Recipient`: who wrote the quoted message. One line, ellipsis. */
+  /** Who wrote the quoted message. One line, ellipsis. */
   name: ReactNode;
-  /** Figma `✏️ Re:Message`: the quoted message. One line, ellipsis. */
+  /** The quoted message. One line, ellipsis. */
   message: ReactNode;
 }
 
 export interface ChatBubbleProps extends Omit<LiHTMLAttributes<HTMLLIElement>, 'children' | 'title'> {
-  /** Figma `Who`: receiver (left, neutral) or sender (right, brand). */
+  /** receiver (left, neutral) or sender (right, brand). */
   who?: ChatBubbleWho;
-  /** Figma `Type`. Figma's audio-playing is `type="audio"` with `playing`. typing: three dots that lift and brighten in turn, on either side. */
+  /** typing: three dots that lift and brighten in turn, on either side. */
   type?: ChatBubbleType;
   /**
-   * Figma `✏️ Message`: the text of a text bubble (it keeps line breaks and wraps at chat-bubble/max-width), the
-   * caption under an image or video (Figma `👀 Message`), or the file name of a document (one line, ellipsis).
+   * The text of a text bubble (it keeps line breaks and wraps at the bubble's maximum width), the
+   * caption under an image or video, or the file name of a document (one line, ellipsis).
    */
   children?: ReactNode;
-  /** Figma `✏️ Date`: the time under the bubble, such as "09:41". Pass a `<time>` element for a machine-readable date. */
+  /** The time under the bubble, such as "09:41". Pass a `<time>` element for a machine-readable date. */
   time?: ReactNode;
-  /** Figma `_message-sent-indicator`, next to the time on a sender bubble: one check, two checks, or two in brand. */
+  /** Next to the time on a sender bubble: one check, two checks, or two in brand. */
   status?: MessageStatus;
   /** Words read for each `status`. Default Sent, Delivered, Seen. */
   statusLabels?: Partial<MessageStatusLabels>;
-  /** Figma `👀 Replying`: the quoted message at the top of the bubble. */
+  /** The quoted message at the top of the bubble. */
   reply?: ChatBubbleReply;
-  /** image and video: the image, or the video's poster frame. Drawn at chat-bubble/media-height, cropped to fill. */
+  /** image and video: the image, or the video's poster frame. Cropped to fill the bubble. */
   src?: string;
   /** image and video: the image's text alternative. Use "" when the caption already says what it shows. */
   alt?: string;
@@ -46,7 +46,7 @@ export interface ChatBubbleProps extends Omit<LiHTMLAttributes<HTMLLIElement>, '
   imgProps?: Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt'>;
   /** video: called by the play button on the poster. Without it the play disc is drawn but is not a button. */
   onPlay?: () => void;
-  /** audio: the pause icon and the playing state (Figma `audio-playing`). Controlled; pair it with `onPlayingChange`. */
+  /** audio: the pause icon and the playing state. Controlled; pair it with `onPlayingChange`. */
   playing?: boolean;
   /** audio: whether it starts playing, uncontrolled. */
   defaultPlaying?: boolean;
@@ -56,15 +56,15 @@ export interface ChatBubbleProps extends Omit<LiHTMLAttributes<HTMLLIElement>, '
   progress?: number;
   /** audio: the time shown after the waveform, such as "0:28" (the length) or "0:14" (elapsed, while playing). */
   duration?: ReactNode;
-  /** audio: bar heights, 1 (quietest) to 5 (loudest). Default Figma's 26 bars. */
+  /** audio: bar heights, 1 (quietest) to 5 (loudest). Default: a 26-bar wave. */
   waveform?: ChatBubbleWaveLevel[];
   /** audio and video: the play button's name. Default "Play voice message" (audio) or "Play video" (video). */
   playLabel?: string;
   /** audio: the pause button's name. Default "Pause voice message". */
   pauseLabel?: string;
-  /** document: Figma `✏️ File type`, such as "PDF". */
+  /** document: such as "PDF". */
   fileType?: ReactNode;
-  /** document: Figma `✏️ File size`, such as "1 MB". */
+  /** document: such as "1 MB". */
   fileSize?: ReactNode;
   /** document: the icon before the file name. Default File. */
   fileIcon?: ReactNode;
@@ -82,7 +82,7 @@ const figmaWaveform: ChatBubbleWaveLevel[] = [
 ];
 
 /**
- * Figma `_chat-bubble-tail`: the receiver tail, 20 x 16. The 8 that show sit outside the bubble; the rest lies under
+ * The receiver tail, 20 x 16. The 8 that show sit outside the bubble; the rest lies under
  * the bubble's rounded bottom corner so the two read as one shape. The sender tail is its mirror (CSS).
  */
 const tailPath =

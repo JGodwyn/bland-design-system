@@ -100,7 +100,13 @@ function Actions() {
 export default {
   title: 'Menu',
   description:
-    'A list of actions or options in a floating panel, opened from a trigger such as a Button or an Icon Button. Size sets the row height (32, 40, 48 with one line); the label wraps. Each row can hold an icon, Avatar or Checkbox in its 24px leading slot and a shortcut, caret or Check in its trailing slot; danger is for destructive actions, and a divider separates groups. The panel carries Elevation/neutral/mid. Arrow keys move through the rows, typing jumps to a row, Escape closes the menu and returns focus to the trigger. A long menu scrolls with a visible scrollbar and an edge fade, capped to the space left on screen.',
+    'A list of actions or options in a floating panel, opened from a button. Use it for actions that don\'t fit on screen, such as behind a More button.',
+  usage: [
+    'Wrap the trigger (a Button or IconButton) in Menu, and handle choices in `onAction`.',
+    'Mark destructive actions with `danger`, and separate groups with `divider`.',
+    'Set `selectionMode` for a menu that picks options; picked rows show a check.',
+    'For a form field with options, use Dropdown.',
+  ],
   components: ['Menu'],
   demo: {
     component: 'Menu',
@@ -130,7 +136,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label">Rows at each size (drawn statically): rest, hover, pressed, keyboard focus, disabled, slots with a divider, danger</span>
+        <span className="pg-label">Rows at each <code>size</code>: rest, hover, pressed, keyboard focus, <code>disabled</code>, slots with a <code>divider</code>, <code>danger</code></span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           {sizes.map((size) => (
             <Rows key={size} size={size} />
@@ -139,7 +145,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Leading slot: an Avatar; trailing slot: a selected Check</span>
+        <span className="pg-label"><code>leading</code> with an Avatar; <code>trailing</code> with a check</span>
         <Panel size="md">
           <MenuRow size="md" item={{ id: 'a', label: 'Ada Lovelace', leading: <Avatar size="xs" initials="AL" /> }} />
           <MenuRow size="md" item={{ id: 'b', label: 'Grace Hopper', leading: <Avatar size="xs" initials="GH" /> }} mark="check" selected />
@@ -147,14 +153,14 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">A label that wraps keeps its slots on the first line</span>
+        <span className="pg-label">A label that wraps keeps its slots level with the first line</span>
         <Panel size="sm">
           <MenuRow size="sm" item={{ id: 'w', label: 'Move this file and everything inside it to another folder', leading: icon(<PlusIcon />), trailing: 'Ctrl M' }} />
         </Panel>
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Triggers: press, or focus and press Enter, Space or an arrow key (the open menus are screenshotted by tests/menu.spec.ts)</span>
+        <span className="pg-label">Try it: press a trigger, or focus it and press Enter, Space or an arrow key</span>
         <Actions />
         <Selection />
         <div className="pg-row">

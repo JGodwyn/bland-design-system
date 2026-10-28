@@ -16,19 +16,19 @@ export interface LogoLinkProps {
 }
 
 export interface LogoProps extends Omit<HTMLAttributes<HTMLElement>, 'color'> {
-  /** Figma `Size`: lg (Heading/heading-md, 40 tall) or sm (Title/title-md, 24 tall, for top bars). */
+  /** lg (40 tall) or sm (24 tall, for top bars). */
   size?: LogoSize;
   /**
-   * Figma `Color`: default is text-bold and follows the theme; on-color is white in both, for brand fills. Put it on
+   * default is text-bold and follows the theme; on-color is white in both, for brand fills. Put it on
    * `--surface-brand-strong`: `--surface-brand` lightens in dark, where white on it is 2.7:1.
    */
   color?: LogoColor;
   /**
-   * Figma `🧩 Mark` (`👀 Mark`): a project logomark before the wordmark, any image or SVG, drawn in the
-   * logo/mark-* square. Decorative: the wordmark names the product, so the mark is hidden from screen readers.
+   * A project logomark before the wordmark, any image or SVG, drawn in a
+   * square the height of the logo. Decorative: the wordmark names the product, so the mark is hidden from screen readers.
    */
   mark?: ReactNode;
-  /** The wordmark. Code only (Figma's text is fixed): defaults to "Bland"; set a project's product name. */
+  /** The wordmark. Defaults to "Bland"; set a project's product name. */
   children?: ReactNode;
   /** Makes the logo a link, usually to the home page, with Bland's focus ring. */
   href?: string;
