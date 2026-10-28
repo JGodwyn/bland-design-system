@@ -217,7 +217,7 @@ export default {
   render: () => (
     <>
       {(['sm', 'md', 'lg'] as const).map((size) => (
-        <Group key={size} label={`size="${size}": rows and header ${size === 'sm' ? 32 : size === 'md' ? 40 : 48} high, leading slot ${size === 'sm' ? 20 : size === 'md' ? 24 : 32}`}>
+        <Group key={size} label={<><code>size="{size}"</code>: rows and header {size === 'sm' ? 32 : size === 'md' ? 40 : 48}px high, leading slot {size === 'sm' ? 20 : size === 'md' ? 24 : 32}px</>}>
           <Table aria-label={`People ${size}`} size={size}>
             <Head />
             <TableBody>
@@ -231,7 +231,7 @@ export default {
         </Group>
       ))}
 
-      <Group label='selectionMode="multiple": a Checkbox column, select all goes mixed; selected rows take the brand tint; the last row is disabled'>
+      <Group label={<><code>selectionMode="multiple"</code>: a Checkbox column, select all goes mixed; selected rows take the brand tint; the last row is <code>disabled</code></>}>
         <Table aria-label="Selectable people" selectionMode="multiple" defaultSelectedKeys={['grace']} data-testid="multiple">
           <Head />
           <TableBody>
@@ -257,7 +257,7 @@ export default {
         </Table>
       </Group>
 
-      <Group label='selectionMode="single": a Radio column under a blank header'>
+      <Group label={<><code>selectionMode="single"</code>: a Radio column under a blank header</>}>
         <Table aria-label="Pick one person" selectionMode="single" defaultSelectedKeys={['ada']} data-testid="single">
           <Head />
           <TableBody>

@@ -107,7 +107,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">A long title in an inline connector step ends in an ellipsis, so the line stays visible</span>
+        <span className="pg-label">A long title in an <code>inline</code> <code>connector</code> step ends in an ellipsis, so the line stays visible</span>
         <ProgressWizard
           style="connector"
           steps={[{ title: 'Billing and shipping address' }, { title: 'Payment' }, { title: 'Review' }]}

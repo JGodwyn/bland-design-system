@@ -70,7 +70,7 @@ export default {
     <>
       {([true, false] as const).map((colored) => (
         <div key={String(colored)} className="pg-stack">
-          <span className="pg-label"><code>colored={String(colored)}</code>: horizontal, then vertical</span>
+          <span className="pg-label"><code>colored={String(colored)}</code>: <code>horizontal</code>, then <code>vertical</code></span>
           {statuses.map((status) => (
             <div key={status} className="pg-row" style={{ alignItems: 'flex-start' }}>
               <Notification status={status} colored={colored} onClose={() => {}}>
@@ -85,7 +85,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label"><code>actions</code>, <code>timestamp</code>, a <code>title</code> on horizontal, no close, no icon</span>
+        <span className="pg-label"><code>actions</code>, <code>timestamp</code>, a <code>title</code> on <code>horizontal</code>, no close, no icon</span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           <div className="pg-stack">
             <Notification status="success" actions={actionsFor('horizontal', 1)} timestamp={stamp}>

@@ -84,7 +84,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label"><code>colored</code>: a tinted surface and border, horizontal then vertical</span>
+        <span className="pg-label"><code>colored</code>: a tinted surface and border, <code>horizontal</code> then <code>vertical</code></span>
         {statuses.map((status) => (
           <Banner key={status} status={status} colored>
             Banners display important announcements ({status})
@@ -98,7 +98,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label"><code>actions</code> (inline when horizontal, under the text when vertical) and <code>onClose</code></span>
+        <span className="pg-label"><code>actions</code> (inline when <code>horizontal</code>, under the text when <code>vertical</code>) and <code>onClose</code></span>
         <Banner status="info" actions={actionsFor('horizontal', 2)} onClose={() => {}}>
           A new version is available
         </Banner>

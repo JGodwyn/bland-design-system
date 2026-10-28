@@ -97,7 +97,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label"><code>current</code>: the open chat, receiver and sender</span>
+        <span className="pg-label"><code>current</code>: the open chat, <code>receiver</code> and <code>sender</code></span>
         <Chats label="Selected">
           <ChatListItem current name="Jane Doe" date="09:41" message="Here is a brief message" unread avatar={avatar} onClick={() => {}} />
           <ChatListItem current type="sender" status="seen" name="Ada Lovelace" date="Yesterday" message="Here is a brief message" avatar={<Avatar size="lg" initials="AL" />} onClick={() => {}} />

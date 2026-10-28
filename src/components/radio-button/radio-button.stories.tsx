@@ -82,7 +82,7 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">RadioGroup: vertical and horizontal, <code>sm</code> and <code>md</code></span>
+        <span className="pg-label">RadioGroup: <code>vertical</code> and <code>horizontal</code>, <code>sm</code> and <code>md</code></span>
         <div className="pg-row" style={{ alignItems: 'flex-start' }}>
           {sizes.map((size) => (
             <RadioGroup key={size} size={size} defaultValue="one" aria-label={`Vertical ${size}`}>

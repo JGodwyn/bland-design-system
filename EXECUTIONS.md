@@ -1783,3 +1783,10 @@ not wrapped; rail contents centred (logo and account icon were off).
 - First auto-code of option values marked prose ("An `image` that fails") and missed `2xl` (filtered as a number); now only a value followed by punctuation, a number, or/and, or the end.
 - Port 5180 was held by an existing dev server; used it (HMR) instead of starting one.
 - docs.spec: updated the Brand table name and banner text assertions; 80 passed. visual.spec: every story differed, only in caption text (checked the icon diff); re-baselined, then `npm test`.
+
+### Follow-up: prop values left as plain text in captions (2026-10-28)
+
+- Godwin spotted `size="sm": rows and header 32 high` on the Table page drawn as plain text: Table's `Group` captions were template strings, so no `<code>`. Rewrote them as JSX with `<code>`, and added px to the sizes.
+- A browser sweep of every component page (captions with `<code>` removed, matched against prop values and `prop=`) found the rest: `vertical`/`horizontal` (Checkbox, Radio, Banner, Notification), `receiver`/`sender` (Chat list item), `inline` `connector` (Progress wizard), `single`/`double` (Slider). Marked as code.
+- Dead end: adding `.pg-label code` to docs.css restyled every raw story caption (raw pages load docs.css too) and broke every screenshot. Not needed: docs pages lift the label into `.docs-variant-caption`. Reverted.
+- The modal and tooltip "open" screenshots still had the old captions from 47b3329; re-baselined. `npm test` 637 passed.

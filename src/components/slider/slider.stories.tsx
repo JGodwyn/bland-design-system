@@ -78,7 +78,7 @@ export default {
         />
       </div>
       <div className="pg-stack">
-        <span className="pg-label"><code>inputField</code>: single at each size; double, with a field each side</span>
+        <span className="pg-label"><code>inputField</code>: <code>single</code> at each size; <code>double</code>, with a field each side</span>
         {sizes.map((size) => (
           <Slider key={size} size={size} inputField defaultValue={50} aria-label={`Field ${size}`} />
         ))}
