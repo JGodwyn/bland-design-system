@@ -743,7 +743,25 @@ export function generateChart(brand: Scale, extras: Extra[] = [], neutrals: Scal
   const fixed = [scaleSeries('brand', brand, neutrals), ...extras.slice(0, MAX_EXTRAS).map((x) => scaleSeries(x.name, x.scale, neutrals))];
   // Picks only take their own slot (Godwin 2026-10-28): Bland's picks are made from the brand and extras alone, so
   // changing one color never moves another. A pick that clashes with a neighbour shows in the check instead.
-  return generateAround(brand, fixed, neutrals).map((s, i) => (i >= fixed.length && pins[i + 1] ? pinnedSeries(pins[i + 1]!, neutrals) : s));
+  const placed = placePins(pins, fixed.length);
+  return generateAround(brand, fixed, neutrals).map((s, i) => (placed[i + 1] ? pinnedSeries(placed[i + 1]!, neutrals) : s));
+}
+
+/**
+ * Picks placed after the first `taken` series (the brand and extras), keeping their colors (Godwin 2026-10-28): a
+ * pick stays in its slot unless an extra now holds it, then it moves to the next free slot, in order. A pick with
+ * no slot left (eight in all) is dropped.
+ */
+export function placePins(pins: ChartPins, taken: number): ChartPins {
+  const out: ChartPins = {};
+  let next = taken + 1;
+  for (const n of Object.keys(pins).map(Number).sort((a, b) => a - b)) {
+    const at = Math.max(n, next);
+    if (at > CHART_COUNT || !pins[n]) continue;
+    out[at] = pins[n];
+    next = at + 1;
+  }
+  return out;
 }
 
 /** Bland's picks for the open slots after the brand and extras: hues in the gaps, ordered and nudged apart. */

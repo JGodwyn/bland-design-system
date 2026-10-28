@@ -4,7 +4,7 @@ import { test } from 'node:test';
 
 import { readFileSync } from 'node:fs';
 
-import { blandChart, fixChartColor, chartAdvice, chartPins, parseChart, pinnedSeries, CHART_CONTRAST, CHART_COUNT, chartCss, chartHues, checkChart, colorOf, deltaE, generateChart, EXTRA_PAIRS, EXTRA_ROLES, extraNameError, harmonyColor, HARMONY_TURNS, parseExtras, blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
+import { blandChart, placePins, fixChartColor, chartAdvice, chartPins, parseChart, pinnedSeries, CHART_CONTRAST, CHART_COUNT, chartCss, chartHues, checkChart, colorOf, deltaE, generateChart, EXTRA_PAIRS, EXTRA_ROLES, extraNameError, harmonyColor, HARMONY_TURNS, parseExtras, blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
 
 const close = (a: string, b: string) => toOklch(a).l - toOklch(b).l;
 
@@ -211,7 +211,7 @@ test('the chart tokens go in the override file, and an extra can’t be called c
 });
 
 test('a picked chart color keeps its place and value, and changes no other series', () => {
-  const chart = generateChart(blandScale, [], blandNeutrals, { 4: '#2B2BD0', 1: '#ff0000' });
+  const chart = generateChart(blandScale, [], blandNeutrals, { 4: '#2B2BD0' });
   assert.equal(chart[0]!.from, 'brand', 'series 1 is always the brand');
   assert.deepEqual([chart[3]!.from, chart[3]!.light], ['pinned', '#2b2bd0']);
   assert.ok(toOklch(chart[3]!.dark).l > toOklch(chart[3]!.light).l && contrast(chart[3]!.dark, bg('dark')) >= CHART_CONTRAST);
@@ -263,4 +263,18 @@ test('a clash between two picks shows on the one just changed', () => {
   assert.deepEqual(on(5), [5]);
   assert.deepEqual(on(4), [4]);
   assert.deepEqual(on(), [4], 'without an edit, the earlier pick (both are yours)');
+});
+
+test('an extra color never changes a pick: the pick keeps its color, moving on only if the extra needs its slot', () => {
+  assert.deepEqual(placePins({ 2: '#111111', 5: '#222222' }, 1), { 2: '#111111', 5: '#222222' });
+  assert.deepEqual(placePins({ 2: '#111111', 3: '#333333', 5: '#222222' }, 3), { 4: '#111111', 5: '#333333', 6: '#222222' });
+  assert.deepEqual(placePins({ 8: '#111111' }, 4), { 8: '#111111' });
+  const pins = { 2: '#2b2bd0', 6: '#d4a000' };
+  const extras = [{ name: 'accent', scale: generate('#16a34a') }];
+  const chart = generateChart(blandScale, extras, blandNeutrals, pins);
+  assert.equal(chart[1]!.from, 'accent');
+  assert.deepEqual([chart[2]!.light, chart[5]!.light], ['#2b2bd0', '#d4a000']);
+  // Changing the extra's color leaves the picks as they are.
+  const again = generateChart(blandScale, [{ name: 'accent', scale: generate('#e11d48') }], blandNeutrals, pins);
+  assert.deepEqual([again[2], again[5]], [chart[2], chart[5]]);
 });

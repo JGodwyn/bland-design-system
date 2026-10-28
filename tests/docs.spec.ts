@@ -417,11 +417,20 @@ test('the brand page shows the chart palette in both themes, takes your own pick
   await expect(previews.first().locator('.docs-brand-chart-track').first().locator('span')).toHaveCount(8);
   await expect(previews.first().getByText('Series 8')).toBeVisible();
 
-  // An extra color takes series 2, and the CSS carries the palette after the extra's roles.
+  // An extra color takes series 2. Your pick there keeps its color, moved to the next free series, and changing the
+  // extra's color leaves it alone.
+  await pick(2, '#2b2bd0');
   await page.getByRole('tab', { name: 'Extra colors' }).click();
   await page.getByRole('button', { name: 'Add color' }).click();
   await page.getByRole('tab', { name: 'Chart colors' }).click();
   await expect(list.getByRole('listitem').nth(1)).toContainText('Extra color accent');
+  await expect(item(3).getByRole('button', { name: 'Series 3 #2B2BD0, change it' })).toBeVisible();
+  await page.getByRole('tab', { name: 'Extra colors' }).click();
+  await page.getByRole('button', { name: /^Extra color accent #/ }).click();
+  await page.getByRole('textbox', { name: 'HEX color' }).fill('#e11d48');
+  await page.keyboard.press('Escape');
+  await page.getByRole('tab', { name: 'Chart colors' }).click();
+  await expect(item(3).getByRole('button', { name: 'Series 3 #2B2BD0, change it' })).toBeVisible();
   await page.getByRole('tab', { name: 'How to use' }).click();
   const css = page.locator('#use-in-a-project pre');
   await expect(css).toContainText('--chart-2: var(--accent-600);');

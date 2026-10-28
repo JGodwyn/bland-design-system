@@ -32,6 +32,7 @@ import {
   chartAdvice,
   checkChart,
   fixChartColor,
+  placePins,
   check,
   contrast,
   EXTRA_PAIRS,
@@ -119,6 +120,12 @@ export function BrandPage() {
   // Extra colors: up to MAX_EXTRAS, each with a name that doesn't clash, made into a scale (fixed when asked).
   const extraScales = extras.map((x) => ({ ...x, scale: x.fixed ?? generate(x.color), error: extraNameError(x.name, extras.filter((o) => o.id !== x.id).map((o) => o.name)) }));
   const validExtras = extraScales.filter((x) => !x.error).map(({ name, scale }) => ({ name, scale }));
+  // Picks keep their colors when extras come and go: one an extra now needs moves to the next free slot, and stays
+  // there (the state follows, so Reset and the CSS name the slot it shows in).
+  useEffect(() => {
+    const placed = placePins(pins, 1 + validExtras.length);
+    if (JSON.stringify(placed) !== JSON.stringify(pins)) setPins(placed);
+  }, [pins, validExtras.length]);
   // The chart palette follows the brand, the valid extras (in order) and the neutrals' page color.
   const chart = useMemo(() => generateChart(scale, validExtras, neutrals, pins), [scale, neutrals, JSON.stringify(validExtras), pins]);
   const updateExtra = (id: string, patch: Partial<ExtraState>) => setExtras((all) => all.map((x) => (x.id === id ? { ...x, ...patch } : x)));
