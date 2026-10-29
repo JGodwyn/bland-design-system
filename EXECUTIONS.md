@@ -1876,3 +1876,8 @@ not wrapped; rail contents centred (logo and account icon were off).
 
 - Godwin's image: the toolbar's search trigger as a grey field with a magnifier and "Search", then the ⌘ and K keys.
 - `DocsApp.tsx`: MagnifyingGlass icon (icon/md, icon-subtle) + "Search" in the label; `aria-label="Search Bland"` keeps the name. `docs.css`: `.docs-search-field` (inline-flex, gap space-sm). Field and keys all 32 tall. Docs spec passes (148).
+
+### Follow-up: bigger columns switch, bigger menu hit area (2026-10-29)
+
+- Godwin asked which size the columns switch was: 32 tall (the toolbar's search-label look, Button sm's height). Now Button md's on phones: 40 (space-sm by space-lg padding); inline from md it keeps 32.
+- Menu button: unchanged 32 button and icon/lg icon, with a control/lg (56) `::before` hit area centred on it, the bar's full height; it reaches the screen corner (checked with elementFromPoint at 370,6). docs + a11y pass (248).

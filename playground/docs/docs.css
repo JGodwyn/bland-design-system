@@ -28,9 +28,22 @@
   padding: var(--space-md) var(--space-sm) var(--space-md) var(--space-lg); /* the button's icon lines up near the page gutter */
   background: var(--surface-100);
 }
-/* The menu button, at the end of the bar: its icon one step up from the sm button's (icon/lg). */
+/* The menu button, at the end of the bar: its icon one step up from the sm button's (icon/lg). Its hit area is
+   control/lg (56), the bar's full height, centred on the 32 button, so a thumb finds it easily; the button itself
+   is unchanged. */
 .docs-topbar .docs-menu-button.bland-icon-button {
   --bland-icon-size: var(--icon-lg);
+
+  position: relative;
+}
+.docs-topbar .docs-menu-button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--control-lg);
+  height: var(--control-lg);
+  transform: translate(-50%, -50%);
 }
 /* While the menu is open the menu button shows EyeClosed and Hide comes in beside it (body-lg, also closing the menu;
    the button is the named control, "Hide menu"). Hide comes out of a space-xs blur as it fades in and goes back into it (as the
@@ -1930,6 +1943,10 @@ code,
   color: var(--text-on-color);
   box-shadow: var(--elevation-brand-mid);
 }
+/* A step up from the toolbar's 32 (Button sm) to Button md's size: 40 tall, space-lg at the sides. */
+.docs-grid-switch .docs-search-label {
+  padding: var(--space-sm) var(--space-lg);
+}
 @media (max-width: 767.98px) {
   .docs-grid-switch .docs-search-trigger:active .docs-search-label {
     background: var(--button-brand-primary-pressed);
@@ -1940,6 +1957,7 @@ code,
     position: static;
   }
   .docs-grid-switch .docs-search-label {
+    padding: var(--space-xs) var(--space-md);
     background: var(--surface-200);
     color: var(--text-subtle);
     box-shadow: none;

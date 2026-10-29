@@ -2291,3 +2291,4 @@ Readers are designers, developers and agents. The voice follows systems known fo
 - Grid page columns switch (Godwin 2026-10-29): on phones a floating button at the bottom left (space-lg in, elevation/neutral/mid, surface-100; brand tint while on); inline under the page header from breakpoint/md.
 - Grid page columns switch on phones (revised 2026-10-29): bottom right, not left; while the columns show it is a primary button (button-brand-primary-rest, text-on-color, elevation/brand/mid).
 - Grid page columns switch on phones (2026-10-29, final): primary in both states; the label says Show or Hide. No tap highlight anywhere on the docs site (`-webkit-tap-highlight-color: transparent` on html).
+- Phone sizes (2026-10-29): the floating columns switch is Button md's size (40); the menu button keeps its 32 look with a 56 (control/lg) hit area.
