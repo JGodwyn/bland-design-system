@@ -279,6 +279,15 @@
   font: var(--type-body-lg);
   white-space: nowrap;
 }
+.docs-search-field {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-inline: var(--space-sm) var(--space-md);
+}
+.docs-search-icon {
+  color: var(--icon-subtle);
+}
 @media (hover: hover) and (pointer: fine) {
   .docs-search-trigger:hover .docs-search-label {
     background: var(--surface-300);

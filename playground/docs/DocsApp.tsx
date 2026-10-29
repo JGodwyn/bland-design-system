@@ -2,7 +2,7 @@
 // search, the selected page, and a rail listing the page's sections.
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { IconButton } from '../../src/components/button/IconButton';
-import { EyeClosedIcon } from '../../src/icons';
+import { EyeClosedIcon, MagnifyingGlassIcon } from '../../src/icons';
 import { Icon } from '../../src/components/icon/Icon';
 import { ScrollArea } from '../../src/components/scroll-area/ScrollArea';
 import { SegmentedBar } from '../../src/components/segmented-bar/SegmentedBar';
@@ -185,8 +185,14 @@ export function DocsApp({ route }: { route: DocsRoute }) {
           value={theme}
           onValueChange={(id) => setTheme(id as Theme)}
         />
-        <button type="button" className="docs-search-trigger bland-focus-ring bland-smooth" onClick={() => setSearchOpen(true)} aria-keyshortcuts={isApple ? 'Meta+K' : 'Control+K'}>
-          <span className="docs-search-label bland-smooth">Search Bland</span>
+        <button type="button" className="docs-search-trigger bland-focus-ring bland-smooth" onClick={() => setSearchOpen(true)} aria-label="Search Bland" aria-keyshortcuts={isApple ? 'Meta+K' : 'Control+K'}>
+          {/* A search field look: the magnifier and Search on the grey fill, the shortcut's keys beside it. */}
+          <span className="docs-search-label docs-search-field bland-smooth">
+            <Icon size="md" className="docs-search-icon">
+              <MagnifyingGlassIcon />
+            </Icon>
+            Search
+          </span>
           <span className="docs-keys" aria-hidden="true">
             <kbd className="docs-key bland-smooth">
               {isApple ? (
