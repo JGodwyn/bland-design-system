@@ -24,44 +24,50 @@
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  padding: var(--space-md) var(--space-lg) var(--space-md) var(--space-sm); /* the button's icon lines up near the page gutter */
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-sm) var(--space-md) var(--space-lg); /* the button's icon lines up near the page gutter */
   background: var(--surface-100);
 }
-/* The menu button's icon one step up from the sm button's (icon/lg). */
+/* The menu button, at the end of the bar: its icon one step up from the sm button's (icon/lg). */
 .docs-topbar .docs-menu-button.bland-icon-button {
   --bland-icon-size: var(--icon-lg);
 }
 /* The logo turns into Close while the menu is open: both sit in one cell and cross-fade, the one going out
    blurring away as the other comes out of a blur (as the Sidebar's slots), duration/md easing/out; opacity only
-   under reduced motion. Close is body-lg and closes the menu too (the X beside it is the named button). */
+   under reduced motion. Close is body-lg: the menu's close button while the menu button is pushed off screen. */
 .docs-topbar-title {
   display: grid;
   align-items: center;
 }
 .docs-topbar-title > * {
   grid-area: 1 / 1;
+  /* Visibility turns on at once (so Close can take focus as the menu opens) and off only after the fade. */
   transition:
     opacity var(--duration-md) var(--easing-out),
     filter var(--duration-md) var(--easing-out),
-    visibility var(--duration-md);
+    visibility 0s;
 }
 .docs-topbar-close {
+  justify-self: start;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  border-radius: var(--rad-sm);
+  background: none;
   font: var(--type-body-lg);
   color: var(--text-bold);
   cursor: pointer;
-  user-select: none;
 }
 .docs-topbar-title > [data-off] {
   opacity: 0;
   filter: blur(var(--space-xs));
   visibility: hidden;
+  transition-property: opacity, filter, visibility;
+  transition-duration: var(--duration-md);
+  transition-timing-function: var(--easing-out);
 }
 @media (prefers-reduced-motion: reduce) {
-  .docs-topbar-title > * {
-    transition:
-      opacity var(--duration-md) var(--easing-out),
-      visibility var(--duration-md);
-  }
+  .docs-topbar-title > *,
   .docs-topbar-title > [data-off] {
     filter: none;
   }

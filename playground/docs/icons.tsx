@@ -5,6 +5,18 @@ import type { SVGProps } from 'react';
 type P = SVGProps<SVGSVGElement>;
 const stroked = { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeLinecap: 'round', strokeLinejoin: 'round' } as const;
 
+/** Phosphor ListBullets (regular, on the 24 grid). The phone top bar's menu button. */
+export const ListBulletsIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M8.25 6H20.25" />
+    <path d="M8.25 12H20.25" />
+    <path d="M8.25 18H20.25" />
+    <circle cx="4.125" cy="6" r="1.125" fill="currentColor" stroke="none" />
+    <circle cx="4.125" cy="12" r="1.125" fill="currentColor" stroke="none" />
+    <circle cx="4.125" cy="18" r="1.125" fill="currentColor" stroke="none" />
+  </svg>
+);
+
 /** Figma: SunDim (6080:106237). The theme switch's Light. */
 export const SunDimIcon = (p: P) => (
   <svg {...stroked} {...p}>

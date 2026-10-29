@@ -575,9 +575,10 @@ test.describe('on a phone', () => {
     const main = page.locator('.docs-main');
     await expect(nav).toBeHidden();
     const before = (await main.boundingBox())!.x;
-    await page.getByRole('button', { name: 'Menu' }).click();
+    await page.getByRole('button', { name: 'Menu', exact: true }).click();
     await expect(nav).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Close menu' })).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.getByRole('button', { name: 'Menu', exact: true })).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.getByRole('button', { name: 'Close menu' })).toBeFocused(); // the menu button is pushed off screen
     const sidebar = (await page.locator('.docs-sidebar').boundingBox())!;
     await expect.poll(async () => (await page.locator('.docs-sidebar').boundingBox())!.x).toBe(0);
     await expect.poll(async () => (await main.boundingBox())!.x).toBe(before + sidebar.width);
@@ -586,15 +587,16 @@ test.describe('on a phone', () => {
     await expect(page.locator('.docs-topbar .docs-brand')).toBeHidden();
     await page.locator('.docs-topbar-close').click();
     await expect(nav).toBeHidden();
+    await expect(page.getByRole('button', { name: 'Menu', exact: true })).toBeFocused();
     await expect(page.locator('.docs-topbar .docs-brand')).toBeVisible();
     await expect(page.locator('.docs-topbar-close')).toBeHidden();
-    await page.getByRole('button', { name: 'Menu' }).click();
+    await page.getByRole('button', { name: 'Menu', exact: true }).click();
     await page.mouse.click(310, 400); // the strip of page beside the menu
     await expect(nav).toBeHidden();
-    await page.getByRole('button', { name: 'Menu' }).click();
+    await page.getByRole('button', { name: 'Menu', exact: true }).click();
     await page.keyboard.press('Escape');
     await expect(nav).toBeHidden();
-    await page.getByRole('button', { name: 'Menu' }).click();
+    await page.getByRole('button', { name: 'Menu', exact: true }).click();
     await nav.getByRole('link', { name: 'Colors' }).click();
     await expect(page).toHaveURL(/#\/styles\/colors$/);
     await expect(nav).toBeHidden();
@@ -608,7 +610,7 @@ test.describe('on a phone', () => {
     expect(picker.x).toBeGreaterThanOrEqual(0);
     expect(picker.x + picker.width).toBeLessThanOrEqual(320);
     await page.keyboard.press('Escape');
-    await page.getByRole('button', { name: 'Menu' }).click();
+    await page.getByRole('button', { name: 'Menu', exact: true }).click();
     await expect(page.getByRole('navigation', { name: 'Docs' })).toBeVisible();
     expect(await sidewaysScroll(page)).toBe(0);
     await page.getByRole('button', { name: 'Close menu' }).click();

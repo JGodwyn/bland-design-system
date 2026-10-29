@@ -1830,3 +1830,12 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Padding space-sm to space-md (bar 56); the toolbar's sticky top now reads `--docs-topbar-height` instead of repeating the sum; sidebar head top padding follows so its logo stays level. Border removed. Menu icon icon/lg on the sm button.
 - Logo and Close share one grid cell and cross-fade with a space-xs blur (the Sidebar slots' recipe), duration/md easing/out, opacity only under reduced motion; the hidden one is `visibility: hidden` so the home link leaves the Tab order. Close is aria-hidden (the X is the named button) and closes on press.
 - docs + a11y specs pass (247).
+
+### Follow-up: menu button to the end, ListBullets (2026-10-29)
+
+- Godwin: move the menu icon to the other end of the bar and use ListBullets.
+- Logo first, menu button last (`justify-content: space-between`). ListBullets added to playground/docs/icons.tsx from Phosphor's regular glyph on the 24 grid (lines stroked, dots filled).
+- The push moves the bar right by the menu's width, so a button at the end leaves the screen while the menu is open: Close (in the strip) became a real button named "Close menu" and takes focus on open; closing from it hands focus back to the menu button. The X icon swap is gone (never seen).
+- Dead end: Close could not take focus as the menu opened: its `visibility` transition started at hidden. Visibility now switches on at once and off only after the fade (transition set per state).
+- Test names: `{ name: 'Menu' }` also matched "Close menu"; exact match.
+- docs + a11y specs pass (247).

@@ -2,13 +2,12 @@
 // search, the selected page, and a rail listing the page's sections.
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { IconButton } from '../../src/components/button/IconButton';
-import { ListIcon, XIcon } from '../../src/icons';
 import { Icon } from '../../src/components/icon/Icon';
 import { ScrollArea } from '../../src/components/scroll-area/ScrollArea';
 import { SegmentedBar } from '../../src/components/segmented-bar/SegmentedBar';
 import { ComponentPage } from './ComponentPage';
 import { stories, type DocsPage, type StylePageId } from './data';
-import { CommandIcon, ListDashesIcon, MoonIcon, SunDimIcon } from './icons';
+import { CommandIcon, ListBulletsIcon, ListDashesIcon, MoonIcon, SunDimIcon } from './icons';
 import { BrandPage } from './BrandPage';
 import './brandStore'; // paints an applied brand on load, on every page
 import { brandPage, componentPageList, overviewPage, PageIcon, stylePageList } from './pages';
@@ -95,6 +94,17 @@ export function DocsApp({ route }: { route: DocsRoute }) {
     window.scrollTo({ top: 0 });
   }, [route]);
 
+  // Focus follows the phone menu: Close takes it when the menu opens (the menu button is pushed off screen), and
+  // the menu button gets it back when the menu closes from there (not when a link closed it).
+  const topbarRef = useRef<HTMLElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
+  useEffect(() => {
+    if (menuOpen) closeRef.current?.focus({ preventScroll: true });
+    else if (wasOpen.current && (document.activeElement === closeRef.current || document.activeElement === document.body)) topbarRef.current?.querySelector<HTMLButtonElement>('.docs-menu-button')?.focus({ preventScroll: true });
+    wasOpen.current = menuOpen;
+  }, [menuOpen]);
+
   // Escape closes the phone menu.
   useEffect(() => {
     if (!menuOpen) return;
@@ -129,27 +139,36 @@ export function DocsApp({ route }: { route: DocsRoute }) {
 
   return (
     <div className="docs" data-menu-open={menuOpen || undefined}>
-      <header className="docs-topbar">
-        <IconButton
-          className="docs-menu-button"
-          size="sm"
-          type="ghost"
-          icon={menuOpen ? <XIcon /> : <ListIcon />}
-          aria-label={menuOpen ? 'Close menu' : 'Menu'}
-          aria-expanded={menuOpen}
-          aria-controls="docs-sidebar"
-          onClick={() => setMenuOpen((o) => !o)}
-        />
+      <header className="docs-topbar" ref={topbarRef}>
         <span className="docs-topbar-title">
           <a href="#/" className="docs-brand bland-focus-ring" data-off={menuOpen || undefined}>
             Bland
           </a>
-          <span className="docs-topbar-close" aria-hidden="true" data-off={!menuOpen || undefined} onClick={() => setMenuOpen(false)}>
+          {/* While the menu is open the menu button is pushed off screen: this is its close button, in the strip. */}
+          <button
+            ref={closeRef}
+            type="button"
+            className="docs-topbar-close bland-focus-ring"
+            data-off={!menuOpen || undefined}
+            aria-label="Close menu"
+            aria-controls="docs-sidebar"
+            onClick={() => setMenuOpen(false)}
+          >
             Close
-          </span>
+          </button>
         </span>
+        <IconButton
+          className="docs-menu-button"
+          size="sm"
+          type="ghost"
+          icon={<ListBulletsIcon />}
+          aria-label="Menu"
+          aria-expanded={menuOpen}
+          aria-controls="docs-sidebar"
+          onClick={() => setMenuOpen((o) => !o)}
+        />
       </header>
-      {/* The strip of page beside the open phone menu: a press there closes it (the close button is in the strip too). */}
+      {/* The strip of page beside the open phone menu: a press there closes it (Close is in the strip too). */}
       {menuOpen && <div className="docs-scrim" aria-hidden="true" onClick={() => setMenuOpen(false)} />}
 
       <aside className="docs-sidebar" id="docs-sidebar">
