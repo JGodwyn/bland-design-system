@@ -1557,7 +1557,7 @@ code,
 .docs-brand-chart-track {
   display: flex;
   gap: var(--space-2xs);
-  height: var(--space-xl);
+  height: var(--space-md); /* thin bars (Godwin 2026-10-29) */
 }
 .docs-brand-chart-track > span {
   flex-basis: var(--space-none);
