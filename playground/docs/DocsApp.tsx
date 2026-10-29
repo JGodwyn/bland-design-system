@@ -2,7 +2,7 @@
 // search, the selected page, and a rail listing the page's sections.
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { IconButton } from '../../src/components/button/IconButton';
-import { XIcon } from '../../src/icons';
+import { EyeClosedIcon } from '../../src/icons';
 import { Icon } from '../../src/components/icon/Icon';
 import { ScrollArea } from '../../src/components/scroll-area/ScrollArea';
 import { SegmentedBar } from '../../src/components/segmented-bar/SegmentedBar';
@@ -134,22 +134,22 @@ export function DocsApp({ route }: { route: DocsRoute }) {
           Bland
         </a>
         <span className="docs-topbar-end">
-          <span className="docs-topbar-close" aria-hidden="true" data-off={!menuOpen || undefined} onClick={() => setMenuOpen(false)}>
-            Close
+          <span className="docs-topbar-hide" aria-hidden="true" data-off={!menuOpen || undefined} onClick={() => setMenuOpen(false)}>
+            Hide
           </span>
           <IconButton
             className="docs-menu-button"
             size="sm"
             type="ghost"
-            icon={menuOpen ? <XIcon /> : <ListBulletsIcon />}
-            aria-label={menuOpen ? 'Close menu' : 'Menu'}
+            icon={menuOpen ? <EyeClosedIcon /> : <ListBulletsIcon />}
+            aria-label={menuOpen ? 'Hide menu' : 'Menu'}
             aria-expanded={menuOpen}
             aria-controls="docs-sidebar"
             onClick={() => setMenuOpen((o) => !o)}
           />
         </span>
       </header>
-      {/* The strip of page beside the open phone menu: a press there closes it (Close is in the strip too). */}
+      {/* The strip of page beside the open phone menu: a press there closes it (Hide is in the strip too). */}
       {menuOpen && <div className="docs-scrim" aria-hidden="true" onClick={() => setMenuOpen(false)} />}
 
       <aside className="docs-sidebar" id="docs-sidebar">

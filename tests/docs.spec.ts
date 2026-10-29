@@ -61,12 +61,14 @@ test('search opens with the shortcut, finds pages and other mentions, and goes t
   const dialog = page.getByRole('dialog', { name: 'Search Bland' });
   await expect(dialog).toBeVisible();
   const field = dialog.getByRole('combobox', { name: 'Search Bland' });
-  // It opens resting on the first result, Colors; the arrows move the highlight, focus stays in the field.
+  // It opens resting on the first result, Brand theme; the arrows move the highlight, focus stays in the field.
   await expect(field).toBeFocused();
-  await expect(dialog.getByRole('option', { selected: true })).toHaveText('Colors');
+  await expect(dialog.getByRole('option', { selected: true })).toHaveText('Brand theme');
   await field.press('ArrowDown');
-  await expect(dialog.getByRole('option', { selected: true })).toHaveText('Typography');
+  await expect(dialog.getByRole('option', { selected: true })).toHaveText('Colors');
   await expect(field).toBeFocused();
+  await field.fill('brand');
+  await expect(dialog.getByRole('option', { name: 'Brand theme', exact: true })).toBeVisible();
   await field.fill('numeric');
   await expect(dialog.getByRole('option', { name: 'Numeric Input Field', exact: true })).toBeVisible();
   await field.fill('surface-100');
@@ -577,16 +579,16 @@ test.describe('on a phone', () => {
     const before = (await main.boundingBox())!.x;
     await page.getByRole('button', { name: 'Menu', exact: true }).click();
     await expect(nav).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Close menu' })).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.getByRole('button', { name: 'Hide menu' })).toHaveAttribute('aria-expanded', 'true');
     const sidebar = (await page.locator('.docs-sidebar').boundingBox())!;
     await expect.poll(async () => (await page.locator('.docs-sidebar').boundingBox())!.x).toBe(320 - sidebar.width);
     await expect.poll(async () => (await main.boundingBox())!.x).toBe(before - sidebar.width);
-    await expect(page.getByRole('button', { name: 'Close menu' })).toBeInViewport(); // pushed along, it stays in the strip
+    await expect(page.getByRole('button', { name: 'Hide menu' })).toBeInViewport(); // pushed along, it stays in the strip
     expect(await sidewaysScroll(page)).toBe(0);
-    // Close comes in beside the X and closes the menu too.
-    await page.locator('.docs-topbar-close').click();
+    // Hide comes in beside the EyeClosed button and closes the menu too.
+    await page.locator('.docs-topbar-hide').click();
     await expect(nav).toBeHidden();
-    await expect(page.locator('.docs-topbar-close')).toHaveCSS('opacity', '0');
+    await expect(page.locator('.docs-topbar-hide')).toHaveCSS('opacity', '0');
     await page.getByRole('button', { name: 'Menu', exact: true }).click();
     await page.mouse.click(10, 400); // the strip of page beside the menu
     await expect(nav).toBeHidden();
@@ -610,7 +612,7 @@ test.describe('on a phone', () => {
     await page.getByRole('button', { name: 'Menu', exact: true }).click();
     await expect(page.getByRole('navigation', { name: 'Docs' })).toBeVisible();
     expect(await sidewaysScroll(page)).toBe(0);
-    await page.getByRole('button', { name: 'Close menu' }).click();
+    await page.getByRole('button', { name: 'Hide menu' }).click();
     await page.getByRole('button', { name: /Search Bland/ }).click();
     await page.keyboard.type('button');
     expect(await sidewaysScroll(page)).toBe(0);

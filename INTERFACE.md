@@ -2287,3 +2287,4 @@ Readers are designers, developers and agents. The voice follows systems known fo
 - Phone top bar (Godwin 2026-10-29, revised): logo first, the menu button (ListBullets, icon/lg) at the end. While the menu is open that button is pushed off screen; the logo's place shows Close (body-lg), the menu's close button, which takes focus on open and returns it to the menu button on close.
 - (2026-10-29, Godwin) The preview's sample chart bars are space-md (12) tall, was space-xl.
 - Phone menu (Godwin 2026-10-29, final): the sidebar slides in from the right, the menu button's side, and pushes the page left; at most sidebar-width, leaving a strip of at least 2 x space-5xl. The menu button stays in the strip as X ("Close menu") with Close (body-lg, blur cross-fade) beside it.
+- Phone menu open state (Godwin 2026-10-29): the button shows EyeClosed ("Hide menu") with Hide beside it, not X and Close.

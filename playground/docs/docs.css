@@ -32,15 +32,15 @@
 .docs-topbar .docs-menu-button.bland-icon-button {
   --bland-icon-size: var(--icon-lg);
 }
-/* While the menu is open the menu button shows X and Close comes in beside it (body-lg, also closing the menu; the
-   button is the named control). Close comes out of a space-xs blur as it fades in and goes back into it (as the
+/* While the menu is open the menu button shows EyeClosed and Hide comes in beside it (body-lg, also closing the menu;
+   the button is the named control, "Hide menu"). Hide comes out of a space-xs blur as it fades in and goes back into it (as the
    Sidebar's slots), duration/md easing/out; opacity only under reduced motion. */
 .docs-topbar-end {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
 }
-.docs-topbar-close {
+.docs-topbar-hide {
   font: var(--type-body-lg);
   color: var(--text-bold);
   cursor: pointer;
@@ -49,13 +49,13 @@
     opacity var(--duration-md) var(--easing-out),
     filter var(--duration-md) var(--easing-out);
 }
-.docs-topbar-close[data-off] {
+.docs-topbar-hide[data-off] {
   opacity: 0;
   filter: blur(var(--space-xs));
   pointer-events: none;
 }
 @media (prefers-reduced-motion: reduce) {
-  .docs-topbar-close[data-off] {
+  .docs-topbar-hide[data-off] {
     filter: none;
   }
 }
@@ -76,12 +76,12 @@
 /*
  * Phone menu (Godwin 2026-10-29): the sidebar slides in from the right, the side of the menu button, full height,
  * and pushes the top bar, toolbar and page left by its width, leaving a strip of the page with the close button
- * (the menu button, now X, beside Close); a press on the strip
+ * (the menu button, now EyeClosed, beside Hide); a press on the strip
  * closes it. A drawer: duration/2xl easing/drawer both ways; under reduced motion it appears at once. Closed,
  * it is hidden (visibility, after the slide), so it is out of the Tab order.
  */
 .docs {
-  --docs-menu-width: min(var(--sidebar-width), calc(100vw - 2 * var(--space-5xl))); /* leaves a strip for Close and the X */
+  --docs-menu-width: min(var(--sidebar-width), calc(100vw - 2 * var(--space-5xl))); /* leaves a strip for Hide and its button */
 
   overflow-x: clip; /* the pushed page never makes the page scroll sideways (clip keeps sticky working) */
 }

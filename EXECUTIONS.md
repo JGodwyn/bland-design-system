@@ -1846,3 +1846,7 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Sidebar `right: 0`, `translate: 100%` closed; the top bar, toolbar contents and page translate left by its width; the scrim covers the strip on the left. The menu button now stays on screen (pushed into the strip), so it shows X ("Close menu") again and Close fades in beside it (blur cross-fade, aria-hidden, closes on press). The focus hand-off from fc8d354 is gone: focus never leaves the button.
 - Strip widened to 2 x space-5xl (112) so Close and the X fit at 320 (menu 208 there, 256 from 368 up).
 - docs + a11y specs pass (247).
+
+### Follow-up: Hide instead of Close (2026-10-29)
+
+- Godwin: Hide and the EyeClosed icon instead of Close and X while the phone menu is open. Button named "Hide menu"; class renamed `docs-topbar-hide`. docs + a11y specs pass.
