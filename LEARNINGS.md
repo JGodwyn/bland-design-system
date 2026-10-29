@@ -130,6 +130,24 @@ server) before looking or testing.
   exist only for some types → leave TIMING (Motion) variables at their default `ALL_SCOPES`, as the
   existing delays are; a failed `use_figma` rolls the whole script back, so recreate rather than patch.
 
+**An instance's `children` leave out layers hidden by a boolean property.**
+Editing a `_fade` instance's end piece found nothing while `👀 Fade end`
+was off. → Turn the boolean on, edit, then restore it.
+
+**`resetOverrides()` on a nested instance after `swapComponent` undoes the
+swap.** Swapping Lucide icons to Phosphor inside other components, the reset
+put the old icon back. → For nested swaps, rebuild the vector paints from the
+new main instead of resetting overrides.
+
+**Property changes on a fresh instance may not reach its sublayers in the
+same call.** Creating an instance, setting its properties and editing a
+sublayer in one script failed on the sublayer. → Split "create and set
+properties" and "edit sublayers" across two `use_figma` calls.
+
+**Frame-only getters throw on TEXT nodes.** A generic dump reading
+`overflowDirection` stopped at the first text layer. → Guard with
+`'prop' in node` before reading a property generically.
+
 ## Fonts
 
 **Fontsource *variable* packages register a different family name**
@@ -607,6 +625,10 @@ change was mostly a near-white panel edge, under `maxDiffPixelRatio`
 0.002. → After an intended visual change, re-baseline with
 `--update-snapshots=all` for that story, then look at the PNG (its
 modified time tells you it was written).
+
+**Replacing a paragraph with `"as":"text"` keeps the first run's marks.**
+A rewritten plan item came out all in code style. → Use `"as":"markdown"`
+with backticks around the code words instead.
 
 ## Browser pane
 

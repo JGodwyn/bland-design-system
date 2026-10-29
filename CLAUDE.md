@@ -10,7 +10,7 @@ Bland is Godwin's personal design system: a Figma UI kit reused across client pr
 
 ```
 CLAUDE.md                 rules (this file)
-docs/                     long-form notes: components.md (how to build one), tokens.md, brand.md, lint.md, motion.md, grid.md, agent-skill.md
+docs/                     long-form notes: components.md (how to build one), tokens.md, brand.md, lint.md, motion.md, grid.md, figma.md (keeping the Figma file), agent-skill.md
 tokens/figma/raw/         raw Figma export, verified by checksum (generated)
 tokens/tokens.json        resolved tokens with descriptions (generated)
 src/tokens/tokens.css     CSS custom properties, shipped as bland/tokens.css (generated)
@@ -236,4 +236,4 @@ In order; tokens come before components.
 
 ## Pending context to merge into `docs/`
 
-The original handoff is in `docs/archive/`. The claude.ai project still holds `claude/bland-handoff.md` (component build notes, node ids) and `claude/bland-handoff-update-2026-10-16.md` (newer; wins on conflicts, including a stroke token rename). The [Figma audit doc](https://claude.ai/code/artifact/8aba9baf-ab27-4b44-b98b-133ba5093546) records foundation decisions. Merge them into `docs/` as components are built; then this repo is the only source.
+The original handoff and its 2026-10-16 update are in `docs/archive/` (the update merged into `docs/figma.md` and `LEARNINGS.md`, 2026-10-29). The claude.ai project still holds `claude/bland-handoff.md` (component build notes, node ids); the repo wins over it. The [Figma audit doc](https://claude.ai/code/artifact/8aba9baf-ab27-4b44-b98b-133ba5093546) records foundation decisions. Merge them into `docs/` as components are built; then this repo is the only source.

@@ -1908,3 +1908,10 @@ not wrapped; rail contents centred (logo and account icon were off).
 ### Motion tables on phones: a wider Use column (2026-10-29)
 
 - Godwin: the Use column on Motion's Durations and Easings tables was too narrow on mobile (128px), so rows ran very tall. `TokenTable` takes a `className`; the two Motion tables get `docs-motion-tokens`, whose Use column has `min-width: 280px` below md (reset from md, desktop unchanged). At 375: Durations 5586 → 2226px tall, Easings 866 → 506. The table already scrolled sideways on phones. Docs tests 150 pass.
+
+### Handoff update merged (2026-10-29)
+
+- Godwin shared `bland-handoff-update-2026-10-16.md` (from the claude.ai project) and asked to prioritise what the repo already has.
+- Its code-facing decisions were already current here: stroke rename, overflow (the repo's newer rule wins: scrollbar only while scrolling), `Fade/*-clear` skipped, the Messaging quote renames, the Indicator danger label. Nothing in code changed.
+- New `docs/figma.md`: file rules (doc pages show what the file has, when a variable may be deleted, description rules, native slots only, stickersheets as components), the overlay fade wiring, the GRID gotcha, Plugin API techniques. Four Figma entries and one Claude Docs entry added to LEARNINGS.md.
+- The file is archived in `docs/archive/` with a header listing what is out of date (scrollbar visibility, 12 collections, grid styles, Code snippet height, scroll areas, shadcn). The older `claude/bland-handoff.md` is still in the claude.ai project.
