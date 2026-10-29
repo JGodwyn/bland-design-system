@@ -1839,3 +1839,10 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Dead end: Close could not take focus as the menu opened: its `visibility` transition started at hidden. Visibility now switches on at once and off only after the fade (transition set per state).
 - Test names: `{ name: 'Menu' }` also matched "Close menu"; exact match.
 - docs + a11y specs pass (247).
+
+### Follow-up: the menu opens from the right (2026-10-29)
+
+- Godwin: the menu should come from the side its button is on: from the right, pushing the page left.
+- Sidebar `right: 0`, `translate: 100%` closed; the top bar, toolbar contents and page translate left by its width; the scrim covers the strip on the left. The menu button now stays on screen (pushed into the strip), so it shows X ("Close menu") again and Close fades in beside it (blur cross-fade, aria-hidden, closes on press). The focus hand-off from fc8d354 is gone: focus never leaves the button.
+- Strip widened to 2 x space-5xl (112) so Close and the X fit at 320 (menu 208 there, 256 from 368 up).
+- docs + a11y specs pass (247).

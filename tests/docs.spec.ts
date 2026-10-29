@@ -569,7 +569,7 @@ test.describe('on a phone', () => {
     await expect.poll(hidden).toBe(false);
   });
 
-  test('the menu button opens the sidebar from the left and pushes the page right; the strip, Escape or a link closes it', async ({ page }) => {
+  test('the menu button opens the sidebar from the right and pushes the page left; the strip, Escape or a link closes it', async ({ page }) => {
     await page.goto('/#/components/button');
     const nav = page.getByRole('navigation', { name: 'Docs' });
     const main = page.locator('.docs-main');
@@ -577,21 +577,18 @@ test.describe('on a phone', () => {
     const before = (await main.boundingBox())!.x;
     await page.getByRole('button', { name: 'Menu', exact: true }).click();
     await expect(nav).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Menu', exact: true })).toHaveAttribute('aria-expanded', 'true');
-    await expect(page.getByRole('button', { name: 'Close menu' })).toBeFocused(); // the menu button is pushed off screen
+    await expect(page.getByRole('button', { name: 'Close menu' })).toHaveAttribute('aria-expanded', 'true');
     const sidebar = (await page.locator('.docs-sidebar').boundingBox())!;
-    await expect.poll(async () => (await page.locator('.docs-sidebar').boundingBox())!.x).toBe(0);
-    await expect.poll(async () => (await main.boundingBox())!.x).toBe(before + sidebar.width);
+    await expect.poll(async () => (await page.locator('.docs-sidebar').boundingBox())!.x).toBe(320 - sidebar.width);
+    await expect.poll(async () => (await main.boundingBox())!.x).toBe(before - sidebar.width);
+    await expect(page.getByRole('button', { name: 'Close menu' })).toBeInViewport(); // pushed along, it stays in the strip
     expect(await sidewaysScroll(page)).toBe(0);
-    // The logo turns into Close, which closes the menu too.
-    await expect(page.locator('.docs-topbar .docs-brand')).toBeHidden();
+    // Close comes in beside the X and closes the menu too.
     await page.locator('.docs-topbar-close').click();
     await expect(nav).toBeHidden();
-    await expect(page.getByRole('button', { name: 'Menu', exact: true })).toBeFocused();
-    await expect(page.locator('.docs-topbar .docs-brand')).toBeVisible();
-    await expect(page.locator('.docs-topbar-close')).toBeHidden();
+    await expect(page.locator('.docs-topbar-close')).toHaveCSS('opacity', '0');
     await page.getByRole('button', { name: 'Menu', exact: true }).click();
-    await page.mouse.click(310, 400); // the strip of page beside the menu
+    await page.mouse.click(10, 400); // the strip of page beside the menu
     await expect(nav).toBeHidden();
     await page.getByRole('button', { name: 'Menu', exact: true }).click();
     await page.keyboard.press('Escape');

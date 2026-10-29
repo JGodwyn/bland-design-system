@@ -32,43 +32,30 @@
 .docs-topbar .docs-menu-button.bland-icon-button {
   --bland-icon-size: var(--icon-lg);
 }
-/* The logo turns into Close while the menu is open: both sit in one cell and cross-fade, the one going out
-   blurring away as the other comes out of a blur (as the Sidebar's slots), duration/md easing/out; opacity only
-   under reduced motion. Close is body-lg: the menu's close button while the menu button is pushed off screen. */
-.docs-topbar-title {
-  display: grid;
+/* While the menu is open the menu button shows X and Close comes in beside it (body-lg, also closing the menu; the
+   button is the named control). Close comes out of a space-xs blur as it fades in and goes back into it (as the
+   Sidebar's slots), duration/md easing/out; opacity only under reduced motion. */
+.docs-topbar-end {
+  display: flex;
   align-items: center;
-}
-.docs-topbar-title > * {
-  grid-area: 1 / 1;
-  /* Visibility turns on at once (so Close can take focus as the menu opens) and off only after the fade. */
-  transition:
-    opacity var(--duration-md) var(--easing-out),
-    filter var(--duration-md) var(--easing-out),
-    visibility 0s;
+  gap: var(--space-xs);
 }
 .docs-topbar-close {
-  justify-self: start;
-  margin: var(--space-none);
-  padding: var(--space-none);
-  border: none;
-  border-radius: var(--rad-sm);
-  background: none;
   font: var(--type-body-lg);
   color: var(--text-bold);
   cursor: pointer;
+  user-select: none;
+  transition:
+    opacity var(--duration-md) var(--easing-out),
+    filter var(--duration-md) var(--easing-out);
 }
-.docs-topbar-title > [data-off] {
+.docs-topbar-close[data-off] {
   opacity: 0;
   filter: blur(var(--space-xs));
-  visibility: hidden;
-  transition-property: opacity, filter, visibility;
-  transition-duration: var(--duration-md);
-  transition-timing-function: var(--easing-out);
+  pointer-events: none;
 }
 @media (prefers-reduced-motion: reduce) {
-  .docs-topbar-title > *,
-  .docs-topbar-title > [data-off] {
+  .docs-topbar-close[data-off] {
     filter: none;
   }
 }
@@ -87,13 +74,14 @@
   background: var(--surface-200);
 }
 /*
- * Phone menu (Godwin 2026-10-29): the sidebar slides in from the left, full height, and pushes the top bar,
- * toolbar and page right by its width, leaving a strip of the page with the close button; a press on the strip
+ * Phone menu (Godwin 2026-10-29): the sidebar slides in from the right, the side of the menu button, full height,
+ * and pushes the top bar, toolbar and page left by its width, leaving a strip of the page with the close button
+ * (the menu button, now X, beside Close); a press on the strip
  * closes it. A drawer: duration/2xl easing/drawer both ways; under reduced motion it appears at once. Closed,
  * it is hidden (visibility, after the slide), so it is out of the Tab order.
  */
 .docs {
-  --docs-menu-width: min(var(--sidebar-width), calc(100vw - var(--space-6xl)));
+  --docs-menu-width: min(var(--sidebar-width), calc(100vw - 2 * var(--space-5xl))); /* leaves a strip for Close and the X */
 
   overflow-x: clip; /* the pushed page never makes the page scroll sideways (clip keeps sticky working) */
 }
@@ -104,10 +92,10 @@
   position: fixed;
   top: 0;
   bottom: 0;
-  left: 0;
+  right: 0;
   z-index: 4;
   width: var(--docs-menu-width);
-  translate: -100% 0;
+  translate: 100% 0;
   visibility: hidden;
   transition:
     translate var(--duration-2xl) var(--easing-drawer),
@@ -123,14 +111,14 @@
   transition: translate var(--duration-2xl) var(--easing-drawer);
 }
 .docs[data-menu-open] :is(.docs-topbar, .docs-toolbar > *, .docs-main) {
-  translate: var(--docs-menu-width) 0;
+  translate: calc(var(--docs-menu-width) * -1) 0;
 }
 .docs[data-menu-open] .docs-topbar {
   z-index: 5; /* its close button stays pressable above the strip that closes the menu */
 }
 .docs-scrim {
   position: fixed;
-  inset: 0 0 0 var(--docs-menu-width);
+  inset: 0 var(--docs-menu-width) 0 0;
   z-index: 4;
 }
 @media (prefers-reduced-motion: reduce) {
