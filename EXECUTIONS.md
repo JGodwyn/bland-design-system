@@ -1855,3 +1855,9 @@ not wrapped; rail contents centred (logo and account icon were off).
 
 - Godwin: Play all should sit on the Durations heading's row, at the far end; Brand theme never came up in search.
 - Play all moved into the Durations section's `action` (`StylePage.tsx`). Search listed only the style pages in Foundations (empty query and title matches); Brand theme added to both (`pages.tsx`). The search spec now opens on Brand theme and finds it by "brand" (that spec edit landed in 42f7361, swept into the mobile session's commit).
+
+### Follow-up: Grid page columns switch floats on phones (2026-10-29)
+
+- Godwin: on mobile only, Show columns as a floating button at the bottom left, with elevation.
+- Below breakpoint/md `.docs-grid-switch` is fixed space-lg from the bottom left (plus the safe area), z-index 2 (under the phone menu), label on surface-100 with elevation/neutral/mid (surface-200 sank into the grid frames); brand tint while on. From md it is inline again with the old fill and no shadow. Keys stay hidden on phones as before.
+- Spec: after a scroll the switch is in view, 16 from the left and bottom, and works. docs + a11y pass (248).

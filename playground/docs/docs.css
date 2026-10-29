@@ -1906,6 +1906,38 @@ code,
   background: var(--surface-brand-light);
   color: var(--text-brand);
 }
+/* Phone (Godwin 2026-10-29): the switch floats at the bottom left over the page, on elevation/neutral/mid, so it can
+   be pressed wherever the page is scrolled; inline under the header again from breakpoint/md. Its fill is the page
+   surface (surface-200 would sink into the frames under it); on, it keeps the brand tint. */
+.docs-grid-switch {
+  position: fixed;
+  bottom: calc(var(--space-lg) + env(safe-area-inset-bottom));
+  left: var(--space-lg);
+  z-index: 2;
+}
+.docs-grid-switch .docs-search-label {
+  background: var(--surface-100);
+  color: var(--text-bold);
+  box-shadow: var(--elevation-neutral-mid);
+}
+.docs-grid-switch [data-on] .docs-search-label {
+  background: var(--surface-brand-light);
+  color: var(--text-brand);
+}
+@media (min-width: 768px) {
+  .docs-grid-switch {
+    position: static;
+  }
+  .docs-grid-switch .docs-search-label {
+    background: var(--surface-200);
+    color: var(--text-subtle);
+    box-shadow: none;
+  }
+  .docs-grid-switch [data-on] .docs-search-label {
+    background: var(--surface-brand-light);
+    color: var(--text-brand);
+  }
+}
 .docs-grid-frames {
   row-gap: var(--space-xl);
 }

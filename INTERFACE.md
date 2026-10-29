@@ -2288,3 +2288,4 @@ Readers are designers, developers and agents. The voice follows systems known fo
 - (2026-10-29, Godwin) The preview's sample chart bars are space-md (12) tall, was space-xl.
 - Phone menu (Godwin 2026-10-29, final): the sidebar slides in from the right, the menu button's side, and pushes the page left; at most sidebar-width, leaving a strip of at least 2 x space-5xl. The menu button stays in the strip as X ("Close menu") with Close (body-lg, blur cross-fade) beside it.
 - Phone menu open state (Godwin 2026-10-29): the button shows EyeClosed ("Hide menu") with Hide beside it, not X and Close.
+- Grid page columns switch (Godwin 2026-10-29): on phones a floating button at the bottom left (space-lg in, elevation/neutral/mid, surface-100; brand tint while on); inline under the page header from breakpoint/md.
