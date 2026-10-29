@@ -131,6 +131,7 @@ export function DocsApp({ route }: { route: DocsRoute }) {
     <div className="docs" data-menu-open={menuOpen || undefined}>
       <header className="docs-topbar">
         <IconButton
+          className="docs-menu-button"
           size="sm"
           type="ghost"
           icon={menuOpen ? <XIcon /> : <ListIcon />}
@@ -139,9 +140,14 @@ export function DocsApp({ route }: { route: DocsRoute }) {
           aria-controls="docs-sidebar"
           onClick={() => setMenuOpen((o) => !o)}
         />
-        <a href="#/" className="docs-brand bland-focus-ring">
-          Bland
-        </a>
+        <span className="docs-topbar-title">
+          <a href="#/" className="docs-brand bland-focus-ring" data-off={menuOpen || undefined}>
+            Bland
+          </a>
+          <span className="docs-topbar-close" aria-hidden="true" data-off={!menuOpen || undefined} onClick={() => setMenuOpen(false)}>
+            Close
+          </span>
+        </span>
       </header>
       {/* The strip of page beside the open phone menu: a press there closes it (the close button is in the strip too). */}
       {menuOpen && <div className="docs-scrim" aria-hidden="true" onClick={() => setMenuOpen(false)} />}

@@ -1823,3 +1823,10 @@ not wrapped; rail contents centred (logo and account icon were off).
 - A scrim over the visible strip closes it; first run it sat over the top bar's close button (Playwright waited on the intercepted click), so the top bar goes to z-index 5 while open. Escape and following a link close it too.
 - The toolbar's own `translate` (scroll hide) would have clashed with the push, so the push moves the toolbar's children instead.
 - Spec covers open, the push distance, strip, Escape and link; docs + a11y pass (247).
+
+### Follow-up: phone top bar polish (2026-10-29)
+
+- Godwin: more padding above and below the logo, a slightly bigger menu icon, no border under the bar, and the logo turning into Close (body-lg, animated) while the menu is open.
+- Padding space-sm to space-md (bar 56); the toolbar's sticky top now reads `--docs-topbar-height` instead of repeating the sum; sidebar head top padding follows so its logo stays level. Border removed. Menu icon icon/lg on the sm button.
+- Logo and Close share one grid cell and cross-fade with a space-xs blur (the Sidebar slots' recipe), duration/md easing/out, opacity only under reduced motion; the hidden one is `visibility: hidden` so the home link leaves the Tab order. Close is aria-hidden (the X is the named button) and closes on press.
+- docs + a11y specs pass (247).

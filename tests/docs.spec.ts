@@ -582,6 +582,13 @@ test.describe('on a phone', () => {
     await expect.poll(async () => (await page.locator('.docs-sidebar').boundingBox())!.x).toBe(0);
     await expect.poll(async () => (await main.boundingBox())!.x).toBe(before + sidebar.width);
     expect(await sidewaysScroll(page)).toBe(0);
+    // The logo turns into Close, which closes the menu too.
+    await expect(page.locator('.docs-topbar .docs-brand')).toBeHidden();
+    await page.locator('.docs-topbar-close').click();
+    await expect(nav).toBeHidden();
+    await expect(page.locator('.docs-topbar .docs-brand')).toBeVisible();
+    await expect(page.locator('.docs-topbar-close')).toBeHidden();
+    await page.getByRole('button', { name: 'Menu' }).click();
     await page.mouse.click(310, 400); // the strip of page beside the menu
     await expect(nav).toBeHidden();
     await page.getByRole('button', { name: 'Menu' }).click();

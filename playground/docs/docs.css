@@ -13,6 +13,10 @@
 }
 
 /* ---- Top bar (mobile): the menu button, then the logo ---- */
+.docs {
+  /* The phone top bar: its row (the menu button and logo, control/sm) and space-md above and below. */
+  --docs-topbar-height: calc(var(--control-sm) + 2 * var(--space-md));
+}
 .docs-topbar {
   position: sticky;
   top: 0;
@@ -20,9 +24,47 @@
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  padding: var(--space-sm) var(--space-lg) var(--space-sm) var(--space-sm); /* the button's icon lines up near the page gutter */
+  padding: var(--space-md) var(--space-lg) var(--space-md) var(--space-sm); /* the button's icon lines up near the page gutter */
   background: var(--surface-100);
-  border-bottom: var(--stroke-sm) solid var(--border-subtle);
+}
+/* The menu button's icon one step up from the sm button's (icon/lg). */
+.docs-topbar .docs-menu-button.bland-icon-button {
+  --bland-icon-size: var(--icon-lg);
+}
+/* The logo turns into Close while the menu is open: both sit in one cell and cross-fade, the one going out
+   blurring away as the other comes out of a blur (as the Sidebar's slots), duration/md easing/out; opacity only
+   under reduced motion. Close is body-lg and closes the menu too (the X beside it is the named button). */
+.docs-topbar-title {
+  display: grid;
+  align-items: center;
+}
+.docs-topbar-title > * {
+  grid-area: 1 / 1;
+  transition:
+    opacity var(--duration-md) var(--easing-out),
+    filter var(--duration-md) var(--easing-out),
+    visibility var(--duration-md);
+}
+.docs-topbar-close {
+  font: var(--type-body-lg);
+  color: var(--text-bold);
+  cursor: pointer;
+  user-select: none;
+}
+.docs-topbar-title > [data-off] {
+  opacity: 0;
+  filter: blur(var(--space-xs));
+  visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .docs-topbar-title > * {
+    transition:
+      opacity var(--duration-md) var(--easing-out),
+      visibility var(--duration-md);
+  }
+  .docs-topbar-title > [data-off] {
+    filter: none;
+  }
 }
 
 .docs-brand {
@@ -99,7 +141,7 @@
   flex-direction: column;
   gap: var(--space-sm);
   /* Phone menu: level with the top bar's logo. */
-  padding: var(--space-sm) var(--space-xl) var(--space-lg);
+  padding: var(--space-md) var(--space-xl) var(--space-lg);
 }
 .docs-descriptor {
   font: var(--type-body-sm);
@@ -168,7 +210,7 @@
 .docs-toolbar {
   /* Stays at the top while the page scrolls (below the mobile top bar); content fades out under it (fade/md). */
   position: sticky;
-  top: calc(var(--control-sm) + 2 * var(--space-sm) + var(--stroke-sm));
+  top: var(--docs-topbar-height);
   z-index: 2;
   display: flex;
   flex-wrap: wrap;
