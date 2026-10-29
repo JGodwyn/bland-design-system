@@ -7,7 +7,7 @@ export interface ScrollAreaProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   /** Scroll direction. Defaults to vertical. */
   axis?: 'y' | 'x';
-  /** Fade length: md (32) by default, sm (16) for compact areas such as Menu. */
+  /** Fade length: sm (16) for compact areas such as Menu, md (32) by default. */
   fadeSize?: 'sm' | 'md';
   /** Extra props for the scrolling element, e.g. a role or an aria-label. */
   viewportProps?: HTMLAttributes<HTMLDivElement>;

@@ -5,7 +5,7 @@ import { Button } from '../../src/components/button/Button';
 import { CodeSnippet } from '../../src/components/code-snippet/CodeSnippet';
 import { Icon } from '../../src/components/icon/Icon';
 import * as BlandIcons from '../../src/icons';
-import { groupBy, inCollection, tokens, stylePages, type StylePageId, type Token } from './data';
+import { bySize, groupBy, inCollection, tokens, stylePages, type StylePageId, type Token } from './data';
 import { highlight } from './highlight';
 import { ArrowFatUpIcon } from './icons';
 import { isApple } from './Search';
@@ -40,20 +40,20 @@ const pages: Record<StylePageId, () => ReactElement> = {
   typography: TypographyPage,
   spacing: () => (
     <Section title="Spacing">
-      <TokenTable items={inCollection('Spacing').filter((t) => !t.name.startsWith('Layout/'))} sample={(t) => <span className="docs-bar" style={{ width: v(t) }} />} />
+      <TokenTable items={bySize(inCollection('Spacing').filter((t) => !t.name.startsWith('Layout/')))} sample={(t) => <span className="docs-bar" style={{ width: v(t) }} />} />
     </Section>
   ),
   radius: () => (
     <Section title="Corner radius">
       <TokenTable
-        items={inCollection('Corner Radius')}
+        items={bySize(inCollection('Corner Radius'))}
         sample={(t) => <span className="docs-radius bland-smooth" style={{ '--bland-radius': v(t) } as CSSProperties} />}
       />
     </Section>
   ),
   stroke: () => (
     <Section title="Stroke">
-      <TokenTable items={inCollection('Stroke')} sample={(t) => <span className="docs-stroke" style={{ borderTopWidth: v(t) }} />} />
+      <TokenTable items={bySize(inCollection('Stroke'))} sample={(t) => <span className="docs-stroke" style={{ borderTopWidth: v(t) }} />} />
     </Section>
   ),
   elevation: () => (
@@ -77,13 +77,13 @@ const pages: Record<StylePageId, () => ReactElement> = {
   motion: MotionPage,
   breakpoints: () => (
     <Section title="Breakpoints">
-      <TokenTable items={inCollection('Breakpoints')} />
+      <TokenTable items={bySize(inCollection('Breakpoints'))} />
     </Section>
   ),
   grid: GridPage,
   sizing: () => (
     <>
-      {groupBy(inCollection('Sizing'), (t) => t.name.split('/')[0]!).map(([group, items]) => (
+      {groupBy(bySize(inCollection('Sizing')), (t) => t.name.split('/')[0]!).map(([group, items]) => (
         <Section key={group} title={group}>
           <TokenTable items={items} sample={(t) => (px(t) <= 640 ? <span className="docs-bar" style={{ width: v(t) }} /> : null)} />
         </Section>
@@ -94,7 +94,7 @@ const pages: Record<StylePageId, () => ReactElement> = {
 };
 
 function ColorsPage() {
-  const theme = inCollection('Theme');
+  const theme = bySize(inCollection('Theme'));
   const groups = groupBy(theme, (t) => t.name.split('/')[0]!);
   const semantic = ['Text', 'Icon', 'Surface', 'Border', 'Shadow', 'Scrollbar'];
   const ordered = [...groups.filter(([g]) => semantic.includes(g)).sort((a, b) => semantic.indexOf(a[0]) - semantic.indexOf(b[0])), ...groups.filter(([g]) => !semantic.includes(g))];
@@ -150,7 +150,8 @@ function TypographyPage() {
 function MotionPage() {
   const [run, setRun] = useState(0);
   const motion = inCollection('Motion');
-  const durations = motion.filter((t) => t.type === 'TIMING');
+  // Shortest first, the delays and hold times among the animation durations.
+  const durations = motion.filter((t) => t.type === 'TIMING').sort((a, b) => parseFloat(a.light) - parseFloat(b.light));
   const easings = motion.filter((t) => t.type === 'EASING');
   const track = (style: CSSProperties) => (
     <span className="docs-motion-track">
@@ -345,7 +346,7 @@ function GridLayout({ children }: { children: ReactNode }) {
 }
 
 function GridPage() {
-  const layout = tokens.filter((t) => t.name.startsWith('Layout/'));
+  const layout = bySize(tokens.filter((t) => t.name.startsWith('Layout/')));
   const cells = [
     { label: 'Full row', spans: {} },
     { label: '4 / 3 / 2', spans: { '--span': 4, '--span-md': 3, '--span-xl': 2 } },

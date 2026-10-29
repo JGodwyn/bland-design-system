@@ -1,7 +1,7 @@
 import type { HTMLAttributes, MouseEvent, ReactNode } from 'react';
 import './logo.css';
 
-export type LogoSize = 'lg' | 'sm';
+export type LogoSize = 'sm' | 'lg';
 export type LogoColor = 'default' | 'on-color';
 
 /** What `renderLink` receives: spread it onto your router's link. */
@@ -16,7 +16,7 @@ export interface LogoLinkProps {
 }
 
 export interface LogoProps extends Omit<HTMLAttributes<HTMLElement>, 'color'> {
-  /** lg (40 tall) or sm (24 tall, for top bars). */
+  /** sm (24 tall, for top bars) or lg (40 tall). */
   size?: LogoSize;
   /**
    * default is text-bold and follows the theme; on-color is white in both, for brand fills. Put it on

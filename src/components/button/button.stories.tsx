@@ -21,7 +21,7 @@ function ClickCounter({ id, loading, disabled }: { id: string; loading?: boolean
 
 const emotions: ButtonEmotion[] = ['brand', 'success', 'danger', 'warning'];
 const types: ButtonType[] = ['primary', 'secondary', 'ghost', 'stroke'];
-const sizes: ButtonSize[] = ['lg', 'md', 'sm', 'xs'];
+const sizes: ButtonSize[] = ['xs', 'sm', 'md', 'lg'];
 
 // Hover and pressed are CSS states, so they show on interaction, not here; tests/button.spec.ts covers them.
 // Option names match the icon exports, so the docs code snippet reads like real usage.
@@ -77,7 +77,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label"><code>size</code>: <code>lg</code>, <code>md</code> (default), <code>sm</code>, <code>xs</code></span>
+        <span className="pg-label"><code>size</code>: <code>xs</code>, <code>sm</code>, <code>md</code> (default), <code>lg</code></span>
         {sizes.map((size) => (
           <div key={size} className="pg-row">
             <Button size={size} iconStart={<PlusIcon />} iconEnd={<CaretDownIcon />}>

@@ -1896,3 +1896,10 @@ not wrapped; rail contents centred (logo and account icon were off).
 ### Brand breakdown on phones in body-lg (2026-10-29)
 
 - Godwin: the contrast warning breakdown on mobile uses the body-lg family. `.docs-findings-list` went body-md → body-lg, `.docs-findings-where` body-md-bold → body-lg-bold; the meta line inherits. Checked at 375 light: rows wrap cleanly, no overflow.
+
+### Smallest to largest ordering (2026-10-29)
+
+- Godwin: every ordered list in the docs should go from smallest to largest (the icon sizing table read xs md lg sm), but leave Typography alone. He agreed to sort durations by ms.
+- Cause: the style pages showed tokens in Figma's export order, and props.json kept TypeScript's union order. Added `bySize`/`bySteps` in data.ts and applied them per page (not inside TokenTable, so Typography's table is untouched).
+- Scanned the story arrays, hand-written `size="…"` sequences, story labels and prop descriptions for sizes going down. Found Button `['lg','md','sm','xs']`, Logo `['lg','sm']` with its type, and the descriptions of Button, Logo and ScrollArea fadeSize; flipped them. The other hits were mappings (`{ sm: 'xs' }`) or unrelated.
+- Checked in the browser: Sizing icon xs sm md lg, Spacing none → 9xl, Motion 100 → 5000, Button props xs sm md lg. Playwright: 703 passed; 4 screenshot diffs, all Button and Logo in the new order, re-baselined.

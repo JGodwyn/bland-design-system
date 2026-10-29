@@ -2295,3 +2295,11 @@ Readers are designers, developers and agents. The voice follows systems known fo
 - Phone round (Godwin 2026-10-29): Overview stat cards one a line below md. A swipe left opens the phone menu, right closes it (it follows the finger; scrollable rows under the finger scroll first, fields, sliders and the picker are skipped). The toolbar stays put only for keyboard focus. Variant rows centre every wrapped line. The Brand picker shows its color at once and the page follows a frame later; the chart palette updates once colors settle (120 ms).
 
 - Docs, Brand theme breakdown on phones (Godwin 2026-10-29): the stacked list is body-lg, the pair's name body-lg-bold; the tablet table is unchanged.
+
+## Smallest to largest everywhere (2026-10-29, Godwin)
+
+- Anywhere the docs list sizes or steps, they run smallest to largest. The Typography page is left as it is.
+- Token tables: `bySize()` in `playground/docs/data.ts` sorts each family's steps (`icon/xs` … `icon/lg`, `space-none` … `space-9xl`, `rad-null` … `rad-rd`, `surface-100` … `surface-600`, Layout mobile → tablet → desktop). A family is the name minus its last step, and families stay where they first appear. Applied on Colors, Spacing, Sizing, Breakpoints, Grid tokens, Corner radius and Stroke. Figma's export order is no longer what the pages show.
+- Motion durations are sorted by milliseconds, so the delays and hold times sit among the animation durations (100 tooltip-close-delay … 5000 toast-visible). Easings keep their order.
+- Prop options: TypeScript lists a union's values in its own order (`sm md xs lg`). `componentDocs` sorts any all-size-step options (`bySteps`), which covers the props table and the demo's select.
+- Code follows: `LogoSize` is `'sm' | 'lg'`, and the Button and Logo stories and the Button, Logo and ScrollArea `fadeSize` descriptions list sizes smallest first.

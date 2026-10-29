@@ -26,11 +26,36 @@ export function groupBy<T>(items: T[], key: (item: T) => string) {
   return [...groups];
 }
 
-export type PropDoc = { name: string; type: string; options?: string[]; required: boolean; default?: string; description: string };
+// Size steps, smallest first: anywhere the docs list them, they run from smallest to largest.
+const STEPS = ['none', 'null', '3xs', '2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl', '6xl', '7xl', '8xl', '9xl', 'rd', 'full', 'mobile', 'tablet', 'desktop'];
+/** Where a value sits in the size order, or -1 when it is not a size step. */
+export const stepRank = (step: string) => (/^\d+$/.test(step) ? 1000 + Number(step) : STEPS.indexOf(step));
+/** Sorts size steps smallest first; anything else keeps its order. */
+export const bySteps = (values: string[]) => (values.every((v) => stepRank(v) >= 0) ? [...values].sort((a, b) => stepRank(a) - stepRank(b)) : values);
+
+/**
+ * Tokens with each family's steps smallest first (`icon/xs` … `icon/lg`, `space-none` … `space-9xl`).
+ * A family is the name without its last step; families stay where they first appear.
+ */
+export function bySize(items: Token[]) {
+  const split = (t: Token) => {
+    const m = t.name.match(/^(.*?)([^/-]+)$/)!;
+    return stepRank(m[2]!) >= 0 ? { family: m[1]!, rank: stepRank(m[2]!) } : { family: t.name, rank: 0 };
+  };
+  return groupBy(items, (t) => split(t).family).flatMap(([, family]) => [...family].sort((a, b) => split(a).rank - split(b).rank));
+}
+
+export type PropDoc ={ name: string; type: string; options?: string[]; required: boolean; default?: string; description: string };
 export type ComponentDoc = { description: string; file: string; props: PropDoc[] };
 // Written by scripts/build-props.ts before the dev server starts; a glob so a missing file is not a type error.
 const propsFiles = import.meta.glob<Record<string, ComponentDoc>>('../.generated/props.json', { eager: true, import: 'default' });
-export const componentDocs: Record<string, ComponentDoc> = Object.values(propsFiles)[0] ?? {};
+// TypeScript lists a union's values in its own order (sm md xs lg); the docs show size steps smallest first.
+export const componentDocs: Record<string, ComponentDoc> = Object.fromEntries(
+  Object.entries(Object.values(propsFiles)[0] ?? {}).map(([name, doc]) => [
+    name,
+    { ...doc, props: doc.props.map((p) => (p.options ? { ...p, options: bySteps(p.options) } : p)) },
+  ]),
+);
 
 const storyModules = import.meta.glob<{ default: Story }>('../../src/components/*/*.stories.tsx', { eager: true });
 export const stories = Object.entries(storyModules)

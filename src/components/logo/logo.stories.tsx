@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import type { Story } from '../../../playground/story';
 import { Logo, type LogoColor, type LogoSize } from './Logo';
 
-const sizes: LogoSize[] = ['lg', 'sm'];
+const sizes: LogoSize[] = ['sm', 'lg'];
 const colors: LogoColor[] = ['default', 'on-color'];
 
 /**
@@ -56,7 +56,7 @@ export default {
   render: () => (
     <>
       <div className="pg-stack">
-        <span className="pg-label"><code>size</code>: <code>lg</code> (default) and <code>sm</code> (for top bars)</span>
+        <span className="pg-label"><code>size</code>: <code>sm</code> (for top bars) and <code>lg</code> (default)</span>
         <div className="pg-row">
           {sizes.map((size) => (
             <Logo key={size} size={size} data-testid={`logo-${size}`} />

@@ -21,7 +21,7 @@ export function useButtonSize(size: ButtonSize | undefined): ButtonSize {
 
 /** Props shared by Button and IconButton. */
 export interface ButtonBaseProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-  /** lg 56, md 40, sm 32, xs 24 (dense desktop UI only, below the comfortable touch target). Default md, or the size a component sets for its action slot (Banner: sm). */
+  /** xs 24 (dense desktop UI only, below the comfortable touch target), sm 32, md 40, lg 56. Default md, or the size a component sets for its action slot (Banner: sm). */
   size?: ButtonSize;
   /** brand for most actions, danger for destructive ones. */
   emotion?: ButtonEmotion;
