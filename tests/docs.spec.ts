@@ -614,6 +614,39 @@ test.describe('on a phone', () => {
     await expect(page.locator('.docs-grid-overlay')).toBeVisible();
   });
 
+  test('a swipe to the left opens the menu and one to the right closes it; a row that can still scroll scrolls first', async ({ page }) => {
+    // A one-finger swipe, as touch events from the element under its start.
+    const swipe = (selector: string, dx: number) =>
+      page.locator(selector).first().evaluate((el, dx) => {
+        const r = el.getBoundingClientRect();
+        const x = r.left + r.width / 2;
+        const y = r.top + Math.min(r.height / 2, 20);
+        const touch = (cx: number) => new Touch({ identifier: 1, target: el, clientX: cx, clientY: y });
+        el.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: [touch(x)], changedTouches: [touch(x)] }));
+        el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: [touch(x + dx)] }));
+      }, dx);
+    const nav = page.getByRole('navigation', { name: 'Docs' });
+    await page.goto('/#/brand');
+    await swipe('.docs-page-header', -120);
+    await expect(nav).toBeVisible();
+    await swipe('.docs-sidebar', 120);
+    await expect(nav).toBeHidden();
+    // The Brand page's tab row overflows at 320: while it can scroll further, a swipe on it does not open the menu.
+    const row = page.locator('.docs-brand-tabs .bland-scroll-area__viewport').first();
+    await swipe('.docs-brand-tabs .bland-scroll-area__viewport', -120);
+    await expect(nav).toBeHidden();
+    await row.evaluate((el) => (el.scrollLeft = el.scrollWidth));
+    await swipe('.docs-brand-tabs .bland-scroll-area__viewport', -120);
+    await expect(nav).toBeVisible();
+  });
+
+  test('after a tap on the theme switch the bar still slides away on scroll', async ({ page }) => {
+    await page.goto('/#/components/button');
+    await page.locator('.docs-theme label').filter({ hasText: 'Dark' }).tap(); // focus stays on its radio
+    await page.mouse.wheel(0, 600);
+    await expect.poll(async () => (await page.locator('.docs-toolbar').evaluate((el) => getComputedStyle(el).translate))).not.toBe('none');
+  });
+
   test('the menu, search and color picker fit the screen', async ({ page }) => {
     await page.goto('/#/brand');
     await page.getByRole('button', { name: /^Brand color #/ }).click();

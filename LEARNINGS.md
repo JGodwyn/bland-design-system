@@ -701,3 +701,10 @@ beats `strictPort`'s config value), then delete it.
 - Symptom: a Playwright sweep with `isMobile: true` reported no overflow on a page that clearly ran past the screen. Cause: with a mobile viewport the layout viewport widens to fit the content (375 became 538), so `innerWidth` and `scrollWidth` match. Rule: compare with the intended device width, or test overflow without `isMobile` (`viewport` only, as the "on a phone" spec does).
 - Symptom: a table in a `display: grid` wrapper pushed the wrapper wider than its card, though the Table scrolls sideways itself. Cause: an implicit grid column is `auto`, whose minimum is the content's min-content width. Rule: a grid that can hold wide content gets `grid-template-columns: minmax(0, 1fr)` (flex children: `min-width: 0`).
 - The in-app browser's mobile preset resets when the pane width changes, mid-script; use a Playwright script for a sweep and the pane for a look.
+
+## Docs on a real phone (2026-10-29)
+
+- Symptom: copy buttons did nothing on a phone. Cause: the docs opened by network address over plain http (`npm run docs:phone`) are not a secure context, so `navigator.clipboard` is undefined. Rule: copy falls back to a hidden read-only textarea + `document.execCommand('copy')` (`useCopy`); `setSelectionRange` too, for iOS.
+- Symptom: the Brand page's color picker stuttered on a phone. Cause: every pointer move re-ran the whole page, and `generateChart` alone is ~60 ms on a laptop. Rule: the picker shows its own color at once and sends at most one per frame in `startTransition`; the chart palette waits until the colors settle (`useSettled`, 120 ms). Measure with CDP `Emulation.setCPUThrottlingRate` 4: 40 drag moves went from 24 s to 2.5 s.
+- Symptom: after a tap on the theme switch the phone toolbar no longer hid on scroll. Cause: `:focus-within` stays true while the tapped radio keeps focus. Rule: pin a bar for keyboard users with `:has(:focus-visible)`, not `:focus-within`.
+- Playwright: `getByText` on a SegmentedBar segment times out on tap/click (the visible text sits over a visually hidden radio); tap its `label`.

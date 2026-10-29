@@ -124,8 +124,14 @@ export function BrandPage() {
   // Extra colors: up to MAX_EXTRAS, each with a name that doesn't clash, made into a scale (fixed when asked).
   const extraScales = extras.map((x) => ({ ...x, scale: x.fixed ?? generate(x.color), error: extraNameError(x.name, extras.filter((o) => o.id !== x.id).map((o) => o.name)) }));
   const validExtras = extraScales.filter((x) => !x.error).map(({ name, scale }) => ({ name, scale }));
-  // The chart palette follows the brand, the valid extras (in order) and the neutrals' page color.
-  const chart = useMemo(() => generateChart(scale, validExtras, neutrals, pins), [scale, neutrals, JSON.stringify(validExtras), pins]);
+  // The chart palette follows the brand, the valid extras (in order) and the neutrals' page color. It is the slow
+  // part (tens of ms, several times that on a phone), so it waits until the colors have settled: while a picker is
+  // dragged it stays as it was, then catches up once the pointer rests or lets go.
+  const chartBasis = useSettled({ scale, neutrals, validExtras, pins }, JSON.stringify([scale, neutrals, validExtras, pins]));
+  const chart = useMemo(
+    () => generateChart(chartBasis.scale, chartBasis.validExtras, chartBasis.neutrals, chartBasis.pins),
+    [chartBasis],
+  );
   const updateExtra = (id: string, patch: Partial<ExtraState>) => setExtras((all) => all.map((x) => (x.id === id ? { ...x, ...patch } : x)));
   const addExtra = () =>
     setExtras((all) => {
@@ -950,6 +956,20 @@ function findingsTable(items: Finding[], fix: (f: Finding) => string) {
       </TableBody>
     </Table>
   );
+}
+
+/** How long a value must stay put before useSettled hands it on (ms): a few frames, below a noticeable lag. */
+const SETTLE_MS = 120;
+
+/** The value once it has stopped changing for SETTLE_MS (by `key`); the first value at once. */
+function useSettled<T>(value: T, key: string): T {
+  const [settled, setSettled] = useState({ key, value });
+  useEffect(() => {
+    if (key === settled.key) return;
+    const timer = setTimeout(() => setSettled({ key, value }), SETTLE_MS);
+    return () => clearTimeout(timer);
+  }, [key]);
+  return settled.value;
 }
 
 /** Brand-colored parts of the kit, in one place. Interactive, so hover and pressed states show the brand too. */

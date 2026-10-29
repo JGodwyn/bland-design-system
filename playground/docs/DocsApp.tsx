@@ -58,6 +58,8 @@ function useTheme() {
 
 /** Scrolling less than this (px) neither hides nor shows the phone toolbar, so a jittery thumb doesn't flicker it. */
 const scrollSlack = 8;
+/** How far a finger must travel sideways (px) for a swipe to open or close the phone menu. */
+const swipeDistance = 56;
 /** Within this distance of the top (px, about the top bar and the toolbar) the phone toolbar always shows. */
 const toolbarStays = 120;
 
@@ -94,6 +96,49 @@ export function DocsApp({ route }: { route: DocsRoute }) {
     setSearchOpen(false);
     window.scrollTo({ top: 0 });
   }, [route]);
+
+  // Phone swipes (Godwin 2026-10-29): the menu follows the finger the way it moves, so a swipe to the left pulls it
+  // in from the right edge and a swipe to the right pushes it away. Anything under the finger that can still scroll
+  // that way, from where it was when the touch began, scrolls instead; the next swipe, once it is at its end, opens
+  // the menu. Sliders, fields and the color picker keep their own drags.
+  useEffect(() => {
+    const phone = window.matchMedia('(max-width: 767.98px)');
+    let start: { x: number; y: number; canLeft: boolean; canRight: boolean; skip: boolean } | null = null;
+    const onStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (!phone.matches || e.touches.length !== 1 || !t) return (start = null);
+      const target = e.target instanceof Element ? e.target : null;
+      let canLeft = false;
+      let canRight = false;
+      for (let el = target; el && el !== document.documentElement; el = el.parentElement) {
+        const { overflowX } = getComputedStyle(el);
+        if ((overflowX === 'auto' || overflowX === 'scroll') && el.scrollWidth > el.clientWidth + 1) {
+          canLeft ||= el.scrollLeft > 0;
+          canRight ||= el.scrollLeft < el.scrollWidth - el.clientWidth - 1;
+        }
+      }
+      const skip = !!target?.closest('input, textarea, select, [role="slider"], [contenteditable="true"], .docs-picker');
+      start = { x: t.clientX, y: t.clientY, canLeft, canRight, skip };
+    };
+    const onEnd = (e: TouchEvent) => {
+      const t = e.changedTouches[0];
+      if (!start || !t || start.skip) return;
+      const dx = t.clientX - start.x;
+      const dy = t.clientY - start.y;
+      const from = start;
+      start = null;
+      if (Math.abs(dx) < swipeDistance || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+      // Finger to the left: content to the right would scroll in, so that wins while there is any.
+      if (dx < 0 && !from.canRight) setMenuOpen(true);
+      if (dx > 0 && !from.canLeft) setMenuOpen(false);
+    };
+    window.addEventListener('touchstart', onStart, { passive: true });
+    window.addEventListener('touchend', onEnd, { passive: true });
+    return () => {
+      window.removeEventListener('touchstart', onStart);
+      window.removeEventListener('touchend', onEnd);
+    };
+  }, []);
 
   // Escape closes the phone menu.
   useEffect(() => {

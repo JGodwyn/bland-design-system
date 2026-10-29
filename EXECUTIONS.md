@@ -1881,3 +1881,14 @@ not wrapped; rail contents centred (logo and account icon were off).
 
 - Godwin asked which size the columns switch was: 32 tall (the toolbar's search-label look, Button sm's height). Now Button md's on phones: 40 (space-sm by space-lg padding); inline from md it keeps 32.
 - Menu button: unchanged 32 button and icon/lg icon, with a control/lg (56) `::before` hit area centred on it, the bar's full height; it reaches the screen corner (checked with elementFromPoint at 370,6). docs + a11y pass (248).
+
+### Follow-up: phone polish round (2026-10-29)
+
+- Godwin's list: Overview stat cards one a line on phones; the toolbar stopped hiding after a theme switch; swipe to open the menu (scrollable rows first); variants centred even when they wrap; Brand page copy broken and the picker choppy on the phone.
+- Stat cards: one column below breakpoint/md, auto-fit from md (they are on the Overview page, not Brand theme).
+- Toolbar: `:focus-within` → `:has(:focus-visible)`; checked the tapped radio holds focus without :focus-visible.
+- Variants: `.docs-variant-box .pg-row { justify-content: center }`; checked badge, toggle, accordion, avatar at 375.
+- Swipe: touchstart/touchend on window, phone only; 56 px sideways, 1.5x more sideways than down; left opens (the menu comes from the right), right closes. Scroll containers under the finger that could still scroll that way at touchstart win. Fields, sliders and the picker are skipped. Spec dispatches TouchEvents (row at its end then opens).
+- Copy: `useCopy` falls back to execCommand when there is no Clipboard API (plain-http network address); checked with clipboard removed in an init script.
+- Picker: profiled core functions (generate 0.1 ms, neutrals 0.8, check 0.2, fixScale 2.3, generateChart 59). Picker local state + rAF/startTransition sends; chart palette via `useSettled`. 4x CPU throttle drag: 24 s → 2.5 s, long tasks 22.8 s → 0.4 s.
+- docs + a11y 250, code-snippet 9 pass.

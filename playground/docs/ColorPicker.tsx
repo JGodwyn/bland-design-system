@@ -1,6 +1,6 @@
 // The Brand theme page's color picker (Figma 6773:22102): a saturation and brightness area, a hue slider and the
 // hex, in one panel. Docs site only. The gradients are the color space itself, so they are computed, not tokens.
-import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { startTransition, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { Icon } from '../../src/components/icon/Icon';
 import { Menu } from '../../src/components/menu/Menu';
 import { CaretDownIcon } from '../../src/icons';
@@ -19,12 +19,14 @@ function savedFormat(): ColorFormat {
 export function ColorPicker({ value, onChange, onDraggingChange }: { value: string; onChange: (hex: string) => void; onDraggingChange?: (dragging: boolean) => void }) {
   // The hue lives here too: a gray or black has none of its own, and the slider should not jump to red.
   const [hsv, setHsv] = useState(() => toHsv(value));
+  // The color the picker shows: its own, at once. The page follows a frame later (below).
+  const current = toHex(hsv);
   // The field's format, kept for the next visit (a per-viewer convenience).
   const [format, setFormatState] = useState(savedFormat);
   const [text, setText] = useState(() => formatColor(value, format));
   const setFormat = (f: ColorFormat) => {
     setFormatState(f);
-    setText(formatColor(value, f));
+    setText(formatColor(current, f));
     try {
       localStorage.setItem(FORMAT_KEY, f);
     } catch {
@@ -34,15 +36,55 @@ export function ColorPicker({ value, onChange, onDraggingChange }: { value: stri
   const area = useRef<HTMLDivElement>(null);
   // Focus starts on the area when the picker opens (React's autoFocus only reaches form controls).
   useEffect(() => area.current?.focus({ preventScroll: true }), []);
+
+  /*
+   * Smooth on a phone: a new color reworks the whole Brand page (13 steps, neutrals, the contrast check, the fix,
+   * the chart palette, the preview), far too much for every pointer move. So the knob, field and swatch follow the
+   * pointer at once from this state, and the page gets at most one color per frame, as a transition React can
+   * interrupt when the next one comes. The last one always lands: on release, and when the picker closes.
+   */
+  const send = useRef(onChange);
+  send.current = onChange;
+  const lastSent = useRef(normalHex(value));
+  const frame = useRef(0);
+  const pending = useRef<string | null>(null);
+  const dragging = useRef(false);
+  const flush = () => {
+    cancelAnimationFrame(frame.current);
+    const hex = pending.current;
+    pending.current = null;
+    if (hex) send.current(hex);
+  };
+  const emit = (hex: string) => {
+    lastSent.current = normalHex(hex);
+    pending.current = hex;
+    cancelAnimationFrame(frame.current);
+    frame.current = requestAnimationFrame(() => {
+      const next = pending.current;
+      pending.current = null;
+      if (next) startTransition(() => send.current(next));
+    });
+  };
+  useEffect(() => () => flush(), []);
+  // A color from outside (Reset, a fix, another tab) moves the picker; its own colors coming back don't, nor do
+  // older ones that land while a drag is still going.
   useEffect(() => {
+    if (dragging.current || normalHex(value) === lastSent.current) return;
+    lastSent.current = normalHex(value);
     if (toHex(hsv) !== normalHex(value)) setHsv(toHsv(value));
-    // Keep what is being typed while it reads as this color (so "0.7 0.2 40" isn't reflowed mid-edit).
-    setText((t) => (parseColor(t, format) === normalHex(value) ? t : formatColor(value, format)));
   }, [value]);
+  useEffect(() => {
+    // Keep what is being typed while it reads as this color (so "0.7 0.2 40" isn't reflowed mid-edit).
+    setText((t) => (parseColor(t, format) === current ? t : formatColor(current, format)));
+  }, [current]);
 
   const set = (next: Hsv) => {
     setHsv(next);
-    onChange(toHex(next));
+    emit(toHex(next));
+  };
+  const typed = (hex: string) => {
+    if (normalHex(hex) !== current) setHsv(toHsv(hex));
+    emit(hex);
   };
 
   const fromPointer = (e: PointerEvent<HTMLDivElement>) => {
@@ -60,8 +102,11 @@ export function ColorPicker({ value, onChange, onDraggingChange }: { value: stri
 
   // A pointer drag in the area or on the hue: true from press to release, wherever the pointer is let go.
   const startDrag = () => {
+    dragging.current = true;
     onDraggingChange?.(true);
     const end = () => {
+      dragging.current = false;
+      flush();
       onDraggingChange?.(false);
       window.removeEventListener('pointerup', end);
       window.removeEventListener('pointercancel', end);
@@ -133,14 +178,14 @@ export function ColorPicker({ value, onChange, onDraggingChange }: { value: stri
             onChange={(e) => {
               setText(e.target.value);
               const hex = parseColor(e.target.value, format);
-              if (hex) onChange(hex);
+              if (hex) typed(hex);
             }}
-            onBlur={() => setText(formatColor(value, format))}
+            onBlur={() => setText(formatColor(current, format))}
           />
         ) : (
-          <Channels key={format} format={format} value={value} onChange={onChange} />
+          <Channels key={format} format={format} value={current} onChange={typed} />
         )}
-        <span className="docs-picker-swatch" style={{ background: value }} aria-hidden="true" />
+        <span className="docs-picker-swatch" style={{ background: current }} aria-hidden="true" />
       </div>
     </div>
   );

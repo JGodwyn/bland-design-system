@@ -244,18 +244,19 @@
   opacity: 1;
 }
 /* Phone: the toolbar slides up under the top bar while the page scrolls down and back on a scroll up (data-away,
-   set in DocsApp); it stays while focus is in it. Enters and leaves along the same path, duration/md easing/out;
+   set in DocsApp); it stays while keyboard focus is in it (:focus-visible: a tap on the theme switch leaves focus
+   on its radio, which must not pin the bar). Enters and leaves along the same path, duration/md easing/out;
    under reduced motion it fades instead. From breakpoint/md up it always shows (the rule is undone there). */
 .docs-toolbar {
   transition:
     translate var(--duration-md) var(--easing-out),
     opacity var(--duration-md) var(--easing-out);
 }
-.docs-toolbar[data-away]:not(:focus-within) {
+.docs-toolbar[data-away]:not(:has(:focus-visible)) {
   translate: 0 -100%;
 }
 @media (prefers-reduced-motion: reduce) {
-  .docs-toolbar[data-away]:not(:focus-within) {
+  .docs-toolbar[data-away]:not(:has(:focus-visible)) {
     translate: none;
     opacity: 0;
     pointer-events: none;
@@ -391,7 +392,7 @@
     top: 0;
     padding: var(--space-lg) var(--space-2xl);
   }
-  .docs-toolbar[data-away]:not(:focus-within) {
+  .docs-toolbar[data-away]:not(:has(:focus-visible)) {
     translate: none;
     opacity: 1;
     pointer-events: auto;
@@ -777,6 +778,10 @@ code,
   max-width: 100%;
   margin-inline: auto;
 }
+/* A row of variants that wraps (a narrow screen) stays centred, every line of it (Godwin 2026-10-29). */
+.docs-variant-box .pg-row {
+  justify-content: center;
+}
 /* A story that gives its group a max width means "this wide": fill-container components (Tab bar) get it. */
 .docs-variant-box > [style*="max-width"] {
   width: 100%;
@@ -895,10 +900,15 @@ code,
   list-style: none;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: minmax(0, 1fr); /* phone: one card a line, filling it (Godwin 2026-10-29) */
   gap: var(--space-sm);
   padding: var(--space-3xl) var(--space-xl);
   background-color: var(--surface-100);
+}
+@media (min-width: 768px) {
+  .docs-stats {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
 }
 .docs-stat-frame,
 .docs-tile-frame {
