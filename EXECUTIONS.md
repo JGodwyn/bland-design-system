@@ -1865,3 +1865,9 @@ not wrapped; rail contents centred (logo and account icon were off).
 ### Follow-up: columns switch bottom right, primary when on (2026-10-29)
 
 - Godwin meant bottom right, and the button primary while on. Phone only: `right: space-lg`; on, the brand Button's primary fill (`button-brand-primary-rest`), text-on-color, elevation/brand/mid. Desktop keeps its inline brand tint. Spec checks the right edge. docs + a11y pass.
+
+### Follow-up: columns switch primary in both states, no tap highlight (2026-10-29)
+
+- Godwin: the floating columns switch is primary whether on or off; and the blue flash on tap should go.
+- Switch: one rule for both states (button-brand-primary-rest, text-on-color, elevation/brand/mid), pressed fill on `:active` (phone only). Tap flash: `html { -webkit-tap-highlight-color: transparent; }` in playground.css (inherited, covers the whole docs site and raw stories).
+- Another session was editing DocsApp.tsx and docs.css (search field) at the same time: staged only my docs.css region by writing the index blob from HEAD plus my block (`git apply --unidiff-zero` had put a hunk inside the wrong media block). docs + a11y pass (248).
