@@ -159,12 +159,15 @@ function MotionPage() {
   );
   return (
     <>
-      <div className="docs-actions">
-        <Button size="sm" type="secondary" onClick={() => setRun((r) => r + 1)}>
-          Play all
-        </Button>
-      </div>
-      <Section title="Durations" note="Press Play all: each dot moves over its duration with the out easing.">
+      <Section
+        title="Durations"
+        note="Press Play all: each dot moves over its duration with the out easing."
+        action={
+          <Button size="sm" type="secondary" onClick={() => setRun((r) => r + 1)}>
+            Play all
+          </Button>
+        }
+      >
         <TokenTable items={durations} sample={(t) => track({ animationDuration: v(t), animationTimingFunction: 'var(--easing-out)' })} />
       </Section>
       <Section title="Easings" note="Each dot moves over 400ms with its easing.">

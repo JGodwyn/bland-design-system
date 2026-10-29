@@ -1850,3 +1850,8 @@ not wrapped; rail contents centred (logo and account icon were off).
 ### Follow-up: Hide instead of Close (2026-10-29)
 
 - Godwin: Hide and the EyeClosed icon instead of Close and X while the phone menu is open. Button named "Hide menu"; class renamed `docs-topbar-hide`. docs + a11y specs pass.
+
+## Docs: Play all beside Durations, Brand theme in search (2026-10-29)
+
+- Godwin: Play all should sit on the Durations heading's row, at the far end; Brand theme never came up in search.
+- Play all moved into the Durations section's `action` (`StylePage.tsx`). Search listed only the style pages in Foundations (empty query and title matches); Brand theme added to both (`pages.tsx`). The search spec now opens on Brand theme and finds it by "brand" (that spec edit landed in 42f7361, swept into the mobile session's commit).

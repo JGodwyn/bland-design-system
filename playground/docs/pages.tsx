@@ -111,13 +111,13 @@ export function search(query: string): SearchResults {
   const all = (text: string) => words.every((w) => text.toLowerCase().includes(w));
   if (words.length === 0) {
     return {
-      foundations: stylePageList.map((page) => ({ href: page.href, title: page.title, page })),
+      foundations: [brandPage, ...stylePageList].map((page) => ({ href: page.href, title: page.title, page })),
       components: componentPageList.map((page) => ({ href: page.href, title: page.title, page })),
       other: [],
     };
   }
   const titled = (list: DocsPage[]) => list.filter((p) => all(p.title)).map((page) => ({ href: page.href, title: page.title, page }));
-  const foundations = titled([overviewPage, ...stylePageList]);
+  const foundations = titled([overviewPage, brandPage, ...stylePageList]);
   const components = titled(componentPageList);
   const shown = new Set([...foundations, ...components].map((h) => h.href));
 
