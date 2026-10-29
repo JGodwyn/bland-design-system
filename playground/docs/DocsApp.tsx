@@ -55,6 +55,11 @@ function useTheme() {
   return [picked ?? system, setPicked] as const;
 }
 
+/** Scrolling less than this (px) neither hides nor shows the phone toolbar, so a jittery thumb doesn't flicker it. */
+const scrollSlack = 8;
+/** Within this distance of the top (px, about the top bar and the toolbar) the phone toolbar always shows. */
+const toolbarStays = 120;
+
 export type DocsRoute = { kind: 'overview' } | { kind: 'brand' } | { kind: 'style'; id: StylePageId } | { kind: 'component'; id: string };
 
 export function DocsApp({ route }: { route: DocsRoute }) {
@@ -62,10 +67,22 @@ export function DocsApp({ route }: { route: DocsRoute }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [toolbarAway, setToolbarAway] = useState(false);
 
-  // The sticky toolbar shows its fade only once the page has scrolled under it.
+  // The sticky toolbar shows its fade only once the page has scrolled under it. On a phone it also slides away
+  // while the page scrolls down and comes back on any scroll up (CSS applies it below breakpoint/md only); a few
+  // pixels either way are ignored, and it never leaves while the page is near the top.
   useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 0);
+    let last = window.scrollY;
+    const on = () => {
+      const y = window.scrollY;
+      setScrolled(y > 0);
+      if (y <= toolbarStays) setToolbarAway(false);
+      else if (y > last + scrollSlack) setToolbarAway(true);
+      else if (y < last - scrollSlack) setToolbarAway(false);
+      else return; // within the slack: keep measuring from the same point
+      last = y;
+    };
     on();
     window.addEventListener('scroll', on, { passive: true });
     return () => window.removeEventListener('scroll', on);
@@ -133,7 +150,7 @@ export function DocsApp({ route }: { route: DocsRoute }) {
         </ScrollArea>
       </aside>
 
-      <div className="docs-toolbar" data-stuck={scrolled || undefined}>
+      <div className="docs-toolbar" data-stuck={scrolled || undefined} data-away={(toolbarAway && !menuOpen) || undefined}>
         <SegmentedBar
           className="docs-theme"
           aria-label="Theme"

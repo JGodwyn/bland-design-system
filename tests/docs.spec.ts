@@ -552,6 +552,23 @@ test.describe('on a phone', () => {
     expect(await sidewaysScroll(page)).toBe(0);
   });
 
+  test('the theme and search bar slides away while scrolling down and comes back on a scroll up', async ({ page }) => {
+    await page.goto('/#/components/button');
+    const toolbar = page.locator('.docs-toolbar');
+    const top = page.locator('.docs-topbar');
+    const hidden = async () => (await toolbar.boundingBox())!.y + (await toolbar.boundingBox())!.height <= (await top.boundingBox())!.y + (await top.boundingBox())!.height + 1;
+    await page.mouse.wheel(0, 600);
+    await expect.poll(hidden).toBe(true);
+    await page.mouse.wheel(0, -100);
+    await expect.poll(hidden).toBe(false);
+    await expect(page.getByRole('radiogroup', { name: 'Theme' })).toBeInViewport();
+    // Near the top it always shows.
+    await page.mouse.wheel(0, 600);
+    await expect.poll(hidden).toBe(true);
+    await page.evaluate(() => window.scrollTo({ top: 0 }));
+    await expect.poll(hidden).toBe(false);
+  });
+
   test('the menu, search and color picker fit the screen', async ({ page }) => {
     await page.goto('/#/brand');
     await page.getByRole('button', { name: /^Brand color #/ }).click();

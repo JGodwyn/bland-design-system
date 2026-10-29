@@ -16,7 +16,7 @@
 .docs-topbar {
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 3; /* above the toolbar, which slides up under it */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -150,6 +150,24 @@
 .docs-toolbar[data-stuck]::after {
   opacity: 1;
 }
+/* Phone: the toolbar slides up under the top bar while the page scrolls down and back on a scroll up (data-away,
+   set in DocsApp); it stays while focus is in it. Enters and leaves along the same path, duration/md easing/out;
+   under reduced motion it fades instead. From breakpoint/md up it always shows (the rule is undone there). */
+.docs-toolbar {
+  transition:
+    translate var(--duration-md) var(--easing-out),
+    opacity var(--duration-md) var(--easing-out);
+}
+.docs-toolbar[data-away]:not(:focus-within) {
+  translate: 0 -100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .docs-toolbar[data-away]:not(:focus-within) {
+    translate: none;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
 .docs-theme {
   flex: none;
   width: max-content; /* the bar fills its container; here it hugs its two segments, as in Figma */
@@ -248,6 +266,11 @@
   .docs-toolbar {
     top: 0;
     padding: var(--space-lg) var(--space-2xl);
+  }
+  .docs-toolbar[data-away]:not(:focus-within) {
+    translate: none;
+    opacity: 1;
+    pointer-events: auto;
   }
   .docs-keys {
     display: flex;

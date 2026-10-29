@@ -2281,3 +2281,4 @@ Readers are designers, developers and agents. The voice follows systems known fo
 - Date Range Picker stacks its two fields below breakpoint/sm.
 - Buttons smaller than 24px get a centred control/xs `::before` hit area (Chip close, Search clear, and now CodeText copy, Dropdown toggle and Clear, date field calendar button, Chat message bar icons).
 - `npm run docs:phone` serves the docs on the local network for a real phone.
+- Phone toolbar (Godwin 2026-10-29): below breakpoint/md the theme switch and search bar slide up under the top bar while the page scrolls down and come back on any scroll up (8px slack, always shown within 120px of the top, while the menu is open, or while focus is in it). duration/md easing/out, a fade under reduced motion. From md up it always shows.

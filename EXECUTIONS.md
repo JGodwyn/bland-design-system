@@ -1804,3 +1804,9 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Touch targets under 24 outside the demos: CodeText copy (12x20, on every style page), Dropdown toggle and Clear, date field calendar button, Chat message bar field icons (20). Gave each a centred control/xs `::before` hit area, Chip's pattern. Left: date segments (inline text) and the Calendar title toggle (98x20 inside its pill).
 - Shell (menu, search modal, page header, theme switch), every style page, all Brand tabs and the Reset modal: no overflow at 320.
 - Added "on a phone" to tests/docs.spec.ts (every route at 320, the breakdown inside its card as a list, picker/menu/search on screen); checked it fails with the fold fix taken out. Added `npm run docs:phone` (`vite --host`), in CLAUDE.md and README.
+
+### Follow-up: phone toolbar hides on scroll down (2026-10-29)
+
+- Godwin: the Light/Dark switch and search bar should hide on scroll down and show on scroll up.
+- DocsApp's existing scroll listener now also tracks direction: `data-away` on `.docs-toolbar` after 8px down, cleared after 8px up or within 120px of the top; never while the menu is open. CSS below breakpoint/md only: translate -100% under the top bar (top bar raised to z-index 3), duration/md easing/out, opacity under reduced motion, stays while focus is inside. Desktop unchanged.
+- Spec "on a phone" covers down, up and back to the top; docs + a11y specs pass (246).
