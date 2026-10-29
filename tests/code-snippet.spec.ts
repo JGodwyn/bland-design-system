@@ -95,6 +95,6 @@ test('long lines scroll sideways and the scrolling area is a Tab stop', async ({
 test('code text copies its code', async ({ page }) => {
   const text = page.getByTestId('code-text-md');
   await text.getByRole('button', { name: 'Copy code' }).click();
-  expect(await clipboard(page)).toBe('bland/tokens.css');
+  expect(await clipboard(page)).toBe('bland-ui/tokens.css');
   await expect(text.getByRole('status')).toHaveText('Copied');
 });

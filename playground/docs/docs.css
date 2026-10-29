@@ -1985,6 +1985,7 @@ code,
   .docs-grid-switch [data-on] .docs-search-label {
     background: var(--surface-brand-light);
     color: var(--text-brand);
+    box-shadow: none; /* the phone's elevation stays on the phone (Godwin 2026-10-29) */
   }
 }
 .docs-grid-frames {

@@ -38,7 +38,7 @@ export function ComponentPage({ id, story }: { id: string; story: Story }) {
           <Prose>{storyDescription(id)}</Prose>
         </p>
         {names.length > 0 && (
-          <CodeText size="lg" copyable className="docs-import">{`import { ${names.join(', ')} } from 'bland';`}</CodeText>
+          <CodeText size="lg" copyable className="docs-import">{`import { ${names.join(', ')} } from 'bland-ui';`}</CodeText>
         )}
       </PageHeader>
       {story.demo && <Demo key={story.title} demo={story.demo} />}
@@ -420,7 +420,7 @@ function example(component: string, args: Args, props: PropDoc[]) {
     body = ['  return (', ...tag, ...(children ? [`      ${children}`, `    </${component}>`] : []), '  );'].join('\n');
   }
   const names = [...new Set([component, ...[...body.matchAll(/<([A-Z]\w*)/g)].map((m) => m[1]!)])];
-  return `import { ${names.join(', ')} } from 'bland';\n\nexport function Example() {\n${body}\n}\n`;
+  return `import { ${names.join(', ')} } from 'bland-ui';\n\nexport function Example() {\n${body}\n}\n`;
 }
 
 /**

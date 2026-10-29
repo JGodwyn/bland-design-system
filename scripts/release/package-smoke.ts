@@ -1,4 +1,4 @@
-// Package smoke test: what a project gets from `npm install bland` (docs/release.md, "Check the package").
+// Package smoke test: what a project gets from `npm install bland-ui` (docs/release.md, "Check the package").
 //
 //   npm run test:package              packs bland, installs the tarball into a throwaway Vite + React app,
 //                                     type-checks and builds that app, then checks it in Chromium
@@ -32,7 +32,7 @@ const packed = spawnSync('npm', ['pack', '--json', '--pack-destination', app], {
 if (packed.status !== 0) throw new Error('npm pack failed');
 const [info] = JSON.parse(packed.stdout.slice(packed.stdout.indexOf('['))) as { filename: string; size: number; unpackedSize: number; files: { path: string }[] }[];
 const files = info!.files.map((f) => f.path);
-const required = ['package.json', 'README.md', 'CHANGELOG.md', 'dist/index.js', 'dist/index.d.ts', 'dist/index.css', 'dist/tokens.css', 'dist/fonts.css', 'dist/base.css'];
+const required = ['package.json', 'LICENSE', 'README.md', 'CHANGELOG.md', 'dist/index.js', 'dist/index.d.ts', 'dist/index.css', 'dist/tokens.css', 'dist/fonts.css', 'dist/base.css'];
 const missing = required.filter((f) => !files.includes(f));
 const stray = files.filter((f) => !/^(package\.json|README\.md|CHANGELOG\.md|LICENSE|dist\/.*\.(js|d\.ts|css))$/.test(f) || /stories|\.test\./.test(f));
 console.log(`${info!.filename}: ${files.length} files, ${(info!.size / 1024).toFixed(0)} kB packed, ${(info!.unpackedSize / 1024).toFixed(0)} kB unpacked`);
@@ -45,7 +45,7 @@ writeFileSync(join(app, 'package.json'), JSON.stringify({
   private: true,
   type: 'module',
   scripts: { build: 'tsc --noEmit && vite build', preview: `vite preview --port ${port} --strictPort` },
-  dependencies: { bland: `file:./${info!.filename}`, react: dev.react, 'react-dom': dev['react-dom'] },
+  dependencies: { 'bland-ui': `file:./${info!.filename}`, react: dev.react, 'react-dom': dev['react-dom'] },
   devDependencies: { vite: dev.vite, '@vitejs/plugin-react': dev['@vitejs/plugin-react'], typescript: dev.typescript, '@types/react': dev['@types/react'], '@types/react-dom': dev['@types/react-dom'] },
 }, null, 2));
 // ES2023 lib: React Aria's @internationalized/number types use Intl.NumberRangeFormatPart. skipLibCheck off, so Bland's own .d.ts files are checked too.
@@ -57,14 +57,14 @@ writeFileSync(join(app, 'vite.config.js'), `import react from '@vitejs/plugin-re
 writeFileSync(join(app, 'index.html'), `<!doctype html>\n<html lang="en"><head><meta charset="utf-8" /><title>Bland smoke</title></head>\n<body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>\n`);
 writeFileSync(join(app, 'src/css.d.ts'), `declare module '*.css';\n`);
 writeFileSync(join(app, 'src/main.tsx'), `// Order: tokens, fonts, base, components, then the project's brand override.
-import 'bland/tokens.css';
-import 'bland/fonts.css';
-import 'bland/base.css';
-import 'bland/styles.css';
+import 'bland-ui/tokens.css';
+import 'bland-ui/fonts.css';
+import 'bland-ui/base.css';
+import 'bland-ui/styles.css';
 import './brand.css';
 import './app.css';
 import { createRoot } from 'react-dom/client';
-import { Alert, Badge, Button, TextInput, Toggle, Tooltip, type ButtonProps } from 'bland';
+import { Alert, Badge, Button, TextInput, Toggle, Tooltip, type ButtonProps } from 'bland-ui';
 
 const primary: ButtonProps['emotion'] = 'brand';
 
@@ -94,7 +94,7 @@ run('npx', ['tsx', 'scripts/brand.ts', 'generate', '#ff5a1f', '--extra', 'accent
 if (!existsSync(join(app, 'src/brand.css'))) throw new Error('npm run brand wrote no brand.css');
 
 // 4. Install, type-check, build. A reused app dir would keep the old tarball's copy (same version), so drop it.
-rmSync(join(app, 'node_modules/bland'), { recursive: true, force: true });
+rmSync(join(app, 'node_modules/bland-ui'), { recursive: true, force: true });
 rmSync(join(app, 'package-lock.json'), { force: true });
 run('npm', ['install', '--no-audit', '--no-fund', '--loglevel=error'], app);
 run('npm', ['run', 'build'], app);

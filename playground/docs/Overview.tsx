@@ -8,11 +8,11 @@ import { PageHeader, Section } from './parts';
 
 const FIGMA_URL = 'https://www.figma.com/design/32J76yQH71a7sENjf60RqD/Bland-Design-System';
 
-const install = `import 'bland/tokens.css';
-import 'bland/fonts.css';
-import 'bland/base.css';
-import 'bland/styles.css';
-import { Button } from 'bland';
+const install = `import 'bland-ui/tokens.css';
+import 'bland-ui/fonts.css';
+import 'bland-ui/base.css';
+import 'bland-ui/styles.css';
+import { Button } from 'bland-ui';
 
 export function Example() {
   return <Button>Save</Button>;

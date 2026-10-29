@@ -7,23 +7,23 @@ How Bland goes live: the package and the docs site. Everything below is prepared
 | Command | Does |
 | --- | --- |
 | `npm run build` | `dist/`: `index.js` (ES module; React, React Aria, React Stately, Floating UI and `@internationalized/*` stay imports), `index.d.ts` and one `.d.ts` per module, `index.css` (every component), `tokens.css`, `fonts.css`, `base.css` |
-| `npm pack` | the tarball a registry would get. `prepack` runs the build first, so a pack or publish never ships a stale `dist/`. Holds `dist/`, `README.md`, `CHANGELOG.md`, `package.json` (about 140 kB packed, 74 files) |
+| `npm pack` | the tarball a registry would get. `prepack` runs the build first, so a pack or publish never ships a stale `dist/`. Holds `dist/`, `README.md`, `CHANGELOG.md`, `LICENSE`, `package.json` (about 140 kB packed, 74 files) |
 | `npm run test:package` | packs, installs the tarball into a throwaway Vite + React 19 app, type-checks the app against Bland's declarations (`skipLibCheck` off), builds it and checks it in Chromium: the four stylesheets in order plus a `npm run brand` override with one extra color, Button, Badge, TextInput, Toggle, Alert and Tooltip in a light and a `data-theme="dark"` section. Fails unless the primary button takes the override's 600, Inter loads, the dark section switches, the extra's roles switch, and keyboard focus opens the tooltip. Needs the network. `-- <dir>` keeps the app there |
 | `npm run docs:build` | the docs site as static files in `dist-docs/` (not committed) |
 | `npm run docs:preview` | serves `dist-docs/` at http://localhost:5181 |
 
-Package entry points (`exports`): `bland` (JS and types), `bland/tokens.css`, `bland/fonts.css`, `bland/base.css`, `bland/styles.css`, `bland/package.json`. `sideEffects` is `**/*.css`, so bundlers tree-shake the JS and keep the CSS imports. A new stylesheet in `src/styles/` needs both a line in the build's `cp` and an `exports` entry.
+Package entry points (`exports`): `bland-ui` (JS and types), `bland-ui/tokens.css`, `bland-ui/fonts.css`, `bland-ui/base.css`, `bland-ui/styles.css`, `bland-ui/package.json`. `sideEffects` is `**/*.css`, so bundlers tree-shake the JS and keep the CSS imports. A new stylesheet in `src/styles/` needs both a line in the build's `cp` and an `exports` entry.
 
 Peer dependencies are React and React DOM **19**: components take `ref` as a plain prop, which React 18 drops.
 
 `fonts.css` `@import`s the `@fontsource` packages (dependencies of Bland), so it needs a bundler that resolves CSS imports from `node_modules`. Every mainstream one does.
 
-## Decide first (any option)
+## Decided (Godwin 2026-10-29)
 
-1. **Registry**: public npm, GitHub Packages or a git install (below).
-2. **Name**: `bland` is taken on public npm (someone else's 0.0.1). Public npm needs a scope you own (`@jgodwyn/bland`, free; the scope is your npm username or an npm org). GitHub Packages needs the scope of the repo owner, lowercased: `@jgodwyn/bland`. A git install can keep `bland`. Renaming means `import … from '@jgodwyn/bland'` in projects, the README, and the docs site's import lines (`playground/docs/ComponentPage.tsx`, `Overview.tsx`).
-3. **License**: there is no `LICENSE` file or `license` field. For a package only you use, add `"license": "UNLICENSED"`. Anything public (npm or a public docs site) needs your choice of license, or it is all rights reserved by default.
-4. **Who can see it**: public npm is public to everyone (private npm packages need a paid npm account). GitHub Packages and git installs follow the repo's access: anyone installing needs a GitHub token or SSH access.
+1. **Name: `bland-ui`.** `bland` is taken on npm (someone else's 0.0.1). The product stays Bland; only the install name and import path change (`npm install bland-ui`, `import … from 'bland-ui'`, `bland-ui/tokens.css`). Renamed in package.json, the README, the docs site's import lines, the stories and the component map. A name is only held once something is published under it, so publishing 0.1.0 soon keeps it.
+2. **License: MIT** (`LICENSE`, `"license": "MIT"`): anyone may use, change and share Bland if they keep the copyright notice. The fonts are SIL Open Font License, Phosphor is MIT.
+3. **Docs site: public**, on Cloudflare Pages (below).
+4. **Registry: public npm** follows from the name (option A). GitHub Packages would need a scoped name (`@jgodwyn/bland-ui`); a git install would work with any name.
 
 ## Before every release
 
@@ -35,11 +35,10 @@ Move the CHANGELOG's "unreleased" heading to the version and date, then `npm ver
 
 ## Package option A: public npm
 
-Needs: an npm account with two-factor auth, the scoped name, a license.
+Name and license are done. Left:
 
-1. In `package.json`: `"name": "@jgodwyn/bland"`, delete `"private": true`, add `"license": "…"` and `"publishConfig": { "access": "public" }` (scoped packages are private by default).
-2. Update the import lines named in "Decide first".
-3. `npm login` once.
+1. In `package.json`: delete `"private": true`.
+2. `npm login` once (an npm account with two-factor auth).
 
 Go live:
 
@@ -47,13 +46,13 @@ Go live:
 npm publish
 ```
 
-A project installs it with `npm install @jgodwyn/bland`.
+A project installs it with `npm install bland-ui`.
 
 ## Package option B: GitHub Packages
 
-Needs: the scoped name `@jgodwyn/bland`, and a classic personal access token with `write:packages` (publishing) or `read:packages` (installing). The `repository` field is already set, which links the package to the repo.
+Needs: the scoped name `@jgodwyn/bland-ui`, and a classic personal access token with `write:packages` (publishing) or `read:packages` (installing). The `repository` field is already set, which links the package to the repo.
 
-1. In `package.json`: `"name": "@jgodwyn/bland"`, delete `"private": true`, add `"publishConfig": { "registry": "https://npm.pkg.github.com" }` and a `license`.
+1. In `package.json`: `"name": "@jgodwyn/bland-ui"`, delete `"private": true`, add `"publishConfig": { "registry": "https://npm.pkg.github.com" }` and a `license`.
 2. Update the import lines.
 3. In `~/.npmrc` (never in the repo): `//npm.pkg.github.com/:_authToken=<token with write:packages>`.
 
@@ -67,7 +66,7 @@ Each project then needs an `.npmrc` with `@jgodwyn:registry=https://npm.pkg.gith
 
 ## Package option C: install from the GitHub repo
 
-Needs: the repo to stay reachable by whoever installs (SSH key or token for the private repo), and a `prepare` script. Keeps the name `bland` and `"private": true` (that only blocks publishing).
+Needs: the repo to stay reachable by whoever installs (SSH key or token for the private repo), and a `prepare` script. Works with the name `bland-ui` and `"private": true` (that only blocks publishing).
 
 1. In `package.json` scripts: `"prepare": "npm run build"`. A git install installs Bland's dev dependencies and runs `prepare` before packing; `prepack` alone runs without them and fails. The cost: every `npm install` in this repo also runs the build (a few seconds).
 2. Tag the release.
@@ -95,7 +94,7 @@ The public site is the landing page at `/` and the docs at `/docs/`. Godwin desi
 - Checked 2026-10-29 with Cloudflare's own local server (`npx wrangler pages dev dist-site`): `/` answers 302 to `/docs/`, `/docs` 308 to `/docs/`, pages, fonts and images load, no failed requests.
 - Free plan. Public by default; Cloudflare Access (Zero Trust, free up to 50 people) can put it behind an email sign-in.
 
-Needs from Godwin: a Cloudflare account (sign in yourself), and whether the site is public or behind Access.
+Needs from Godwin: a Cloudflare account (sign in yourself). The site is public (decided 2026-10-29), so no Access.
 
 Go live (deploys on every push to `main` from then on): Cloudflare dashboard, Workers & Pages, Create, Pages, Connect to Git, pick `JGodwyn/bland-design-system` (private repos are fine), then:
 

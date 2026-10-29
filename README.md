@@ -8,33 +8,30 @@ Godwin's design system: design tokens as CSS custom properties and React compone
 
 ## Install
 
-Bland is not published yet; `docs/release.md` lists the ways it can be. Once it is, one of:
+Bland is published on npm as `bland-ui` (not yet: `docs/release.md` has the steps):
 
 ```bash
-npm install @jgodwyn/bland                                   # public npm or GitHub Packages (scoped name)
-npm install github:JGodwyn/bland-design-system#v0.1.0        # straight from the GitHub repo
+npm install bland-ui
 ```
 
 Peer dependencies: `react` and `react-dom` 19. Components take `ref` as a prop, which React 18 does not pass through.
 
-The examples below import from `bland`; with a scoped name, import from `@jgodwyn/bland` instead.
-
 ## Load the CSS, in this order
 
 ```ts
-import 'bland/tokens.css';  // every token, light and dark
-import 'bland/fonts.css';   // Inter and Geist Mono (skip it if the project already loads them)
-import 'bland/base.css';    // light reset, page defaults, focus ring, corner smoothing, scroll fade
-import 'bland/styles.css';  // every component's CSS
+import 'bland-ui/tokens.css';  // every token, light and dark
+import 'bland-ui/fonts.css';   // Inter and Geist Mono (skip it if the project already loads them)
+import 'bland-ui/base.css';    // light reset, page defaults, focus ring, corner smoothing, scroll fade
+import 'bland-ui/styles.css';  // every component's CSS
 import './brand.css';       // the project's brand override, last
 ```
 
-The stylesheets are plain CSS. `fonts.css` imports the font files from the `@fontsource` packages Bland depends on, so it needs a bundler that resolves CSS `@import` from `node_modules` (Vite, webpack, Next.js, Parcel all do). Without a bundler, link `tokens.css`, `base.css` and `styles.css` from `node_modules/bland/dist/` and load the fonts yourself.
+The stylesheets are plain CSS. `fonts.css` imports the font files from the `@fontsource` packages Bland depends on, so it needs a bundler that resolves CSS `@import` from `node_modules` (Vite, webpack, Next.js, Parcel all do). Without a bundler, link `tokens.css`, `base.css` and `styles.css` from `node_modules/bland-ui/dist/` and load the fonts yourself.
 
 ## Use the components
 
 ```tsx
-import { Button, TextInput, Tooltip } from 'bland';
+import { Button, TextInput, Tooltip } from 'bland-ui';
 
 export function Form() {
   return (
@@ -98,3 +95,7 @@ The docs site shows every token and component with live controls, in both themes
 ## Developing Bland
 
 See `CLAUDE.md` for the commands and rules, `docs/components.md` to build a component, `docs/tokens.md` to sync tokens from Figma, and `docs/release.md` to publish.
+
+## License
+
+MIT (`LICENSE`). Inter and Geist Mono are under the SIL Open Font License.

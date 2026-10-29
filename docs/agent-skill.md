@@ -4,7 +4,7 @@ Raw material for the skill we package at the end of the project: what an agent n
 
 ## Setup in a project
 
-- Install the package (not published yet: `docs/release.md`; the name may become `@jgodwyn/bland`). Needs React 19. Import `bland/tokens.css`, `bland/fonts.css`, `bland/base.css`, `bland/styles.css`, then the project's `brand.css`: the override comes after Bland's tokens (`docs/brand.md`, README).
+- Install with `npm install bland-ui` (the product is Bland; the npm name is `bland-ui`; not published yet, `docs/release.md`). Needs React 19. Import `bland-ui/tokens.css`, `bland-ui/fonts.css`, `bland-ui/base.css`, `bland-ui/styles.css`, then the project's `brand.css`: the override comes after Bland's tokens (`docs/brand.md`, README). Components: `import { Button } from 'bland-ui'`. MIT license.
 - Fonts: Inter and Geist Mono ship self-hosted in `src/styles/fonts.css`; base reset and helpers in `base.css`.
 - Theme (Godwin 2026-10-27: both ways): `data-theme="light|dark"` on any element wins; without it `prefers-color-scheme` decides. Nested `data-theme` sections work. A theme toggle sets `data-theme` on `<html>` (and removes it to follow the system again); don't add a class or a second set of dark styles.
 

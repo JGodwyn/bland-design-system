@@ -1923,3 +1923,9 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Added `site/_redirects` (`/` → `/docs/` 302 for now), `npm run site:build` (docs build copied to `dist-site/docs/` plus `site/`), `.node-version` 24, `dist-site/` and `.wrangler/` gitignored.
 - Checked with `npx wrangler@4 pages dev dist-site --port 5193`: `/` 302 to `/docs/`, `/docs` 308 to `/docs/`; Chromium on /docs/ (avatar, chat bubble, brand, typography pages): image 200, Inter loaded, no failed requests.
 - `docs/release.md` gets a Cloudflare Pages section (dashboard settings, the wrangler command); CLAUDE.md commands, roadmap and open question updated.
+
+## bland-ui, MIT, public site; Grid button shadow (2026-10-29, release side session)
+
+- Grid page: the desktop Show columns button had the phone's brand shadow while on: the phone's `[data-on]` rule set it and the `min-width: 768px` block reset the shadow only for the resting state. Added `box-shadow: none` to the desktop `[data-on]` rule; checked in Chromium at 1280 (none, on and off) and 375 (kept).
+- Renamed the package to `bland-ui`: package.json, README, docs/release.md, agent-skill, the docs site's import lines (ComponentPage, Overview), the Code snippet story text and its specs, the smoke test, `from 'bland'` lines in CLAUDE.md and INTERFACE.md. Older log entries left as written.
+- MIT LICENSE added (Copyright 2026 Godwin John); the smoke test now requires it in the tarball.

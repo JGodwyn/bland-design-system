@@ -203,7 +203,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Retuned in Figma 2026-10-25 (Godwin): every `Button/*-disabled` fill is lighter in light (#c4cad4, was #a8b0be) and darker in dark (#2b313b, was #576275), so disabled reads as receded in both themes; brand secondary rest, hover and pressed each moved one step brighter in dark only (#001b55, #002873, #003a9e). Token-only change, no CSS.
 
 ### Indicator (2026-10-18)
-- `import { Indicator } from 'bland'`. Props: `size` sm/md/lg/xl/2xl (default
+- `import { Indicator } from 'bland-ui'`. Props: `size` sm/md/lg/xl/2xl (default
   sm, Figma's), `emotion` brand/neutral/success/danger/warning (default brand),
   `type` primary/secondary (default primary), `children` (the label, usually a
   count), `ring` (default **false**), plus native span props and `className`.
@@ -221,7 +221,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   parent (Avatar's slot), not inside Indicator.
 
 ### Badge (2026-10-18)
-- `import { Badge } from 'bland'`. Props: `size` sm/md/lg/xl (16, 20, 24, 32;
+- `import { Badge } from 'bland-ui'`. Props: `size` sm/md/lg/xl (16, 20, 24, 32;
   default sm, Figma's), `emotion` brand/neutral/success/danger/warning,
   `type` primary/secondary/outline, `children` (label), `iconStart`,
   `iconEnd` (Figma `🌟 Leading/Trailing icon`; the `👀` booleans are "pass an
@@ -276,7 +276,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   state, so the chip is a `<span>` and only its close button is a `<button>`.
   Pills is "selectable … a toggle button with aria-pressed", so a Pill is a
   native `<button aria-pressed>`. Neither is both.
-- **Chip** (`import { Chip } from 'bland'`): `size` sm/md/lg (default sm, as
+- **Chip** (`import { Chip } from 'bland-ui'`): `size` sm/md/lg (default sm, as
   in Figma; 20, 24, 32), `children` (label), `leading` (Figma `🧩 Slot`, one
   Avatar or Indicator; named for its place because a Figma slot called just
   "Slot" says nothing), `count` (Figma `Type=countable` + `✏️ Count`), and
@@ -293,7 +293,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   description asks. No hover or disabled look: Figma has none. Press feedback
   `scale(0.97)`. Removing is the app's job (`onRemove`), the chip never hides
   itself.
-- **Pill** (`import { Pill } from 'bland'`, folder `pills/` after the Figma
+- **Pill** (`import { Pill } from 'bland-ui'`, folder `pills/` after the Figma
   set): `size` sm/md/lg (default sm, as in Figma; 32, 40, 48, `min-width`
   the same), `selected` (controlled) or `defaultSelected`, `onSelectedChange`,
   `icon` (Figma `🌟 Icon`, icon/md at every size), `count` (Figma
@@ -310,7 +310,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   is shown as is.
 
 ### Checkbox and Radio (2026-10-18)
-- `import { Checkbox, CheckboxGroup, Radio, RadioGroup } from 'bland'`. Folders
+- `import { Checkbox, CheckboxGroup, Radio, RadioGroup } from 'bland-ui'`. Folders
   follow the Figma sets: `checkbox/` and `radio-button/`, each with its group.
   The code name is `Radio`, shorter than Figma's "Radio Button".
 - **The native input is the box.** `<input type="checkbox|radio">` with
@@ -352,7 +352,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Press feedback `scale(0.97)` on the box, dropped under reduced motion.
 
 ### Toggle (2026-10-18)
-- `import { Toggle } from 'bland'`, folder `toggle/`. Same pattern as
+- `import { Toggle } from 'bland-ui'`, folder `toggle/`. Same pattern as
   Checkbox: a native `<input type="checkbox" role="switch">` drawn as Figma's
   track (`appearance: none`), so Space, forms, `:checked`, `:disabled` and
   the focus ring stay native and screen readers announce on/off. The knob is
@@ -382,7 +382,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Not handled yet: right-to-left. The knob translates on the physical x axis.
 
 ### Text Input (2026-10-18)
-- `import { TextInput } from 'bland'`, folder `text-input/`. Figma set
+- `import { TextInput } from 'bland-ui'`, folder `text-input/`. Figma set
   "Text Input" plus its private add-ons `_leading-input` / `_trailing-input`.
 - **The contract other components build on (Dropdown's trigger, the Date
   pickers):** Text Input is a plain native `<input>`. It works controlled
@@ -436,7 +436,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   `.bland-text-input:has(:disabled)` for that reason.
 
 ### Text Area (2026-10-18)
-- `import { TextArea } from 'bland'`, folder `text-area/`. Same contract as
+- `import { TextArea } from 'bland-ui'`, folder `text-area/`. Same contract as
   Text Input: a native `<textarea>`, controlled or uncontrolled, native props
   and `ref` on it, `className` on the wrapper; `label`, `helperText`,
   `status` wired the same way (danger sets `aria-invalid`).
@@ -467,7 +467,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   validation state), so neither component needed more.
 
 ### Numeric Input Field (2026-10-18)
-- `import { NumericInputField } from 'bland'`, folder `numeric-input-field/`.
+- `import { NumericInputField } from 'bland-ui'`, folder `numeric-input-field/`.
   Figma "Numeric Input Field" (the row) and "_Numeric Input Field Base"
   (one box, private).
 - **One native input per box** (`type="text"`, `inputMode="numeric"`,
@@ -503,7 +503,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   Figma's twelve disabled variants were rebound from a `text-bold` label.
 
 ### Search Input (2026-10-18)
-- `import { SearchInput } from 'bland'`, folder `search-input/`. It is Text
+- `import { SearchInput } from 'bland-ui'`, folder `search-input/`. It is Text
   Input's field (`InputField`, same classes and CSS) with `type="search"`
   and the MagnifyingGlass icon at the start; Figma's Search set binds the
   same tokens as Text Input's default status. No label, helper or status
@@ -526,7 +526,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   color (`icon-subtle`, `icon-minimal` disabled).
 
 ### Alert, Banner, Toast and Notification (2026-10-18)
-- `import { Alert, Banner, Toast, Toaster, useToaster, Notification } from 'bland'`.
+- `import { Alert, Banner, Toast, Toaster, useToaster, Notification } from 'bland-ui'`.
   Folders follow the Figma sets (`alert/`, `banner/`, `toast/` with the
   Toaster, `notification/`).
 - **One status model, written once.** `status` info/danger/success/warning
@@ -670,7 +670,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   none; links are used constantly).
 
 ### Progress-bar and Progress-wizard (2026-10-19)
-- `import { ProgressBar, ProgressWizard } from 'bland'`. Folders follow the
+- `import { ProgressBar, ProgressWizard } from 'bland-ui'`. Folders follow the
   Figma sets: `progress-bar/`, `progress-wizard/` (with the private
   `_progress-wizard-item` and `_progress-icon` drawn inside it).
 - **Progress-bar is determinate only**, as in Figma. `value` with `min` 0 and
@@ -745,7 +745,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   `.bland-smooth`.
 
 ### Accordion (2026-10-19)
-- `import { Accordion } from 'bland'`, folder `accordion/`. A native
+- `import { Accordion } from 'bland-ui'`, folder `accordion/`. A native
   `<details>` whose `<summary>` is Figma's header, so it opens without scripts
   and keeps the browser's keyboard (Enter, Space) and screen reader behaviour:
   Chromium exposes the summary as a disclosure button with an expanded state,
@@ -785,7 +785,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Figma's `🌟 Slot` property is defined on the set but no layer uses it; ignored.
 
 ### List item (2026-10-19)
-- `import { ListItem } from 'bland'`, folder `list/`. Figma has one set,
+- `import { ListItem } from 'bland-ui'`, folder `list/`. Figma has one set,
   `List` (375:6454, 24 variants: Flush x Lines x State); every variant's
   bindings read, inner frames included. There is **no List wrapper** in
   Figma, so none in code: a row is an `<li>` (Figma: "li inside ul") and the
@@ -850,7 +850,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   tokens instead of the fixed 64, with no new token; code's 62 stands.
 
 ### Empty State (2026-10-19)
-- `import { EmptyState } from 'bland'`, folder `empty-state/`. Figma: set
+- `import { EmptyState } from 'bland-ui'`, folder `empty-state/`. Figma: set
   `Empty-state` (864:4114, Size sm/lg) and the private `_empty-illustration`
   (6184:558); every variant's bindings read, inner frames and the hidden
   actions included. A plain `<div>`: no role, no live region, no focus. Only
@@ -884,7 +884,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 
 ### Table (2026-10-19)
 - `import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell,
-  TableExpandCell, TableOptionCell } from 'bland'`, folder `table/`. Figma:
+  TableExpandCell, TableOptionCell } from 'bland-ui'`, folder `table/`. Figma:
   sets `Table-row` (849:6722, 12 variants), `_table-header` (711:72592, 45)
   and `_table-cell` (53:9651, 60); every variant's bindings read, inner
   frames and hidden slots and focus rings included.
@@ -968,7 +968,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   users can scroll a table with no controls in it.
 
 ### Tooltip (2026-10-19, the React Aria and Floating UI pattern)
-- `import { Tooltip } from 'bland'`, folder `tooltip/`. Figma: set `Tooltip`
+- `import { Tooltip } from 'bland-ui'`, folder `tooltip/`. Figma: set `Tooltip`
   (244:2806, 12 Placement variants) and the private `_Tooltip-pointers`
   (244:2778, 4 directions); every variant's bindings read, inner frames
   included.
@@ -1070,7 +1070,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   follows the trigger (the Button), never the tooltip.
 
 ### Menu and Dropdown (2026-10-19)
-- `import { Menu, Dropdown } from 'bland'`, folders `menu/` and `dropdown/`.
+- `import { Menu, Dropdown } from 'bland-ui'`, folders `menu/` and `dropdown/`.
   Figma page Dropdown: sets `Menu` (580:9303), `_menu-item` (579:8897, 24
   variants), `_dropdown-trigger` (562:29520, 96 variants) and `Dropdown`
   (585:12559, 27 ready-made compositions); every variant's bindings read.
@@ -1169,7 +1169,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   motion. The list stays mounted until the exit has played.
 
 ### Modal (2026-10-19)
-- `import { Modal } from 'bland'`, folder `modal/`. Figma page Modals: set
+- `import { Modal } from 'bland-ui'`, folder `modal/`. Figma page Modals: set
   `Modal` (6210:1009, Size sm/md) built from the private `_modal-title`
   (614:14281), `_modal-body` (649:3797, Alignment left/center) and
   `_modal-action-bar` (615:14570, Orientation x Alignment x Buttons); every
@@ -1250,7 +1250,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - **Corners are `rad-lg` (16) (Figma, 2026-10-22),** was `rad-md`.
 
 ### Tabs: Section tab, Pill tab, File tab, Segmented bar, Tab bar (2026-10-19)
-- `import { SectionTabs, PillTabs, FileTabs, SegmentedBar, TabBar } from 'bland'`,
+- `import { SectionTabs, PillTabs, FileTabs, SegmentedBar, TabBar } from 'bland-ui'`,
   folders named after the Figma sets: `section-tab/`, `pill-tab/`,
   `file-tab/`, `segmented-bar/`, `tab-bar/`, plus the internal `tabs/`.
   Figma: `Section-tab` (1471:35740) + `_section-tab-item` (1471:35889, 18),
@@ -1367,7 +1367,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   selection slides as above.
 
 ### Pagination and Pagination-table (2026-10-19)
-- `import { Pagination, PaginationTable } from 'bland'`, folders `pagination/`
+- `import { Pagination, PaginationTable } from 'bland-ui'`, folders `pagination/`
   and `pagination-table/`. Figma: `_pagination-item` (786:9, 18 variants),
   `Pagination-simple` (787:1338, 3), `Pagination-table` (787:2186, 6); every
   variant's bindings read in three read-only `use_figma` calls.
@@ -1417,7 +1417,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - New icon: CaretLeft (6080:106855), exported from Figma.
 
 ### Slider (2026-10-19)
-- `import { Slider } from 'bland'`, folder `slider/`. Figma: `Slider`
+- `import { Slider } from 'bland-ui'`, folder `slider/`. Figma: `Slider`
   (289:10407, 12 variants), private `_knob` (289:3819, 9) and
   `_slider-labels` (350:1341, 8); bindings read for every size and type,
   rest and disabled, in three read-only `use_figma` calls.
@@ -1595,7 +1595,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   (Figma's today), in `tests/stories.ts`.
 
 ### File Upload (2026-10-19)
-- `import { FileUpload } from 'bland'`, folder `file-upload/`. Figma: File
+- `import { FileUpload } from 'bland-ui'`, folder `file-upload/`. Figma: File
   Upload page, sets File-upload (608:7433), `_uploader` (608:207),
   `_file-upload-progress` (608:384). Read in three read-only `use_figma`
   calls (descriptions and properties, bindings, icon colors and exports).
@@ -1660,7 +1660,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   zone colors transition over `duration/xs` `easing/ease`, as Button.
 
 ### Code snippet and Code text (2026-10-19)
-- `import { CodeSnippet, CodeText } from 'bland'`, folder `code-snippet/`.
+- `import { CodeSnippet, CodeText } from 'bland-ui'`, folder `code-snippet/`.
   Figma: Code snippet page, sets Code-snippet (990:11356), `_code-action-bar`
   (988:10933), Code-text (6259:1754). Read in three read-only `use_figma`
   calls plus one icon export (Copy, Eye, EyeClosed).
@@ -1720,7 +1720,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   Figma's description warns.
 
 ### Sidebar (2026-10-19)
-- `import { Sidebar } from 'bland'`, folder `sidebar/`. Figma: `Sidebar`
+- `import { Sidebar } from 'bland-ui'`, folder `sidebar/`. Figma: `Sidebar`
   (1084:13817, 12 variants), `_sidebar-item-group` (1078:9910, 16),
   `_sidebar-item` (1077:3151, 48); every variant's bindings read.
 - **Godwin's calls (2026-10-19):** the minimized rail uses the **hover peek**
@@ -1780,7 +1780,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   (vestigial), tooltips and menus in the rail (replaced by the peek).
 
 ### Chat bubble and Chat list item (2026-10-20)
-- `import { ChatBubble, ChatListItem } from 'bland'`, folders `chat-bubble/`,
+- `import { ChatBubble, ChatListItem } from 'bland-ui'`, folders `chat-bubble/`,
   `chat-list-item/`, and internal `message-sent-indicator/` (Figma
   `_message-sent-indicator`, used by both). Figma sets read with every
   variant's bindings: Chat-bubble (926:9102, 13 variants), `_chat-bubble-tail`
@@ -1852,7 +1852,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   Figma draws no look for the open chat (raised on the tracker).
 
 ### Chat navbar and Chat message bar (2026-10-20)
-- `import { ChatNavbar, ChatMessageBar } from 'bland'`, folders
+- `import { ChatNavbar, ChatMessageBar } from 'bland-ui'`, folders
   `chat-navbar/`, `chat-message-bar/`. Figma: Chat-navbar (902:1874, one
   component) and Chat-message-bar (904:3354, State x Replying, 6 variants);
   every binding read.
@@ -2312,3 +2312,10 @@ Readers are designers, developers and agents. The voice follows systems known fo
 - Host: Cloudflare Pages (not Vercel). Landing page at `/`, designed by Godwin in Figma; the docs at `/docs/`, linked from it.
 - `npm run site:build` → `dist-site/` = `dist-docs/` copied to `docs/` + the files in `site/`. Until the landing page exists, `site/_redirects` sends `/` to `/docs/` (302, so it can change later without browsers caching it).
 - `.node-version` 24 for Cloudflare's build image. Open: public or behind Cloudflare Access.
+
+## Package name, license, site visibility (Godwin 2026-10-29)
+
+- npm name **`bland-ui`** (`bland` is taken); the product is still Bland. Imports: `from 'bland-ui'`, `bland-ui/tokens.css` and the other stylesheets. Renamed everywhere a project reads it (package.json, README, docs site import lines, stories, component map); class names stay `bland-*`.
+- **MIT** license (`LICENSE`, `license` field).
+- The public site is **public** (no Cloudflare Access).
+- Docs site Grid page: the Show/Hide columns button has no shadow from tablet up in either state; the phone's floating button keeps elevation/brand/mid (Godwin 2026-10-29).

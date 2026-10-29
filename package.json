@@ -1,8 +1,9 @@
 {
-  "name": "bland",
+  "name": "bland-ui",
   "version": "0.1.0",
   "private": true,
   "description": "Bland design system: tokens and React components",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JGodwyn/bland-design-system.git"

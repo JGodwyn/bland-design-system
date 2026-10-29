@@ -50,7 +50,7 @@ test('demo controls change the component and the code snippet', async ({ page })
 test('the code view shows a whole file: the imports and a component', async ({ page }) => {
   await page.goto('/#/components/button');
   const code = page.locator('.docs-example-code code');
-  await expect(code).toContainText("import { Button, PlusIcon } from 'bland';");
+  await expect(code).toContainText("import { Button, PlusIcon } from 'bland-ui';");
   await expect(code).toContainText('export function Example() {');
   await expect(code).toContainText('iconStart={<PlusIcon />}');
 });

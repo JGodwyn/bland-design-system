@@ -55,7 +55,7 @@ class Product {
 }
 `;
 
-const short = `import { CodeSnippet } from 'bland';
+const short = `import { CodeSnippet } from 'bland-ui';
 
 function Example() {
   return <CodeSnippet code="print('hello')" />;
@@ -284,9 +284,9 @@ export default {
         <span className="pg-label">CodeText: <code>sm</code>, <code>md</code>, <code>lg</code>, then <code>copyable</code></span>
         {sizes.map((size) => (
           <p key={size} style={{ font: bodyType[size], color: 'var(--text-bold)', margin: 0 }}>
-            Install it with <CodeText size={size}>npm install bland</CodeText> and import{' '}
+            Install it with <CodeText size={size}>npm install bland-ui</CodeText> and import{' '}
             <CodeText size={size} copyable data-testid={`code-text-${size}`}>
-              bland/tokens.css
+              bland-ui/tokens.css
             </CodeText>{' '}
             once.
           </p>
