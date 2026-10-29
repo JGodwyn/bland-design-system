@@ -569,6 +569,31 @@ test.describe('on a phone', () => {
     await expect.poll(hidden).toBe(false);
   });
 
+  test('the menu button opens the sidebar from the left and pushes the page right; the strip, Escape or a link closes it', async ({ page }) => {
+    await page.goto('/#/components/button');
+    const nav = page.getByRole('navigation', { name: 'Docs' });
+    const main = page.locator('.docs-main');
+    await expect(nav).toBeHidden();
+    const before = (await main.boundingBox())!.x;
+    await page.getByRole('button', { name: 'Menu' }).click();
+    await expect(nav).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Close menu' })).toHaveAttribute('aria-expanded', 'true');
+    const sidebar = (await page.locator('.docs-sidebar').boundingBox())!;
+    await expect.poll(async () => (await page.locator('.docs-sidebar').boundingBox())!.x).toBe(0);
+    await expect.poll(async () => (await main.boundingBox())!.x).toBe(before + sidebar.width);
+    expect(await sidewaysScroll(page)).toBe(0);
+    await page.mouse.click(310, 400); // the strip of page beside the menu
+    await expect(nav).toBeHidden();
+    await page.getByRole('button', { name: 'Menu' }).click();
+    await page.keyboard.press('Escape');
+    await expect(nav).toBeHidden();
+    await page.getByRole('button', { name: 'Menu' }).click();
+    await nav.getByRole('link', { name: 'Colors' }).click();
+    await expect(page).toHaveURL(/#\/styles\/colors$/);
+    await expect(nav).toBeHidden();
+    await expect.poll(async () => (await main.boundingBox())!.x).toBe(before);
+  });
+
   test('the menu, search and color picker fit the screen', async ({ page }) => {
     await page.goto('/#/brand');
     await page.getByRole('button', { name: /^Brand color #/ }).click();
@@ -579,7 +604,7 @@ test.describe('on a phone', () => {
     await page.getByRole('button', { name: 'Menu' }).click();
     await expect(page.getByRole('navigation', { name: 'Docs' })).toBeVisible();
     expect(await sidewaysScroll(page)).toBe(0);
-    await page.getByRole('button', { name: 'Close' }).click();
+    await page.getByRole('button', { name: 'Close menu' }).click();
     await page.getByRole('button', { name: /Search Bland/ }).click();
     await page.keyboard.type('button');
     expect(await sidewaysScroll(page)).toBe(0);

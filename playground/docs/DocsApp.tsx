@@ -1,7 +1,8 @@
 // The Bland docs site: a sidebar of styles and components, a top bar with the theme switch and the
 // search, the selected page, and a rail listing the page's sections.
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { Button } from '../../src/components/button/Button';
+import { IconButton } from '../../src/components/button/IconButton';
+import { ListIcon, XIcon } from '../../src/icons';
 import { Icon } from '../../src/components/icon/Icon';
 import { ScrollArea } from '../../src/components/scroll-area/ScrollArea';
 import { SegmentedBar } from '../../src/components/segmented-bar/SegmentedBar';
@@ -94,6 +95,14 @@ export function DocsApp({ route }: { route: DocsRoute }) {
     window.scrollTo({ top: 0 });
   }, [route]);
 
+  // Escape closes the phone menu.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMenuOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [menuOpen]);
+
   // ⌘K on Apple keyboards, Ctrl+K elsewhere, opens the search from anywhere.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -121,13 +130,21 @@ export function DocsApp({ route }: { route: DocsRoute }) {
   return (
     <div className="docs" data-menu-open={menuOpen || undefined}>
       <header className="docs-topbar">
+        <IconButton
+          size="sm"
+          type="ghost"
+          icon={menuOpen ? <XIcon /> : <ListIcon />}
+          aria-label={menuOpen ? 'Close menu' : 'Menu'}
+          aria-expanded={menuOpen}
+          aria-controls="docs-sidebar"
+          onClick={() => setMenuOpen((o) => !o)}
+        />
         <a href="#/" className="docs-brand bland-focus-ring">
           Bland
         </a>
-        <Button size="sm" type="ghost" aria-expanded={menuOpen} aria-controls="docs-sidebar" onClick={() => setMenuOpen((o) => !o)}>
-          {menuOpen ? 'Close' : 'Menu'}
-        </Button>
       </header>
+      {/* The strip of page beside the open phone menu: a press there closes it (the close button is in the strip too). */}
+      {menuOpen && <div className="docs-scrim" aria-hidden="true" onClick={() => setMenuOpen(false)} />}
 
       <aside className="docs-sidebar" id="docs-sidebar">
         <div className="docs-sidebar-head">

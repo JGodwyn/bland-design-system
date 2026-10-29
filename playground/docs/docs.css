@@ -12,15 +12,15 @@
   color: var(--text-bold);
 }
 
-/* ---- Top bar (mobile) ---- */
+/* ---- Top bar (mobile): the menu button, then the logo ---- */
 .docs-topbar {
   position: sticky;
   top: 0;
   z-index: 3; /* above the toolbar, which slides up under it */
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: var(--space-sm) var(--space-lg);
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg) var(--space-sm) var(--space-sm); /* the button's icon lines up near the page gutter */
   background: var(--surface-100);
   border-bottom: var(--stroke-sm) solid var(--border-subtle);
 }
@@ -31,31 +31,75 @@
   text-decoration: none;
   border-radius: var(--rad-sm);
 }
-.docs-topbar .docs-brand {
-  font: var(--type-title-md);
-}
 
 /* ---- Sidebar: brand, then Overview, Foundations and Components ---- */
 .docs-sidebar {
-  display: none;
+  display: flex;
   flex-direction: column;
   background: var(--surface-200);
 }
-.docs[data-menu-open] .docs-sidebar {
-  display: flex;
+/*
+ * Phone menu (Godwin 2026-10-29): the sidebar slides in from the left, full height, and pushes the top bar,
+ * toolbar and page right by its width, leaving a strip of the page with the close button; a press on the strip
+ * closes it. A drawer: duration/2xl easing/drawer both ways; under reduced motion it appears at once. Closed,
+ * it is hidden (visibility, after the slide), so it is out of the Tab order.
+ */
+.docs {
+  --docs-menu-width: min(var(--sidebar-width), calc(100vw - var(--space-6xl)));
+
+  overflow-x: clip; /* the pushed page never makes the page scroll sideways (clip keeps sticky working) */
+}
+:root:has(.docs[data-menu-open]) {
+  overflow: hidden; /* the page under the open menu stays put */
+}
+.docs-sidebar {
   position: fixed;
-  inset: 0;
-  /* Below the top bar: its button plus its padding and border. */
-  top: calc(var(--control-sm) + 2 * var(--space-sm) + var(--stroke-sm));
-  z-index: 3;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 4;
+  width: var(--docs-menu-width);
+  translate: -100% 0;
+  visibility: hidden;
+  transition:
+    translate var(--duration-2xl) var(--easing-drawer),
+    visibility var(--duration-2xl);
+}
+.docs[data-menu-open] .docs-sidebar {
+  translate: none;
+  visibility: visible;
+}
+.docs-topbar,
+.docs-toolbar > *,
+.docs-main {
+  transition: translate var(--duration-2xl) var(--easing-drawer);
+}
+.docs[data-menu-open] :is(.docs-topbar, .docs-toolbar > *, .docs-main) {
+  translate: var(--docs-menu-width) 0;
+}
+.docs[data-menu-open] .docs-topbar {
+  z-index: 5; /* its close button stays pressable above the strip that closes the menu */
+}
+.docs-scrim {
+  position: fixed;
+  inset: 0 0 0 var(--docs-menu-width);
+  z-index: 4;
+}
+@media (prefers-reduced-motion: reduce) {
+  .docs-sidebar,
+  .docs-topbar,
+  .docs-toolbar > *,
+  .docs-main {
+    transition: none;
+  }
 }
 
 .docs-sidebar-head {
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  /* Figma: the brand block sits space-4xl from the top, space-lg above and below, space-xl at the sides. */
-  padding: calc(var(--space-4xl) + var(--space-lg)) var(--space-xl) var(--space-lg);
+  /* Phone menu: level with the top bar's logo. */
+  padding: var(--space-sm) var(--space-xl) var(--space-lg);
 }
 .docs-descriptor {
   font: var(--type-body-sm);
@@ -252,16 +296,38 @@
   .docs-topbar {
     display: none;
   }
+  /* From the tablet layout the sidebar is a column of the page: the phone menu's drawer is undone. */
+  .docs {
+    overflow-x: visible;
+  }
+  :root:has(.docs[data-menu-open]) {
+    overflow: visible;
+  }
   .docs-sidebar,
   .docs[data-menu-open] .docs-sidebar {
     grid-row: 1 / -1;
-    display: flex;
     position: sticky;
     top: 0;
+    z-index: auto;
+    width: auto;
     height: 100vh;
+    translate: none;
+    visibility: visible;
+    transition: none;
+  }
+  .docs-topbar,
+  .docs-toolbar > *,
+  .docs-main,
+  .docs[data-menu-open] :is(.docs-topbar, .docs-toolbar > *, .docs-main) {
+    translate: none;
+    transition: none;
+  }
+  .docs-scrim {
+    display: none;
   }
   .docs-sidebar-head {
-    display: flex;
+    /* Figma: the brand block sits space-4xl from the top, space-lg above and below, space-xl at the sides. */
+    padding: calc(var(--space-4xl) + var(--space-lg)) var(--space-xl) var(--space-lg);
   }
   .docs-toolbar {
     top: 0;

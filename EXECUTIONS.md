@@ -1814,3 +1814,12 @@ not wrapped; rail contents centred (logo and account icon were off).
 ### Follow-up: style page footnote (2026-10-29)
 
 - Godwin: remove "Token values as of <date>" from the style pages. Dropped that sentence (and the unused `tokensExportedAt`); the footnote keeps "Copy a token name with the button beside it." docs.spec passes.
+
+### Follow-up: phone top bar and push menu (2026-10-29)
+
+- Godwin: bigger logo on mobile, a menu icon on its left that opens the sidebar by pushing the content right.
+- Top bar: ghost sm IconButton (List, X while open; "Menu" / "Close menu") then the logo at heading-sm (was title-md); same 32 row, so the toolbar's sticky offset is unchanged.
+- Sidebar on phones: fixed, full height, `min(sidebar-width, 100vw - space-6xl)` wide, slides in from the left while the top bar, the toolbar's contents and the page translate by the same width (duration/2xl easing/drawer, none under reduced motion). `.docs` gets `overflow-x: clip` so the pushed page never scrolls sideways; the root stops scrolling while open. Written mobile first and undone from breakpoint/md.
+- A scrim over the visible strip closes it; first run it sat over the top bar's close button (Playwright waited on the intercepted click), so the top bar goes to z-index 5 while open. Escape and following a link close it too.
+- The toolbar's own `translate` (scroll hide) would have clashed with the push, so the push moves the toolbar's children instead.
+- Spec covers open, the push distance, strip, Escape and link; docs + a11y pass (247).
