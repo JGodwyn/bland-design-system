@@ -1892,3 +1892,7 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Copy: `useCopy` falls back to execCommand when there is no Clipboard API (plain-http network address); checked with clipboard removed in an init script.
 - Picker: profiled core functions (generate 0.1 ms, neutrals 0.8, check 0.2, fixScale 2.3, generateChart 59). Picker local state + rAF/startTransition sends; chart palette via `useSettled`. 4x CPU throttle drag: 24 s → 2.5 s, long tasks 22.8 s → 0.4 s.
 - docs + a11y 250, code-snippet 9 pass.
+
+### Brand breakdown on phones in body-lg (2026-10-29)
+
+- Godwin: the contrast warning breakdown on mobile uses the body-lg family. `.docs-findings-list` went body-md → body-lg, `.docs-findings-where` body-md-bold → body-lg-bold; the meta line inherits. Checked at 375 light: rows wrap cleanly, no overflow.

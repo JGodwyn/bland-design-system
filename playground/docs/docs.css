@@ -1289,8 +1289,8 @@ code,
   background: var(--surface-100);
   border: var(--stroke-sm) solid var(--border-subtle);
   border-radius: var(--bland-radius);
-  font: var(--type-body-md);
-  letter-spacing: var(--type-body-md-letter-spacing);
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
   color: var(--text-bold);
 }
 @supports (corner-shape: superellipse(2)) {
@@ -1308,7 +1308,7 @@ code,
   border-top: var(--stroke-sm) solid var(--border-subtle);
 }
 .docs-findings-where {
-  font: var(--type-body-md-bold);
+  font: var(--type-body-lg-bold);
   color: var(--text-bold);
 }
 .docs-findings-meta {

@@ -2293,3 +2293,5 @@ Readers are designers, developers and agents. The voice follows systems known fo
 - Grid page columns switch on phones (2026-10-29, final): primary in both states; the label says Show or Hide. No tap highlight anywhere on the docs site (`-webkit-tap-highlight-color: transparent` on html).
 - Phone sizes (2026-10-29): the floating columns switch is Button md's size (40); the menu button keeps its 32 look with a 56 (control/lg) hit area.
 - Phone round (Godwin 2026-10-29): Overview stat cards one a line below md. A swipe left opens the phone menu, right closes it (it follows the finger; scrollable rows under the finger scroll first, fields, sliders and the picker are skipped). The toolbar stays put only for keyboard focus. Variant rows centre every wrapped line. The Brand picker shows its color at once and the page follows a frame later; the chart palette updates once colors settle (120 ms).
+
+- Docs, Brand theme breakdown on phones (Godwin 2026-10-29): the stacked list is body-lg, the pair's name body-lg-bold; the tablet table is unchanged.
