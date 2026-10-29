@@ -25,6 +25,7 @@ scripts/figma/            Plugin API scripts run through use_figma, plus the loc
 scripts/stylelint/        bland/use-tokens lint rule, fixtures and test
 scripts/release/          package smoke test (npm run test:package)
 docs/hosting/             inert host config examples for the docs site (docs/release.md)
+site/                     the public site's own files beside the docs (Cloudflare Pages: _redirects, later the landing page)
 ```
 
 - `npm run tokens`: regenerate `tokens.json` and `tokens.css` from the raw export.
@@ -34,7 +35,7 @@ docs/hosting/             inert host config examples for the docs site (docs/rel
 - `npm run tokens:drift`: drift check against Figma, variable by variable, with the CSS tokens each change reaches; `-- --apply` takes the Figma version. Two steps around one `use_figma` call (`docs/tokens.md`, "Drift check"). `npm run test:drift` runs its tests.
 - `npm run build`: tokens, Vite library build, `dist/tokens.css`, type declarations. `npm pack` runs it first (`prepack`).
 - `npm run test:package`: packs Bland, installs the tarball into a throwaway Vite + React 19 app with a brand override, type-checks, builds and checks it in Chromium. Needs the network. Publishing options and the command to go live for each: `docs/release.md` (nothing is published; `private: true` stays until Godwin picks a registry).
-- `npm run docs:build`: the docs site as static files in `dist-docs/` (relative paths, hash routes: any host or subpath); `npm run docs:preview` serves it at http://localhost:5181.
+- `npm run docs:build`: the docs site as static files in `dist-docs/` (relative paths, hash routes: any host or subpath); `npm run docs:preview` serves it at http://localhost:5181. `npm run site:build`: the public site for Cloudflare Pages in `dist-site/`: the docs under `/docs/` plus `site/` (landing page to come from Figma; `/` redirects to the docs until then).
 - `npm run typecheck`.
 - `npm run lint:css`: Stylelint on `src/components/**/*.css`; rejects any value that is not a `var(--…)` token (including durations, easings and `@media` widths) and names the token to use (`docs/lint.md`). `npm run test:lint` runs its fixtures.
 - `npm test`: Playwright in Chromium against the docs site: screenshots of every story in both themes, axe, behaviour specs, docs smoke tests. `npm run test:update` re-baselines screenshots after an intended visual change.
@@ -223,7 +224,7 @@ In order; tokens come before components.
 - [x] Playwright (decided 2026-10-17): screenshots of every story in both themes, axe checks and behaviour specs, Chromium only, against the playground. Set up 2026-10-17.
 - [x] Base: fonts, reset, focus and smoothing helpers, icon slot, scroll area, conventions in `docs/components.md`. Done 2026-10-17. Grid system done 2026-10-28: `.bland-grid` on new Layout column and max-width tokens (`docs/grid.md`).
 - [x] Docs site, local (2026-10-17): sidebar of styles and components, live demo with controls, variants, props tables, theme switch. Runs with `npm run docs`. Redesigned from the Figma Doc site page (2026-10-22): Bland controls, full code view, props in Table, search (⌘K), page contents rail; see INTERFACE.md.
-- [ ] Docs site hosting: not deployed anywhere yet. Static build ready (2026-10-27, `npm run docs:build`); Vercel, Netlify and GitHub Pages steps in `docs/release.md`. Left: Godwin picks a host.
+- [ ] Docs site hosting: Cloudflare Pages (Godwin 2026-10-29), landing page at `/` (Godwin designs it in Figma), docs at `/docs/`. `npm run site:build` ready and checked; steps in `docs/release.md`. Left: the landing page, public or behind Cloudflare Access, Godwin connects the repo.
 - [x] Extra project colors beside the brand: built 2026-10-27 (up to three, steps + light/dark roles, `docs/brand.md`). Chart palette `--chart-1…8` generated from the brand and extras, 2026-10-27 (Godwin: generated, not designed in Figma first).
 - [ ] Before the docs site goes live: review its copy (Godwin 2026-10-27): plain words a project's designer understands, no jargon messages (the chart check's ΔE and color-vision terms were the trigger).
 - [ ] Publish the `bland` package so projects can install it. Ready 2026-10-27: 0.1.0, React 19 peers, README, CHANGELOG, `npm run test:package`. Left: Godwin picks public npm, GitHub Packages (both need the name `@jgodwyn/bland`; `bland` is taken on npm) or a git install, and a license (`docs/release.md`).
@@ -231,7 +232,7 @@ In order; tokens come before components.
 
 ## Open questions (ask Godwin, don't assume)
 
-- Docs site hosting: Vercel, Netlify or GitHub Pages (or none); each is ready in `docs/release.md`.
+- Docs site: public, or behind Cloudflare Access (email sign-in)?
 - Package registry, name and license: public npm, GitHub Packages or a git install (`docs/release.md`).
 
 ## Pending context to merge into `docs/`

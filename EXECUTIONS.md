@@ -1916,3 +1916,10 @@ not wrapped; rail contents centred (logo and account icon were off).
 - New `docs/figma.md`: file rules (doc pages show what the file has, when a variable may be deleted, description rules, native slots only, stickersheets as components), the overlay fade wiring, the GRID gotcha, Plugin API techniques. Four Figma entries and one Claude Docs entry added to LEARNINGS.md.
 - The file is archived in `docs/archive/` with a header listing what is out of date (scrollbar visibility, 12 collections, grid styles, Code snippet height, scroll areas, shadcn). The older `claude/bland-handoff.md` is still in the claude.ai project.
 - Then Godwin shared `bland-handoff.md` (85k tokens, Figma build notes per component) and asked to delete unneeded files after. Read the conventions, Pending decisions, Key IDs and order sections; Status is per-component Figma history, superseded by the component map. Lasting conventions went into `docs/figma.md` ("Building a component in Figma"); the file is archived with a header naming what is stale (pending decisions settled in code, stroke names, the plan doc, the shadow rule for Tooltip). CLAUDE.md "Pending context" is now empty. The two Downloads copies were deleted once archived.
+
+## Cloudflare site build (2026-10-29, release side session)
+
+- Godwin: Cloudflare, not Vercel; landing page plus a link to the docs; he designs the landing page in Figma.
+- Added `site/_redirects` (`/` → `/docs/` 302 for now), `npm run site:build` (docs build copied to `dist-site/docs/` plus `site/`), `.node-version` 24, `dist-site/` and `.wrangler/` gitignored.
+- Checked with `npx wrangler@4 pages dev dist-site --port 5193`: `/` 302 to `/docs/`, `/docs` 308 to `/docs/`; Chromium on /docs/ (avatar, chat bubble, brand, typography pages): image 200, Inter loaded, no failed requests.
+- `docs/release.md` gets a Cloudflare Pages section (dashboard settings, the wrangler command); CLAUDE.md commands, roadmap and open question updated.

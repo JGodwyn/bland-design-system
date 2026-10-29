@@ -86,6 +86,33 @@ A project installs it with `npm install github:JGodwyn/bland-design-system#v0.1.
 
 The site is the whole playground, Brand theme page included; anything hosted publicly shows every component and token. Host configs are kept as inert examples in `docs/hosting/`: copy one into place to use it.
 
+### Cloudflare Pages (Godwin's pick, 2026-10-29)
+
+The public site is the landing page at `/` and the docs at `/docs/`. Godwin designs the landing page in Figma; until it is built, `/` redirects to `/docs/` (`site/_redirects`).
+
+- `npm run site:build` builds the docs and assembles `dist-site/`: `docs/` plus everything in `site/` (today only `_redirects`; the landing page goes there).
+- `.node-version` (24) sets Node for Cloudflare's build image.
+- Checked 2026-10-29 with Cloudflare's own local server (`npx wrangler pages dev dist-site`): `/` answers 302 to `/docs/`, `/docs` 308 to `/docs/`, pages, fonts and images load, no failed requests.
+- Free plan. Public by default; Cloudflare Access (Zero Trust, free up to 50 people) can put it behind an email sign-in.
+
+Needs from Godwin: a Cloudflare account (sign in yourself), and whether the site is public or behind Access.
+
+Go live (deploys on every push to `main` from then on): Cloudflare dashboard, Workers & Pages, Create, Pages, Connect to Git, pick `JGodwyn/bland-design-system` (private repos are fine), then:
+
+| Setting | Value |
+| --- | --- |
+| Production branch | `main` |
+| Build command | `npm run site:build` |
+| Build output directory | `dist-site` |
+
+The site is then at `https://<project-name>.pages.dev` (a custom domain can be added in the project's settings). Cloudflare builds what is on GitHub, so local commits need a push first.
+
+Or deploy from this Mac without Git (after `npx wrangler login` once):
+
+```bash
+npm run site:build && npx wrangler pages deploy dist-site --project-name bland
+```
+
 ### Vercel
 
 Needs: a Vercel account with GitHub connected (Hobby works with a private repo for a personal account; password protection is a paid feature).

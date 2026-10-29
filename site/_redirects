@@ -1,0 +1,3 @@
+# Cloudflare Pages redirects for the public site (npm run site:build copies this into dist-site/).
+# Until the landing page (Godwin's Figma design) lives at /, the root sends visitors to the docs.
+/  /docs/  302

@@ -2306,3 +2306,9 @@ Readers are designers, developers and agents. The voice follows systems known fo
 - Motion page (2026-10-29, Godwin): Easings has its own Play button on its heading row, which replays only the easing dots. Durations' Play all still runs every dot. The dots' track is surface-300; surface-200 matched the table in dark.
 
 - Docs, Motion page on phones (Godwin 2026-10-29): the Durations and Easings tables keep the Use column at least 280px wide (the table scrolls sideways), so long notes don't stretch the rows; from md the columns size as before.
+
+## Public site on Cloudflare Pages (Godwin 2026-10-29)
+
+- Host: Cloudflare Pages (not Vercel). Landing page at `/`, designed by Godwin in Figma; the docs at `/docs/`, linked from it.
+- `npm run site:build` → `dist-site/` = `dist-docs/` copied to `docs/` + the files in `site/`. Until the landing page exists, `site/_redirects` sends `/` to `/docs/` (302, so it can change later without browsers caching it).
+- `.node-version` 24 for Cloudflare's build image. Open: public or behind Cloudflare Access.

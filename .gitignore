@@ -9,3 +9,5 @@ playwright-report/
 playground/.generated/
 tokens/figma/drift/
 dist-docs/
+dist-site/
+.wrangler/
