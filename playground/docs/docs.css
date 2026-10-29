@@ -1906,13 +1906,14 @@ code,
   background: var(--surface-brand-light);
   color: var(--text-brand);
 }
-/* Phone (Godwin 2026-10-29): the switch floats at the bottom left over the page, on elevation/neutral/mid, so it can
+/* Phone (Godwin 2026-10-29): the switch floats at the bottom right over the page, on elevation/neutral/mid, so it can
    be pressed wherever the page is scrolled; inline under the header again from breakpoint/md. Its fill is the page
-   surface (surface-200 would sink into the frames under it); on, it keeps the brand tint. */
+   surface (surface-200 would sink into the frames under it); on, it is a primary button (the brand Button's primary
+   fill, white text, elevation/brand/mid). */
 .docs-grid-switch {
   position: fixed;
+  right: var(--space-lg);
   bottom: calc(var(--space-lg) + env(safe-area-inset-bottom));
-  left: var(--space-lg);
   z-index: 2;
 }
 .docs-grid-switch .docs-search-label {
@@ -1921,8 +1922,9 @@ code,
   box-shadow: var(--elevation-neutral-mid);
 }
 .docs-grid-switch [data-on] .docs-search-label {
-  background: var(--surface-brand-light);
-  color: var(--text-brand);
+  background: var(--button-brand-primary-rest);
+  color: var(--text-on-color);
+  box-shadow: var(--elevation-brand-mid);
 }
 @media (min-width: 768px) {
   .docs-grid-switch {

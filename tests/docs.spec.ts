@@ -602,13 +602,13 @@ test.describe('on a phone', () => {
     await expect.poll(async () => (await main.boundingBox())!.x).toBe(before);
   });
 
-  test('the Grid page\'s columns switch floats at the bottom left, wherever the page is scrolled', async ({ page }) => {
+  test('the Grid page\'s columns switch floats at the bottom right, wherever the page is scrolled', async ({ page }) => {
     await page.goto('/#/styles/grid');
     await page.mouse.wheel(0, 1500);
     const button = page.getByRole('button', { name: 'Show columns' });
     await expect(button).toBeInViewport();
     const box = (await button.boundingBox())!;
-    expect(box.x).toBe(16);
+    expect(Math.round(box.x + box.width)).toBe(320 - 16);
     expect(Math.round(box.y + box.height)).toBe(700 - 16);
     await button.click();
     await expect(page.locator('.docs-grid-overlay')).toBeVisible();

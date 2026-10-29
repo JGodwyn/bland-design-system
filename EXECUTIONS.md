@@ -1861,3 +1861,7 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Godwin: on mobile only, Show columns as a floating button at the bottom left, with elevation.
 - Below breakpoint/md `.docs-grid-switch` is fixed space-lg from the bottom left (plus the safe area), z-index 2 (under the phone menu), label on surface-100 with elevation/neutral/mid (surface-200 sank into the grid frames); brand tint while on. From md it is inline again with the old fill and no shadow. Keys stay hidden on phones as before.
 - Spec: after a scroll the switch is in view, 16 from the left and bottom, and works. docs + a11y pass (248).
+
+### Follow-up: columns switch bottom right, primary when on (2026-10-29)
+
+- Godwin meant bottom right, and the button primary while on. Phone only: `right: space-lg`; on, the brand Button's primary fill (`button-brand-primary-rest`), text-on-color, elevation/brand/mid. Desktop keeps its inline brand tint. Spec checks the right edge. docs + a11y pass.
