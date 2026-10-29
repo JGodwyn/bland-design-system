@@ -2303,3 +2303,4 @@ Readers are designers, developers and agents. The voice follows systems known fo
 - Motion durations are sorted by milliseconds, so the delays and hold times sit among the animation durations (100 tooltip-close-delay … 5000 toast-visible). Easings keep their order.
 - Prop options: TypeScript lists a union's values in its own order (`sm md xs lg`). `componentDocs` sorts any all-size-step options (`bySteps`), which covers the props table and the demo's select.
 - Code follows: `LogoSize` is `'sm' | 'lg'`, and the Button and Logo stories and the Button, Logo and ScrollArea `fadeSize` descriptions list sizes smallest first.
+- Motion page (2026-10-29, Godwin): Easings has its own Play button on its heading row, which replays only the easing dots. Durations' Play all still runs every dot. The dots' track is surface-300; surface-200 matched the table in dark.

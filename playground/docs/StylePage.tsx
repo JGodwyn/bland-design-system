@@ -148,14 +148,16 @@ function TypographyPage() {
 }
 
 function MotionPage() {
+  // Play all runs every dot; the Easings button replays only the easing dots.
   const [run, setRun] = useState(0);
+  const [easingRun, setEasingRun] = useState(0);
   const motion = inCollection('Motion');
   // Shortest first, the delays and hold times among the animation durations.
   const durations = motion.filter((t) => t.type === 'TIMING').sort((a, b) => parseFloat(a.light) - parseFloat(b.light));
   const easings = motion.filter((t) => t.type === 'EASING');
-  const track = (style: CSSProperties) => (
+  const track = (style: CSSProperties, runs = run) => (
     <span className="docs-motion-track">
-      <span key={run} className="docs-motion-dot" data-run={run > 0 || undefined} style={style} />
+      <span key={runs} className="docs-motion-dot" data-run={runs > 0 || undefined} style={style} />
     </span>
   );
   return (
@@ -164,15 +166,26 @@ function MotionPage() {
         title="Durations"
         note="Press Play all: each dot moves over its duration with the out easing."
         action={
-          <Button size="sm" type="secondary" onClick={() => setRun((r) => r + 1)}>
+          <Button size="sm" type="secondary" onClick={() => {
+              setRun((r) => r + 1);
+              setEasingRun((r) => r + 1);
+            }}>
             Play all
           </Button>
         }
       >
         <TokenTable items={durations} sample={(t) => track({ animationDuration: v(t), animationTimingFunction: 'var(--easing-out)' })} />
       </Section>
-      <Section title="Easings" note="Each dot moves over 400ms with its easing.">
-        <TokenTable items={easings} sample={(t) => track({ animationDuration: 'var(--duration-xl)', animationTimingFunction: v(t) })} />
+      <Section
+        title="Easings"
+        note="Press Play: each dot moves over 400ms with its easing."
+        action={
+          <Button size="sm" type="secondary" onClick={() => setEasingRun((r) => r + 1)}>
+            Play
+          </Button>
+        }
+      >
+        <TokenTable items={easings} sample={(t) => track({ animationDuration: 'var(--duration-xl)', animationTimingFunction: v(t) }, easingRun)} />
       </Section>
     </>
   );
