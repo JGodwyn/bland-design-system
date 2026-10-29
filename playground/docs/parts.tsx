@@ -98,9 +98,9 @@ export function Values({ token }: { token: Token }) {
 }
 
 /** A table of tokens with a visual sample per row, in Bland's Table (as the props tables). */
-export function TokenTable({ items, sample, sampleLabel = 'Sample' }: { items: Token[]; sample?: (t: Token) => ReactNode; sampleLabel?: string }) {
+export function TokenTable({ items, sample, sampleLabel = 'Sample', className }: { items: Token[]; sample?: (t: Token) => ReactNode; sampleLabel?: string; className?: string }) {
   return (
-    <Table size="md" className="docs-data docs-tokens" data-sample={sample ? '' : undefined} aria-label={items[0] ? `${items[0].collection} tokens` : 'Tokens'}>
+    <Table size="md" className={`docs-data docs-tokens${className ? ` ${className}` : ''}`} data-sample={sample ? '' : undefined} aria-label={items[0] ? `${items[0].collection} tokens` : 'Tokens'}>
       <TableHead>
         <TableRow>
           {sample && <TableHeaderCell>{sampleLabel}</TableHeaderCell>}

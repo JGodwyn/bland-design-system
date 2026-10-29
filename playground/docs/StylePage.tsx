@@ -174,7 +174,7 @@ function MotionPage() {
           </Button>
         }
       >
-        <TokenTable items={durations} sample={(t) => track({ animationDuration: v(t), animationTimingFunction: 'var(--easing-out)' })} />
+        <TokenTable items={durations} className="docs-motion-tokens" sample={(t) => track({ animationDuration: v(t), animationTimingFunction: 'var(--easing-out)' })} />
       </Section>
       <Section
         title="Easings"
@@ -185,7 +185,7 @@ function MotionPage() {
           </Button>
         }
       >
-        <TokenTable items={easings} sample={(t) => track({ animationDuration: 'var(--duration-xl)', animationTimingFunction: v(t) }, easingRun)} />
+        <TokenTable items={easings} className="docs-motion-tokens" sample={(t) => track({ animationDuration: 'var(--duration-xl)', animationTimingFunction: v(t) }, easingRun)} />
       </Section>
     </>
   );

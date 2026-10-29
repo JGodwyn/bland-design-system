@@ -2304,3 +2304,5 @@ Readers are designers, developers and agents. The voice follows systems known fo
 - Prop options: TypeScript lists a union's values in its own order (`sm md xs lg`). `componentDocs` sorts any all-size-step options (`bySteps`), which covers the props table and the demo's select.
 - Code follows: `LogoSize` is `'sm' | 'lg'`, and the Button and Logo stories and the Button, Logo and ScrollArea `fadeSize` descriptions list sizes smallest first.
 - Motion page (2026-10-29, Godwin): Easings has its own Play button on its heading row, which replays only the easing dots. Durations' Play all still runs every dot. The dots' track is surface-300; surface-200 matched the table in dark.
+
+- Docs, Motion page on phones (Godwin 2026-10-29): the Durations and Easings tables keep the Use column at least 280px wide (the table scrolls sideways), so long notes don't stretch the rows; from md the columns size as before.

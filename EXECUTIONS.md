@@ -1904,3 +1904,7 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Scanned the story arrays, hand-written `size="…"` sequences, story labels and prop descriptions for sizes going down. Found Button `['lg','md','sm','xs']`, Logo `['lg','sm']` with its type, and the descriptions of Button, Logo and ScrollArea fadeSize; flipped them. The other hits were mappings (`{ sm: 'xs' }`) or unrelated.
 - Checked in the browser: Sizing icon xs sm md lg, Spacing none → 9xl, Motion 100 → 5000, Button props xs sm md lg. Playwright: 703 passed; 4 screenshot diffs, all Button and Logo in the new order, re-baselined.
 - Motion page follow-up: Godwin asked whether the Easings dots should move. They did, but only from Play all in Durations, and their track was invisible in dark (surface-200 = the table cell). Track → surface-300 (df9ba18), and Easings got its own Play (separate run counter).
+
+### Motion tables on phones: a wider Use column (2026-10-29)
+
+- Godwin: the Use column on Motion's Durations and Easings tables was too narrow on mobile (128px), so rows ran very tall. `TokenTable` takes a `className`; the two Motion tables get `docs-motion-tokens`, whose Use column has `min-width: 280px` below md (reset from md, desktop unchanged). At 375: Durations 5586 → 2226px tall, Easings 866 → 506. The table already scrolled sideways on phones. Docs tests 150 pass.

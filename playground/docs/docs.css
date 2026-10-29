@@ -871,6 +871,16 @@ code,
 .docs-tokens td:last-child {
   color: var(--text-subtle);
 }
+/* Motion on a phone: Use keeps a readable measure, so its long notes don't stretch the rows tall; the table
+   already scrolls sideways there (Godwin 2026-10-29). No token. */
+.docs-motion-tokens :is(th, td):last-child {
+  min-width: 280px;
+}
+@media (min-width: 768px) {
+  .docs-motion-tokens :is(th, td):last-child {
+    min-width: 0;
+  }
+}
 .docs-tokens .docs-figma-name {
   display: block;
 }
