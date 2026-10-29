@@ -215,7 +215,7 @@ The doc shows status; the roadmap below and the component map stay the source fo
 
 In order; tokens come before components.
 
-- [ ] Repo + sync setup. Done: git repo on GitHub (private, [JGodwyn/bland-design-system](https://github.com/JGodwyn/bland-design-system)), `docs/` seeded, handoff archived. Left: connect it to the claude.ai project, merge and retire the project's `claude/bland-handoff*.md` files.
+- [ ] Repo + sync setup. Done: git repo on GitHub (private, [JGodwyn/bland-design-system](https://github.com/JGodwyn/bland-design-system)), `docs/` seeded, handoff archived. Handoff files merged and archived (2026-10-29). Left: connect it to the claude.ai project and delete the two `claude/bland-handoff*.md` files there (Godwin).
 - [x] Drift check with a per-variable diff report (2026-10-18): `npm run tokens:drift`, see `docs/tokens.md`.
 - [ ] Weekly drift check on a schedule (optional): it needs the Figma MCP, so it would be a scheduled Claude task.
 - [x] Token export pipeline (Light/Dark CSS, resolved aliases and alphas, descriptions kept, `Fade/*-clear` skipped). First export 2026-10-16.
@@ -236,4 +236,4 @@ In order; tokens come before components.
 
 ## Pending context to merge into `docs/`
 
-The original handoff and its 2026-10-16 update are in `docs/archive/` (the update merged into `docs/figma.md` and `LEARNINGS.md`, 2026-10-29). The claude.ai project still holds `claude/bland-handoff.md` (component build notes, node ids); the repo wins over it. The [Figma audit doc](https://claude.ai/code/artifact/8aba9baf-ab27-4b44-b98b-133ba5093546) records foundation decisions. Merge them into `docs/` as components are built; then this repo is the only source.
+Nothing left (2026-10-29). Both claude.ai handoff files and the original Claude Code handoff are archived in `docs/archive/`, merged into `docs/figma.md` and `LEARNINGS.md`; this repo is the only source. The [Figma audit doc](https://claude.ai/code/artifact/8aba9baf-ab27-4b44-b98b-133ba5093546) is history.

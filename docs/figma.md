@@ -1,6 +1,6 @@
 # Working in the Figma file
 
-How the Figma file is kept, for anyone (Godwin or an agent) editing it through the Figma MCP. Code rules live in `CLAUDE.md` and the other `docs/`; this page is the Figma side. Merged from the handoff update of 2026-10-16 (`docs/archive/handoff-update-2026-10-16.md`); where the two disagree, this page and the repo win.
+How the Figma file is kept, for anyone (Godwin or an agent) editing it through the Figma MCP. Code rules live in `CLAUDE.md` and the other `docs/`; this page is the Figma side. Merged from the two claude.ai handoff files of 2026-10-16 (`docs/archive/bland-handoff.md` and `docs/archive/handoff-update-2026-10-16.md`); where they disagree with this page or the repo, the repo wins.
 
 ## File rules
 
@@ -11,6 +11,28 @@ How the Figma file is kept, for anyone (Godwin or an agent) editing it through t
 - **No manual slots:** every slot is a native `🧩` slot.
 - **Doc chrome stays on primitives:** the Annotations helpers (Header, Footer, Typo card) bind their colors to primitives on purpose; they are not part of the kit.
 - **Destructive file-wide writes** go through Godwin as a lettered list he approves by letter (a bare "ok" on a summary was refused by the permission check).
+
+## Building a component in Figma
+
+How Godwin built the kit (2026-10-15 and 16), for any component added or reworked later.
+
+- **One pass per component:** inspect read-only, propose and get agreement (a lettered list for anything destructive), write in one call, screenshot light and dark with a contrast check, then arrange the page.
+- **Leave the page arranged:** inside a set, Size in columns (sm, md, lg) and every other combination in rows, 24 padding and gaps, layer order matching the visual order (one column ordered by Size if columns would pass about 1,400 wide). The page frame restacked top to bottom, gap 72, padding 80 top and bottom, 160 left and right, sized to its children, Header and Footer resized to match. Resize the frame first, then place its children.
+- **Units:** every Sizing, Stroke, Spacing and Corner Radius token aliases a `_Units` primitive named by value (`unit/24`, `unit/0-5`). Snap to an existing unit before adding one. Typography and Effects keep raw values on purpose.
+- **Component color tokens alias primitives,** never another component's tokens, so they can diverge (`Badge/*` to `Indicator/*` is the one exception). Copy the primitive values when one component should look like another.
+- **`-content` suffix** for the token that colors text and icons on a fill (`Button/danger-content`), not `-label`.
+- **Slots:** native `🧩` slots with a matching `👀` boolean that hides them (an empty slot still takes the gap). Two stacked slots are `Top slot` / `Bottom slot`, side by side `Leading` / `Trailing`. A slot gets a fixed size bound to a token (`list/slot-*`, `menu/slot`), except open-ended column content, which fills the width and hugs its height.
+- **Reuse before inventing:** nest finished pieces (Button, Checkbox, Indicator, Text Input, Pagination item, Progress-bar) as exposed instances, but a nested piece must match its host's shape (Chip has its own square count box, not the round Indicator).
+- **Auto layout everywhere;** proportions (a slider's value) as a GRID with FLEX columns.
+- **First-line icons:** an icon beside wrapping text sits in an `icon-wrap` frame with `space-2xs` top padding, so it centres on the first line (code: the first-line rule in `CLAUDE.md`).
+- **Elevation:** simple boxes carry the style on the surface; shapes with a pointer carry it on a fill-less wrapper. Components in the page flow get none. (Code's Tooltip puts `near` on the content box only.)
+- **Row dividers** are an absolute `divider` rectangle as the row's first child (`stroke-sm`, `border-subtle`), not a frame stroke, which would cover a selected underline.
+- **Hover never changes size:** add a sibling text style (`body-lg-underline`) rather than switching style. A selected item in a hugging row changes color, not weight.
+- **Sizes differ in height, not just density:** no size that only shrinks the type, none that is only wider when the component can be resized.
+- **Pressed fills** may have lower contrast; they last a split second.
+- **100% corner smoothing** on every rounded layer (set per layer).
+
+The archived `bland-handoff.md` ("How Godwin wants the work done") holds the long list of Plugin API gotchas from that build: native slot migration, variant cloning and renaming, icon swaps and recolors, sizing and text style traps. Read it before restructuring a component set.
 
 ## Overflow in Figma
 
