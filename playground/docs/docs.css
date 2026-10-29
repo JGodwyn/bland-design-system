@@ -1135,7 +1135,7 @@ code,
   position: relative;
   width: 160px;
   height: var(--space-lg);
-  background: var(--surface-200);
+  background: var(--surface-300);
   border-radius: var(--rad-rd);
 }
 .docs-motion-dot {
