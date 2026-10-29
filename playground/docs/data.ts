@@ -14,7 +14,6 @@ export type Token = {
   aliasOf?: { light?: string; dark?: string };
 };
 export const tokens = tokensFile.tokens as Token[];
-export const tokensExportedAt = tokensFile.$exportedAt;
 export const inCollection = (collection: string) => tokens.filter((t) => t.collection === collection);
 
 /** Groups items by a key, keeping first-seen order. */

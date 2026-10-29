@@ -5,7 +5,7 @@ import { Button } from '../../src/components/button/Button';
 import { CodeSnippet } from '../../src/components/code-snippet/CodeSnippet';
 import { Icon } from '../../src/components/icon/Icon';
 import * as BlandIcons from '../../src/icons';
-import { groupBy, inCollection, tokens, stylePages, tokensExportedAt, type StylePageId, type Token } from './data';
+import { groupBy, inCollection, tokens, stylePages, type StylePageId, type Token } from './data';
 import { highlight } from './highlight';
 import { ArrowFatUpIcon } from './icons';
 import { isApple } from './Search';
@@ -27,7 +27,7 @@ export function StylePage({ id }: { id: StylePageId }) {
       </PageHeader>
       <Page />
       <p className="docs-footnote">
-        Token values as of {new Date(tokensExportedAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}. Copy a token name with the button beside it.
+        Copy a token name with the button beside it.
       </p>
     </>
   );

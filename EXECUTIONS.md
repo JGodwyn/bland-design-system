@@ -1810,3 +1810,7 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Godwin: the Light/Dark switch and search bar should hide on scroll down and show on scroll up.
 - DocsApp's existing scroll listener now also tracks direction: `data-away` on `.docs-toolbar` after 8px down, cleared after 8px up or within 120px of the top; never while the menu is open. CSS below breakpoint/md only: translate -100% under the top bar (top bar raised to z-index 3), duration/md easing/out, opacity under reduced motion, stays while focus is inside. Desktop unchanged.
 - Spec "on a phone" covers down, up and back to the top; docs + a11y specs pass (246).
+
+### Follow-up: style page footnote (2026-10-29)
+
+- Godwin: remove "Token values as of <date>" from the style pages. Dropped that sentence (and the unused `tokensExportedAt`); the footnote keeps "Copy a token name with the button beside it." docs.spec passes.
