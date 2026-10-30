@@ -1950,3 +1950,9 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Docs: tokens.md, brand.md ("Fonts"), lint.md, README ("Your fonts", with an `@font-face` example), agent-skill.md, INTERFACE.md, LEARNINGS.md, CLAUDE.md. `fonts.css` and the CodeText prop comment reworded.
 - 0.1.1 in package.json (package-lock had been left at 0.0.0; `npm version` set both), CHANGELOG entry "unreleased" for Godwin to date at publish. Not published.
 - Checks: typecheck, lint:css, test:lint (4), test:brand (31), test:drift (6), build, checksum unchanged (4a186ff6). `npm test`: 707 passed, no screenshot changed. This cloud container has Playwright's Chromium only at `/opt/pw-browsers/chromium`, not the 1.64.1 headless shell, so both suites ran from a local config / script copy with `executablePath` set (not committed). `test:package`: every check passed (brand fill, Inter loaded, CodeText on `"Smoke Mono"` from the brand file, dark section, extra roles, tooltip) except one console 404 for `/favicon.ico`, which the full Chromium binary requests and the headless shell doesn't; not from this change. Run it on the Mac before publishing.
+
+### Font tokens merged, Figma pointers (2026-10-30)
+
+- The cloud session's PR #1 (`--font-sans`, `--font-mono`, 0.1.1 prepared) was checked here before merging: typecheck, lint, test:lint, test:brand, test:drift, checksum, build, 707 Playwright tests and `test:package` all passed on the Mac (no favicon 404 here; that was the cloud browser). Fast-forwarded and pushed; the lockfile still said `"name": "bland"`, fixed in its own commit.
+- Figma: `family/sans` and `family/mono` descriptions now name `--font-sans` / `--font-mono` and point to docs/brand.md, Fonts. Synced with the drift check (2 descriptions changed, no CSS token affected), applied, regenerated; checksum `e4400790` matches Figma.
+- Left: the CHANGELOG date (Godwin, at publish time) and a live font tester on the docs site (next).
