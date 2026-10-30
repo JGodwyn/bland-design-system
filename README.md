@@ -2,7 +2,7 @@
 
 Godwin's design system: design tokens as CSS custom properties and React components built on them. One package, rebranded per project with a 13-step brand color (and neutrals tinted toward it), in light and dark.
 
-- Inter for UI text, Geist Mono for code, self-hosted; a project can swap either (`--font-sans`, `--font-mono`).
+- Inter for text, Geist Mono for code, self-hosted; a project can set its own body, heading and code fonts (`--font-body`, `--font-heading`, `--font-code`).
 - Every component value is a token: rebranding or theming never touches component CSS.
 - React 19, React Aria for keyboard and screen reader behaviour, Floating UI for positioning.
 
@@ -77,22 +77,33 @@ Each gets 13 steps (`--accent-0` … `--accent-1000`) and six roles that switch 
 
 ### Your fonts
 
-Every text style reads two family tokens: `--font-sans` (UI text, Inter) and `--font-mono` (code, Geist Mono). Set them in `brand.css`, on `:root`, and every component follows:
+Every text style reads one of three family tokens, named by what the text does, so any font fits (serif, sans or anything else):
+
+| Token | Text styles | Bland's font |
+| --- | --- | --- |
+| `--font-body` | Body | Inter |
+| `--font-heading` | Display, Heading, Title | the body font (`var(--font-body)`) until you set it |
+| `--font-code` | Code | Geist Mono |
+
+Set them in `brand.css`, on `:root`, and every component follows. One font for all text: set `--font-body` alone, and headings follow it. A separate heading font: set `--font-heading` too.
 
 ```bash
-npm run brand -- generate "#ff5a1f" --font-sans "Söhne" --font-mono "Berkeley Mono" --out brand.css
+npm run brand -- generate "#ff5a1f" --font-body "Söhne" --font-heading "Lora" --font-code "Berkeley Mono" --out brand.css
 ```
 
 ```css
 /* brand.css */
 :root {
   /* … brand and neutral steps … */
-  --font-sans: "Söhne", system-ui, sans-serif;
-  --font-mono: "Berkeley Mono", ui-monospace, monospace;
+  --font-body: "Söhne", system-ui, sans-serif;
+  --font-heading: "Lora", system-ui, sans-serif;
+  --font-code: "Berkeley Mono", ui-monospace, monospace;
 }
 ```
 
-The tokens only name the family; load the font files yourself, under the same family name, with the weights the text styles use (sans 400, 500, 600; mono 400, 600):
+The tool adds Bland's fallbacks when your list ends without a generic family; end it yourself to choose them (`--font-heading "Lora, Georgia, serif"`).
+
+The tokens only name the family; load the font files yourself, under the same family name, with the weights the text styles use (body 400 and 500, heading 600, code 400 and 600):
 
 ```css
 /* fonts.css of your project, loaded instead of bland-ui/fonts.css */
@@ -102,10 +113,10 @@ The tokens only name the family; load the font files yourself, under the same fa
   font-weight: 400;
   font-display: swap;
 }
-/* … one @font-face per weight, the same for the mono font … */
+/* … one @font-face per weight, the same for the heading and code fonts … */
 ```
 
-Or use a font host's stylesheet (Google Fonts, Adobe Fonts, a Fontsource package). Skip `bland-ui/fonts.css` when you replace both fonts; keep it if you replace only one. Sizes, line heights and letter spacing stay Bland's, tuned for Inter and Geist Mono, so check a new font's look on the docs site's components.
+Or use a font host's stylesheet (Google Fonts, Adobe Fonts, a Fontsource package). Skip `bland-ui/fonts.css` when you replace every font; keep it if you keep Inter or Geist Mono anywhere. Sizes, line heights and letter spacing stay Bland's, tuned for Inter and Geist Mono, so check a new font's look on the docs site's components.
 
 ## Light and dark
 

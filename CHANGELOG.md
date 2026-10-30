@@ -4,8 +4,8 @@ Bland follows [semantic versioning](https://semver.org). Until 1.0, a minor vers
 
 ## 0.1.1 (unreleased)
 
-- **Fonts are swappable.** Two new tokens in `tokens.css`, `--font-sans` (Inter, UI text) and `--font-mono` (Geist Mono, code), and every `--type-*` text style now reads them (`600 34px/40px var(--font-sans)`). Set them on `:root` in your `brand.css` to change every component's type, and load the font files yourself; skip `bland-ui/fonts.css` if you replace both. The resolved styles are unchanged, so nothing changes for a project that keeps Inter and Geist Mono. See the README, "Your fonts".
-- **Brand tool:** `npm run brand -- generate … --font-sans "Söhne" --font-mono "Berkeley Mono"` writes them into `brand.css`, with Bland's fallbacks added; `check` keeps a file's fonts.
+- **Fonts are swappable.** Three new tokens in `tokens.css`, named by role so any font fits: `--font-body` (Body styles, Inter), `--font-heading` (Display, Heading and Title; `var(--font-body)` until set) and `--font-code` (Code styles, Geist Mono). Every `--type-*` text style now reads one of them (`600 34px/40px var(--font-heading)`). Set them on `:root` in your `brand.css` to change every component's type, and load the font files yourself; skip `bland-ui/fonts.css` if you replace every font. The resolved styles are unchanged, so nothing changes for a project that keeps Inter and Geist Mono. See the README, "Your fonts".
+- **Brand tool:** `npm run brand -- generate … --font-body "Söhne" --font-heading "Lora" --font-code "Berkeley Mono"` writes them into `brand.css`, with Bland's fallbacks added; `check` keeps a file's fonts.
 - Nothing to change in a project.
 
 ## 0.1.0 (2026-10-30)

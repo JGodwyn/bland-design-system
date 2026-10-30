@@ -170,14 +170,22 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     Inter: '"Inter", system-ui, sans-serif',
     'Geist Mono': '"Geist Mono", ui-monospace, monospace',
   };
-  // The two family tokens a project can override at :root to swap its fonts (Godwin 2026-10-29): Code/* text
-  // styles read --font-mono, every other one --font-sans. Nothing else of the type scale is emitted (no size,
-  // line height or letter spacing tokens). A family Figma names without a stack here gets the role's fallback.
-  const FONT_ROLES = {
-    sans: { css: '--font-sans', fallback: 'system-ui, sans-serif', what: 'UI text: every Display, Heading, Title and Body text style' },
-    mono: { css: '--font-mono', fallback: 'ui-monospace, monospace', what: 'code: every Code/* text style' },
+  // The font family tokens a project can override at :root to swap its fonts (Godwin 2026-10-29), named by
+  // role (Godwin 2026-10-30): each `family/<role>` variable a text style is bound to becomes `--font-<role>`.
+  // Figma has body (Body/*), heading (Display, Heading, Title; it points at body, so in CSS it is
+  // var(--font-body) until a project sets it) and code (Code/*). Nothing else of the type scale is emitted (no
+  // size, line height or letter spacing tokens). A family Figma names without a stack here gets the role's fallback.
+  const FONT_ROLES: Record<string, { fallback: string; what: string }> = {
+    body: { fallback: 'system-ui, sans-serif', what: 'body text: every Body text style' },
+    heading: { fallback: 'system-ui, sans-serif', what: 'headings: every Display, Heading and Title text style' },
+    code: { fallback: 'ui-monospace, monospace', what: 'code: every Code/* text style' },
   };
-  const fontRole = (styleName: string) => (styleName.startsWith('Code/') ? FONT_ROLES.mono : FONT_ROLES.sans);
+  const fontRole = (familyId: string, style: string) => {
+    const name = variables.get(familyId)?.[1] ?? '';
+    const role = /^family\/([a-z-]+)$/.exec(name)?.[1];
+    if (!role) throw new Error(`${style}: its font family is bound to ${name || familyId}, not a family/<role> variable.`);
+    return { role, css: `--font-${role}`, ...(FONT_ROLES[role] ?? { fallback: 'system-ui, sans-serif', what: `${role} text` }) };
+  };
 
   function cssValue(value: string | number, type: string, name: string): string {
     if (type === 'COLOR') return formatColor(hexToRgba(String(value)));
@@ -273,27 +281,30 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     });
   }
 
-  // Font families: one token per role, holding the family its text styles use in Figma and its fallbacks.
-  const familyOf = new Map<string, string>();
-  for (const style of meta.textStyles) {
-    if (!style.fontFamily) continue;
-    const family = String(resolveRaw(style.fontFamily, 'light'));
-    const { css } = fontRole(style.name);
-    const other = familyOf.get(css);
-    if (other && other !== family) throw new Error(`${style.name} uses "${family}" but other text styles on ${css} use "${other}". One family per token.`);
-    familyOf.set(css, family);
-  }
+  // Font families: one token per family/<role> variable the text styles use, in FONT_ROLES order. A family
+  // variable that points at another (heading at body) becomes var() of that token, so one override sets both.
   const fontStack = (family: string, fallback: string) => FONT_STACKS[family] ?? `"${family}", ${fallback}`;
-  for (const { css, fallback, what } of Object.values(FONT_ROLES)) {
-    const family = familyOf.get(css);
-    if (!family) continue;
+  const usedFamilies = [...new Set(meta.textStyles.map((s) => s.fontFamily).filter((id): id is string => !!id))];
+  const roleOrder = Object.keys(FONT_ROLES);
+  const rank = (id: string) => {
+    const i = roleOrder.indexOf(fontRole(id, "A text style").role);
+    return i < 0 ? roleOrder.length : i;
+  };
+  for (const id of usedFamilies.sort((a, b) => rank(a) - rank(b))) {
+    const { css, fallback, what } = fontRole(id, 'A text style');
+    const family = String(resolveRaw(id, 'light'));
+    const target = aliasName(id, 'light');
+    const ref = target && /^family\//.test(target) ? `var(--font-${target.slice('family/'.length)})` : undefined;
     tokens.push({
       name: `Font/${css.slice(2)}`,
       css,
       collection: 'Font families',
       type: 'FONT_FAMILY',
-      description: `The ${family} family and its fallbacks, for ${what}. Override it per project at :root to change the font; every text style follows.`,
+      description: ref
+        ? `The font for ${what}. Follows ${ref.slice(4, -1)} (${family}) unless set; set it per project at :root for a separate font.`
+        : `The ${family} family and its fallbacks, for ${what}. Override it per project at :root to change the font; every text style that reads it follows.`,
       light: fontStack(family, fallback),
+      ...(ref && { cssValue: { light: ref } }),
     });
   }
 
@@ -308,7 +319,7 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     const weight = FONT_WEIGHTS[String(val(style.fontStyle, 'fontStyle'))];
     const family = String(val(style.fontFamily, 'fontFamily'));
     const lineHeight = `${val(style.lineHeight, 'lineHeight')}px`;
-    const role = fontRole(style.name);
+    const role = fontRole(style.fontFamily!, style.name);
     const shorthand = (stack: string) => `${weight} ${val(style.fontSize, 'fontSize')}px/${lineHeight} ${stack}`;
     const font = shorthand(fontStack(family, role.fallback));
     const underline = style.textDecoration === 'UNDERLINE';

@@ -48,7 +48,7 @@
 
 .kbd {
   /* Only the family changes; size and line height come from the text style around it. */
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   margin-inline-start: calc(var(--space-xs) * -1);
   max-width: 60ch;
   text-overflow: ellipsis;

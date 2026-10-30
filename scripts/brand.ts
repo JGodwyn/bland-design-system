@@ -1,14 +1,14 @@
 // Brand override tool (docs/brand.md).
 //
-//   npm run brand -- generate "#ff5a1f" [--at 400] [--neutrals full|subtle|none] [--extra accent=#7c3aed …] [--chart 4=#hex …] [--font-sans "Söhne"] [--font-mono "…"] [--fix] [--out brand.css]
+//   npm run brand -- generate "#ff5a1f" [--at 400] [--neutrals full|subtle|none] [--extra accent=#7c3aed …] [--chart 4=#hex …] [--font-body "Söhne"] [--font-heading "…"] [--font-code "…"] [--fix] [--out brand.css]
 //       13 brand steps from one color (placed on the step its lightness belongs on, or --at), 13 neutral steps
 //       tinted toward it, up to three extra colors (13 steps and light/dark roles each; `--extra name` alone takes the
 //       next color in harmony with the brand: complement, then the square's other two), then the check
 //   npm run brand -- check brand.css [--neutrals full|subtle|none] [--fix] [--out fixed.css]
 //       the contrast check for an override file (its neutrals, or Bland's when it sets none, and its extra colors)
 //
-// --font-sans / --font-mono set the project's fonts (UI text, code): a font-family list, quoted and given Bland's
-// fallbacks when it ends in no generic family. On check, the file's own fonts stay unless a flag replaces them.
+// --font-body / --font-heading / --font-code set the project's fonts (body text; Display, Heading and Title, which
+// follow body unless set; code): a font-family list, quoted and given Bland's fallbacks when it ends in no generic family. On check, the file's own fonts stay unless a flag replaces them.
 //
 // Both also make the chart palette (--chart-1 … --chart-8: the brand, the extras, then generated hues) from the final
 // colors, check it (3:1 on the page, neighbours apart under normal and color-blind vision) and write it with the rest.
@@ -90,14 +90,14 @@ function pinsFromFlags(): ChartPins {
   return pins;
 }
 const pins = pinsFromFlags();
-/** `--font-sans "…"` and `--font-mono "…"`, made into font-family lists. */
+/** `--font-body "…"`, `--font-heading "…"` and `--font-code "…"`, made into font-family lists. */
 function fontsFromFlags(): Fonts {
   const fonts: Fonts = {};
   for (const role of FONT_ROLES) {
     const i = rest.indexOf(`--font-${role}`);
     if (i === -1) continue;
     const value = rest[i + 1];
-    if (!value || value.startsWith('--')) throw new Error(`--font-${role} needs a font-family list, e.g. --font-${role} "${role === 'sans' ? 'Söhne' : 'Berkeley Mono'}".`);
+    if (!value || value.startsWith('--')) throw new Error(`--font-${role} needs a font-family list, e.g. --font-${role} "${role === 'code' ? 'Berkeley Mono' : 'Söhne'}".`);
     fonts[role] = fontStack(value, role);
   }
   return fonts;
@@ -163,7 +163,7 @@ if (command === 'generate' && arg) {
   run(brand, `checked from ${arg}`, false, tintFlag, parseNeutrals(file), undefined, extras, (n) => parseChart(file, brand, extras, n), parseFonts(file));
 } else {
   console.log(
-    'Usage:\n  npm run brand -- generate "#rrggbb" [--at <step>] [--neutrals full|subtle|none] [--extra name[=#rrggbb] …] [--chart N=#rrggbb …] [--font-sans "Family, …"] [--font-mono "Family, …"] [--fix] [--out brand.css]\n  npm run brand -- check brand.css [--neutrals full|subtle|none] [--chart N=#rrggbb …] [--font-sans "…"] [--font-mono "…"] [--fix] [--out fixed.css]',
+    'Usage:\n  npm run brand -- generate "#rrggbb" [--at <step>] [--neutrals full|subtle|none] [--extra name[=#rrggbb] …] [--chart N=#rrggbb …] [--font-body "Family, …"] [--font-heading "Family, …"] [--font-code "Family, …"] [--fix] [--out brand.css]\n  npm run brand -- check brand.css [--neutrals full|subtle|none] [--chart N=#rrggbb …] [--font-body "…"] [--font-heading "…"] [--font-code "…"] [--fix] [--out fixed.css]',
   );
   process.exitCode = 2;
 }

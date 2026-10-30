@@ -234,10 +234,13 @@ export function toCss(scale: Scale, note = '', neutrals?: Scale, extras: Extra[]
 
 // ---------- fonts ----------
 
-/** A project's font families: `--font-sans` (UI text) and `--font-mono` (code), each a CSS font-family list. */
+/**
+ * A project's font families, each a CSS font-family list: `--font-body` (Body styles), `--font-heading` (Display,
+ * Heading, Title; follows body unless set) and `--font-code` (Code styles).
+ */
 export type Fonts = Partial<Record<FontRole, string>>;
-export type FontRole = 'sans' | 'mono';
-export const FONT_ROLES: FontRole[] = ['sans', 'mono'];
+export type FontRole = 'body' | 'heading' | 'code';
+export const FONT_ROLES: FontRole[] = ['body', 'heading', 'code'];
 /** Bland's own stacks, as tokens.css ships them. */
 export const blandFonts = Object.fromEntries(FONT_ROLES.map((r) => [r, tokens.find((t) => t.css === `--font-${r}`)!.light])) as Record<FontRole, string>;
 const GENERIC_FAMILIES = new Set(['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'system-ui', 'ui-serif', 'ui-sans-serif', 'ui-monospace', 'ui-rounded', 'math', 'emoji', 'fangsong']);
@@ -245,7 +248,7 @@ const GENERIC_FAMILIES = new Set(['serif', 'sans-serif', 'monospace', 'cursive',
 /**
  * A font-family list for a role from what a project typed (`Söhne`, `"Söhne", Helvetica, sans-serif`): family names
  * quoted, generic families left bare, and, when the list ends in no generic family, Bland's fallbacks for that role
- * after it (system-ui, sans-serif; ui-monospace, monospace), so text still shows while the font loads or if it fails.
+ * after it (system-ui, sans-serif for body and heading; ui-monospace, monospace for code), so text still shows while the font loads or if it fails.
  */
 export function fontStack(value: string, role: FontRole): string {
   if (/[;{}]/.test(value)) throw new Error(`--font-${role} "${value}": a font-family list cannot contain ; { or }.`);
@@ -256,10 +259,10 @@ export function fontStack(value: string, role: FontRole): string {
   return list.join(', ');
 }
 
-/** The font families an override file sets (`--font-sans: …;`), as written. */
+/** The font families an override file sets (`--font-body: …;`), as written. */
 export function parseFonts(text: string): Fonts {
   const fonts: Fonts = {};
-  for (const m of text.matchAll(/--font-(sans|mono)\s*:\s*([^;}]+)/g)) fonts[m[1] as FontRole] = m[2]!.trim();
+  for (const m of text.matchAll(/--font-(body|heading|code)\s*:\s*([^;}]+)/g)) fonts[m[1] as FontRole] = m[2]!.trim();
   return fonts;
 }
 

@@ -1956,3 +1956,9 @@ not wrapped; rail contents centred (logo and account icon were off).
 - The cloud session's PR #1 (`--font-sans`, `--font-mono`, 0.1.1 prepared) was checked here before merging: typecheck, lint, test:lint, test:brand, test:drift, checksum, build, 707 Playwright tests and `test:package` all passed on the Mac (no favicon 404 here; that was the cloud browser). Fast-forwarded and pushed; the lockfile still said `"name": "bland"`, fixed in its own commit.
 - Figma: `family/sans` and `family/mono` descriptions now name `--font-sans` / `--font-mono` and point to docs/brand.md, Fonts. Synced with the drift check (2 descriptions changed, no CSS token affected), applied, regenerated; checksum `e4400790` matches Figma.
 - Left: the CHANGELOG date (Godwin, at publish time) and a live font tester on the docs site (next).
+
+### Font tokens by role (2026-10-30)
+
+- Figma: renamed `family/sans`/`mono` to `family/body`/`code`, added `family/heading` (alias of body), rebound Display, Heading, Title. Drift check: 1 added, 2 changed, 9 text styles changed, no CSS affected before the build change. Applied; checksum `b6fb0406` (639 variables) matches Figma.
+- Build: font role from the bound family variable; an aliasing family emits `var()`. The CSS writer's `:root` block printed resolved values only, so `--font-heading` came out as Inter until it used `cssValue` too.
+- Renamed through the brand tool (and its tests), lint rule and fixtures, drift test, package test (now also sets `--font-heading` and checks a Title follows it while body stays Inter), docs site note, README, CHANGELOG (still unreleased), docs, CLAUDE.md.

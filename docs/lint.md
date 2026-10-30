@@ -24,15 +24,15 @@ gap: "10px" is hardcoded and no Spacing token is 10px. Nearest Spacing: var(--sp
 
 - **Lengths** in `px`, `rem`, `em`, `pt`, `ch`, `ex`, `lh` and the other absolute or font-relative units, in any property, including custom properties and `calc()`.
 - **Colors**: hex, named colors, and color functions (`rgb()`, `hsl()`, `oklch()`, `color-mix()`, …).
-- **Font weights** as numbers or `normal`/`bold`, and any **font family** name. The message names the text style, and `font-family: var(--font-sans)` / `var(--font-mono)` for a part that changes only the family.
-- **Redefining `--font-sans` or `--font-mono`** in a component: they are a project's font choice, set in its `brand.css` (`brand.md`, "Fonts").
+- **Font weights** as numbers or `normal`/`bold`, and any **font family** name. The message names the text style, and `font-family: var(--font-body)`, `var(--font-heading)` or `var(--font-code)` for a part that changes only the family.
+- **Redefining `--font-body`, `--font-heading` or `--font-code`** in a component: they are a project's font choice, set in its `brand.css` (`brand.md`, "Fonts").
 - **`em` and `ch` outside their one use.** `em` is allowed only on `width`, `height`, `inline-size` and `block-size` (icons sized to the adjacent text); `ch` only on `max-width` and `max-inline-size` (a text measure). Everywhere else they are rejected.
 - **Durations and easings.** Raw `ms` or `s` values, easing keywords (`ease`, `ease-out`, `linear`, …), `cubic-bezier()`, `steps()` and `linear()` in `transition*`, `animation*` and custom properties. The message names the Motion token: an exact match by value, else the nearest durations or the easing for the same intent (`ease-out` → `--easing-out`). **`ease-in` is banned outright**, including `cubic-bezier(0.42, 0, 1, 1)`.
 - **`transition: all`** (and `transition-property: all`): name the exact properties.
 - **Opacity on disabled states.** `opacity` inside a rule whose selector mentions disabled (`:disabled`, `[disabled]`, `[aria-disabled]`, `[data-disabled]`, `.is-disabled`, `--disabled`) fails and lists the disabled color tokens. There is no opacity token.
 - **`@media` widths** that are not a breakpoint. Only mobile-first `(min-width: N)` or `(width >= N)` with N one of the `Breakpoints` values from `tokens.json` (640, 768, 1024, 1280, 1536, 1920px) passes. `max-width`, ranges, `em` widths and any other value fail and name the nearest breakpoint. Other media features (`hover`, `pointer`, `prefers-reduced-motion`, …) pass.
 - **Mask colors outside the fade pattern.** Inside `mask-image` only `black` and `transparent` pass; any other color, or any color in another property (including the `mask` shorthand), fails.
-- **`font` and `box-shadow` shorthands** with any hardcoded part. These get one message for the whole value pointing at the composite (`--type-*`, `--elevation-*`). `font: 400 14px/20px var(--font-sans)` counts as hardcoded: the family token doesn't excuse the size and weight.
+- **`font` and `box-shadow` shorthands** with any hardcoded part. These get one message for the whole value pointing at the composite (`--type-*`, `--elevation-*`). `font: 400 14px/20px var(--font-body)` counts as hardcoded: the family token doesn't excuse the size and weight.
 - **`var()` fallbacks**: `var(--control-sm, 32px)` is rejected, because the fallback is a hardcoded value too.
 
 ## What it allows
@@ -41,7 +41,7 @@ gap: "10px" is hardcoded and no Spacing token is 10px. Nearest Spacing: var(--sp
 - Units with no token: `%`, viewport units, `fr`, angles. Unitless numbers such as `opacity: 0.5` (outside disabled states), `z-index: 1`, `scale(0.97)` and unitless `line-height: 1`.
 - `black` and `transparent` inside `mask-image`, because a mask only reads alpha. Components don't write their own fade: they use the shared `.bland-scroll-fade` class in `src/components/scroll-area/scroll-fade.css`, whose length is `--fade-md` or `--fade-sm`.
 - Negative values via `calc(var(--space-md) * -1)`; the message suggests this form.
-- `font-family: var(--font-sans)` and `var(--font-mono)` (the two family tokens, Godwin 2026-10-29). Components still set type with `font: var(--type-…)`.
+- `font-family: var(--font-body)`, `var(--font-heading)` and `var(--font-code)` (the family tokens, Godwin 2026-10-29, roles 2026-10-30). Components still set type with `font: var(--type-…)`.
 - Generated files: `src/tokens/**` and `dist/**` are in `ignoreFiles`, and the test proves `tokens.css` is ignored. `lint:css` only globs `src/components/**` anyway.
 
 ## Dependency audit

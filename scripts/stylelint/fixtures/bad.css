@@ -25,10 +25,11 @@
   background: color-mix(in srgb, var(--surface-brand) 50%, transparent); /* expect: hardcoded color */
   border-color: var(--brand-600); /* expect: Brand step 600 is a primitive | var(--border-brand) */
   color: var(--neutral-600); /* expect: Neutral step 600 is a primitive | var(--text-subtle) */
-  font-family: Söhne, var(--font-sans); /* expect: var(--font-sans) | var(--type-body-md) */
-  font: 400 14px/20px var(--font-sans); /* expect: var(--type-body-md) */
-  --font-sans: "Söhne", sans-serif; /* expect: brand.css */
-  --font-mono: var(--font-sans); /* expect: brand.css */
+  font-family: Söhne, var(--font-body); /* expect: var(--font-body) | var(--type-body-md) */
+  font: 400 14px/20px var(--font-body); /* expect: var(--type-body-md) */
+  --font-body: "Söhne", sans-serif; /* expect: brand.css */
+  --font-heading: "Lora", serif; /* expect: brand.css */
+  --font-code: var(--font-body); /* expect: brand.css */
 }
 
 .units {

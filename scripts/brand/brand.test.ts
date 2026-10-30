@@ -285,36 +285,42 @@ test('a card speaks of itself: one line per kind of problem, naming its neighbou
   for (const n of notes) assert.doesNotMatch(n.text, /[Ss]eries 6/);
 });
 
-test('fonts: Bland’s own stacks come from tokens.css, and the text styles read them', () => {
-  assert.equal(blandFonts.sans, '"Inter", system-ui, sans-serif');
-  assert.equal(blandFonts.mono, '"Geist Mono", ui-monospace, monospace');
+test('fonts: Bland’s own stacks come from tokens.css, and the text styles read them by role', () => {
+  assert.equal(blandFonts.body, '"Inter", system-ui, sans-serif');
+  assert.equal(blandFonts.heading, '"Inter", system-ui, sans-serif');
+  assert.equal(blandFonts.code, '"Geist Mono", ui-monospace, monospace');
   const css = readFileSync(new URL('../../src/tokens/tokens.css', import.meta.url), 'utf8');
+  // Headings follow the body font until a project sets their own.
+  assert.match(css, /^\s*--font-heading: var\(--font-body\);$/m);
   const styles = [...css.matchAll(/^\s*(--type-[a-z0-9-]+):\s*(.+);$/gm)].filter(([, name]) => !/-(line-height|letter-spacing)$/.test(name!));
   assert.equal(styles.length, 23);
-  for (const [, name = '', value = ''] of styles) assert.match(value, name.startsWith('--type-code-') ? /var\(--font-mono\)$/ : /var\(--font-sans\)$/, name);
+  const role = (name: string) => (name.startsWith('--type-code-') ? 'code' : /^--type-(display|heading|title)-/.test(name) ? 'heading' : 'body');
+  for (const [, name = '', value = ''] of styles) assert.ok(value.endsWith(`var(--font-${role(name)})`), `${name}: ${value}`);
 });
 
 test('fonts: a typed family list is quoted and gets Bland’s fallbacks unless it ends in a generic family', () => {
-  assert.equal(fontStack('Söhne', 'sans'), '"Söhne", system-ui, sans-serif');
-  assert.equal(fontStack(' Söhne Breit , Helvetica ', 'sans'), '"Söhne Breit", "Helvetica", system-ui, sans-serif');
-  assert.equal(fontStack("'Berkeley Mono', Menlo, monospace", 'mono'), '"Berkeley Mono", "Menlo", monospace');
-  assert.equal(fontStack('IBM Plex Mono', 'mono'), '"IBM Plex Mono", ui-monospace, monospace');
-  assert.equal(fontStack('Georgia, Serif', 'sans'), '"Georgia", serif');
-  assert.throws(() => fontStack('Söhne; color: red', 'sans'), /cannot contain/);
-  assert.throws(() => fontStack('Söhne,,', 'sans'), /family names/);
+  assert.equal(fontStack('Söhne', 'body'), '"Söhne", system-ui, sans-serif');
+  assert.equal(fontStack(' Söhne Breit , Helvetica ', 'body'), '"Söhne Breit", "Helvetica", system-ui, sans-serif');
+  assert.equal(fontStack("'Berkeley Mono', Menlo, monospace", 'code'), '"Berkeley Mono", "Menlo", monospace');
+  assert.equal(fontStack('IBM Plex Mono', 'code'), '"IBM Plex Mono", ui-monospace, monospace');
+  assert.equal(fontStack('Georgia, Serif', 'heading'), '"Georgia", serif');
+  assert.throws(() => fontStack('Söhne; color: red', 'body'), /cannot contain/);
+  assert.throws(() => fontStack('Söhne,,', 'body'), /family names/);
 });
 
 test('fonts: toCss writes them on :root after the scales, and parseFonts reads them back', () => {
-  const fonts = { sans: fontStack('Söhne', 'sans'), mono: fontStack('Berkeley Mono', 'mono') };
+  const fonts = { body: fontStack('Söhne', 'body'), heading: fontStack('Lora, serif', 'heading'), code: fontStack('Berkeley Mono', 'code') };
   const css = toCss(blandScale, '', blandNeutrals, [], undefined, fonts);
   const root = css.slice(css.indexOf(':root {'), css.indexOf('}'));
-  assert.ok(root.includes('--font-sans: "Söhne", system-ui, sans-serif;'));
-  assert.ok(root.indexOf('--font-sans') > root.indexOf('--neutral-1000'));
+  assert.ok(root.includes('--font-body: "Söhne", system-ui, sans-serif;'));
+  assert.ok(root.includes('--font-heading: "Lora", serif;'));
+  assert.ok(root.indexOf('--font-body') > root.indexOf('--neutral-1000'));
+  assert.ok(root.indexOf('--font-heading') < root.indexOf('--font-code'));
   assert.deepEqual(parseFonts(css), fonts);
   // The other parsers ignore them, and a file without fonts writes none.
   assert.deepEqual(parseScale(css), blandScale);
   assert.deepEqual(parseExtras(css), []);
   assert.doesNotMatch(toCss(blandScale), /--font-/);
   assert.deepEqual(parseFonts(toCss(blandScale)), {});
-  assert.deepEqual(parseFonts(toCss(blandScale, '', undefined, [], undefined, { mono: fonts.mono })), { mono: fonts.mono });
+  assert.deepEqual(parseFonts(toCss(blandScale, '', undefined, [], undefined, { code: fonts.code })), { code: fonts.code });
 });

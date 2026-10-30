@@ -239,14 +239,14 @@ function suggestShadow(raw, value) {
 }
 
 // Weights and sizes are the hidden type scale in Figma: they reach components only through text styles. The two
-// family tokens (--font-sans, --font-mono) exist so a project can swap its fonts; the text styles read them.
+// family tokens (--font-body, --font-heading, --font-code) exist so a project can swap its fonts; the text styles read them.
 const TYPE_ONLY = 'Bland sets type through text styles (the raw type scale is not emitted).'
-const FAMILY_TOKEN = /^--font-(sans|mono)$/
+const FAMILY_TOKEN = /^--font-(body|heading|code)$/
 
 function suggestFamily(raw) {
   const mono = /mono|courier|consol/i.test(raw)
   const example = mono ? 'var(--type-code-body-md)' : 'var(--type-body-md)'
-  const family = mono ? 'var(--font-mono)' : 'var(--font-sans)'
+  const family = mono ? 'var(--font-code)' : 'var(--font-body) (or var(--font-heading) for a heading)'
   return `${q(raw)} is hardcoded. ${TYPE_ONLY} Set font: ${example} or another ${mono ? 'Code' : 'text'} style instead; where only the family changes, font-family: ${family}.`
 }
 

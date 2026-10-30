@@ -71,6 +71,7 @@ const primary: ButtonProps['emotion'] = 'brand';
 function Section({ theme }: { theme: 'light' | 'dark' }) {
   return (
     <section data-theme={theme} data-testid={theme} className="section">
+      <h2 className="title">Settings</h2>
       <Tooltip text="Saves the draft">
         <Button emotion={primary} type="primary">Save</Button>
       </Tooltip>
@@ -88,10 +89,11 @@ createRoot(document.getElementById('root')!).render(<><Section theme="light" /><
 `);
 writeFileSync(join(app, 'src/app.css'), `.section { display: flex; flex-wrap: wrap; gap: var(--space-md); padding: var(--space-lg); background: var(--surface-100); color: var(--text-bold); }
 .accent { padding: var(--space-sm); background: var(--accent-surface-light); color: var(--accent-text); }
+.title { margin: 0; font: var(--type-title-md); letter-spacing: var(--type-title-md-letter-spacing); }
 `);
 
 // 3. The brand override, made by the tool as a project would (it exits 1 on a contrast warning; that's fine here).
-run('npx', ['tsx', 'scripts/brand.ts', 'generate', '#ff5a1f', '--extra', 'accent', '--font-mono', 'Smoke Mono', '--out', join(app, 'src/brand.css')], root, true);
+run('npx', ['tsx', 'scripts/brand.ts', 'generate', '#ff5a1f', '--extra', 'accent', '--font-heading', 'Smoke Serif, serif', '--font-code', 'Smoke Mono', '--out', join(app, 'src/brand.css')], root, true);
 if (!existsSync(join(app, 'src/brand.css'))) throw new Error('npm run brand wrote no brand.css');
 
 // 4. Install, type-check, build. A reused app dir would keep the old tarball's copy (same version), so drop it.
@@ -138,6 +140,7 @@ try {
       font: color(button, 'font-family'),
       interLoaded: document.fonts.check('16px Inter'),
       codeFont: color(light.querySelector('.bland-code-text__code')!, 'font-family'),
+      titleFont: color(light.querySelector('.title')!, 'font-family'),
       lightSurface: color(light, 'background-color'),
       darkSurface: color(dark, 'background-color'),
       lightAccent: color(document.querySelector('[data-testid=light-accent]')!, 'color'),
@@ -150,7 +153,9 @@ try {
   if (result.buttonFill !== result.brand600) problems.push(`primary button fill ${result.buttonFill} is not the brand override's 600 (${result.brand600})`);
   if (result.buttonFill === result.blandBlue) problems.push('primary button is still Bland blue: the brand override did not apply');
   if (!result.interLoaded || !result.font.includes('Inter')) problems.push(`Inter not in use (${result.font})`);
-  if (!result.codeFont.startsWith('"Smoke Mono"')) problems.push(`CodeText does not follow the brand file's --font-mono (${result.codeFont})`);
+  if (!result.codeFont.startsWith('"Smoke Mono"')) problems.push(`CodeText does not follow the brand file's --font-code (${result.codeFont})`);
+  // A heading font of its own reaches the Title styles while body text stays on Inter.
+  if (result.titleFont !== '"Smoke Serif", serif') problems.push(`a Title style does not follow the brand file's --font-heading (${result.titleFont})`);
   if (result.lightSurface === result.darkSurface) problems.push('data-theme="dark" section has the light surface');
   if (!result.lightAccent || result.lightAccent === result.darkAccent) problems.push('extra color roles do not switch in dark');
   if (!result.toggle) problems.push('Toggle did not render checked');

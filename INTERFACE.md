@@ -2330,3 +2330,10 @@ Readers are designers, developers and agents. The voice follows systems known fo
 - Brand tool: `--font-sans "…"` / `--font-mono "…"` on `generate` and `check`, a font-family list: names quoted, generic families bare, Bland's fallbacks appended when the list ends in no generic family; written at the end of `:root` under a "load their files yourself" comment; `check` keeps a file's own fonts unless a flag replaces them.
 - Docs site: Typography page opens with a Font families table (sample "Aa" in each). The Brand theme page has no font fields yet (follow-up: its previews would need the project's font files).
 - Shipped as 0.1.1.
+
+## Font tokens by role (2026-10-30, Godwin)
+
+- Godwin: "sans" is wrong when a project picks a serif, and an app may want a separate heading font, with Title counting as a heading. Before 0.1.1 shipped, `--font-sans` / `--font-mono` became `--font-body`, `--font-heading` and `--font-code` (no aliases: the old names were never published).
+- Body styles read `--font-body`; Display, Heading and Title read `--font-heading`; Code reads `--font-code`. `--font-heading` is `var(--font-body)` in `tokens.css`, so one override sets all text and a second sets headings apart. Three roles, no more.
+- Figma follows: `family/sans` → `family/body`, `family/mono` → `family/code`, new `family/heading` aliasing `family/body`; the nine Display, Heading and Title styles bound to it. The build maps each text style through the `family/<role>` variable it is bound to (not by style name), and a family variable aliasing another becomes `var()` of that token.
+- Brand tool flags `--font-body`, `--font-heading`, `--font-code`; the lint allows the three in `font-family` and rejects redefining them in a component. Resolved text styles are unchanged.

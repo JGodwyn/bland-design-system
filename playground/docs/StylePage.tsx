@@ -127,7 +127,7 @@ function TypographyPage() {
     <>
       <Section
         title="Font families"
-        note="The two families every text style reads: sans for UI text, mono for code. A project changes its fonts by setting them in its brand file, beside its brand colors, and loading the font files; every text style follows. Components use the text styles, never the families alone."
+        note="The families the text styles read: body for Body text, heading for Display, Heading and Title (the body font unless a project sets its own), code for Code. A project changes its fonts by setting them in its brand file, beside its brand colors, and loading the font files; every text style follows. Components use the text styles, never the families alone."
       >
         <TokenTable items={inCollection('Font families')} sample={(t) => <span style={{ fontFamily: v(t) }}>Aa</span>} />
       </Section>

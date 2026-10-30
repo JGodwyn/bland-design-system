@@ -7,7 +7,7 @@ import './code-text.css';
 export type CodeTextSize = 'sm' | 'md' | 'lg';
 
 export interface CodeTextProps extends HTMLAttributes<HTMLSpanElement> {
-  /** The code, set in the code font (`--font-mono`, Geist Mono unless the project changes it). */
+  /** The code, set in the code font (`--font-code`, Geist Mono unless the project changes it). */
   children: ReactNode;
   /**
    * Match the surrounding text. sm (default) next to body-sm, md next to body-md, lg next
