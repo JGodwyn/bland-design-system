@@ -1,8 +1,9 @@
 /*
  * Bland's fonts, self-hosted through Fontsource so no page depends on Google Fonts.
  * Only the weights the text styles use: Inter 400/500/600 (weight/regular, medium, semibold)
- * and Geist Mono 400/600 (weight/regular, mono-semibold). Family names match --font-family-*.
- * Shipped as bland/fonts.css; a project that already loads these fonts can skip it.
+ * and Geist Mono 400/600 (weight/regular, mono-semibold). Family names match --font-sans and --font-mono.
+ * Shipped as bland-ui/fonts.css; a project that already loads these fonts, or sets its own --font-sans and
+ * --font-mono in brand.css (docs/brand.md, "Fonts"), can skip it.
  */
 @import "@fontsource/inter/400.css";
 @import "@fontsource/inter/500.css";

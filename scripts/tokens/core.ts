@@ -170,6 +170,14 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     Inter: '"Inter", system-ui, sans-serif',
     'Geist Mono': '"Geist Mono", ui-monospace, monospace',
   };
+  // The two family tokens a project can override at :root to swap its fonts (Godwin 2026-10-29): Code/* text
+  // styles read --font-mono, every other one --font-sans. Nothing else of the type scale is emitted (no size,
+  // line height or letter spacing tokens). A family Figma names without a stack here gets the role's fallback.
+  const FONT_ROLES = {
+    sans: { css: '--font-sans', fallback: 'system-ui, sans-serif', what: 'UI text: every Display, Heading, Title and Body text style' },
+    mono: { css: '--font-mono', fallback: 'ui-monospace, monospace', what: 'code: every Code/* text style' },
+  };
+  const fontRole = (styleName: string) => (styleName.startsWith('Code/') ? FONT_ROLES.mono : FONT_ROLES.sans);
 
   function cssValue(value: string | number, type: string, name: string): string {
     if (type === 'COLOR') return formatColor(hexToRgba(String(value)));
@@ -265,6 +273,30 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     });
   }
 
+  // Font families: one token per role, holding the family its text styles use in Figma and its fallbacks.
+  const familyOf = new Map<string, string>();
+  for (const style of meta.textStyles) {
+    if (!style.fontFamily) continue;
+    const family = String(resolveRaw(style.fontFamily, 'light'));
+    const { css } = fontRole(style.name);
+    const other = familyOf.get(css);
+    if (other && other !== family) throw new Error(`${style.name} uses "${family}" but other text styles on ${css} use "${other}". One family per token.`);
+    familyOf.set(css, family);
+  }
+  const fontStack = (family: string, fallback: string) => FONT_STACKS[family] ?? `"${family}", ${fallback}`;
+  for (const { css, fallback, what } of Object.values(FONT_ROLES)) {
+    const family = familyOf.get(css);
+    if (!family) continue;
+    tokens.push({
+      name: `Font/${css.slice(2)}`,
+      css,
+      collection: 'Font families',
+      type: 'FONT_FAMILY',
+      description: `The ${family} family and its fallbacks, for ${what}. Override it per project at :root to change the font; every text style follows.`,
+      light: fontStack(family, fallback),
+    });
+  }
+
   // Text styles: a `font` shorthand per style. Underline variants also need text-decoration: underline.
   // The raw type scale (_Typography) is hidden like the other primitives, so each style also carries
   // the two parts the shorthand can't set or a component may need alone: line height and letter spacing.
@@ -276,7 +308,9 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     const weight = FONT_WEIGHTS[String(val(style.fontStyle, 'fontStyle'))];
     const family = String(val(style.fontFamily, 'fontFamily'));
     const lineHeight = `${val(style.lineHeight, 'lineHeight')}px`;
-    const font = `${weight} ${val(style.fontSize, 'fontSize')}px/${lineHeight} ${FONT_STACKS[family] ?? `"${family}"`}`;
+    const role = fontRole(style.name);
+    const shorthand = (stack: string) => `${weight} ${val(style.fontSize, 'fontSize')}px/${lineHeight} ${stack}`;
+    const font = shorthand(fontStack(family, role.fallback));
     const underline = style.textDecoration === 'UNDERLINE';
     // Code/* text styles share step names with Body/*, so they get their own prefix.
     const css = `--type-${style.name.startsWith('Code/') ? 'code-' : ''}${kebab(style.name.split('/').slice(1).join('-'))}`;
@@ -288,6 +322,7 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
         type: 'FONT',
         description: decode(style.description) + (underline ? ' Pair with text-decoration: underline.' : ''),
         light: font,
+        cssValue: { light: shorthand(`var(${role.css})`) },
       },
       {
         name: `${style.name}/line-height`,
@@ -317,7 +352,7 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
     seenCss.set(t.css, t.name);
   }
 
-  const order = ['Brand', 'Neutral', 'Theme', 'Spacing', 'Corner Radius', 'Stroke', 'Text styles', 'Effects', 'Effect styles', 'Sizing', 'Motion', 'Breakpoints'];
+  const order = ['Brand', 'Neutral', 'Font families', 'Theme', 'Spacing', 'Corner Radius', 'Stroke', 'Text styles', 'Effects', 'Effect styles', 'Sizing', 'Motion', 'Breakpoints'];
   tokens.sort((a, b) => order.indexOf(a.collection) - order.indexOf(b.collection));
 
   return { tokens, skipped, order };

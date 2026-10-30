@@ -125,6 +125,12 @@ function TypographyPage() {
   const parts = inCollection('Text styles').filter((t) => t.type !== 'FONT');
   return (
     <>
+      <Section
+        title="Font families"
+        note="The two families every text style reads: sans for UI text, mono for code. A project changes its fonts by setting them in its brand file, beside its brand colors, and loading the font files; every text style follows. Components use the text styles, never the families alone."
+      >
+        <TokenTable items={inCollection('Font families')} sample={(t) => <span style={{ fontFamily: v(t) }}>Aa</span>} />
+      </Section>
       <Section title="Text styles">
         <div className="docs-type-list">
           {styles.map((t) => (

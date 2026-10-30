@@ -44,6 +44,11 @@
 .label {
   font-family: inherit;
   font: var(--type-body-md-bold);
+}
+
+.kbd {
+  /* Only the family changes; size and line height come from the text style around it. */
+  font-family: var(--font-mono);
   margin-inline-start: calc(var(--space-xs) * -1);
   max-width: 60ch;
   text-overflow: ellipsis;

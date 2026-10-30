@@ -220,14 +220,47 @@ export function parseScale(text: string): Scale {
   return Object.fromEntries(STEPS.map((s) => [s, `#${parseHex(found[s]!).map((v) => Math.round(v * 255).toString(16).padStart(2, '0')).join('')}`])) as Scale;
 }
 
-export function toCss(scale: Scale, note = '', neutrals?: Scale, extras: Extra[] = [], chart?: ChartSeries[]): string {
+export function toCss(scale: Scale, note = '', neutrals?: Scale, extras: Extra[] = [], chart?: ChartSeries[], fonts: Fonts = {}): string {
   const lines = STEPS.map((s) => `  --brand-${s}: ${scale[s]};`);
   if (neutrals) lines.push('', ...STEPS.map((s) => `  --neutral-${s}: ${neutrals[s]};`));
   for (const x of extras) lines.push('', ...STEPS.map((s) => `  --${x.name}-${s}: ${x.scale[s]};`));
+  const families = FONT_ROLES.filter((r) => fonts[r]);
+  if (families.length) lines.push('', '  /* Fonts: load their files yourself (an @font-face or the font host\'s stylesheet). */', ...families.map((r) => `  --font-${r}: ${fonts[r]};`));
   let css = `/* Brand override for Bland${note ? `: ${note}` : ''}. Load after bland/tokens.css. */\n:root {\n${lines.join('\n')}\n}\n`;
   if (extras.length) css += `\n${extraRolesCss(extras)}`;
   if (chart) css += `\n${chartCss(chart)}`;
   return css;
+}
+
+// ---------- fonts ----------
+
+/** A project's font families: `--font-sans` (UI text) and `--font-mono` (code), each a CSS font-family list. */
+export type Fonts = Partial<Record<FontRole, string>>;
+export type FontRole = 'sans' | 'mono';
+export const FONT_ROLES: FontRole[] = ['sans', 'mono'];
+/** Bland's own stacks, as tokens.css ships them. */
+export const blandFonts = Object.fromEntries(FONT_ROLES.map((r) => [r, tokens.find((t) => t.css === `--font-${r}`)!.light])) as Record<FontRole, string>;
+const GENERIC_FAMILIES = new Set(['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'system-ui', 'ui-serif', 'ui-sans-serif', 'ui-monospace', 'ui-rounded', 'math', 'emoji', 'fangsong']);
+
+/**
+ * A font-family list for a role from what a project typed (`Söhne`, `"Söhne", Helvetica, sans-serif`): family names
+ * quoted, generic families left bare, and, when the list ends in no generic family, Bland's fallbacks for that role
+ * after it (system-ui, sans-serif; ui-monospace, monospace), so text still shows while the font loads or if it fails.
+ */
+export function fontStack(value: string, role: FontRole): string {
+  if (/[;{}]/.test(value)) throw new Error(`--font-${role} "${value}": a font-family list cannot contain ; { or }.`);
+  const names = value.split(',').map((n) => n.trim().replace(/^(["'])(.*)\1$/, '$2').trim());
+  if (!names.length || names.some((n) => !n)) throw new Error(`--font-${role} "${value}": give one or more family names separated by commas, e.g. "Söhne, sans-serif".`);
+  const list = names.map((n) => (GENERIC_FAMILIES.has(n.toLowerCase()) ? n.toLowerCase() : `"${n.replace(/"/g, '\\"')}"`));
+  if (!GENERIC_FAMILIES.has(names.at(-1)!.toLowerCase())) list.push(...blandFonts[role].split(',').slice(1).map((n) => n.trim()));
+  return list.join(', ');
+}
+
+/** The font families an override file sets (`--font-sans: …;`), as written. */
+export function parseFonts(text: string): Fonts {
+  const fonts: Fonts = {};
+  for (const m of text.matchAll(/--font-(sans|mono)\s*:\s*([^;}]+)/g)) fonts[m[1] as FontRole] = m[2]!.trim();
+  return fonts;
 }
 
 /** The 13 neutral steps from an override file, or undefined when it sets none (Bland's neutrals then stay). */

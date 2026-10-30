@@ -6,6 +6,7 @@ Raw material for the skill we package at the end of the project: what an agent n
 
 - Install with `npm install bland-ui` (the product is Bland; the npm name is `bland-ui`, published 2026-10-30). Needs React 19. Import `bland-ui/tokens.css`, `bland-ui/fonts.css`, `bland-ui/base.css`, `bland-ui/styles.css`, then the project's `brand.css`: the override comes after Bland's tokens (`docs/brand.md`, README). Components: `import { Button } from 'bland-ui'`. MIT license.
 - Fonts: Inter and Geist Mono ship self-hosted in `src/styles/fonts.css`; base reset and helpers in `base.css`.
+- Changing fonts (2026-10-29): set `--font-sans` (UI text) and `--font-mono` (code) on `:root` in `brand.css` (`npm run brand -- generate … --font-sans "Söhne" --font-mono "…"`), load the font files yourself (an `@font-face` per weight: sans 400/500/600, mono 400/600) and skip `bland-ui/fonts.css` if both are replaced. Every `--type-*` style follows; sizes, line heights and letter spacing stay Bland's. Never set a family in project CSS beside a text style; never redefine the two tokens anywhere but `:root` (`docs/brand.md`, "Fonts").
 - Theme (Godwin 2026-10-27: both ways): `data-theme="light|dark"` on any element wins; without it `prefers-color-scheme` decides. Nested `data-theme` sections work. A theme toggle sets `data-theme` on `<html>` (and removes it to follow the system again); don't add a class or a second set of dark styles.
 
 ## Brand and colors

@@ -156,6 +156,12 @@ Use the static packages (`@fontsource/inter/400.css` etc.), whose family names
 are exactly "Inter" and "Geist Mono", and load only the weights the text styles
 use.
 
+**A family token keyed by the family's name breaks the build when Figma changes the font** (2026-10-29). The first
+cut mapped `Inter` → `--font-sans`, `Geist Mono` → `--font-mono`, so swapping `family/sans` in Figma would have
+thrown instead of flowing through. → Map by role (`Code/*` → mono, the rest → sans) and take the family from Figma;
+the drift test changes `family/sans` to Söhne and expects `--font-sans` to follow. Also: the drift report calls a
+single-mode token's change `value`, not `light`.
+
 ## TypeScript and React
 
 **TypeScript 7 has no JavaScript API.** `react-docgen-typescript` crashed with

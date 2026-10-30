@@ -5,7 +5,7 @@
 //   npm run test:package -- <dir>     builds the app in <dir> (kept) instead of a temp folder
 //
 // The app imports the four stylesheets in the documented order, a brand override made by `npm run brand`
-// (with one extra color) and a few components, in a light and a dark section. Needs the network (npm install).
+// (with one extra color and its own code font) and a few components, in a light and a dark section. Needs the network (npm install).
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -64,7 +64,7 @@ import 'bland-ui/styles.css';
 import './brand.css';
 import './app.css';
 import { createRoot } from 'react-dom/client';
-import { Alert, Badge, Button, TextInput, Toggle, Tooltip, type ButtonProps } from 'bland-ui';
+import { Alert, Badge, Button, CodeText, TextInput, Toggle, Tooltip, type ButtonProps } from 'bland-ui';
 
 const primary: ButtonProps['emotion'] = 'brand';
 
@@ -78,6 +78,7 @@ function Section({ theme }: { theme: 'light' | 'dark' }) {
       <TextInput label="Name" placeholder="Ada Lovelace" />
       <Toggle defaultChecked>Notifications</Toggle>
       <Alert status="warning">Heads up</Alert>
+      <CodeText>npm install bland-ui</CodeText>
       <div className="accent" data-testid={theme + '-accent'}>Accent</div>
     </section>
   );
@@ -90,7 +91,7 @@ writeFileSync(join(app, 'src/app.css'), `.section { display: flex; flex-wrap: wr
 `);
 
 // 3. The brand override, made by the tool as a project would (it exits 1 on a contrast warning; that's fine here).
-run('npx', ['tsx', 'scripts/brand.ts', 'generate', '#ff5a1f', '--extra', 'accent', '--out', join(app, 'src/brand.css')], root, true);
+run('npx', ['tsx', 'scripts/brand.ts', 'generate', '#ff5a1f', '--extra', 'accent', '--font-mono', 'Smoke Mono', '--out', join(app, 'src/brand.css')], root, true);
 if (!existsSync(join(app, 'src/brand.css'))) throw new Error('npm run brand wrote no brand.css');
 
 // 4. Install, type-check, build. A reused app dir would keep the old tarball's copy (same version), so drop it.
@@ -136,6 +137,7 @@ try {
       blandBlue: probe('#0062ff'),
       font: color(button, 'font-family'),
       interLoaded: document.fonts.check('16px Inter'),
+      codeFont: color(light.querySelector('.bland-code-text__code')!, 'font-family'),
       lightSurface: color(light, 'background-color'),
       darkSurface: color(dark, 'background-color'),
       lightAccent: color(document.querySelector('[data-testid=light-accent]')!, 'color'),
@@ -148,6 +150,7 @@ try {
   if (result.buttonFill !== result.brand600) problems.push(`primary button fill ${result.buttonFill} is not the brand override's 600 (${result.brand600})`);
   if (result.buttonFill === result.blandBlue) problems.push('primary button is still Bland blue: the brand override did not apply');
   if (!result.interLoaded || !result.font.includes('Inter')) problems.push(`Inter not in use (${result.font})`);
+  if (!result.codeFont.startsWith('"Smoke Mono"')) problems.push(`CodeText does not follow the brand file's --font-mono (${result.codeFont})`);
   if (result.lightSurface === result.darkSurface) problems.push('data-theme="dark" section has the light surface');
   if (!result.lightAccent || result.lightAccent === result.darkAccent) problems.push('extra color roles do not switch in dark');
   if (!result.toggle) problems.push('Toggle did not render checked');

@@ -3,7 +3,7 @@
 Bland is Godwin's personal design system: a Figma UI kit reused across client projects, being turned into code with a token pipeline and (later) a docs site. Figma is finished; this repo is the code side.
 
 - Light and dark themes. A per-project brand color: a project overrides the 13 `--brand-*` steps (and the 13 `--neutral-*`, tinted toward its brand or pure gray) at `:root` and everything follows (`docs/brand.md`). Up to three extra project colors (charts, illustrations, its own UI) get 13 steps and light/dark roles each; Bland's components never use them.
-- Inter for UI text, Geist Mono for code, Phosphor icons, 100% corner smoothing on every rounded corner.
+- Inter for UI text, Geist Mono for code (a project can swap either through `--font-sans` / `--font-mono` in its `brand.css`), Phosphor icons, 100% corner smoothing on every rounded corner.
 - One-person system (Godwin plus Claude). Keep process light: no review flow, no client-facing docs yet.
 
 ## Repo
@@ -30,7 +30,7 @@ site/                     the public site's own files beside the docs (Cloudflar
 
 - `npm run tokens`: regenerate `tokens.json` and `tokens.css` from the raw export.
 - `npm run tokens:checksum`: hash of the raw export; must equal `scripts/figma/checksum.js` run in Figma.
-- `npm run brand`: the brand override tool: `generate "#hex"` makes 13 brand steps from one color and 13 neutral steps leaning toward it (`--neutrals full|subtle|none`), plus up to three `--extra name=#hex` colors, `check brand.css` tests the brand pairings (warns, never blocks), `--fix` applies suggested steps (`docs/brand.md`). `npm run test:brand` runs its tests.
+- `npm run brand`: the brand override tool: `generate "#hex"` makes 13 brand steps from one color and 13 neutral steps leaning toward it (`--neutrals full|subtle|none`), plus up to three `--extra name=#hex` colors and the project's fonts (`--font-sans "…"`, `--font-mono "…"`), `check brand.css` tests the brand pairings (warns, never blocks), `--fix` applies suggested steps (`docs/brand.md`). `npm run test:brand` runs its tests.
 - Chart palette: `--chart-1` … `--chart-8`, the brand, then the extras, then generated hues, light and dark, 3:1 on the page and neighbours apart for color-blind readers; Bland's own is appended to `tokens.css`, a project's is in its override file; a project can pick its own color for any later series (`--chart N=#hex`, or tap it on the Brand theme page), which changes no other series. Components never use them (`docs/brand.md`, "Chart palette").
 - `npm run tokens:drift`: drift check against Figma, variable by variable, with the CSS tokens each change reaches; `-- --apply` takes the Figma version. Two steps around one `use_figma` call (`docs/tokens.md`, "Drift check"). `npm run test:drift` runs its tests.
 - `npm run build`: tokens, Vite library build, `dist/tokens.css`, type declarations. `npm pack` runs it first (`prepack`).
@@ -82,7 +82,7 @@ They merge with git's `union` strategy (`.gitattributes`): append, never restruc
 
 ## Token architecture
 
-Three layers. **Components bind only to Theme or scale tokens, never primitives.** 638 variables in 12 collections (as of 2026-10-28), plus 15 elevation styles and 23 text styles. Primitives are not emitted to CSS, except the 13 brand and 13 neutral steps (`--brand-*`, `--neutral-*`), which exist only for a project's brand override; the lint keeps components off them.
+Three layers. **Components bind only to Theme or scale tokens, never primitives.** 638 variables in 12 collections (as of 2026-10-28), plus 15 elevation styles and 23 text styles. Primitives are not emitted to CSS, except the 13 brand and 13 neutral steps (`--brand-*`, `--neutral-*`), which exist only for a project's brand override (the lint keeps components off them), and the two font families `--font-sans` / `--font-mono`, which the text styles read so a project can swap its fonts.
 
 | Collection | Layer | Modes | Holds |
 | --- | --- | --- | --- |
@@ -93,7 +93,7 @@ Three layers. **Components bind only to Theme or scale tokens, never primitives.
 | `Spacing` | Scale | 1 | `space-none` 0 – `space-9xl` 256, `Layout/margin-desktop` 152, `Layout/margin-mobile` 24, `Layout/columns-mobile` 4, `-tablet` 6, `-desktop` 8 (plain numbers in CSS), `Layout/max-width-sm` 1136, `-md` 1264, `-lg` 1392 (page grid, `docs/grid.md`) |
 | `Corner Radius` | Scale | 1 | `rad-null` 0, `rad-xs` 2, `rad-sm` 4, `rad-md` 8, `rad-lg` 16, `rad-xl` 24, `rad-rd` full |
 | `Stroke` | Scale | 1 | `stroke-none` 0, `stroke-xs` 0.5, `stroke-sm` 1 (borders), `stroke-md` 1.5 (icons), `stroke-lg` 2 (focus), `stroke-xl` 4 |
-| `_Typography` | Primitive, hidden | 1 | `family/`, `weight/`, `size/`, `line-height/`, `letter-spacing/normal` (0). Hidden 2026-10-25: type reaches code only through text styles |
+| `_Typography` | Primitive, hidden | 1 | `family/`, `weight/`, `size/`, `line-height/`, `letter-spacing/normal` (0). Hidden 2026-10-25: type reaches code only through text styles, plus `family/` as `--font-sans` / `--font-mono` (2026-10-29) |
 | `Effects` | Scale | 1 | `elevation/{near,mid,far}/{ambient,key}-{y,blur,spread}`, `elevation/x` |
 | `Sizing` | Scale | 1 | `control/*`, `icon/*`, `input/*`, `avatar/*`, `table/*`, `fade/*`, `scrollbar/width`, `logo/mark-*`, … |
 | `Motion` | Scale | 1 | `duration/xs` 125, `sm` 160, `md` 200, `lg` 250, `xl` 400 (Toast), `2xl` 500 (Sidebar, sheets), `spin` 800 (one turn of a loading spinner), `typing` 1200 (one wave of a typing bubble's dots, looping), `toast-visible` 5000 (how long a Toast stays on screen, not an animation), `tooltip-delay` 500 and `tooltip-close-delay` 100 (a Tooltip's hover delays, not animations), `sidebar-peek-delay` 200 and `sidebar-peek-close-delay` 300 (a minimized Sidebar's hover delays), `scrollbar-hide-delay` 1000 (how long a scrollbar stays after scrolling stops) and `copied-visible` 2000 (how long a copy button shows Copied), both added 2026-10-22; `easing/out`, `in-out`, `drawer`, `ease`, `linear` |
@@ -111,7 +111,7 @@ Implemented in `scripts/build-tokens.ts`; CSS naming and the sync steps are in `
 - **Do not export `Fade/*-clear`** (Figma-only drawing aids).
 - Export every variable's description alongside its value.
 - Elevation: 15 styles `Elevation/{neutral,brand,danger,success,warning}/{near,mid,far}`, each an ambient + key layer. Geometry from `Effects`, color from `Shadow/{family}-{ambient,key}`. In code each is **one `box-shadow` variable** whose color switches in dark mode.
-- Text styles: Display, Heading, Title, Body (incl. `-bold`, `-underline`), `Code/*` in Geist Mono. Each is a `font` shorthand (`--type-body-md`) plus `--type-body-md-line-height` and `--type-body-md-letter-spacing`; set the letter spacing beside the `font`. No raw `--font-*`, `--line-height-*` or `--letter-spacing-*` tokens. `weight/semibold` (Inter "Semi Bold") and `weight/mono-semibold` (Geist "SemiBold") are both real: the families spell the style differently.
+- Text styles: Display, Heading, Title, Body (incl. `-bold`, `-underline`), `Code/*` in Geist Mono. Each is a `font` shorthand (`--type-body-md`) plus `--type-body-md-line-height` and `--type-body-md-letter-spacing`; set the letter spacing beside the `font`. The family is `var(--font-sans)`, or `var(--font-mono)` in `Code/*`: these two family tokens are the only font tokens (Godwin 2026-10-29, reversing the earlier no-`--font-*` rule, so a project can swap its fonts in `brand.css`; `docs/brand.md`, "Fonts"). Still no `--font-size-*`, `--font-weight-*`, `--line-height-*` or `--letter-spacing-*` tokens. Components keep using the `--type-*` composites. `weight/semibold` (Inter "Semi Bold") and `weight/mono-semibold` (Geist "SemiBold") are both real: the families spell the style differently.
 - Naming: size steps follow value order (`xs` < `sm` < `md` < `lg`). Variant values lowercase; property names capitalized.
 
 ## Decisions code must follow

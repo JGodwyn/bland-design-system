@@ -2319,3 +2319,14 @@ Readers are designers, developers and agents. The voice follows systems known fo
 - **MIT** license (`LICENSE`, `license` field).
 - The public site is **public** (no Cloudflare Access).
 - Docs site Grid page: the Show/Hide columns button has no shadow from tablet up in either state; the phone's floating button keeps elevation/brand/mid (Godwin 2026-10-29).
+
+## Font family tokens (Godwin 2026-10-29)
+
+- **Godwin's call, reversing the old "no raw `--font-*` tokens" rule:** two family tokens, `--font-sans` (UI text, Inter) and `--font-mono` (code, Geist Mono), so a project swaps its fonts in `brand.css` like its brand. Nothing else of the type scale becomes a token: no size, weight, line height or letter spacing tokens.
+- Emitted in the overridable `:root` block after the brand and neutral steps (collection `Font families` in `tokens.json`), with the fallback stacks the build always used: `"Inter", system-ui, sans-serif` and `"Geist Mono", ui-monospace, monospace`.
+- Named by role, not family. The build maps by text style: `Code/*` reads `--font-mono`, every other style `--font-sans`; the value is the family Figma's `family/sans` / `family/mono` hold, so a family change in Figma lands in the token (a family without a known stack gets the role's fallbacks). Two styles of one role on different families fail the build.
+- All 23 `--type-*` shorthands end in `var(--font-sans)` or `var(--font-mono)`; `tokens.json` keeps the resolved shorthand in `light` and the `var()` form under `cssValue`. Resolved, every style is byte-for-byte what it was.
+- Lint: `font-family: var(--font-sans|mono)` passes (for a part that changes only the family); a component redefining either token fails and points at `brand.css`; a `font` shorthand with only a family token and raw size/weight still fails.
+- Brand tool: `--font-sans "…"` / `--font-mono "…"` on `generate` and `check`, a font-family list: names quoted, generic families bare, Bland's fallbacks appended when the list ends in no generic family; written at the end of `:root` under a "load their files yourself" comment; `check` keeps a file's own fonts unless a flag replaces them.
+- Docs site: Typography page opens with a Font families table (sample "Aa" in each). The Brand theme page has no font fields yet (follow-up: its previews would need the project's font files).
+- Shipped as 0.1.1.

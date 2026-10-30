@@ -47,14 +47,14 @@ Not set up yet: running the check on a schedule. It needs the Figma MCP, so it w
 
 ## What the build does
 
-- **Primitives are not emitted, except the brand scale.** `_Core Colors`, `_Functional Colors`, `_Units` and `_Typography` are hidden collections. The 13 `Brand/BrandN` steps are emitted as `--brand-N` in a `:root` block of their own, and every token whose alias chain ends in one holds `var(--brand-N)` (alpha steps a `color-mix`), so a project's override cascades (`brand.md`). Every exported token resolves through them to a final value.
+- **Primitives are not emitted, except the brand and neutral scales and the two font families.** `_Core Colors`, `_Functional Colors`, `_Units` and `_Typography` are hidden collections. The 13 `Brand/BrandN` steps are emitted as `--brand-N` in a `:root` block of their own, and every token whose alias chain ends in one holds `var(--brand-N)` (alpha steps a `color-mix`), so a project's override cascades (`brand.md`). Every exported token resolves through them to a final value.
 - **Alias chains resolve to values**, per mode. `tokens.json` keeps the first alias hop (`aliasOf`) so you can see which primitive a token points at.
 - **Alpha primitives** (`{color: alias, opacity: N}`) resolve to the source color at exactly N%, written as `rgb(r g b / N%)`.
 - **`Fade/*-clear` is skipped** (Figma-only drawing aids). The build lists them under `skipped` in `tokens.json`.
 - **Elevation styles** become one `box-shadow` value each, ambient layer first, then key. The colors come from `Shadow/*` Theme tokens, so each elevation token is redefined in Dark.
 - **Text styles** become a `font` shorthand value each (`weight size/line-height family`), plus `--type-<style>-line-height` and `--type-<style>-letter-spacing` (the shorthand can't carry letter spacing, so components set it beside the `font`). The `-underline` styles also need `text-decoration: underline`; their description says so.
 - **Font weights** map from Figma style names to numbers: Regular 400, Medium 500, Semi Bold / SemiBold 600.
-- **Font families** get fallback stacks: Inter falls back to `system-ui, sans-serif`, Geist Mono to `ui-monospace, monospace`.
+- **Font families** are two tokens, `--font-sans` and `--font-mono` (Godwin 2026-10-29), in the overridable `:root` block beside the brand and neutral steps. Each holds the family its text styles use in Figma and a fallback stack: `"Inter", system-ui, sans-serif` and `"Geist Mono", ui-monospace, monospace`. `Code/*` text styles read `--font-mono`, every other one `--font-sans`, so the shorthand is `400 14px/20px var(--font-sans)`; `tokens.json` keeps the resolved shorthand in `light` and the `var()` form under `cssValue`, as for the brand. A family Figma names that the build has no stack for gets the role's fallbacks (`"Söhne", system-ui, sans-serif`), and two styles of one role on different families fail the build (one family per token). A project overrides them in its `brand.css` (`brand.md`, "Fonts"). These are the only font tokens: no `--font-size-*`, `--line-height-*` or `--letter-spacing-*`.
 - All dimensions are in `px`. Column counts (`Layout/columns-*`) are plain numbers.
 - **Durations** (Figma `TIMING`, stored in seconds as float32, so 0.16 arrives as 0.1599999964) become whole milliseconds: `--duration-sm: 160ms`.
 - **Easings** (Figma `EASING`) become `cubic-bezier()` with coordinates rounded to 3 decimals, and `LINEAR` becomes `linear`. Any other easing type fails the build.
@@ -71,6 +71,7 @@ Not set up yet: running the check on a schedule. It needs the Figma MCP, so it w
 | `control/sm`, `icon/md` | `--control-sm`, `--icon-md` | Sizing |
 | `elevation/mid/key-y` | `--elevation-mid-key-y` | Effects geometry |
 | `Elevation/neutral/mid` (style) | `--elevation-neutral-mid` | Full `box-shadow` |
+| `family/sans`, `family/mono` (via the text styles) | `--font-sans`, `--font-mono` | Named by role, not by family, so a project's override reads right |
 | `Body/body-md` (style) | `--type-body-md` | Use as `font: var(--type-body-md)` |
 | `Code/body-md` (style) | `--type-code-body-md` | |
 | `Body/body-md` line height, letter spacing | `--type-body-md-line-height`, `--type-body-md-letter-spacing` | From the style's bindings |
@@ -79,7 +80,7 @@ Not set up yet: running the check on a schedule. It needs the Figma MCP, so it w
 | `breakpoint/md` | `--breakpoint-md` | Breakpoints |
 | `Layout/columns-mobile` | `--layout-columns-mobile` | Page grid (`grid.md`), unitless |
 
-Prefer the composite tokens in components: `font: var(--type-body-md)` and `box-shadow: var(--elevation-neutral-mid)`. Reach for the parts (`--type-body-md-line-height`, `--elevation-mid-key-y`) only when a component needs one property alone. Families, weights and sizes have no tokens of their own: pick the text style.
+Prefer the composite tokens in components: `font: var(--type-body-md)` and `box-shadow: var(--elevation-neutral-mid)`. Reach for the parts (`--type-body-md-line-height`, `--elevation-mid-key-y`) only when a component needs one property alone. Weights and sizes have no tokens of their own: pick the text style. The two family tokens are for a project's font choice; in a component, `font-family: var(--font-mono)` is only for the rare part that changes the family alone inside a text style.
 
 ## Light and dark
 

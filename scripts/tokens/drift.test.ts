@@ -86,3 +86,21 @@ test('applying writes chunks that hash exactly like Figma', () => {
   assert.equal(sorted(chunk(merged.raw).flat()), sorted(figmaExport.raw));
   assert.ok(chunk(merged.raw).every((c) => JSON.stringify(c).length < 18100));
 });
+
+test('a family change in Figma reaches its font token, and the text styles follow through it', () => {
+  const renamed = clone(local);
+  find(renamed, 'family/sans')[5]['6047:1'] = 'Söhne';
+  const r = figmaSide(renamed, fingerprint(local));
+  const cmp = compare(local, r);
+  const report = diff(local, mergeExport(local, cmp, r), cmp);
+  const token = (css: string) => report.tokens.find((t) => t.css === css);
+  // A family Bland has no stack for gets the role's fallbacks.
+  assert.deepEqual(token('--font-sans')!.fields.find((f) => f.field === 'value'), {
+    field: 'value',
+    before: '"Inter", system-ui, sans-serif',
+    after: '"Söhne", system-ui, sans-serif',
+  });
+  assert.ok(token('--type-body-md'), 'the resolved text style changes too');
+  assert.equal(token('--font-mono'), undefined);
+  assert.equal(report.buildError, undefined);
+});

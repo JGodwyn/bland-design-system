@@ -4,7 +4,7 @@ import { test } from 'node:test';
 
 import { readFileSync } from 'node:fs';
 
-import { blandChart, localNotes, fixChartColor, chartAdvice, chartPins, parseChart, pinnedSeries, CHART_CONTRAST, CHART_COUNT, chartCss, chartHues, checkChart, colorOf, deltaE, generateChart, EXTRA_PAIRS, EXTRA_ROLES, extraNameError, harmonyColor, HARMONY_TURNS, parseExtras, blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
+import { blandFonts, fontStack, parseFonts, blandChart, localNotes, fixChartColor, chartAdvice, chartPins, parseChart, pinnedSeries, CHART_CONTRAST, CHART_COUNT, chartCss, chartHues, checkChart, colorOf, deltaE, generateChart, EXTRA_PAIRS, EXTRA_ROLES, extraNameError, harmonyColor, HARMONY_TURNS, parseExtras, blandNeutrals, blandScale, check, contrast, fixScale, generate, generateNeutrals, parseNeutrals, placeStep, parseScale, STEPS, toCss, toOklch } from './core';
 
 const close = (a: string, b: string) => toOklch(a).l - toOklch(b).l;
 
@@ -283,4 +283,38 @@ test('a card speaks of itself: one line per kind of problem, naming its neighbou
   assert.ok(notes.some((n) => n.text === 'Too faint on the white page.'), JSON.stringify(notes));
   assert.ok(notes.some((n) => n.text.startsWith('Looks too much like --chart-5 and --chart-7')), JSON.stringify(notes));
   for (const n of notes) assert.doesNotMatch(n.text, /[Ss]eries 6/);
+});
+
+test('fonts: Bland’s own stacks come from tokens.css, and the text styles read them', () => {
+  assert.equal(blandFonts.sans, '"Inter", system-ui, sans-serif');
+  assert.equal(blandFonts.mono, '"Geist Mono", ui-monospace, monospace');
+  const css = readFileSync(new URL('../../src/tokens/tokens.css', import.meta.url), 'utf8');
+  const styles = [...css.matchAll(/^\s*(--type-[a-z0-9-]+):\s*(.+);$/gm)].filter(([, name]) => !/-(line-height|letter-spacing)$/.test(name!));
+  assert.equal(styles.length, 23);
+  for (const [, name = '', value = ''] of styles) assert.match(value, name.startsWith('--type-code-') ? /var\(--font-mono\)$/ : /var\(--font-sans\)$/, name);
+});
+
+test('fonts: a typed family list is quoted and gets Bland’s fallbacks unless it ends in a generic family', () => {
+  assert.equal(fontStack('Söhne', 'sans'), '"Söhne", system-ui, sans-serif');
+  assert.equal(fontStack(' Söhne Breit , Helvetica ', 'sans'), '"Söhne Breit", "Helvetica", system-ui, sans-serif');
+  assert.equal(fontStack("'Berkeley Mono', Menlo, monospace", 'mono'), '"Berkeley Mono", "Menlo", monospace');
+  assert.equal(fontStack('IBM Plex Mono', 'mono'), '"IBM Plex Mono", ui-monospace, monospace');
+  assert.equal(fontStack('Georgia, Serif', 'sans'), '"Georgia", serif');
+  assert.throws(() => fontStack('Söhne; color: red', 'sans'), /cannot contain/);
+  assert.throws(() => fontStack('Söhne,,', 'sans'), /family names/);
+});
+
+test('fonts: toCss writes them on :root after the scales, and parseFonts reads them back', () => {
+  const fonts = { sans: fontStack('Söhne', 'sans'), mono: fontStack('Berkeley Mono', 'mono') };
+  const css = toCss(blandScale, '', blandNeutrals, [], undefined, fonts);
+  const root = css.slice(css.indexOf(':root {'), css.indexOf('}'));
+  assert.ok(root.includes('--font-sans: "Söhne", system-ui, sans-serif;'));
+  assert.ok(root.indexOf('--font-sans') > root.indexOf('--neutral-1000'));
+  assert.deepEqual(parseFonts(css), fonts);
+  // The other parsers ignore them, and a file without fonts writes none.
+  assert.deepEqual(parseScale(css), blandScale);
+  assert.deepEqual(parseExtras(css), []);
+  assert.doesNotMatch(toCss(blandScale), /--font-/);
+  assert.deepEqual(parseFonts(toCss(blandScale)), {});
+  assert.deepEqual(parseFonts(toCss(blandScale, '', undefined, [], undefined, { mono: fonts.mono })), { mono: fonts.mono });
 });

@@ -1935,3 +1935,17 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Godwin made an npm account (`gdwn`) and ran `npm login`; `bland-ui` still free. Removed `private: true`, dated the CHANGELOG 0.1.0, README and agent notes say published; typecheck and `npm run test:package` passed.
 - First `npm publish`: E403, the account had no 2FA. Godwin turned it on. Second, from my shell: EOTP, npm wants a browser confirmation and a non-interactive shell exits instead of waiting. Third: `npm publish` typed into Godwin's Terminal panel; he pressed Enter, approved in the browser: `+ bland-ui@0.1.0`.
 - `npm view bland-ui`: first `0.0.0-stage` (npm's placeholder while processing), then `latest: 0.1.0`, MIT, maintainer gdwn.
+
+## Font family tokens, 0.1.1 prep (2026-10-30)
+
+- Godwin's call (2026-10-29): `--font-sans` and `--font-mono` that every text style reads, overridable in `brand.css`; reverses the "no raw `--font-*`" line in CLAUDE.md for these two only. No Figma or tracker access in this session.
+- Checksum before: `{"count":638,"hash":"4a186ff6"}`; the raw export is untouched, so it stays that.
+- `scripts/tokens/core.ts`: first cut keyed the tokens by family name (Inter, Geist Mono). Dropped it: a family change in Figma would have failed the build. Now by role (`Code/*` → mono, others → sans), the value is Figma's family plus a fallback stack; `cssValue` carries the `var()` shorthand, `light` the resolved one. `build-tokens.ts` puts `Font families` in the overridable `:root` block. 588 tokens (2 new).
+- Checked the 23 resolved shorthands against the old `tokens.css` with the `var()`s substituted back: identical.
+- Drift test added (family/sans → Söhne reaches `--font-sans` and `--type-body-md`); the report names a single-mode change `value`, not `light` (first run failed on that).
+- Lint: `font-family: var(--font-*)` already passed (a function, not a word). Added: redefining either token in a component fails; `font: 400 14px/20px var(--font-sans)` fails like any hardcoded shorthand; the family message names the family tokens. Fixtures in good.css / bad.css.
+- Brand tool: `fontStack`, `parseFonts`, `blandFonts`, `toCss(…, fonts)`; `--font-sans` / `--font-mono` on generate and check, `check` keeps the file's. Three tests. Brand theme page left without font fields (its previews would need the font files; screenshots baselined): follow-up.
+- Docs site Typography page: a Font families table first. Docs pages have smoke tests, no screenshots.
+- Package smoke test now generates with `--font-mono "Smoke Mono"` and checks a CodeText's computed family.
+- Docs: tokens.md, brand.md ("Fonts"), lint.md, README ("Your fonts", with an `@font-face` example), agent-skill.md, INTERFACE.md, LEARNINGS.md, CLAUDE.md. `fonts.css` and the CodeText prop comment reworded.
+- 0.1.1 in package.json (package-lock had been left at 0.0.0; `npm version` set both), CHANGELOG entry "unreleased" for Godwin to date at publish. Not published.

@@ -53,6 +53,28 @@ Load a stylesheet after Bland's tokens:
 
 Neutrals are optional in the file: set all 13 or none. Override at `:root`, not on a nested element: the brand-colored tokens are computed where `tokens.css` defines them (`:root` and `[data-theme]`), and they read the brand steps from there. Step 0 is white in Bland's scale; keep it white unless the brand needs otherwise.
 
+## Fonts (decided 2026-10-29)
+
+A project swaps Bland's fonts the same way: two family tokens on `:root`, `--font-sans` (UI text: every Display, Heading, Title and Body style; Inter) and `--font-mono` (code: every `Code/*` style; Geist Mono). Every `--type-*` text style reads one of them, so overriding them changes every component's type. Godwin's call (2026-10-29): only the families are swappable; sizes, line heights, letter spacing and weights stay Bland's (they come from Figma's text styles).
+
+```css
+/* brand.css, after bland-ui/tokens.css */
+:root {
+  /* … brand and neutral steps … */
+  --font-sans: "Söhne", system-ui, sans-serif;
+  --font-mono: "Berkeley Mono", ui-monospace, monospace;
+}
+```
+
+- **Load the font files yourself.** The tokens only name the family. Add an `@font-face` per weight (or the font host's stylesheet) under the same family name, and skip `bland-ui/fonts.css`, which loads only Inter and Geist Mono (keep it if you change just one of the two).
+- **Weights:** the text styles use 400, 500 and 600 for sans and 400 and 600 for mono. Load those; a missing weight is synthesized or falls back to the nearest.
+- **Keep a fallback stack** ending in a generic family, so text shows while the font loads. The tool adds Bland's when you leave it out.
+- **Override at `:root`,** as with the brand: the `--type-*` tokens are computed where `tokens.css` defines them and read the families from there.
+- **Metrics:** line heights and letter spacing are tuned for Inter and Geist Mono. A font with a much larger or smaller x-height will look bigger or smaller at the same size; check the docs site's components with it before shipping.
+- Components never set a family themselves: they use the text styles, and the lint rejects a component that redefines `--font-sans` or `--font-mono` (`lint.md`).
+
+The tool writes them for you: `--font-sans "Söhne"` and `--font-mono "Berkeley Mono"` on `generate` or `check` (below). The Brand theme page has no font fields yet (a follow-up: its previews would need the project's font files).
+
 ## Extra colors (decided 2026-10-27)
 
 A project can add up to three colors beside the brand, for charts, illustrations or any part of its own UI. Godwin's calls: the brand stays on every component; extras are the project's to place; they get light and dark theming; three at most.
@@ -114,6 +136,7 @@ A project can add up to three colors beside the brand, for charts, illustrations
 - **Extra colors:** Add color (up to three), each with a name, the same tap-to-change swatch, its steps, its roles in light and dark, and its own contrast check. They show in the previews and the CSS, and are kept for the visit; Reset clears them.
 - **Chart colors** (Godwin 2026-10-27): laid out like the Extra colors tab. The note with **Use Bland's picks** beside it, then a block per color (its card tinted with the color's own quiet tint, step 50 in light and 1000 in dark, as an extra's card; the brand's keeps surface-brand-light): its token as the heading, where it comes from (Brand color, Extra color name, Bland's pick) or **Use Bland's pick** on your own, and its card. The swatch shows the color for the theme the page is in (switch the theme to see the other). Every color but the brand's says **Tap to change** (the picker sets the light color; dark is made from it); the brand's card says **You can't change this** (it changes under Brand colors). Blocks sit space-2xl apart. Each card shows a warning only when that color has a problem, written about that color ("Too faint on the white page.", "Looks too much like --chart-5 and --chart-7."; `localNotes`, Godwin 2026-10-28) (no "checks out" banner anywhere on the page, Godwin 2026-10-28), in plain words, with **Fix color** when a color clears it (lightness up to 0.35 away, hue in 5° steps to 30° then 10° steps all the way round, the nearest first; it names the new hex before you press, "Fixing this color changes it to #…", and the fix becomes your pick; the warning is one run of sentences, no line breaks). The previews show a stacked bar chart in the palette.
 - **Preview** in light and dark, and **Use in a project** with the CSS to copy.
+- **No fonts yet:** set them with the command's `--font-sans` / `--font-mono`, or add the two lines to the copied CSS by hand.
 
 The page imports `scripts/brand/core.ts`, so it never disagrees with the command.
 
@@ -124,6 +147,7 @@ npm run brand -- generate "#ff5a1f"                 # 13 brand + 13 neutral step
 npm run brand -- generate "#ff5a1f" --neutrals none # pure gray neutrals (or subtle; full is the default)
 npm run brand -- generate "#ff5a1f" --extra accent=#7c3aed --extra highlight  # up to three extra colors; no color = the next in harmony
 npm run brand -- generate "#ff5a1f" --chart 4=#2b2bd0     # your own color for chart series 4; the others stay as they are
+npm run brand -- generate "#ff5a1f" --font-sans "Söhne" --font-mono "Berkeley Mono"  # the project's fonts, Bland's fallbacks added
 npm run brand -- generate "#ff5a1f" --fix --out brand.css
 npm run brand -- check brand.css                    # check a project's override (CSS or JSON)
 npm run brand -- check brand.css --fix --out fixed.css
@@ -132,6 +156,8 @@ npm run brand -- check brand.css --fix --out fixed.css
 **Generate** builds a scale in the shape of Bland's own, which was made in OKLCH. **The color lands exactly, unchanged, on the step its lightness belongs on** (`placeStep`: the Bland step closest in OKLCH lightness; decided 2026-10-26, Godwin: you never pick a step). Bland's blue lands on 600, a bright orange on 400, a green on 500, a yellow on 200, a near-black on 1000. Lighter steps spread its lightness up to white, darker ones down to Bland's darkest, chroma follows Bland's curve scaled to the color's, and the hue stays the color's. Generating from Bland's blue rebuilds Bland's scale. `--at <step>` still forces a step on the command line.
 
 **Check** tests the 35 brand pairings Bland draws, in both themes: text at 4.5:1 (button labels on brand fills, links, brand text, selected sidebar rows, sent chat bubbles, calendar days, badge and indicator labels) and icons, borders, fills and the focus ring at 3:1. Each miss names the pairing, its ratio and the step to move (`darken 600`). The pairings are listed in `scripts/brand/core.ts` (`PAIRS`); add one when a new component draws on the brand.
+
+**Fonts:** `--font-sans` and `--font-mono` take a font-family list (`"Söhne"`, `"Söhne, Helvetica, sans-serif"`). Family names are quoted, generic families (`sans-serif`, `monospace`, `system-ui`, …) left bare, and a list that ends in no generic family gets Bland's fallbacks for its role (`system-ui, sans-serif` or `ui-monospace, monospace`). They are written at the end of the `:root` block with a comment to load the files. `check` keeps the fonts a file already sets, unless a flag replaces them.
 
 **Warn, never block** (Godwin's default): the check exits 1 when something misses, and a brand may keep a miss on purpose, as Bland keeps its white success labels.
 
@@ -154,6 +180,6 @@ npm run brand -- check brand.css --fix --out fixed.css
 | Path | What |
 | --- | --- |
 | `scripts/brand.ts` | The command |
-| `scripts/brand/core.ts` | Generator, file parsing, pairings, check, suggestions |
+| `scripts/brand/core.ts` | Generator, file parsing, pairings, check, suggestions, font lists (`fontStack`, `parseFonts`) |
 | `scripts/brand/brand.test.ts` | Tests (`npm run test:brand`) |
 | `scripts/tokens/core.ts` | `brandRef`: which tokens point at which step |

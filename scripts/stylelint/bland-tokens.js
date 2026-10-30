@@ -238,13 +238,20 @@ function suggestShadow(raw, value) {
   return `${q(raw)} is hardcoded and matches no elevation style. Use var(--elevation-{neutral,brand,danger,success,warning}-{near,mid,far}), e.g. var(--elevation-neutral-mid). ${ASK}`
 }
 
-// Families, weights and sizes are the hidden type scale in Figma: they reach components only through text styles.
-const TYPE_ONLY = 'Bland sets type only through text styles (the raw type scale is not emitted).'
+// Weights and sizes are the hidden type scale in Figma: they reach components only through text styles. The two
+// family tokens (--font-sans, --font-mono) exist so a project can swap its fonts; the text styles read them.
+const TYPE_ONLY = 'Bland sets type through text styles (the raw type scale is not emitted).'
+const FAMILY_TOKEN = /^--font-(sans|mono)$/
 
 function suggestFamily(raw) {
   const mono = /mono|courier|consol/i.test(raw)
   const example = mono ? 'var(--type-code-body-md)' : 'var(--type-body-md)'
-  return `${q(raw)} is hardcoded. ${TYPE_ONLY} Set font: ${example} or another ${mono ? 'Code' : 'text'} style instead.`
+  const family = mono ? 'var(--font-mono)' : 'var(--font-sans)'
+  return `${q(raw)} is hardcoded. ${TYPE_ONLY} Set font: ${example} or another ${mono ? 'Code' : 'text'} style instead; where only the family changes, font-family: ${family}.`
+}
+
+function suggestFamilyOverride(name) {
+  return `${name} is a project's font choice: a project sets it at :root in its brand.css (docs/brand.md, "Fonts"). Components never redefine it; they read the text styles, which follow it.`
 }
 
 function suggestWeight(raw) {
@@ -339,7 +346,10 @@ const ruleFunction = (primary) => (root, result) => {
     const hasVar = (nodes) => nodes.some((n) => n.type === 'function' && n.value.toLowerCase() === 'var')
 
     // Whole-declaration checks: one message per declaration where a composite token exists.
-    if (prop === 'font' && !hasVar(parsed.nodes)) return report(suggestFont(value.trim()))
+    if (FAMILY_TOKEN.test(prop)) return report(suggestFamilyOverride(prop))
+    // A family token alone in a font shorthand leaves the size and weight hardcoded: use the text style.
+    const familyOnly = (n) => n.type === 'function' && n.value.toLowerCase() === 'var' && FAMILY_TOKEN.test(n.nodes[0]?.value ?? '')
+    if (prop === 'font' && !parsed.nodes.some((n) => hasVar([n]) && !familyOnly(n))) return report(suggestFont(value.trim()))
     if (prop === 'font-family') {
       const bad = parsed.nodes.filter((n) => n.type === 'string' || n.type === 'word')
       if (bad.length > 0) report(suggestFamily(valueParser.stringify(bad[0])), bad[0])
