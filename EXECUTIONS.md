@@ -1982,3 +1982,5 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Tests: first run, two failed on `toContainText` on `.bland-dropdown__button`: the chosen value is drawn in the field, the button is an empty overlay. Asserted on `.bland-dropdown__field`; all five font tests pass.
 - Looked at screenshots of the open menu and How to use at 1280.
 - Playwright from the uncommitted `pw.local.config.ts` with `executablePath` (LEARNINGS, "Playwright in a cloud container").
+- Checks: typecheck, lint:css, test:brand (31), docs:build (each preset weight is its own CSS file in `dist-docs/assets`; picked Playfair Display in `docs:preview` and it loaded from there), `npm test` 712 passed, no screenshot changed (the Brand page has no visual baseline).
+- Branches: `claude/sharp-brahmagupta-f511pt` (PR #1) and `claude/affectionate-curie-ctsi28` (PR #2) are both in `git branch -r --merged origin/main` and both PRs show merged, but `git push origin --delete` got HTTP 403: this session may push only its own branch. Left for Godwin.
