@@ -1,6 +1,5 @@
 // The docs site: every page opens without errors, the theme switch works, demo controls drive the demo,
 // the code view shows a whole file, and the search finds pages.
-import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import { pickOption, storyIds } from './stories';
 
@@ -525,9 +524,7 @@ test('the Grid page sits on its own grid, and Shift+G or the switch shows its co
   await expect(overlay).toBeVisible();
 });
 
-// The Fonts tab's tests load a real font file (Geist Mono's, from its npm package) under made-up family names, so
-// the page can tell it apart from the fallback, and never touch the network: Google Fonts is mocked.
-const fontFile = readFileSync('node_modules/@fontsource/geist-mono/files/geist-mono-latin-400-normal.woff2');
+// The Fonts tab's tests pick from its six self-hosted presets (Fontsource packages): nothing touches the network.
 const rootVar = (page: Page, name: string) => page.locator('html').evaluate((el, n) => el.style.getPropertyValue(n), name);
 const computedVar = (page: Page, name: string) => page.locator('html').evaluate((el, n) => getComputedStyle(el).getPropertyValue(n).trim(), name);
 const fontOf = (page: Page, selector: string) => page.locator(selector).first().evaluate((el) => getComputedStyle(el).fontFamily);
@@ -535,117 +532,95 @@ async function openFonts(page: Page) {
   await page.goto('/#/brand');
   await page.getByRole('tab', { name: 'Fonts' }).click();
 }
+async function pickFont(page: Page, role: 'Body' | 'Heading', font: string) {
+  await page.getByRole('region', { name: role }).locator('.bland-dropdown__button').click();
+  await page.getByRole('option', { name: new RegExp(`^${font}`) }).click();
+  await expect(page.getByRole('listbox')).toBeHidden();
+}
+/** Whether a family's face in a weight has loaded, so text really draws in it. */
+const fontLoaded = (page: Page, family: string, weight: string) =>
+  page.evaluate(async ([f, w]) => (await document.fonts.load(`${w} 16px "${f}"`)).length > 0, [family, weight] as const);
 
-test('the Fonts tab uses a font on this computer on every page, headings follow the body font until set, and Reset goes back to Inter', async ({ page }) => {
-  // "Installed Test" stands in for a font installed on the computer: the page can draw it, but loaded nothing for it.
-  await page.addInitScript((bytes) => {
-    const face = new FontFace('Installed Test', new Uint8Array(bytes).buffer);
-    document.fonts.add(face);
-    void face.load();
-  }, [...fontFile]);
+test('the Fonts tab: a serif picked for Body is set on the root and every page uses it', async ({ page }) => {
   await openFonts(page);
   const body = page.getByRole('region', { name: 'Body' });
-  const heading = page.getByRole('region', { name: 'Heading' });
-  await expect(body).toContainText('Inter (Bland’s)');
-  await expect(heading).toContainText('Same as body');
+  await expect(body.locator('.bland-dropdown__field')).toContainText('Inter');
+  await expect(page.getByRole('region', { name: 'Heading' }).locator('.bland-dropdown__field')).toContainText('Same as body');
+  await expect(page.getByRole('region', { name: 'Code' })).toContainText('Geist Mono');
+  await expect(page.getByRole('button', { name: 'Reset fonts' })).toBeDisabled();
 
-  await body.getByRole('textbox', { name: 'Body font' }).fill('Nope Sans 123');
-  await body.getByRole('button', { name: 'Use font' }).click();
-  await expect(body).toContainText('Not found on this computer; try Google Fonts or upload the file.');
-  expect(await rootVar(page, '--font-body')).toBe('');
-
-  await body.getByRole('textbox', { name: 'Body font' }).fill('Installed Test');
-  await body.getByRole('button', { name: 'Use font' }).click();
-  await expect(body).toContainText('Found on this computer. Every page uses it now.');
-  expect(await rootVar(page, '--font-body')).toBe('"Installed Test", system-ui, sans-serif');
-  // Headings follow the body font while their own is not set.
-  expect(await rootVar(page, '--font-heading')).toBe('');
-  expect(await computedVar(page, '--font-heading')).toBe('"Installed Test", system-ui, sans-serif');
-  expect(await fontOf(page, '.docs-font-sample[data-role="heading"]')).toContain('Installed Test');
-  expect(await fontOf(page, '.docs-page-header h1')).toContain('Installed Test');
+  await pickFont(page, 'Body', 'Lora');
+  expect(await rootVar(page, '--font-body')).toBe('"Lora", serif');
+  expect(await fontLoaded(page, 'Lora', '400')).toBe(true);
+  expect(await fontOf(page, '.docs-font-sample[data-role="body"]')).toContain('Lora');
   expect(await fontOf(page, '.docs-font-sample[data-role="code"]')).toContain('Geist Mono');
 
-  // Every page follows, component demos included, and a reload keeps it.
+  // Another page follows, component demos included, and a reload keeps it.
   await page.goto('/#/components/button');
   await expect(page.locator('.docs-page-header h1')).toBeVisible();
-  expect(await fontOf(page, '.docs-content .bland-button')).toContain('Installed Test');
+  expect(await fontOf(page, '.docs-content .bland-button')).toContain('Lora');
   await page.reload();
-  expect(await rootVar(page, '--font-body')).toBe('"Installed Test", system-ui, sans-serif');
+  expect(await rootVar(page, '--font-body')).toBe('"Lora", serif');
+  expect(await fontLoaded(page, 'Lora', '500')).toBe(true);
+});
 
+test('the Fonts tab: Heading follows Body until it has its own font', async ({ page }) => {
   await openFonts(page);
-  await expect(body).toContainText('Now: Installed Test, installed.');
+  await pickFont(page, 'Body', 'DM Sans');
+  expect(await rootVar(page, '--font-heading')).toBe('');
+  expect(await computedVar(page, '--font-heading')).toBe('"DM Sans", system-ui, sans-serif');
+  expect(await fontOf(page, '.docs-page-header h1')).toContain('DM Sans');
+
+  await pickFont(page, 'Heading', 'Playfair Display');
+  expect(await rootVar(page, '--font-heading')).toBe('"Playfair Display", serif');
+  expect(await fontLoaded(page, 'Playfair Display', '600')).toBe(true);
+  expect(await fontOf(page, '.docs-page-header h1')).toContain('Playfair Display');
+  expect(await fontOf(page, '.docs-font-sample[data-role="body"]')).toContain('DM Sans');
+
+  await pickFont(page, 'Heading', 'Same as body');
+  expect(await rootVar(page, '--font-heading')).toBe('');
+  expect(await fontOf(page, '.docs-page-header h1')).toContain('DM Sans');
+});
+
+test('the Fonts tab: How to use gives the font lines, the install line and the imports', async ({ page }) => {
+  await openFonts(page);
+  await page.getByRole('tab', { name: 'How to use' }).click();
+  await expect(page.locator('.docs-font-install')).toHaveCount(0); // Inter needs nothing: bland-ui/fonts.css loads it
+  await page.getByRole('tab', { name: 'Fonts' }).click();
+  await pickFont(page, 'Body', 'Source Serif 4');
+  await pickFont(page, 'Heading', 'Geist');
   await page.getByRole('tab', { name: 'How to use' }).click();
   const css = page.locator('#use-in-a-project pre').first();
-  await expect(css).toContainText('--font-body: "Installed Test", system-ui, sans-serif;');
-  await expect(css).not.toContainText('--font-heading');
-  await expect(page.locator('.docs-font-link')).toHaveCount(0);
+  await expect(css).toContainText('--font-body: "Source Serif 4", serif;');
+  await expect(css).toContainText('--font-heading: "Geist", system-ui, sans-serif;');
+  await expect(css).not.toContainText('--font-code');
+  await expect(page.locator('.docs-font-install pre')).toHaveText('npm install @fontsource/source-serif-4 @fontsource/geist');
+  await expect(page.locator('.docs-font-imports pre')).toHaveText(
+    ['@import "@fontsource/source-serif-4/400.css";', '@import "@fontsource/source-serif-4/500.css";', '@import "@fontsource/geist/600.css";'].join('\n'),
+  );
 
+  // While headings follow the body font, the body font brings its 600 too.
   await page.getByRole('tab', { name: 'Fonts' }).click();
+  await pickFont(page, 'Heading', 'Same as body');
+  await page.getByRole('tab', { name: 'How to use' }).click();
+  await expect(page.locator('.docs-font-install pre')).toHaveText('npm install @fontsource/source-serif-4');
+  await expect(page.locator('.docs-font-imports pre')).toContainText('@import "@fontsource/source-serif-4/600.css";');
+});
+
+test('the Fonts tab: Reset fonts goes back to Inter', async ({ page }) => {
+  await openFonts(page);
+  await pickFont(page, 'Body', 'Lora');
+  await pickFont(page, 'Heading', 'Geist');
   await page.getByRole('button', { name: 'Reset fonts' }).click();
   expect(await rootVar(page, '--font-body')).toBe('');
-  expect(await fontOf(page, '.docs-page-header h1')).toContain('Inter');
-  await expect(body).toContainText('Inter (Bland’s)');
-  await expect(page.getByRole('button', { name: 'Reset fonts' })).toBeDisabled();
-});
-
-test('the Fonts tab loads a Google font, says plainly when Google has none by that name, and adds its link to the CSS', async ({ page }) => {
-  const asked: string[] = [];
-  await page.route('https://fonts.googleapis.com/css2**', (route) => {
-    const family = new URL(route.request().url()).searchParams.get('family') ?? '';
-    asked.push(family);
-    const headers = { 'access-control-allow-origin': '*' };
-    if (!family.startsWith('Test Serif')) return route.fulfill({ status: 400, headers, body: 'Font family not found' });
-    return route.fulfill({ headers, contentType: 'text/css', body: "@font-face { font-family: 'Test Serif'; font-weight: 600; src: url(https://fonts.gstatic.com/s/testserif.woff2) format('woff2'); }" });
-  });
-  await page.route('https://fonts.gstatic.com/**', (route) => route.fulfill({ headers: { 'access-control-allow-origin': '*' }, contentType: 'font/woff2', body: fontFile }));
-  await openFonts(page);
-  const heading = page.getByRole('region', { name: 'Heading' });
-  await heading.getByRole('radio', { name: 'Google' }).check({ force: true }); // visually hidden under its label
-  const field = heading.getByRole('textbox', { name: 'Heading font' });
-
-  await field.fill('Nope Font');
-  await heading.getByRole('button', { name: 'Load font' }).click();
-  await expect(heading).toContainText('Google Fonts has no font called “Nope Font”. Check the spelling on fonts.google.com.');
   expect(await rootVar(page, '--font-heading')).toBe('');
-
-  await field.fill('Test Serif');
-  await heading.getByRole('button', { name: 'Load font' }).click();
-  await expect(heading).toContainText('Loaded from Google Fonts. Every page uses it now.');
-  expect(asked).toContain('Test Serif:wght@400;500;600');
-  expect(await rootVar(page, '--font-heading')).toBe('"Test Serif", system-ui, sans-serif');
+  expect(await fontOf(page, '.docs-page-header h1')).toContain('Inter');
+  await expect(page.getByRole('region', { name: 'Body' }).locator('.bland-dropdown__field')).toContainText('Inter');
+  await expect(page.getByRole('region', { name: 'Heading' }).locator('.bland-dropdown__field')).toContainText('Same as body');
+  await expect(page.getByRole('button', { name: 'Reset fonts' })).toBeDisabled();
+  await page.reload();
   expect(await rootVar(page, '--font-body')).toBe('');
-  expect(await fontOf(page, '.docs-page-header h1')).toContain('Test Serif');
-  expect(await fontOf(page, '.docs-font-sample[data-role="body"]')).toContain('Inter');
-  await expect(heading.getByRole('button', { name: 'Heading: back to the body font' })).toBeVisible();
-
-  await page.getByRole('tab', { name: 'How to use' }).click();
-  await expect(page.locator('#use-in-a-project pre').first()).toContainText('--font-heading: "Test Serif", system-ui, sans-serif;');
-  await expect(page.locator('.docs-font-link')).toContainText('https://fonts.googleapis.com/css2?family=Test+Serif:wght@600&display=swap');
-
-  // A reload keeps the pick and adds the font's stylesheet again.
-  await page.reload();
-  expect(await rootVar(page, '--font-heading')).toBe('"Test Serif", system-ui, sans-serif');
-  await expect(page.locator('style[data-docs-font="Test Serif"]')).toHaveCount(1);
 });
-
-test('the Fonts tab loads an uploaded font file under the name it gives, and asks for it again after a reload', async ({ page }) => {
-  await openFonts(page);
-  const code = page.getByRole('region', { name: 'Code' });
-  await code.getByRole('radio', { name: 'Upload' }).check({ force: true });
-  await code.locator('input[type="file"]').setInputFiles({ name: 'TestMono-SemiBold.woff2', mimeType: 'font/woff2', buffer: fontFile });
-  await expect(code).toContainText('Loaded as “Test Mono”. Every page uses it now.');
-  expect(await rootVar(page, '--font-code')).toBe('"Test Mono", ui-monospace, monospace');
-  expect(await page.evaluate(() => [...document.fonts].some((f) => f.family === 'Test Mono' && f.weight === '600' && f.status === 'loaded'))).toBe(true);
-  expect(await fontOf(page, '.docs-font-sample[data-role="code"]')).toContain('Test Mono');
-
-  // A file can't be kept for the visit: after a reload the name stays and the page asks for the file again.
-  await page.reload();
-  await page.getByRole('tab', { name: 'Fonts' }).click();
-  await code.getByRole('radio', { name: 'Upload' }).check({ force: true });
-  await expect(code).toContainText('Upload this file again: files stay only until the page reloads.');
-  expect(await rootVar(page, '--font-code')).toBe('"Test Mono", ui-monospace, monospace');
-});
-
 
 /** How far the page scrolls sideways: 0 when nothing runs past the screen. */
 const sidewaysScroll = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
@@ -662,15 +637,14 @@ test.describe('on a phone', () => {
     });
   }
 
-  test('the Fonts tab fits the screen with every way to add a font', async ({ page }) => {
+  test('the Fonts tab fits the screen, with a long font picked and its menu open', async ({ page }) => {
     await page.goto('/#/brand');
     await page.getByRole('tab', { name: 'Fonts' }).click();
-    await expect(page.getByRole('textbox', { name: 'Body font' })).toBeVisible();
-    for (const source of ['Installed', 'Google', 'Upload']) {
-      await page.getByRole('region', { name: 'Body' }).getByRole('radio', { name: source }).check({ force: true });
-      await page.evaluate(() => document.fonts.ready);
-      expect(await sidewaysScroll(page)).toBe(0);
-    }
+    await pickFont(page, 'Heading', 'Playfair Display');
+    await page.getByRole('region', { name: 'Body' }).locator('.bland-dropdown__button').click();
+    await expect(page.getByRole('listbox')).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    expect(await sidewaysScroll(page)).toBe(0);
   });
 
   test('the brand contrast breakdown stays inside its card as a stacked list', async ({ page }) => {

@@ -58,7 +58,7 @@ import {
   type Tint,
 } from '../../scripts/brand/core';
 import { paletteStyle, setAppliedBrand, useAppliedBrand, type Palette } from './brandStore';
-import { googleFamilies, googleHref, pickedFonts, useFontPicks } from './fontStore';
+import { fontInstalls, pickedFonts, useFontPicks } from './fontStore';
 import { FontTester } from './FontTester';
 import { normalHex } from './colorFormats';
 import { ColorPicker } from './ColorPicker';
@@ -92,7 +92,7 @@ export function BrandPage() {
   const [edited, setEdited] = useState<number>();
   const [tab, setTab] = useState('brand');
   const fontPicks = useFontPicks();
-  const google = googleFamilies(fontPicks);
+  const installs = fontInstalls(fontPicks);
   useEffect(() => saveExtras(extras), [extras]);
   useEffect(() => saveDraft({ color: input, tint, fixed }), [input, tint, fixed]);
   useEffect(() => savePins(pins), [pins]);
@@ -294,23 +294,15 @@ export function BrandPage() {
                     languages={[{ id: 'css', label: 'CSS' }]}
                     highlight={highlight}
                   />
-                  {google.length > 0 && (
+                  {installs.length > 0 && (
                     <>
                       <p className="docs-note">
-                        The CSS only names the fonts. Load the Google fonts with these lines in your page’s <code>&lt;head&gt;</code>, before the CSS:
+                        The CSS only names the fonts. Install their files from npm, then import the weights Bland uses in your main CSS file. Keep{' '}
+                        <code>bland-ui/fonts.css</code>: it loads Geist Mono for code, and Inter.
                       </p>
-                      <CodeSnippet
-                        className="docs-font-link"
-                        code={{ html: googleLink(google) }}
-                        languages={[{ id: 'html', label: 'HTML' }]}
-                        highlight={highlight}
-                      />
+                      <CodeSnippet className="docs-font-install" code={{ shell: fontInstallLine(installs) }} languages={[{ id: 'shell', label: 'Terminal' }]} />
+                      <CodeSnippet className="docs-font-imports" code={{ css: fontImports(installs) }} languages={[{ id: 'css', label: 'CSS' }]} highlight={highlight} />
                     </>
-                  )}
-                  {Object.values(fontPicks).some((p) => p.source !== 'google') && (
-                    <p className="docs-note">
-                      Fonts from this computer or a file need their files in your project too: an <code>@font-face</code> for each weight, under the same family name.
-                    </p>
                   )}
                 </Section>
               ),
@@ -341,13 +333,11 @@ export function BrandPage() {
   );
 }
 
-/** The <link> lines a project adds to load its Google fonts, in the weights Bland's text styles use. */
-const googleLink = (families: { name: string; weights: number[] }[]) =>
-  [
-    '<link rel="preconnect" href="https://fonts.googleapis.com">',
-    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
-    `<link rel="stylesheet" href="${googleHref(families)}">`,
-  ].join('\n');
+/** The command that installs the picked fonts' Fontsource packages. */
+const fontInstallLine = (installs: { pkg: string }[]) => `npm install ${installs.map((f) => `@fontsource/${f.pkg}`).join(' ')}`;
+/** The CSS imports for the weights Bland's text styles use, one file per weight. */
+const fontImports = (installs: { pkg: string; weights: number[] }[]) =>
+  installs.flatMap((f) => f.weights.map((w) => `@import "@fontsource/${f.pkg}/${w}.css";`)).join('\n');
 
 type ExtraState = { id: string; name: string; color: string; fixed: Scale | null };
 const EXTRA_NAMES = ['accent', 'highlight', 'illustration'];

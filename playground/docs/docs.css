@@ -2073,28 +2073,21 @@ code,
 
 /* ---- Brand theme page: Fonts tab ---- */
 /* Laid out as the Extra colors tab: one block per role (Body, Heading, Code), each its heading, what the role
-   covers, where the font comes from, the field (or the drop zone), and a line in the role's own text style. */
+   covers, the font (Body and Heading; Code stays Geist Mono), and a line in the role's own text style. */
 .docs-font-about {
   margin: var(--space-none);
   font: var(--type-body-md);
   letter-spacing: var(--type-body-md-letter-spacing);
   color: var(--text-subtle);
 }
-/* The field and its button share a row; the button lines up with the field box under the label, and goes under
-   the field when the row is too narrow. */
-.docs-font-form {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: var(--space-sm);
+.docs-font-select {
+  max-width: var(--dropdown-width);
 }
-.docs-font-input {
-  flex: 1 1 var(--space-9xl);
-  min-width: var(--space-none);
-}
-.docs-font-form > .bland-button {
-  flex: none;
-  margin-top: calc(var(--type-body-lg-line-height) + var(--space-xs));
+/* Sans or Serif, beside each font in the menu. */
+.docs-font-kind {
+  font: var(--type-body-md);
+  letter-spacing: var(--type-body-md-letter-spacing);
+  color: var(--text-subtle);
 }
 .docs-font-sample {
   --bland-radius: var(--rad-lg);

@@ -1972,3 +1972,13 @@ not wrapped; rail contents centred (logo and account icon were off).
 - First upload run failed: the success note only showed in the file row, so the row now says "Loaded as …".
 - Screenshots at 1280 light and dark and at 320: "Google Fonts" truncated in the segmented bar at 320, so the segment says "Google". No story screenshot changes (the Brand page has no visual baseline).
 - Playwright ran from an uncommitted config with `executablePath: '/opt/pw-browsers/chromium'` (LEARNINGS, "Playwright in a cloud container").
+
+## Font tester: six presets, merged branches deleted (2026-10-30, cloud session)
+
+- Godwin's call: the Fonts tab is too much and what it tries can't be copied. Read FontTester.tsx, fontStore.ts, BrandPage.tsx's How to use, docs.css, the font tests, docs/brand.md.
+- `npm ci` (node_modules was missing), then `npm view` for each package: geist 5.3.0, dm-sans 5.3.0, source-serif-4 5.3.1, lora 5.3.0, playfair-display 5.3.0; each has 400.css, 500.css and 600.css. Added as exact devDependencies.
+- Rewrote `fontStore.ts` (presets, literal per-weight `import()` loaders, picks for body and heading, `fontInstalls`) and `FontTester.tsx` (two Dropdowns, a Code block without a picker); How to use now shows the install line and imports instead of the Google `<link>`. Removed the form/input CSS, added `.docs-font-select` and `.docs-font-kind`.
+- Showing each option in its own font turned out simple: the tab loads the six presets' `@font-face` rules on mount, and the files download only when the menu draws the names.
+- Tests: first run, two failed on `toContainText` on `.bland-dropdown__button`: the chosen value is drawn in the field, the button is an empty overlay. Asserted on `.bland-dropdown__field`; all five font tests pass.
+- Looked at screenshots of the open menu and How to use at 1280.
+- Playwright from the uncommitted `pw.local.config.ts` with `executablePath` (LEARNINGS, "Playwright in a cloud container").

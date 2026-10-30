@@ -756,3 +756,8 @@ shell never produces. Also: don't point two Playwright runs at one log file.
 
 - **`document.fonts.check('16px "Anything"')` is true for a font that doesn't exist.** It only reports on faces in the FontFaceSet, and a family with none needs no loading. → To tell whether a typed family renders, measure text in `"Name", <generic>` against the generic alone (canvas `measureText`) for a few generics; any difference means it drew.
 - **A mocked cross-origin `fetch` in Playwright fails without CORS headers.** `page.route` fulfils the response, but the page still applies CORS. → Add `access-control-allow-origin: *` to mocked Google Fonts CSS and font files.
+
+## Dropdown in Playwright (2026-10-30)
+
+- **`toContainText` on a basic Dropdown's `.bland-dropdown__button` reads "".** The button is an empty overlay over the field; the chosen value is drawn in the field beside it. → Click `.bland-dropdown__button` to open, assert the value on `.bland-dropdown__field`.
+- The "Fonts in the browser" entries above (installed-font check, mocked Google Fonts) belong to the Fonts tab's first version; it has used self-hosted presets only since 2026-10-30.

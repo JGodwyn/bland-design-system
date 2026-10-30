@@ -2346,3 +2346,13 @@ Readers are designers, developers and agents. The voice follows systems known fo
 - Google: the stylesheet is fetched, not linked, so a missing family is told apart from no connection; loaded with 400;500;600 on the site, retried without weights when Google refuses one. The project `<link>` asks only for each role's weights (merged when roles share a font).
 - Upload: family, weight and style from the file name; several files make one family; kept in the tab only, the pick survives a reload with a "upload this file again" row.
 - The CSS panel passes the picks to `toCss(..., fonts)`; a second snippet holds the Google `<link>` lines.
+
+## Font tester: six presets (2026-10-30, Godwin)
+
+Replaces the sources in "Font tester on the Brand theme page" above: Installed, Google and Upload are gone, with the installed-font check, the Google fetch and `<link>` snippet, and the file loader. That section's first, third, fourth and fifth bullets and its last bullet's `<link>` snippet no longer hold; the second (applies at once, `fontStore.ts`, sessionStorage `bland-docs-fonts`, Reset fonts separate from the brand's Reset) still does.
+
+- **Body** and **Heading** each get a basic `Dropdown` (label "Body font" / "Heading font", width `--dropdown-width`) of six presets, sans then serif with a divider, a "Sans" / "Serif" word in each row's trailing slot, each label in its own font: Inter, Geist, DM Sans, Source Serif 4, Lora, Playfair Display. Heading's first option is "Same as body" (no pick, `--font-heading` left to `var(--font-body)`). Body on Inter is no pick either, so the CSS stays Bland's.
+- **Code** has no picker: its block says it stays Geist Mono and shows the sample.
+- Fonts come from Fontsource devDependencies (`@fontsource/geist`, `dm-sans`, `source-serif-4`, `lora`, `playfair-display`, all with 400, 500 and 600). `fontStore.ts` holds a literal `import()` per preset and weight so Vite splits each into its own CSS file; they load when the Fonts tab mounts (for the labels) or when a saved pick is painted on load. Font files download only when text uses them.
+- Stacks through `fontStack`: a serif preset is passed as `Name, serif` (so it ends in `serif`, not Bland's sans fallbacks), a sans as the name alone (`"Geist", system-ui, sans-serif`).
+- How to use: the CSS from `toCss(..., fonts)`, then, when any pick isn't Inter, a note, a Terminal snippet (`npm install @fontsource/a @fontsource/b`) and a CSS snippet of `@import "@fontsource/<pkg>/<weight>.css";` lines: body 400 and 500 (and 600 while Heading is Same as body), heading 600, merged when both roles use one font. Inter needs no install: `bland-ui/fonts.css` loads it.
