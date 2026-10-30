@@ -25,6 +25,10 @@ Peer dependencies are React and React DOM **19**: components take `ref` as a pla
 3. **Docs site: public**, on Cloudflare Pages (below).
 4. **Registry: public npm** follows from the name (option A). GitHub Packages would need a scoped name (`@jgodwyn/bland-ui`); a git install would work with any name.
 
+## Published
+
+`bland-ui` 0.1.0 went to public npm on 2026-10-30 (account `gdwn`, two-factor auth on). npm asks for a browser confirmation on each publish, which a non-interactive shell cannot wait for (it fails with EOTP): run `npm publish` in a terminal you can see, press Enter, approve in the browser. While a version is processed npm briefly shows a `0.0.0-stage` placeholder; `npm view bland-ui dist-tags` shows the real version a minute later.
+
 ## Before every release
 
 ```bash

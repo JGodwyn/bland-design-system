@@ -8,7 +8,7 @@ Godwin's design system: design tokens as CSS custom properties and React compone
 
 ## Install
 
-Bland is published on npm as `bland-ui` (not yet: `docs/release.md` has the steps):
+Bland is published on npm as `bland-ui`:
 
 ```bash
 npm install bland-ui

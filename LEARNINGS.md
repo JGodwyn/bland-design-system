@@ -730,3 +730,9 @@ beats `strictPort`'s config value), then delete it.
 - Symptom: the Brand page's color picker stuttered on a phone. Cause: every pointer move re-ran the whole page, and `generateChart` alone is ~60 ms on a laptop. Rule: the picker shows its own color at once and sends at most one per frame in `startTransition`; the chart palette waits until the colors settle (`useSettled`, 120 ms). Measure with CDP `Emulation.setCPUThrottlingRate` 4: 40 drag moves went from 24 s to 2.5 s.
 - Symptom: after a tap on the theme switch the phone toolbar no longer hid on scroll. Cause: `:focus-within` stays true while the tapped radio keeps focus. Rule: pin a bar for keyboard users with `:has(:focus-visible)`, not `:focus-within`.
 - Playwright: `getByText` on a SegmentedBar segment times out on tap/click (the visible text sits over a visually hidden radio); tap its `label`.
+
+## Publishing to npm (2026-10-30)
+
+- **E403 "Two-factor authentication … is required"** → the npm account has no 2FA; publishing needs it on.
+- **EOTP from a non-interactive shell** → with 2FA, npm asks for a browser confirmation and exits when it can't wait. Run `npm publish` in a visible terminal (the Terminal panel), press Enter, approve in the browser.
+- **`0.0.0-stage` right after publishing** → npm's placeholder while the version is processed; the real version shows within a minute or two.

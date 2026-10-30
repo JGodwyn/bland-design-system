@@ -1929,3 +1929,9 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Grid page: the desktop Show columns button had the phone's brand shadow while on: the phone's `[data-on]` rule set it and the `min-width: 768px` block reset the shadow only for the resting state. Added `box-shadow: none` to the desktop `[data-on]` rule; checked in Chromium at 1280 (none, on and off) and 375 (kept).
 - Renamed the package to `bland-ui`: package.json, README, docs/release.md, agent-skill, the docs site's import lines (ComponentPage, Overview), the Code snippet story text and its specs, the smoke test, `from 'bland'` lines in CLAUDE.md and INTERFACE.md. Older log entries left as written.
 - MIT LICENSE added (Copyright 2026 Godwin John); the smoke test now requires it in the tarball.
+
+## Published bland-ui 0.1.0 (2026-10-30, release side session)
+
+- Godwin made an npm account (`gdwn`) and ran `npm login`; `bland-ui` still free. Removed `private: true`, dated the CHANGELOG 0.1.0, README and agent notes say published; typecheck and `npm run test:package` passed.
+- First `npm publish`: E403, the account had no 2FA. Godwin turned it on. Second, from my shell: EOTP, npm wants a browser confirmation and a non-interactive shell exits instead of waiting. Third: `npm publish` typed into Godwin's Terminal panel; he pressed Enter, approved in the browser: `+ bland-ui@0.1.0`.
+- `npm view bland-ui`: first `0.0.0-stage` (npm's placeholder while processing), then `latest: 0.1.0`, MIT, maintainer gdwn.

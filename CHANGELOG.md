@@ -2,7 +2,7 @@
 
 Bland follows [semantic versioning](https://semver.org). Until 1.0, a minor version (0.2.0) may change an API or a token name; a patch (0.1.1) never does. Each entry says what a project has to change, if anything.
 
-## 0.1.0 (unreleased)
+## 0.1.0 (2026-10-30)
 
 First release.
 
