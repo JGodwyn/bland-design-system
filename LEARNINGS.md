@@ -742,3 +742,12 @@ beats `strictPort`'s config value), then delete it.
 - **E403 "Two-factor authentication … is required"** → the npm account has no 2FA; publishing needs it on.
 - **EOTP from a non-interactive shell** → with 2FA, npm asks for a browser confirmation and exits when it can't wait. Run `npm publish` in a visible terminal (the Terminal panel), press Enter, approve in the browser.
 - **`0.0.0-stage` right after publishing** → npm's placeholder while the version is processed; the real version shows within a minute or two.
+
+## Playwright in a cloud container (2026-10-30)
+
+**Every test fails in a few ms: "Executable doesn't exist at /opt/pw-browsers/chromium_headless_shell-1248".** The
+container's preinstalled browser is an older build than the repo's @playwright/test 1.64.1 wants. → Don't run
+`playwright install`; run from an uncommitted config that spreads `playwright.config.ts` and sets
+`use.launchOptions.executablePath: '/opt/pw-browsers/chromium'` (same for `test:package`'s `chromium.launch()`).
+That full Chromium requests `/favicon.ico`, so the package smoke test reports a console 404 there that the headless
+shell never produces. Also: don't point two Playwright runs at one log file.
