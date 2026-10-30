@@ -11,6 +11,7 @@ import { stories, type DocsPage, type StylePageId } from './data';
 import { CommandIcon, ListBulletsIcon, ListDashesIcon, MoonIcon, SunDimIcon } from './icons';
 import { BrandPage } from './BrandPage';
 import './brandStore'; // paints an applied brand on load, on every page
+import './fontStore'; // and the fonts tried on the Brand theme page
 import { brandPage, componentPageList, overviewPage, PageIcon, stylePageList } from './pages';
 import { isApple, SearchDialog } from './Search';
 import { Overview } from './Overview';

@@ -2337,3 +2337,12 @@ Readers are designers, developers and agents. The voice follows systems known fo
 - Body styles read `--font-body`; Display, Heading and Title read `--font-heading`; Code reads `--font-code`. `--font-heading` is `var(--font-body)` in `tokens.css`, so one override sets all text and a second sets headings apart. Three roles, no more.
 - Figma follows: `family/sans` → `family/body`, `family/mono` → `family/code`, new `family/heading` aliasing `family/body`; the nine Display, Heading and Title styles bound to it. The build maps each text style through the `family/<role>` variable it is bound to (not by style name), and a family variable aliasing another becomes `var()` of that token.
 - Brand tool flags `--font-body`, `--font-heading`, `--font-code`; the lint allows the three in `font-family` and rejects redefining them in a component. Resolved text styles are unchanged.
+
+## Font tester on the Brand theme page (2026-10-30)
+
+- A **Fonts** tab after Chart colors: Body, Heading, Code blocks laid out as the Extra colors tab, each with a SegmentedBar for the source (Installed, Google, Upload; "Google Fonts" truncated at 320), a TextInput + Button form or a FileUpload, and a sample in the role's text style. Heading shows "Same as body" until set.
+- Applies at once, no Apply button: a font is only set once it renders, and trying fonts on the site is the point. Fonts live in `playground/docs/fontStore.ts` beside `brandStore.ts`, set on `<html>` (sessionStorage key `bland-docs-fonts`), painted on load from `DocsApp.tsx`. Separate from the brand: the brand's Reset leaves fonts alone; **Reset fonts** clears them.
+- Installed check: canvas width against monospace, sans-serif and serif (after `document.fonts.load`), not `document.fonts.check`.
+- Google: the stylesheet is fetched, not linked, so a missing family is told apart from no connection; loaded with 400;500;600 on the site, retried without weights when Google refuses one. The project `<link>` asks only for each role's weights (merged when roles share a font).
+- Upload: family, weight and style from the file name; several files make one family; kept in the tab only, the pick survives a reload with a "upload this file again" row.
+- The CSS panel passes the picks to `toCss(..., fonts)`; a second snippet holds the Google `<link>` lines.

@@ -58,6 +58,8 @@ import {
   type Tint,
 } from '../../scripts/brand/core';
 import { paletteStyle, setAppliedBrand, useAppliedBrand, type Palette } from './brandStore';
+import { googleFamilies, googleHref, pickedFonts, useFontPicks } from './fontStore';
+import { FontTester } from './FontTester';
 import { normalHex } from './colorFormats';
 import { ColorPicker } from './ColorPicker';
 import { highlight } from './highlight';
@@ -89,6 +91,8 @@ export function BrandPage() {
   // The chart color you last picked or fixed: a clash it is in shows on it.
   const [edited, setEdited] = useState<number>();
   const [tab, setTab] = useState('brand');
+  const fontPicks = useFontPicks();
+  const google = googleFamilies(fontPicks);
   useEffect(() => saveExtras(extras), [extras]);
   useEffect(() => saveDraft({ color: input, tint, fixed }), [input, tint, fixed]);
   useEffect(() => savePins(pins), [pins]);
@@ -271,6 +275,11 @@ export function BrandPage() {
               ),
             },
             {
+              id: 'fonts',
+              label: 'Fonts',
+              panel: <FontTester />,
+            },
+            {
               id: 'use',
               label: 'How to use',
               panel: (
@@ -278,13 +287,31 @@ export function BrandPage() {
                   <p className="docs-note">
                     Save this as a CSS file and load it after Bland’s tokens. It replaces the brand and neutral shades, and every component follows in both themes. Extra colors
                     add their shades and their roles (<code>--name-surface</code>, <code>--name-text</code> and so on) for your own CSS. The chart colors,
-                    <code>--chart-1</code> to <code>--chart-{CHART_COUNT}</code>, come last.
+                    <code>--chart-1</code> to <code>--chart-{CHART_COUNT}</code>, come last. Fonts picked under Fonts add their <code>--font-*</code> lines.
                   </p>
                   <CodeSnippet
-                    code={{ css: toCss(scale, isBland ? 'Bland’s own blue' : `made from ${input}, neutrals ${tint === 'none' ? 'pure gray' : `${tint} tint`}`, neutrals, validExtras, chart) }}
+                    code={{ css: toCss(scale, isBland ? 'Bland’s own blue' : `made from ${input}, neutrals ${tint === 'none' ? 'pure gray' : `${tint} tint`}`, neutrals, validExtras, chart, pickedFonts(fontPicks)) }}
                     languages={[{ id: 'css', label: 'CSS' }]}
                     highlight={highlight}
                   />
+                  {google.length > 0 && (
+                    <>
+                      <p className="docs-note">
+                        The CSS only names the fonts. Load the Google fonts with these lines in your page’s <code>&lt;head&gt;</code>, before the CSS:
+                      </p>
+                      <CodeSnippet
+                        className="docs-font-link"
+                        code={{ html: googleLink(google) }}
+                        languages={[{ id: 'html', label: 'HTML' }]}
+                        highlight={highlight}
+                      />
+                    </>
+                  )}
+                  {Object.values(fontPicks).some((p) => p.source !== 'google') && (
+                    <p className="docs-note">
+                      Fonts from this computer or a file need their files in your project too: an <code>@font-face</code> for each weight, under the same family name.
+                    </p>
+                  )}
                 </Section>
               ),
             },
@@ -313,6 +340,14 @@ export function BrandPage() {
     </>
   );
 }
+
+/** The <link> lines a project adds to load its Google fonts, in the weights Bland's text styles use. */
+const googleLink = (families: { name: string; weights: number[] }[]) =>
+  [
+    '<link rel="preconnect" href="https://fonts.googleapis.com">',
+    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
+    `<link rel="stylesheet" href="${googleHref(families)}">`,
+  ].join('\n');
 
 type ExtraState = { id: string; name: string; color: string; fixed: Scale | null };
 const EXTRA_NAMES = ['accent', 'highlight', 'illustration'];

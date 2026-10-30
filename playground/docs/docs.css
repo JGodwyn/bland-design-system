@@ -2070,3 +2070,50 @@ code,
   color: var(--text-bold);
   text-align: center;
 }
+
+/* ---- Brand theme page: Fonts tab ---- */
+/* Laid out as the Extra colors tab: one block per role (Body, Heading, Code), each its heading, what the role
+   covers, where the font comes from, the field (or the drop zone), and a line in the role's own text style. */
+.docs-font-about {
+  margin: var(--space-none);
+  font: var(--type-body-md);
+  letter-spacing: var(--type-body-md-letter-spacing);
+  color: var(--text-subtle);
+}
+/* The field and its button share a row; the button lines up with the field box under the label, and goes under
+   the field when the row is too narrow. */
+.docs-font-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+.docs-font-input {
+  flex: 1 1 var(--space-9xl);
+  min-width: var(--space-none);
+}
+.docs-font-form > .bland-button {
+  flex: none;
+  margin-top: calc(var(--type-body-lg-line-height) + var(--space-xs));
+}
+.docs-font-sample {
+  --bland-radius: var(--rad-lg);
+
+  margin: var(--space-none);
+  padding: var(--space-lg);
+  background: var(--surface-200);
+  color: var(--text-bold);
+  overflow-wrap: anywhere;
+}
+.docs-font-sample[data-role="body"] {
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+}
+.docs-font-sample[data-role="heading"] {
+  font: var(--type-heading-md);
+  letter-spacing: var(--type-heading-md-letter-spacing);
+}
+.docs-font-sample[data-role="code"] {
+  font: var(--type-code-body-md);
+  letter-spacing: var(--type-code-body-md-letter-spacing);
+}

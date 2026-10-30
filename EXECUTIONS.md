@@ -1962,3 +1962,13 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Figma: renamed `family/sans`/`mono` to `family/body`/`code`, added `family/heading` (alias of body), rebound Display, Heading, Title. Drift check: 1 added, 2 changed, 9 text styles changed, no CSS affected before the build change. Applied; checksum `b6fb0406` (639 variables) matches Figma.
 - Build: font role from the bound family variable; an aliasing family emits `var()`. The CSS writer's `:root` block printed resolved values only, so `--font-heading` came out as Inter until it used `cssValue` too.
 - Renamed through the brand tool (and its tests), lint rule and fixtures, drift test, package test (now also sets `--font-heading` and checks a Title follows it while body stays Inter), docs site note, README, CHANGELOG (still unreleased), docs, CLAUDE.md.
+
+## Font tester on the docs site (2026-10-30, cloud session)
+
+- Read CLAUDE.md, INTERFACE.md (Brand theme page, font tokens by role), docs/brand.md, BrandPage.tsx, brandStore.ts, scripts/brand/core.ts (`fontStack`, `toCss`, `FONT_ROLES`).
+- Checked that a root inline `--font-body` reaches every `--type-*`: they are defined on `:root, [data-theme]` with `var(--font-*)`, so the value inherits into themed sections too.
+- Built `playground/docs/fontStore.ts` (picks, paint, installed check, Google loader, font file loader) and `FontTester.tsx`; wired the tab and the CSS panel into `BrandPage.tsx`, the store into `DocsApp.tsx`; styles in `docs.css` (tokens only).
+- Tests in `tests/docs.spec.ts`: installed font (a FontFace added by an init script stands in for an installed font; Geist Mono's woff2 from node_modules under made-up names), heading follows body, other pages follow, Reset; Google with `page.route` (CORS headers needed on both the CSS and the font file, since the page fetches cross-origin); upload through `setInputFiles` with a buffer; phone width for each source.
+- First upload run failed: the success note only showed in the file row, so the row now says "Loaded as …".
+- Screenshots at 1280 light and dark and at 320: "Google Fonts" truncated in the segmented bar at 320, so the segment says "Google". No story screenshot changes (the Brand page has no visual baseline).
+- Playwright ran from an uncommitted config with `executablePath: '/opt/pw-browsers/chromium'` (LEARNINGS, "Playwright in a cloud container").

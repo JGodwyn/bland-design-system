@@ -751,3 +751,8 @@ container's preinstalled browser is an older build than the repo's @playwright/t
 `use.launchOptions.executablePath: '/opt/pw-browsers/chromium'` (same for `test:package`'s `chromium.launch()`).
 That full Chromium requests `/favicon.ico`, so the package smoke test reports a console 404 there that the headless
 shell never produces. Also: don't point two Playwright runs at one log file.
+
+## Fonts in the browser (2026-10-30)
+
+- **`document.fonts.check('16px "Anything"')` is true for a font that doesn't exist.** It only reports on faces in the FontFaceSet, and a family with none needs no loading. → To tell whether a typed family renders, measure text in `"Name", <generic>` against the generic alone (canvas `measureText`) for a few generics; any difference means it drew.
+- **A mocked cross-origin `fetch` in Playwright fails without CORS headers.** `page.route` fulfils the response, but the page still applies CORS. → Add `access-control-allow-origin: *` to mocked Google Fonts CSS and font files.
