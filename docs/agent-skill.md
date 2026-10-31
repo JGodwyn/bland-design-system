@@ -12,7 +12,7 @@ Raw material for the skill we package at the end of the project: what an agent n
 
 ## Brand and colors
 
-- A project's brand is 13 `--brand-*` steps and 13 `--neutral-*` steps at `:root`, made on the docs site's Brand theme page (copy its CSS) or by `npm run brand -- generate "#hex"` in a clone of the Bland repo; the `bland-ui` npm package has no command, so a project's agent never runs `npm run brand` in the project itself. Fonts need no tool: write the `--font-*` lines by hand. Never edit Bland's tokens to rebrand.
+- A project's brand is 13 `--brand-*` steps and 13 `--neutral-*` steps at `:root`, made on the docs site's Brand theme page (copy its CSS): that is the default to suggest. `npm run brand -- generate "#hex"` is fine too when someone prefers it (Godwin 2026-10-31), but it runs only in a clone of the Bland repo: the `bland-ui` npm package has no command, so `npm run brand` inside the project itself fails. Fonts need no tool: write the `--font-*` lines by hand. Never edit Bland's tokens to rebrand.
 - The entered color lands unchanged on the step its lightness belongs on; Fix contrast moves the other steps only. Never change a project's brand color to clear a contrast miss; a miss on that color's own step is the project's to keep or answer with another color.
 - Up to three extra colors (`--extra name=#hex`), for the project's own UI: charts, illustrations, a section, a tag. Bland's components never read them.
 - A new extra's default color is the next one in harmony with the brand (complement, then the square); pass a hex to choose your own.
