@@ -2364,3 +2364,13 @@ Replaces the sources in "Font tester on the Brand theme page" above: Installed, 
 - Code keeps Geist Mono: its card shows the Chip and the sample with no list or caret, as the card's own copy says (the Figma card shows "Tap to change" and a caret on Code; not drawn in code since there's nothing to pick).
 - The sample uses `text-inverse` on `surface-inverse`, not Figma's `text-on-color` (white on white in dark). Icons line up with the sample's first line.
 - Fonts tab follow-up (Godwin 2026-10-31): the whole row picks its font (the label covers the row; hover and pressed use List's fills), and the list folds open and closed as the contrast breakdown does (`.docs-fold`).
+
+## Fonts tab: a code font picker; live font values (2026-10-31, Godwin)
+
+Reverses "Code has no picker" (Font tester: six presets) and "Code keeps Geist Mono" (Fonts tab from Figma): the Code card now has a picker, so a project can try a code font with ligatures.
+- The Code card works like Body and Heading: "Tap to change", the dark sample is a button (`aria-expanded`) that folds open (`.docs-fold`) a radio list of four self-hosted monospace fonts as List rows, each name in its own font, the whole row pressable: **Geist Mono** (Bland's own, first), **JetBrains Mono**, **Fira Code**, **IBM Plex Mono**. The alt text says what each is known for in a word or two (Bland's own, Ligatures, Ligatures, Plain), short enough that no name is cut at 320px.
+- Sample: `const ok = (a, b) => a !== b && a <= b;`, so `=>`, `!==` and `<=` join in a font with ligatures.
+- `fontStore.ts`: `CODE_PRESETS`, `presetsFor(role)`, `PICK_ROLES` is body, heading, code; the pick sets `--font-code` on `<html>` through `fontStack(..., 'code')` (`"Fira Code", ui-monospace, monospace`). Geist Mono, like Inter for body, is no pick and writes nothing. Reset fonts clears it. Fontsource devDependencies `@fontsource/jetbrains-mono`, `fira-code`, `ibm-plex-mono` 5.3.0, weights 400 and 600, loaded lazily per weight as the other presets.
+- How to use adds the `--font-code` line, the `npm install` line and the 400 and 600 imports; its note says `bland-ui/fonts.css` loads Inter and Geist Mono.
+- Live values: font values on the docs site are read from the page (`useLiveValue` in `fontStore.ts`, re-read when the picks change), so they name the picked fonts: every `TokenTable` row whose token is a font family or a text style, and each text style's value on the Typography page. Bland's own values come back after Reset.
+- Token tables (every one, in `TokenTable`): the Figma name sits space-sm under the token's code chip; the Use column is `text-bold`.

@@ -3,7 +3,7 @@ import type { StylePageId } from './data';
 
 export const leads: Record<StylePageId, string> = {
   colors: 'Every color has a light and a dark value and switches with the theme. Components use these tokens only, never the color steps behind them. Switch the theme to see both.',
-  typography: 'Inter for interface text, Geist Mono for code. Set a text style as one value, `font: var(--type-body-md)`, with its letter spacing beside it.',
+  typography: 'Inter for interface text and Geist Mono for code, unless a project sets its own. Set a text style as one value, `font: var(--type-body-md)`, with its letter spacing beside it.',
   spacing: 'Padding and gaps, from `--space-none` (0) to `--space-9xl` (256).',
   radius: 'Corner sizes. Every rounded corner in Bland is smoothed: set the radius as `--bland-radius` and add the `bland-smooth` class.',
   stroke: 'Weights for borders, icons and focus rings.',

@@ -9,6 +9,7 @@ import { bySize, groupBy, inCollection, tokens, stylePages, type StylePageId, ty
 import { highlight } from './highlight';
 import { ArrowFatUpIcon } from './icons';
 import { isApple } from './Search';
+import { useLiveValue } from './fontStore';
 import { leads } from './leads';
 import { PageHeader, Prose, Section, TokenName, TokenTable } from './parts';
 
@@ -123,6 +124,8 @@ function ColorsPage() {
 function TypographyPage() {
   const styles = inCollection('Text styles').filter((t) => t.type === 'FONT');
   const parts = inCollection('Text styles').filter((t) => t.type !== 'FONT');
+  // Each style's value as the page computes it, so it names the fonts picked on the Brand theme page.
+  const live = useLiveValue();
   return (
     <>
       <Section
@@ -140,7 +143,7 @@ function TypographyPage() {
               </div>
               <div className="docs-type-meta">
                 <TokenName css={t.css} />
-                <code className="docs-value">{t.light}</code>
+                <code className="docs-value">{live(t.css, t.light)}</code>
               </div>
             </div>
           ))}

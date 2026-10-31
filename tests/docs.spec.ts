@@ -524,7 +524,7 @@ test('the Grid page sits on its own grid, and Shift+G or the switch shows its co
   await expect(overlay).toBeVisible();
 });
 
-// The Fonts tab's tests pick from its six self-hosted presets (Fontsource packages): nothing touches the network.
+// The Fonts tab's tests pick from its self-hosted presets (Fontsource packages): nothing touches the network.
 const rootVar = (page: Page, name: string) => page.locator('html').evaluate((el, n) => el.style.getPropertyValue(n), name);
 const computedVar = (page: Page, name: string) => page.locator('html').evaluate((el, n) => getComputedStyle(el).getPropertyValue(n).trim(), name);
 const fontOf = (page: Page, selector: string) => page.locator(selector).first().evaluate((el) => getComputedStyle(el).fontFamily);
@@ -533,7 +533,7 @@ async function openFonts(page: Page) {
   await page.getByRole('tab', { name: 'Fonts' }).click();
 }
 /** Opens a role's font list (its sample is the toggle) if it is closed, and picks a font by its name. */
-async function pickFont(page: Page, role: 'Body' | 'Heading', font: string) {
+async function pickFont(page: Page, role: 'Body' | 'Heading' | 'Code', font: string) {
   const card = page.getByRole('region', { name: role });
   const toggle = card.getByRole('button', { name: new RegExp(`^${role} font:`) });
   if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
@@ -554,7 +554,7 @@ test('the Fonts tab: a serif picked for Body is set on the root and every page u
   await expect(chipOf(page, 'Heading')).toHaveText('Same as body');
   await expect(chipOf(page, 'Code')).toHaveText('Geist Mono');
   await expect(page.getByRole('button', { name: 'Reset fonts' })).toBeDisabled();
-  // The list opens from the sample and closes again; Code's sample opens nothing.
+  // The list opens from the sample and closes again.
   const toggle = page.getByRole('button', { name: /^Body font:/ });
   await expect(page.getByRole('radiogroup', { name: 'Body' })).toBeHidden();
   await toggle.click();
@@ -569,7 +569,6 @@ test('the Fonts tab: a serif picked for Body is set on the root and every page u
   await expect(chipOf(page, 'Body')).toHaveText('Source Serif 4');
   await toggle.click();
   await expect(page.getByRole('radiogroup', { name: 'Body' })).toBeHidden();
-  await expect(page.getByRole('region', { name: 'Code' }).getByRole('button')).toHaveCount(0);
   await pickFont(page, 'Body', 'Lora');
   expect(await rootVar(page, '--font-body')).toBe('"Lora", serif');
   expect(await fontLoaded(page, 'Lora', '400')).toBe(true);
@@ -643,6 +642,76 @@ test('the Fonts tab: Reset fonts goes back to Inter', async ({ page }) => {
   expect(await rootVar(page, '--font-body')).toBe('');
 });
 
+test('the Fonts tab: a code font picked is set on the root, and Code text on other pages uses it', async ({ page }) => {
+  await openFonts(page);
+  const toggle = page.getByRole('button', { name: /^Code font:/ });
+  await toggle.click();
+  const list = page.getByRole('radiogroup', { name: 'Code' });
+  await expect(list.getByRole('radio')).toHaveCount(4);
+  await expect(list.getByRole('radio', { name: 'Geist Mono', exact: true })).toBeChecked();
+  await expect(page.getByRole('region', { name: 'Code' }).getByRole('listitem').filter({ hasText: 'Fira Code' })).toContainText('Ligatures');
+
+  await pickFont(page, 'Code', 'JetBrains Mono');
+  expect(await rootVar(page, '--font-code')).toBe('"JetBrains Mono", ui-monospace, monospace');
+  expect(await fontLoaded(page, 'JetBrains Mono', '400')).toBe(true);
+  expect(await fontLoaded(page, 'JetBrains Mono', '600')).toBe(true);
+  expect(await fontOf(page, '.docs-font-sample[data-role="code"]')).toContain('JetBrains Mono');
+  expect(await fontOf(page, '.docs-font-sample[data-role="body"]')).toContain('Inter');
+
+  // A CodeText on another page follows.
+  await page.goto('/#/components/code-snippet');
+  await expect(page.locator('.docs-page-header h1')).toBeVisible();
+  expect(await fontOf(page, '.docs-content .bland-code-text code')).toContain('JetBrains Mono');
+});
+
+test('the Fonts tab: Reset fonts brings back Geist Mono for code', async ({ page }) => {
+  await openFonts(page);
+  await pickFont(page, 'Code', 'Fira Code');
+  await expect(page.getByRole('button', { name: 'Reset fonts' })).toBeEnabled();
+  await page.getByRole('button', { name: 'Reset fonts' }).click();
+  expect(await rootVar(page, '--font-code')).toBe('');
+  expect(await fontOf(page, '.docs-font-sample[data-role="code"]')).toContain('Geist Mono');
+  await expect(chipOf(page, 'Code')).toHaveText('Geist Mono');
+  await expect(page.getByRole('radiogroup', { name: 'Code' }).getByRole('radio', { name: 'Geist Mono', exact: true })).toBeChecked();
+  await page.reload();
+  expect(await rootVar(page, '--font-code')).toBe('');
+});
+
+test('the Fonts tab: How to use gives the code font line, its install and its imports', async ({ page }) => {
+  await openFonts(page);
+  await pickFont(page, 'Code', 'Fira Code');
+  await page.getByRole('tab', { name: 'How to use' }).click();
+  const css = page.locator('#use-in-a-project pre').first();
+  await expect(css).toContainText('--font-code: "Fira Code", ui-monospace, monospace;');
+  await expect(css).not.toContainText('--font-body');
+  await expect(page.locator('.docs-font-install pre')).toHaveText('npm install @fontsource/fira-code');
+  await expect(page.locator('.docs-font-imports pre')).toHaveText(['@import "@fontsource/fira-code/400.css";', '@import "@fontsource/fira-code/600.css";'].join('\n'));
+  await expect(page.locator('#use-in-a-project')).toContainText('it loads Inter and Geist Mono');
+});
+
+test('the Typography page names the picked fonts in its values', async ({ page }) => {
+  await openFonts(page);
+  await pickFont(page, 'Body', 'DM Sans');
+  await pickFont(page, 'Code', 'JetBrains Mono');
+  await page.goto('/#/styles/typography');
+  await expect(page.locator('.docs-page-header h1')).toBeVisible();
+  const families = page.getByRole('table', { name: 'Font families tokens' });
+  const family = (css: string) => families.getByRole('row').filter({ has: page.locator('.docs-token').getByText(css, { exact: true }) }).locator('.docs-value');
+  await expect(family('--font-body')).toHaveText('"DM Sans", system-ui, sans-serif');
+  await expect(family('--font-heading')).toHaveText('"DM Sans", system-ui, sans-serif');
+  await expect(family('--font-code')).toHaveText('"JetBrains Mono", ui-monospace, monospace');
+  const row = (css: string) => page.locator('.docs-type-row').filter({ has: page.getByText(css, { exact: true }) });
+  await expect(row('--type-display-lg').locator('.docs-value')).toHaveText('600 83px/88px "DM Sans", system-ui, sans-serif');
+  await expect(row('--type-code-body-md').locator('.docs-value')).toContainText('"JetBrains Mono"');
+  await expect(page.locator('.docs-content')).not.toContainText('"Inter", system-ui');
+  // Reset goes back to Bland's own.
+  await page.goto('/#/brand');
+  await page.getByRole('tab', { name: 'Fonts' }).click();
+  await page.getByRole('button', { name: 'Reset fonts' }).click();
+  await page.goto('/#/styles/typography');
+  await expect(row('--type-display-lg').locator('.docs-value')).toHaveText('600 83px/88px "Inter", system-ui, sans-serif');
+});
+
 /** How far the page scrolls sideways: 0 when nothing runs past the screen. */
 const sidewaysScroll = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
 
@@ -666,6 +735,18 @@ test.describe('on a phone', () => {
     await expect(page.getByRole('radiogroup', { name: 'Body' })).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
     expect(await sidewaysScroll(page)).toBe(0);
+  });
+
+  test('the Fonts tab fits the screen with the code font list open', async ({ page }) => {
+    await page.goto('/#/brand');
+    await page.getByRole('tab', { name: 'Fonts' }).click();
+    await pickFont(page, 'Code', 'IBM Plex Mono');
+    await expect(page.getByRole('radiogroup', { name: 'Code' })).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    expect(await sidewaysScroll(page)).toBe(0);
+    // Each row fits: no font's name is cut short by what the font is known for.
+    for (const name of await page.getByRole('radiogroup', { name: 'Code' }).locator('.bland-list-item__title').all())
+      expect(await name.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
   });
 
   test('the brand contrast breakdown stays inside its card as a stacked list', async ({ page }) => {

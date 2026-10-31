@@ -869,7 +869,7 @@ code,
   width: 45%;
 }
 .docs-tokens td:last-child {
-  color: var(--text-subtle);
+  color: var(--text-bold);
 }
 /* Motion on a phone: Use keeps a readable measure, so its long notes don't stretch the rows tall; the table
    already scrolls sideways there (Godwin 2026-10-29). No token. */
@@ -881,8 +881,10 @@ code,
     min-width: 0;
   }
 }
+/* The Figma name sits under the token's code chip, space-sm clear of its box (space-xs still read as touching). */
 .docs-tokens .docs-figma-name {
   display: block;
+  margin-top: var(--space-sm);
 }
 .docs-type {
   display: flex;
@@ -2074,7 +2076,7 @@ code,
 /* ---- Brand theme page: Fonts tab ---- */
 /* Figma: Brand theme / Fonts (6907:11680). One block per role (Body, Heading, Code): its title, then a card
    (surface-200) holding the font in a Chip, a dark sample in the role's text style that opens the font list
-   (List rows with radios), and what the role covers. Code stays Geist Mono, so its sample doesn't open. */
+   (List rows with radios), and what the role covers. Code has its own list of monospace fonts (2026-10-31). */
 .docs-font-list {
   display: flex;
   flex-direction: column;

@@ -5,6 +5,7 @@ import { IconButton } from '../../src/components/button/IconButton';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../../src/components/table/Table';
 import { CaretLeftIcon, CaretRightIcon } from '../../src/icons';
 import type { Token } from './data';
+import { useLiveValue } from './fontStore';
 import { docsPages } from './pages';
 
 /**
@@ -97,8 +98,15 @@ export function Values({ token }: { token: Token }) {
   );
 }
 
-/** A table of tokens with a visual sample per row, in Bland's Table (as the props tables). */
+/** Tokens whose value names a font family: the families and the text styles built on them. */
+const namesFont = (t: Token) => t.type === 'FONT_FAMILY' || t.type === 'FONT';
+
+/**
+ * A table of tokens with a visual sample per row, in Bland's Table (as the props tables). Font values are read from
+ * the page, so they name the fonts picked on the Brand theme page's Fonts tab, as the samples show them.
+ */
 export function TokenTable({ items, sample, sampleLabel = 'Sample', className }: { items: Token[]; sample?: (t: Token) => ReactNode; sampleLabel?: string; className?: string }) {
+  const live = useLiveValue();
   return (
     <Table size="md" className={`docs-data docs-tokens${className ? ` ${className}` : ''}`} data-sample={sample ? '' : undefined} aria-label={items[0] ? `${items[0].collection} tokens` : 'Tokens'}>
       <TableHead>
@@ -118,7 +126,7 @@ export function TokenTable({ items, sample, sampleLabel = 'Sample', className }:
               <span className="docs-figma-name">{t.name}</span>
             </TableCell>
             <TableCell>
-              <Values token={t} />
+              <Values token={namesFont(t) ? { ...t, light: live(t.css, t.light) } : t} />
             </TableCell>
             <TableCell>{t.description}</TableCell>
           </TableRow>

@@ -298,7 +298,7 @@ export function BrandPage() {
                     <>
                       <p className="docs-note">
                         The CSS only names the fonts. Install their files from npm, then import the weights Bland uses in your main CSS file. Keep{' '}
-                        <code>bland-ui/fonts.css</code>: it loads Geist Mono for code, and Inter.
+                        <code>bland-ui/fonts.css</code>: it loads Inter and Geist Mono, Bland’s own fonts.
                       </p>
                       <CodeSnippet className="docs-font-install" code={{ shell: fontInstallLine(installs) }} languages={[{ id: 'shell', label: 'Terminal' }]} />
                       <CodeSnippet className="docs-font-imports" code={{ css: fontImports(installs) }} languages={[{ id: 'css', label: 'CSS' }]} highlight={highlight} />
