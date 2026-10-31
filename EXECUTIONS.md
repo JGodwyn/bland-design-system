@@ -2003,3 +2003,9 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Code picker: fontStore gains CODE_PRESETS and the code role; FontTester's Code card is now a FontCard like the others. First alt texts ("Ligatures, tall letters", "No ligatures, a classic look") squeezed the names into ellipses at 320px; shortened to one or two words, and the phone test checks no name is cut.
 - Tests: one new assertion first matched two rows (the heading row's description names `--font-body`); matched on the token chip instead.
 - Playwright from an uncommitted `pw.local.config.ts` with `executablePath` (LEARNINGS, "Playwright in a cloud container").
+
+### PR #4 merged: code font picker, live values, token tables (2026-10-31)
+
+- Checked here before merging. The first full run timed out page after page: the docs dev server had been started before `npm install` added the new Fontsource packages, so pages that import them never loaded. Restarted it (`npm run docs:stop`, then the preview); 717 passed. Typecheck, lint, brand tests and docs:build passed.
+- Tried it: DM Sans and Fira Code picked; Fira Code's ligatures show in the sample; the Typography page's values and the Font families table name the picks; the Figma name sits 9px under the chip; Use is text-bold.
+- Found one more stale font name: the generated `--font-*` descriptions in the Use column said "The Inter family…" beside a DM Sans value. Reworded in `scripts/tokens/core.ts` to "Bland's default is Inter", and the heading one no longer names a family; regenerated (checksum unchanged, b6fb0406).

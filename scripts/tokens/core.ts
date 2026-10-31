@@ -301,8 +301,8 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
       collection: 'Font families',
       type: 'FONT_FAMILY',
       description: ref
-        ? `The font for ${what}. Follows ${ref.slice(4, -1)} (${family}) unless set; set it per project at :root for a separate font.`
-        : `The ${family} family and its fallbacks, for ${what}. Override it per project at :root to change the font; every text style that reads it follows.`,
+        ? `The font for ${what}. Follows ${ref.slice(4, -1)} unless set; set it per project at :root for a separate font.`
+        : `The font for ${what}; Bland's default is ${family}, with its fallbacks. Override it per project at :root to change the font; every text style that reads it follows.`,
       light: fontStack(family, fallback),
       ...(ref && { cssValue: { light: ref } }),
     });

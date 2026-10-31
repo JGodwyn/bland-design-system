@@ -761,3 +761,7 @@ shell never produces. Also: don't point two Playwright runs at one log file.
 
 - **`toContainText` on a basic Dropdown's `.bland-dropdown__button` reads "".** The button is an empty overlay over the field; the chosen value is drawn in the field beside it. → Click `.bland-dropdown__button` to open, assert the value on `.bland-dropdown__field`.
 - The "Fonts in the browser" entries above (installed-font check, mocked Google Fonts) belong to the Fonts tab's first version; it has used self-hosted presets only since 2026-10-30.
+
+## Docs server after new dependencies (2026-10-31)
+
+**Every Playwright test timed out in `beforeEach` after merging a PR that added npm packages.** The docs dev server had been running since before `npm install`, and pages that dynamically import the new packages never finished loading. → After `npm install` brings new dependencies, restart the docs server (`npm run docs:stop`, then `npm run docs`) before testing.
