@@ -2356,3 +2356,10 @@ Replaces the sources in "Font tester on the Brand theme page" above: Installed, 
 - Fonts come from Fontsource devDependencies (`@fontsource/geist`, `dm-sans`, `source-serif-4`, `lora`, `playfair-display`, all with 400, 500 and 600). `fontStore.ts` holds a literal `import()` per preset and weight so Vite splits each into its own CSS file; they load when the Fonts tab mounts (for the labels) or when a saved pick is painted on load. Font files download only when text uses them.
 - Stacks through `fontStack`: a serif preset is passed as `Name, serif` (so it ends in `serif`, not Bland's sans fallbacks), a sans as the name alone (`"Geist", system-ui, sans-serif`).
 - How to use: the CSS from `toCss(..., fonts)`, then, when any pick isn't Inter, a note, a Terminal snippet (`npm install @fontsource/a @fontsource/b`) and a CSS snippet of `@import "@fontsource/<pkg>/<weight>.css";` lines: body 400 and 500 (and 600 while Heading is Same as body), heading 600, merged when both roles use one font. Inter needs no install: `bland-ui/fonts.css` loads it.
+
+## Fonts tab from Figma (2026-10-31, Godwin)
+
+- The Brand theme page's Fonts tab follows Figma's Brand theme / Fonts (6907:11680): per role a title, then a surface-200 card (rad-lg) with the font in a Chip md and "Tap to change", a dark sample in the role's text style that opens the font list, and what the role covers. The Dropdowns are gone.
+- The list is a RadioGroup of List rows (`ListItem`, a Radio in the leading slot, the font name as its label in its own font, Sans or Serif as alt text), hidden until the sample (a button with `aria-expanded`) opens it; the caret turns 180° over duration/md easing/out, at once under reduced motion. Heading's list starts with Same as body.
+- Code keeps Geist Mono: its card shows the Chip and the sample with no list or caret, as the card's own copy says (the Figma card shows "Tap to change" and a caret on Code; not drawn in code since there's nothing to pick).
+- The sample uses `text-inverse` on `surface-inverse`, not Figma's `text-on-color` (white on white in dark). Icons line up with the sample's first line.

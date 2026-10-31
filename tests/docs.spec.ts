@@ -532,21 +532,34 @@ async function openFonts(page: Page) {
   await page.goto('/#/brand');
   await page.getByRole('tab', { name: 'Fonts' }).click();
 }
+/** Opens a role's font list (its sample is the toggle) if it is closed, and picks a font by its name. */
 async function pickFont(page: Page, role: 'Body' | 'Heading', font: string) {
-  await page.getByRole('region', { name: role }).locator('.bland-dropdown__button').click();
-  await page.getByRole('option', { name: new RegExp(`^${font}`) }).click();
-  await expect(page.getByRole('listbox')).toBeHidden();
+  const card = page.getByRole('region', { name: role });
+  const toggle = card.getByRole('button', { name: new RegExp(`^${role} font:`) });
+  if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+  await card.getByRole('radio', { name: font, exact: true }).check();
+  await expect(card.locator('.bland-chip')).toHaveText(font);
 }
+/** The font a role's card shows in its Chip. */
+const chipOf = (page: Page, role: string) => page.getByRole('region', { name: role }).locator('.bland-chip');
 /** Whether a family's face in a weight has loaded, so text really draws in it. */
 const fontLoaded = (page: Page, family: string, weight: string) =>
   page.evaluate(async ([f, w]) => (await document.fonts.load(`${w} 16px "${f}"`)).length > 0, [family, weight] as const);
 
 test('the Fonts tab: a serif picked for Body is set on the root and every page uses it', async ({ page }) => {
   await openFonts(page);
-  const body = page.getByRole('region', { name: 'Body' });
-  await expect(body.locator('.bland-dropdown__field')).toContainText('Inter');
-  await expect(page.getByRole('region', { name: 'Heading' }).locator('.bland-dropdown__field')).toContainText('Same as body');
-  await expect(page.getByRole('region', { name: 'Code' })).toContainText('Geist Mono');
+  await expect(chipOf(page, 'Body')).toHaveText('Inter');
+  await expect(chipOf(page, 'Heading')).toHaveText('Same as body');
+  await expect(chipOf(page, 'Code')).toHaveText('Geist Mono');
+  // The list opens from the sample and closes again; Code's sample opens nothing.
+  const toggle = page.getByRole('button', { name: /^Body font:/ });
+  await expect(page.getByRole('radiogroup', { name: 'Body' })).toBeHidden();
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.getByRole('radiogroup', { name: 'Body' }).getByRole('radio')).toHaveCount(6);
+  await toggle.click();
+  await expect(page.getByRole('radiogroup', { name: 'Body' })).toBeHidden();
+  await expect(page.getByRole('region', { name: 'Code' }).getByRole('button')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Reset fonts' })).toBeDisabled();
 
   await pickFont(page, 'Body', 'Lora');
@@ -615,8 +628,8 @@ test('the Fonts tab: Reset fonts goes back to Inter', async ({ page }) => {
   expect(await rootVar(page, '--font-body')).toBe('');
   expect(await rootVar(page, '--font-heading')).toBe('');
   expect(await fontOf(page, '.docs-page-header h1')).toContain('Inter');
-  await expect(page.getByRole('region', { name: 'Body' }).locator('.bland-dropdown__field')).toContainText('Inter');
-  await expect(page.getByRole('region', { name: 'Heading' }).locator('.bland-dropdown__field')).toContainText('Same as body');
+  await expect(chipOf(page, 'Body')).toHaveText('Inter');
+  await expect(chipOf(page, 'Heading')).toHaveText('Same as body');
   await expect(page.getByRole('button', { name: 'Reset fonts' })).toBeDisabled();
   await page.reload();
   expect(await rootVar(page, '--font-body')).toBe('');
@@ -637,12 +650,12 @@ test.describe('on a phone', () => {
     });
   }
 
-  test('the Fonts tab fits the screen, with a long font picked and its menu open', async ({ page }) => {
+  test('the Fonts tab fits the screen, with a long font picked and a font list open', async ({ page }) => {
     await page.goto('/#/brand');
     await page.getByRole('tab', { name: 'Fonts' }).click();
     await pickFont(page, 'Heading', 'Playfair Display');
-    await page.getByRole('region', { name: 'Body' }).locator('.bland-dropdown__button').click();
-    await expect(page.getByRole('listbox')).toBeVisible();
+    await page.getByRole('button', { name: /^Body font:/ }).click();
+    await expect(page.getByRole('radiogroup', { name: 'Body' })).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
     expect(await sidewaysScroll(page)).toBe(0);
   });

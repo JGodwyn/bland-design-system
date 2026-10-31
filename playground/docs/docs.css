@@ -2072,41 +2072,125 @@ code,
 }
 
 /* ---- Brand theme page: Fonts tab ---- */
-/* Laid out as the Extra colors tab: one block per role (Body, Heading, Code), each its heading, what the role
-   covers, the font (Body and Heading; Code stays Geist Mono), and a line in the role's own text style. */
+/* Figma: Brand theme / Fonts (6907:11680). One block per role (Body, Heading, Code): its title, then a card
+   (surface-200) holding the font in a Chip, a dark sample in the role's text style that opens the font list
+   (List rows with radios), and what the role covers. Code stays Geist Mono, so its sample doesn't open. */
+.docs-font-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+.docs-font {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+.docs-font-card {
+  --bland-radius: var(--rad-lg);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  background: var(--surface-200);
+}
+.docs-font-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-inline: var(--space-md);
+}
+.docs-font-hint,
 .docs-font-about {
   margin: var(--space-none);
   font: var(--type-body-md);
   letter-spacing: var(--type-body-md-letter-spacing);
   color: var(--text-subtle);
 }
-.docs-font-select {
-  max-width: var(--dropdown-width);
+.docs-font-about {
+  padding-inline: var(--space-md);
 }
-/* Sans or Serif, beside each font in the menu. */
-.docs-font-kind {
-  font: var(--type-body-md);
-  letter-spacing: var(--type-body-md-letter-spacing);
-  color: var(--text-subtle);
-}
+/* The sample: surface-inverse with text-inverse (Figma binds text-on-color, white in both themes, which vanishes on
+   the white inverse surface in dark), the TextAa marker and, when it opens the list, a caret. Icons and caret line
+   up with the sample's first line (first-line rule). */
 .docs-font-sample {
   --bland-radius: var(--rad-lg);
+  --docs-font-line: var(--type-body-lg-line-height);
 
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  width: 100%;
   margin: var(--space-none);
-  padding: var(--space-lg);
-  background: var(--surface-200);
-  color: var(--text-bold);
+  padding: var(--space-xl) var(--space-lg);
+  border: none;
+  background: var(--surface-inverse);
+  color: var(--text-inverse);
+  text-align: start;
   overflow-wrap: anywhere;
+}
+button.docs-font-sample {
+  cursor: pointer;
 }
 .docs-font-sample[data-role="body"] {
   font: var(--type-body-lg);
   letter-spacing: var(--type-body-lg-letter-spacing);
 }
 .docs-font-sample[data-role="heading"] {
+  --docs-font-line: var(--type-heading-md-line-height);
+
   font: var(--type-heading-md);
   letter-spacing: var(--type-heading-md-letter-spacing);
 }
 .docs-font-sample[data-role="code"] {
-  font: var(--type-code-body-md);
-  letter-spacing: var(--type-code-body-md-letter-spacing);
+  font: var(--type-code-body-lg);
+  letter-spacing: var(--type-code-body-lg-letter-spacing);
+}
+.docs-font-sample-text {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+.docs-font-sample-icon {
+  flex: none;
+  margin-block-start: calc((var(--docs-font-line) - var(--icon-md)) / 2);
+  color: var(--icon-subtle);
+}
+.docs-font-caret {
+  flex: none;
+  margin-block-start: calc((var(--docs-font-line) - var(--icon-lg)) / 2);
+  color: var(--icon-inverse);
+  transition: transform var(--duration-md) var(--easing-out);
+}
+.docs-font-sample[aria-expanded="true"] .docs-font-caret {
+  transform: rotate(180deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .docs-font-caret {
+    transition: none;
+  }
+}
+.docs-font-options {
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  min-width: 0;
+}
+.docs-font-options[hidden] {
+  display: none;
+}
+.docs-font-rows {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch; /* the radio group lines its options up at the start */
+  gap: var(--space-xs);
+  margin: var(--space-none);
+  padding: var(--space-none);
+  list-style: none;
+}
+.docs-font-row label {
+  cursor: pointer;
 }

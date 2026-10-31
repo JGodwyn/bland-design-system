@@ -1984,3 +1984,10 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Playwright from the uncommitted `pw.local.config.ts` with `executablePath` (LEARNINGS, "Playwright in a cloud container").
 - Checks: typecheck, lint:css, test:brand (31), docs:build (each preset weight is its own CSS file in `dist-docs/assets`; picked Playfair Display in `docs:preview` and it loaded from there), `npm test` 712 passed, no screenshot changed (the Brand page has no visual baseline).
 - Branches: `claude/sharp-brahmagupta-f511pt` (PR #1) and `claude/affectionate-curie-ctsi28` (PR #2) are both in `git branch -r --merged origin/main` and both PRs show merged, but `git push origin --delete` got HTTP 403: this session may push only its own branch. Left for Godwin.
+
+### Branches cleared; Fonts tab from Figma (2026-10-31)
+
+- Removed the last spare branch: `claude/batch1-decisions-b6936a`, merged and checked out in a clean old worktree (`.claude/worktrees/batch1-decisions-b6936a`); `git worktree remove` then `git branch -d`. Only `main` is left, here and on GitHub.
+- Read Figma 6907:11680 (Brand theme / Fonts): the whole frame was too large for get_design_context, so read the article (6907:11749) and the sample panel's bindings with use_figma. Found the sample text bound to text-on-color, which is white in dark on a white surface-inverse: used text-inverse.
+- Rebuilt `FontTester.tsx` as the design's cards (Chip, inverse sample button, RadioGroup of ListItems), CSS in docs.css. The docs site already had a TextAa icon; my copy duplicated it and was removed. The RadioGroup lines its children up at the start, so the list needed `align-self: stretch`. Coordinate clicks in the browser pane hit the wrong rows; clicking the label element worked, and the tests use `getByRole('radio')`.
+- Tests: pickFont now opens the card's sample and checks the radio; the Chip shows the pick; Code's card has no button.
