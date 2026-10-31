@@ -537,7 +537,9 @@ async function pickFont(page: Page, role: 'Body' | 'Heading', font: string) {
   const card = page.getByRole('region', { name: role });
   const toggle = card.getByRole('button', { name: new RegExp(`^${role} font:`) });
   if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
-  await card.getByRole('radio', { name: font, exact: true }).check();
+  // The name's label covers the row (and its radio), so press the row as a person would.
+  await card.locator('.docs-font-row label').getByText(font, { exact: true }).click();
+  await expect(card.getByRole('radio', { name: font, exact: true })).toBeChecked();
   await expect(card.locator('.bland-chip')).toHaveText(font);
 }
 /** The font a role's card shows in its Chip. */
@@ -551,17 +553,23 @@ test('the Fonts tab: a serif picked for Body is set on the root and every page u
   await expect(chipOf(page, 'Body')).toHaveText('Inter');
   await expect(chipOf(page, 'Heading')).toHaveText('Same as body');
   await expect(chipOf(page, 'Code')).toHaveText('Geist Mono');
+  await expect(page.getByRole('button', { name: 'Reset fonts' })).toBeDisabled();
   // The list opens from the sample and closes again; Code's sample opens nothing.
   const toggle = page.getByRole('button', { name: /^Body font:/ });
   await expect(page.getByRole('radiogroup', { name: 'Body' })).toBeHidden();
   await toggle.click();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await expect(page.getByRole('radiogroup', { name: 'Body' }).getByRole('radio')).toHaveCount(6);
+  // A press anywhere on a row picks its font, not only on the name: here on its "Serif", once the list has unfolded.
+  await page.locator('.docs-font .docs-fold:not([hidden])').evaluate((el) => Promise.all(el.getAnimations({ subtree: true }).map((a) => a.finished)));
+  const serifText = page.getByRole('listitem').filter({ hasText: 'Source Serif 4' }).locator('.bland-list-item__alt').first();
+  await serifText.scrollIntoViewIfNeeded();
+  const serif = (await serifText.boundingBox())!;
+  await page.mouse.click(serif.x + serif.width / 2, serif.y + serif.height / 2);
+  await expect(chipOf(page, 'Body')).toHaveText('Source Serif 4');
   await toggle.click();
   await expect(page.getByRole('radiogroup', { name: 'Body' })).toBeHidden();
   await expect(page.getByRole('region', { name: 'Code' }).getByRole('button')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Reset fonts' })).toBeDisabled();
-
   await pickFont(page, 'Body', 'Lora');
   expect(await rootVar(page, '--font-body')).toBe('"Lora", serif');
   expect(await fontLoaded(page, 'Lora', '400')).toBe(true);

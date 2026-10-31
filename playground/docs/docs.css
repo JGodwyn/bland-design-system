@@ -2088,6 +2088,8 @@ code,
 .docs-font-card {
   --bland-radius: var(--rad-lg);
 
+  --docs-fold-gap: var(--space-sm);
+
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
@@ -2179,9 +2181,6 @@ button.docs-font-sample {
   border: none;
   min-width: 0;
 }
-.docs-font-options[hidden] {
-  display: none;
-}
 .docs-font-rows {
   display: flex;
   flex-direction: column;
@@ -2191,6 +2190,23 @@ button.docs-font-sample {
   padding: var(--space-none);
   list-style: none;
 }
+.docs-font-row .bland-list-item__row {
+  position: relative;
+}
+/* The font's name labels its radio and stretches over the whole row, so a press anywhere picks the font. */
 .docs-font-row label {
   cursor: pointer;
+}
+.docs-font-row label::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+@media (hover: hover) and (pointer: fine) {
+  .docs-font-row .bland-list-item__row:hover {
+    --_bg: var(--list-surface-hover);
+  }
+}
+.docs-font-row .bland-list-item__row:active {
+  --_bg: var(--list-surface-pressed);
 }

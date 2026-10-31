@@ -101,20 +101,23 @@ function FontCard({ role, value }: { role: Role; value: string }) {
           </div>
         )}
         {pickable && (
-          <RadioGroup
-            id={listId}
-            className="docs-font-options"
-            aria-labelledby={titleId}
-            value={value}
-            onValueChange={(id) => setFontPick(role, id === SAME ? null : id)}
-            hidden={!open}
-          >
-            <ul className="docs-font-rows">
-              {[...(role === 'heading' ? [SAME_ROW] : []), ...FONT_PRESETS].map((p) => (
-                <FontRow key={p.id} role={role} id={p.id} name={p.name} kind={p.kind} />
-              ))}
-            </ul>
-          </RadioGroup>
+          // Opens and closes as the contrast breakdown does: the space folds while the list fades and scales.
+          <div id={listId} className="docs-fold" hidden={!open}>
+            <div className="docs-fold-inner">
+              <RadioGroup
+                className="docs-font-options"
+                aria-labelledby={titleId}
+                value={value}
+                onValueChange={(id) => setFontPick(role, id === SAME ? null : id)}
+              >
+                <ul className="docs-font-rows">
+                  {[...(role === 'heading' ? [SAME_ROW] : []), ...FONT_PRESETS].map((p) => (
+                    <FontRow key={p.id} role={role} id={p.id} name={p.name} kind={p.kind} />
+                  ))}
+                </ul>
+              </RadioGroup>
+            </div>
+          </div>
         )}
         <p className="docs-font-about">{about}</p>
       </div>
@@ -122,7 +125,8 @@ function FontCard({ role, value }: { role: Role; value: string }) {
   );
 }
 
-/** A font as a List row: its radio, its name in its own font, and whether it is sans or serif. */
+/** A font as a List row: its radio, its name in its own font, and whether it is sans or serif. The name's label
+ * covers the whole row (docs.css), so a press anywhere on it picks the font. */
 function FontRow({ role, id, name, kind }: { role: PickRole; id: string; name: string; kind?: 'sans' | 'serif' }) {
   const inputId = useId();
   const preset = presetOf(id);
