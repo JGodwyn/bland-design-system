@@ -51,7 +51,10 @@ Icons are any SVG passed as a React node (Phosphor, Lucide, your own); Bland siz
 
 Bland ships blue. A project brings its own color by overriding the 13 `--brand-*` steps (and the 13 `--neutral-*` steps, tinted toward the brand) at `:root`; every brand-colored token follows in light and dark.
 
-Make the override from one color, in a Bland checkout:
+The 13 steps are worked out from one color, so make them with a tool rather than by hand. Nothing extra to install in your project:
+
+- **The Brand theme page on the docs site:** pick the color, check contrast, try fonts, then copy the CSS into your `brand.css`.
+- **Or the `brand` command, in a clone of the Bland repo** (it isn't part of the npm package), which writes the same file:
 
 ```bash
 npm run brand -- generate "#ff5a1f" --out brand.css
@@ -61,13 +64,11 @@ npm run brand -- generate "#ff5a1f" --out brand.css
 - `--fix`: moves other steps until the brand's contrast pairings pass. The color you entered never moves.
 - `npm run brand -- check brand.css`: re-checks an override after a hand edit. It warns, never blocks.
 
-Or use the **Brand theme** page on the docs site: pick the color, check contrast, copy the CSS.
-
 Load `brand.css` after Bland's CSS and keep it on `:root`, not on a nested element.
 
 ### Extra colors
 
-Up to three more colors for the project's own UI (charts, illustrations, a section, a tag). Bland's components never use them.
+Up to three more colors for the project's own UI (charts, illustrations, a section, a tag). Bland's components never use them. Add them on the Brand theme page (Extra colors), or with the command in the Bland repo:
 
 ```bash
 npm run brand -- generate "#ff5a1f" --extra accent=#7c3aed --extra chart --out brand.css
@@ -85,23 +86,19 @@ Every text style reads one of three family tokens, named by what the text does, 
 | `--font-heading` | Display, Heading, Title | the body font (`var(--font-body)`) until you set it |
 | `--font-code` | Code | Geist Mono |
 
-Set them in `brand.css`, on `:root`, and every component follows. One font for all text: set `--font-body` alone, and headings follow it. A separate heading font: set `--font-heading` too.
-
-```bash
-npm run brand -- generate "#ff5a1f" --font-body "Söhne" --font-heading "Lora" --font-code "Berkeley Mono" --out brand.css
-```
+Write them yourself in `brand.css`, on `:root`; no tool needed. Every component follows. One font for all text: set `--font-body` alone, and headings follow it. A separate heading font: set `--font-heading` too. Set only the ones you change.
 
 ```css
 /* brand.css */
 :root {
   /* … brand and neutral steps … */
   --font-body: "Söhne", system-ui, sans-serif;
-  --font-heading: "Lora", system-ui, sans-serif;
+  --font-heading: "Lora", Georgia, serif;
   --font-code: "Berkeley Mono", ui-monospace, monospace;
 }
 ```
 
-The tool adds Bland's fallbacks when your list ends without a generic family; end it yourself to choose them (`--font-heading "Lora, Georgia, serif"`).
+End each list with a generic family (`sans-serif`, `serif`, `monospace`) so text shows while the font loads. To try fonts first, use the Fonts tab on the docs site's Brand theme page; it copies these lines for you, with the install lines for the fonts it offers. The `brand` command in the Bland repo writes them too (`--font-body "Söhne" --font-heading "Lora" --font-code "Berkeley Mono"`).
 
 The tokens only name the family; load the font files yourself, under the same family name, with the weights the text styles use (body 400 and 500, heading 600, code 400 and 600):
 

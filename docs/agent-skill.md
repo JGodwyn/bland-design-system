@@ -12,16 +12,16 @@ Raw material for the skill we package at the end of the project: what an agent n
 
 ## Brand and colors
 
-- A project's brand is 13 `--brand-*` steps and 13 `--neutral-*` steps at `:root`, made by `npm run brand -- generate "#hex"` or the docs site's Brand theme page. Never edit Bland's tokens to rebrand.
+- A project's brand is 13 `--brand-*` steps and 13 `--neutral-*` steps at `:root`, made on the docs site's Brand theme page (copy its CSS) or by `npm run brand -- generate "#hex"` in a clone of the Bland repo; the `bland-ui` npm package has no command, so a project's agent never runs `npm run brand` in the project itself. Fonts need no tool: write the `--font-*` lines by hand. Never edit Bland's tokens to rebrand.
 - The entered color lands unchanged on the step its lightness belongs on; Fix contrast moves the other steps only. Never change a project's brand color to clear a contrast miss; a miss on that color's own step is the project's to keep or answer with another color.
 - Up to three extra colors (`--extra name=#hex`), for the project's own UI: charts, illustrations, a section, a tag. Bland's components never read them.
 - A new extra's default color is the next one in harmony with the brand (complement, then the square); pass a hex to choose your own.
 - **Use roles, not steps.** Brand: Bland's Theme tokens (`--surface-brand`, `--text-brand`, …). Extras: `--name-surface`, `-surface-strong`, `-surface-light`, `-text`, `-icon`, `-border`, which switch in dark mode. Raw steps (`--name-600`) are the same in both modes: only for something meant to look identical in light and dark.
 - White text goes on `-surface-strong`, never `-surface` (it lightens in dark).
 - **Charts:** series use `--chart-1` … `--chart-8` in order (series 1 = `--chart-1`, the brand), never cycled; past eight, fold into Other or split the chart. They switch in dark mode and hold 3:1 on `--surface-100`; keep a legend, and label series directly when the check warns. Meaning (good/bad) uses danger/success/warning tokens instead. Bland's components never use chart tokens.
-- To use a specific color for a chart series, regenerate with `npm run brand -- generate "#hex" --chart N=#hex` (or the Brand theme page) rather than editing `--chart-N` by hand, so it gets a dark value and the check runs (other series are unchanged); then `check brand.css`.
+- To use a specific color for a chart series, pick it on the Brand theme page (Chart colors) or regenerate with `npm run brand -- generate "#hex" --chart N=#hex` in the Bland repo rather than editing `--chart-N` by hand, so it gets a dark value and the check runs (other series are unchanged); then `check brand.css`.
 - To recolor a Bland component in one area, override that component's tokens on a wrapper: `.promo { --button-brand-primary-rest: var(--accent-surface-strong); }`.
-- Run `npm run brand -- check brand.css` after any hand change; it warns, never blocks.
+- After a hand change to the colors, re-check them: paste the brand color into the Brand theme page, or run `npm run brand -- check brand.css` in the Bland repo; it warns, never blocks.
 
 ## Writing project CSS
 

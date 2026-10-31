@@ -1,6 +1,6 @@
 # Release
 
-How Bland goes live: the package and the docs site. Everything below is prepared and checked; nothing is published or deployed. `package.json` keeps `"private": true` until Godwin picks a registry (prepared 2026-10-27).
+How Bland goes live: the package and the docs site. The package is on public npm as `bland-ui` (0.1.0 on 2026-10-30, 0.1.1 prepared 2026-10-31); the docs site is not deployed yet (Cloudflare Pages, below). The `brand` command is not in the package: projects copy their `brand.css` from the docs site's Brand theme page, or run `npm run brand` in a clone of this repo.
 
 ## What is ready
 

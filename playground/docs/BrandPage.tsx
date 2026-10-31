@@ -148,7 +148,7 @@ export function BrandPage() {
       <PageHeader title="Brand theme" href={brandPage.href}>
         <p>
           Pick your project’s brand color and Bland makes the 13 shades its components use, then checks that text and icons on them stay readable. Preview them in both
-          themes, apply them to this site, and copy the small CSS file your project loads after Bland’s tokens. Developers can run the same tool as <code>npm run brand</code>.
+          themes, apply them to this site, and copy the small CSS file your project loads after Bland’s tokens. Nothing to install: the CSS is all a project needs. In a clone of the Bland repo, the same tool runs as <code>npm run brand</code>.
         </p>
       </PageHeader>
 

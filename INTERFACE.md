@@ -2374,3 +2374,7 @@ Reverses "Code has no picker" (Font tester: six presets) and "Code keeps Geist M
 - How to use adds the `--font-code` line, the `npm install` line and the 400 and 600 imports; its note says `bland-ui/fonts.css` loads Inter and Geist Mono.
 - Live values: font values on the docs site are read from the page (`useLiveValue` in `fontStore.ts`, re-read when the picks change), so they name the picked fonts: every `TokenTable` row whose token is a font family or a text style, and each text style's value on the Typography page. Bland's own values come back after Reset.
 - Token tables (every one, in `TokenTable`): the Figma name sits space-sm under the token's code chip; the Use column is `text-bold`.
+
+## The brand command is not part of the package (2026-10-31, Godwin)
+
+- `npm run brand` runs only in a clone of the Bland repo; the `bland-ui` package ships no command. Projects get their `brand.css` from the docs site's Brand theme page (copy the CSS), and fonts need no tool at all: three `--font-*` lines written by hand. README, CHANGELOG 0.1.1, `docs/agent-skill.md`, `docs/release.md` and the Brand theme page's intro now say so. A command people run with npx may come later if projects ask.
