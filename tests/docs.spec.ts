@@ -552,6 +552,10 @@ test('the Fonts tab: a serif picked for Body is set on the root and every page u
   await openFonts(page);
   await expect(chipOf(page, 'Body')).toHaveText('Inter');
   await expect(chipOf(page, 'Heading')).toHaveText('Same as body');
+  // Any font works in a project, not only the presets: the tab says how, with the CSS to copy.
+  const own = page.getByRole('region', { name: 'Your own font' });
+  await expect(own).toContainText('Your project can use any font');
+  await expect(own.locator('pre')).toContainText('--font-body: "Acme Sans", system-ui, sans-serif;');
   await expect(chipOf(page, 'Code')).toHaveText('Geist Mono');
   await expect(page.getByRole('button', { name: 'Reset fonts' })).toBeDisabled();
   // The list opens from the sample and closes again.

@@ -147,8 +147,10 @@ export function BrandPage() {
     <>
       <PageHeader title="Brand theme" href={brandPage.href}>
         <p>
-          Pick your project’s brand color and Bland makes the 13 shades its components use, then checks that text and icons on them stay readable. Preview them in both
-          themes, apply them to this site, and copy the small CSS file your project loads after Bland’s tokens. Nothing to install: the CSS is all a project needs. In a clone of the Bland repo, the same tool runs as <code>npm run brand</code>.
+          Make Bland your project’s own. Pick a brand color and Bland makes the 13 shades its components use and checks that text on them stays readable; add extra
+          colors for your own UI and charts; choose the fonts for body text, headings and code. Preview it all in both themes, try it across this whole site, then copy one
+          small CSS file your project loads after Bland’s tokens. Nothing to install: the CSS is all a project needs. In a clone of the Bland repo, the same tool runs as{' '}
+          <code>npm run brand</code>.
         </p>
       </PageHeader>
 
@@ -287,7 +289,7 @@ export function BrandPage() {
                   <p className="docs-note">
                     Save this as a CSS file and load it after Bland’s tokens. It replaces the brand and neutral shades, and every component follows in both themes. Extra colors
                     add their shades and their roles (<code>--name-surface</code>, <code>--name-text</code> and so on) for your own CSS. The chart colors,
-                    <code>--chart-1</code> to <code>--chart-{CHART_COUNT}</code>, come last. Fonts picked under Fonts add their <code>--font-*</code> lines.
+                    <code>--chart-1</code> to <code>--chart-{CHART_COUNT}</code>, come last. Fonts picked under Fonts add their <code>--font-*</code> lines; for a font of your own, set those lines to its name (Fonts, Your own font).
                   </p>
                   <CodeSnippet
                     code={{ css: toCss(scale, isBland ? 'Bland’s own blue' : `made from ${input}, neutrals ${tint === 'none' ? 'pure gray' : `${tint} tint`}`, neutrals, validExtras, chart, pickedFonts(fontPicks)) }}

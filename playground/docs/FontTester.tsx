@@ -6,12 +6,14 @@
 import { useEffect, useId, useState } from 'react';
 import { Button } from '../../src/components/button/Button';
 import { Chip } from '../../src/components/chip/Chip';
+import { CodeSnippet } from '../../src/components/code-snippet/CodeSnippet';
 import { Icon } from '../../src/components/icon/Icon';
 import { ListItem } from '../../src/components/list/ListItem';
 import { Radio } from '../../src/components/radio-button/Radio';
 import { RadioGroup } from '../../src/components/radio-button/RadioGroup';
 import { CaretDownIcon } from '../../src/icons';
 import { CODE_PRESETS, FONT_PRESETS, PICK_ROLES, loadPreset, presetOf, presetStack, presetsFor, resetFonts, setFontPick, useFontPicks, type PickRole } from './fontStore';
+import { highlight } from './highlight';
 import { TextAaIcon } from './icons';
 
 type Role = PickRole;
@@ -47,8 +49,42 @@ export function FontTester() {
         {PICK_ROLES.map((role) => (
           <FontCard key={role} role={role} value={picks[role] ?? DEFAULT_VALUE[role]} />
         ))}
+        <OwnFont />
       </div>
     </div>
+  );
+}
+
+// The fonts above are for trying things out; a project can use any font (Godwin 2026-11-01).
+const OWN_FONT_CSS = `/* 1. Load the font's files in your project, one @font-face per weight
+   (400 and 500 for body, 600 for headings, 400 and 600 for code). */
+@font-face {
+  font-family: "Acme Sans";
+  src: url("/fonts/acme-sans-400.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* 2. Name it in your brand.css. Set only the roles you change;
+   end each list with a generic family. */
+:root {
+  --font-body: "Acme Sans", system-ui, sans-serif;
+}`;
+
+/** Any font works in a project, not only the ones above: how to load your own and point the tokens at it. */
+function OwnFont() {
+  return (
+    <section className="docs-font" aria-labelledby="font-own">
+      <h3 id="font-own" className="docs-brand-chart-title">
+        Your own font
+      </h3>
+      <p className="docs-note">
+        The fonts above are here to try things out. Your project can use any font: your own files, a font service such as Google Fonts or Adobe Fonts, or a font package.
+        Load it in your project, then set <code>--font-body</code>, <code>--font-heading</code> or <code>--font-code</code> to its name in your <code>brand.css</code>.
+        Every component follows. Fonts that look much larger or smaller than Inter at the same size are worth checking on a few screens.
+      </p>
+      <CodeSnippet code={{ css: OWN_FONT_CSS }} languages={[{ id: 'css', label: 'CSS' }]} highlight={highlight} />
+    </section>
   );
 }
 

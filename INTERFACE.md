@@ -2378,3 +2378,8 @@ Reverses "Code has no picker" (Font tester: six presets) and "Code keeps Geist M
 ## The brand command is not part of the package (2026-10-31, Godwin)
 
 - `npm run brand` runs only in a clone of the Bland repo; the `bland-ui` package ships no command. Projects get their `brand.css` from the docs site's Brand theme page (copy the CSS), and fonts need no tool at all: three `--font-*` lines written by hand. README, CHANGELOG 0.1.1, `docs/agent-skill.md`, `docs/release.md` and the Brand theme page's intro now say so. A command people run with npx may come later if projects ask.
+
+## Brand theme page: own fonts, wider intro (2026-11-01, Godwin)
+
+- The Fonts tab ends with **Your own font**: the presets are for trying things out, a project can use any font. It shows an `@font-face` and the `--font-body` line to copy; How to use points to it.
+- The page intro now covers the whole page (brand color and contrast, extra and chart colors, fonts, one CSS file to copy), not colors alone; the search description says the same.

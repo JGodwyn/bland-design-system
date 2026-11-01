@@ -56,7 +56,7 @@ export const brandPage: DocsPage = {
   href: '#/brand',
   title: 'Brand theme',
   kind: 'brand',
-  description: 'Make a project’s brand colors from one color, check that text on them stays readable, preview them in both themes and apply them across this site.',
+  description: 'Make Bland your project’s own: brand colors from one color with a contrast check, extra and chart colors, and fonts for body, headings and code, tried across this site and copied as one CSS file.',
   icon: PaletteIcon,
 };
 export const stylePageList: DocsPage[] = stylePages.map((p) => ({

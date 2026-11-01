@@ -2015,3 +2015,7 @@ not wrapped; rail contents centred (logo and account icon were off).
 - Found the README and the 0.1.1 CHANGELOG told npm users to run `npm run brand`, which only exists in the repo. Reworded: fonts by hand (example in the README), colors from the Brand theme page, the command only in a clone. Also `docs/agent-skill.md` (a project's agent never runs it in the project), `docs/release.md` (opening said nothing was published) and the Brand theme page's intro.
 - CHANGELOG 0.1.1 dated 2026-10-31; version already 0.1.1. No earlier tags, so none added.
 - Checks: typecheck, lint:css, 717 Playwright tests, test:package all passed. Two stale docs servers were both on port 5180; stopped them and started one before testing.
+
+### Own fonts on the Fonts tab; Brand page intro (2026-11-01)
+
+- Added the Your own font block (FontTester `OwnFont`, a CodeSnippet) and a pointer in How to use; rewrote the Brand theme intro and its search description to cover fonts and extra colors. A test checks the block. 717 passed.
