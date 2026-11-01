@@ -2,7 +2,7 @@
 
 Bland follows [semantic versioning](https://semver.org). Until 1.0, a minor version (0.2.0) may change an API or a token name; a patch (0.1.1) never does. Each entry says what a project has to change, if anything.
 
-## 0.1.1 (2026-10-31)
+## 0.1.1 (2026-11-01)
 
 - **Fonts are swappable.** Three new tokens in `tokens.css`, named by role so any font fits: `--font-body` (Body styles, Inter), `--font-heading` (Display, Heading and Title; `var(--font-body)` until set) and `--font-code` (Code styles, Geist Mono). Every `--type-*` text style now reads one of them (`600 34px/40px var(--font-heading)`). Set them on `:root` in your `brand.css` to change every component's type, and load the font files yourself; skip `bland-ui/fonts.css` if you replace every font. The resolved styles are unchanged, so nothing changes for a project that keeps Inter and Geist Mono. See the README, "Your fonts".
 - **Setting them:** write the lines in your `brand.css` (the README has the example), or copy them from the docs site's Brand theme page, whose Fonts tab tries fonts live and gives the install lines too. The `brand` command in the Bland repo (not part of the package) takes `--font-body`, `--font-heading` and `--font-code` as well.
