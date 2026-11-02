@@ -7,8 +7,11 @@
  */
 
 .docs {
+  /* The page colour: surface-100, except the Overview, a surface-sunken page under raised cards (Godwin 2026-11-02). */
+  --docs-page: var(--surface-100);
+
   min-height: 100vh;
-  background: var(--surface-100);
+  background: var(--docs-page);
   color: var(--text-bold);
 }
 
@@ -26,7 +29,7 @@
   gap: var(--space-xs);
   justify-content: space-between;
   padding: var(--space-md) var(--space-sm) var(--space-md) var(--space-lg); /* the button's icon lines up near the page gutter */
-  background: var(--surface-100);
+  background: var(--docs-page);
 }
 /* The menu button, at the end of the bar: its icon one step up from the sm button's (icon/lg). Its hit area is
    control/lg (56), the bar's full height, centred on the 32 button, so a thumb finds it easily; the button itself
@@ -225,7 +228,7 @@
   justify-content: space-between;
   gap: var(--space-sm);
   padding: var(--space-md) var(--space-lg);
-  background: var(--surface-100);
+  background: var(--docs-page);
 }
 /* The fade: the page colour thinning to nothing over fade/md below the bar, once the page has scrolled. */
 .docs-toolbar::after {
@@ -235,7 +238,7 @@
   right: 0;
   left: 0;
   height: var(--fade-md);
-  background: linear-gradient(var(--surface-100), transparent);
+  background: linear-gradient(var(--docs-page), transparent);
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--duration-md) var(--easing-out);
@@ -578,11 +581,7 @@ code,
   font: var(--type-code-body-md);
 }
 
-/*
- * A frame drawn as Figma's: a surface-sunken card, space-md inside, around a bordered surface-100 box.
- * Sunken, not surface-200, so in dark the frame stays at the page color instead of turning lighter than
- * the demo box; the box keeps the page color either way, so demos sit on their real background.
- */
+/* A frame drawn as Figma's: a surface-200 card, space-md inside, around a bordered surface-100 box. */
 .docs-frame {
   container: docs-frame / inline-size;
 }
@@ -592,7 +591,7 @@ code,
 
   margin: 0;
   padding: var(--space-md);
-  background: var(--surface-sunken);
+  background: var(--surface-200);
   border-radius: var(--rad-lg);
   corner-shape: superellipse(2);
 }
@@ -905,6 +904,9 @@ code,
 }
 
 /* ---- Overview ---- */
+.docs:has(.docs-hero) {
+  --docs-page: var(--surface-sunken);
+}
 .docs-hero {
   display: flex;
   flex-direction: column;
@@ -919,7 +921,7 @@ code,
   grid-template-columns: minmax(0, 1fr); /* phone: one card a line, filling it (Godwin 2026-10-29) */
   gap: var(--space-sm);
   padding: var(--space-3xl) var(--space-xl);
-  background-color: var(--surface-100);
+  background-color: var(--docs-page);
 }
 @media (min-width: 768px) {
   .docs-stats {
@@ -943,7 +945,7 @@ code,
   flex-direction: column;
   gap: var(--space-xs);
   padding: var(--space-xl) var(--space-lg);
-  background: var(--surface-100);
+  background: var(--surface-raised);
   box-shadow: inset 0 0 0 var(--stroke-lg) var(--border-brand);
 }
 .docs-stat-n {
@@ -972,7 +974,7 @@ code,
   height: 100%;
   box-sizing: border-box;
   padding: var(--space-sm) var(--space-md);
-  background: var(--surface-100);
+  background: var(--surface-raised);
   box-shadow: inset 0 0 0 var(--stroke-xs) var(--border-brand);
   font: var(--type-body-lg);
   color: var(--text-bold);
@@ -980,7 +982,7 @@ code,
 }
 @media (hover: hover) and (pointer: fine) {
   .docs-tile:hover {
-    background: var(--surface-200);
+    background: var(--surface-raised-hover);
   }
 }
 .docs-figma-link {

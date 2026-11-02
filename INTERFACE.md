@@ -39,9 +39,12 @@ when), `docs/components.md` (how to build one).
   a card on it) and `surface-raised-hover` (Neutral50 / Neutral800). For
   project layouts; no Bland component uses them, and components keep the
   numbered steps for states and nesting. No `surface-raised` alias of
-  `surface-200`: raised means on top of sunken. The docs site's Playground and
-  variant frames are `surface-sunken` around a `surface-100` box, so demos sit
-  on the page color in both modes.
+  `surface-200`: raised means on top of sunken. On the docs site the Overview
+  page is `surface-sunken` with `surface-raised` stat cards and tiles (hover
+  `surface-raised-hover`), through a `--docs-page` color the page, top bar and
+  toolbar share. The Playground and variant frames stay `surface-200` around a
+  `surface-100` box (Godwin: their lighter gray frame in dark is wanted; a sunken
+  frame matched the page and showed nothing).
 
 ### Brand override (Godwin, 2026-10-26)
 - One package; a project brings its brand by overriding the 13 `--brand-*`

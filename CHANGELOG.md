@@ -2,7 +2,7 @@
 
 Bland follows [semantic versioning](https://semver.org). Until 1.0, a minor version (0.2.0) may change an API or a token name; a patch (0.1.1) never does. Each entry says what a project has to change, if anything.
 
-## 0.1.2 (unreleased)
+## 0.1.2 (2026-11-02)
 
 - **Raised and sunken surfaces.** Three new tokens: `--surface-sunken` (a gray app background, a demo stage, a well), `--surface-raised` (a card on it) and `--surface-raised-hover`. Use them for a gray page with white cards: `--surface-200` under `--surface-100` mirrors in dark mode, so the page turned lighter than its cards; with these the page stays darkest and the cards lift. `--surface-200`'s description no longer suggests it for wells.
 - Nothing to change in a project. No component's look changes.
