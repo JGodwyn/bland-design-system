@@ -82,14 +82,14 @@ They merge with git's `union` strategy (`.gitattributes`): append, never restruc
 
 ## Token architecture
 
-Three layers. **Components bind only to Theme or scale tokens, never primitives.** 639 variables in 12 collections (as of 2026-10-30), plus 15 elevation styles and 23 text styles. Primitives are not emitted to CSS, except the 13 brand and 13 neutral steps (`--brand-*`, `--neutral-*`), which exist only for a project's brand override (the lint keeps components off them), and the three font families `--font-body` / `--font-heading` / `--font-code`, which the text styles read so a project can swap its fonts.
+Three layers. **Components bind only to Theme or scale tokens, never primitives.** 642 variables in 12 collections (as of 2026-11-02), plus 15 elevation styles and 23 text styles. Primitives are not emitted to CSS, except the 13 brand and 13 neutral steps (`--brand-*`, `--neutral-*`), which exist only for a project's brand override (the lint keeps components off them), and the three font families `--font-body` / `--font-heading` / `--font-code`, which the text styles read so a project can swap its fonts.
 
 | Collection | Layer | Modes | Holds |
 | --- | --- | --- | --- |
 | `_Core Colors` | Primitive, hidden | 1 | `Brand/*`, `Neutral/*`, `Purple/*` (OKLCH) + `Alpha/aN` steps |
 | `_Functional Colors` | Primitive, hidden | 1 | `Red/*`, `Green/*`, `Amber/*` + alphas |
 | `_Units` | Primitive, hidden | 1 | `unit/0`–`unit/640`, `unit/0-5`, `unit/1-5`, `unit/full` |
-| `Theme` | Semantic + component | Light, Dark | `Text/`, `Icon/`, `Surface/`, `Border/`, `Shadow/`, `Scrollbar/`, `Fade/`, one group per component (`Button/`, `Indicator/`, `Badge/`, `Toggle/`, `TextInput/`, `Menu/`, `Table/`, `Messaging/`, `Code/`, …) |
+| `Theme` | Semantic + component | Light, Dark | `Text/`, `Icon/`, `Surface/` (numbered steps plus `surface-sunken`, `-raised`, `-raised-hover`), `Border/`, `Shadow/`, `Scrollbar/`, `Fade/`, one group per component (`Button/`, `Indicator/`, `Badge/`, `Toggle/`, `TextInput/`, `Menu/`, `Table/`, `Messaging/`, `Code/`, …) |
 | `Spacing` | Scale | 1 | `space-none` 0 – `space-9xl` 256, `Layout/margin-desktop` 152, `Layout/margin-mobile` 24, `Layout/columns-mobile` 4, `-tablet` 6, `-desktop` 8 (plain numbers in CSS), `Layout/max-width-sm` 1136, `-md` 1264, `-lg` 1392 (page grid, `docs/grid.md`) |
 | `Corner Radius` | Scale | 1 | `rad-null` 0, `rad-xs` 2, `rad-sm` 4, `rad-md` 8, `rad-lg` 16, `rad-xl` 24, `rad-rd` full |
 | `Stroke` | Scale | 1 | `stroke-none` 0, `stroke-xs` 0.5, `stroke-sm` 1 (borders), `stroke-md` 1.5 (icons), `stroke-lg` 2 (focus), `stroke-xl` 4 |
@@ -117,7 +117,7 @@ Implemented in `scripts/build-tokens.ts`; CSS naming and the sync steps are in `
 ## Decisions code must follow
 
 - **Dark mode switch (Godwin 2026-10-27): both.** `data-theme="light|dark"` on any element wins (nested sections work); without it `prefers-color-scheme` decides. This is how `tokens.css` is generated; a project's theme toggle sets `data-theme` on `<html>`.
-- **Dark mode:** Neutral mirrors (0↔950, 50↔900, …); color tints (50–300) become deep tones; color solids (400+) move two steps lighter. Toggle knob is white in both modes. Danger primary Badge/Indicator label stays white in dark (3.7:1, deliberate). Success primary Badge/Indicator label stays white in light (4.47:1, deliberate, decided 2026-10-18).
+- **Dark mode:** Neutral mirrors (0↔950, 50↔900, …); color tints (50–300) become deep tones; color solids (400+) move two steps lighter. `surface-sunken` / `surface-raised` / `surface-raised-hover` don't mirror (a gray page with white cards stays darker than its cards in dark; Godwin 2026-11-02, `INTERFACE.md`). Toggle knob is white in both modes. Danger primary Badge/Indicator label stays white in dark (3.7:1, deliberate). Success primary Badge/Indicator label stays white in light (4.47:1, deliberate, decided 2026-10-18).
 - **Focus:** `:focus-visible` only, never a state or prop. 2px ring (`stroke-lg`) in `Border/border-focused`, offset 2px. Figma's `👀 Focused` boolean is dropped in code.
 - **States:** rest, hover, pressed (where relevant), disabled. Selected and checked are their own props.
 - **Slots:** Figma `🧩` slots map to `children` or named slot props.

@@ -129,3 +129,7 @@ Four Spacing variables added in Figma for the page grid (`docs/grid.md`): `Layou
 ## Sync of 2026-10-28 (Desktop md and lg grids)
 
 `breakpoint/3xl` 1920 and `Layout/max-width-md` 1264 / `-lg` 1392 added; `Layout/max-width` renamed `Layout/max-width-sm` (so `--layout-max-width` became `--layout-max-width-sm`; nothing outside the grid used it); `breakpoint/2xl`'s description now names the grid. Through the drift check (3 added, 2 changed) and `--apply`; checksum 638 variables, `4a186ff6`, equal in Figma and the repo. 586 tokens emitted.
+
+## Sync of 2026-11-02 (raised and sunken surfaces)
+
+Three Theme variables added in Figma (Godwin): `Surface/surface-sunken` (Neutral50 / Neutral950), `Surface/surface-raised` (Neutral0 / Neutral900) and `Surface/surface-raised-hover` (Neutral50 / Neutral800), the light/dark pairs the mirrored numbered surfaces can't make (`INTERFACE.md`, "Light and dark"). `surface-200`'s description no longer says wells; it points to `surface-sunken`. Through the drift check (3 added, 1 changed) and `--apply`; the Figma side returned only the four records (meta unchanged), and the checksum confirms the rest: 642 variables, `fce24ba5`, equal in Figma and the repo. 592 tokens emitted. Figma turned an apostrophe in a new description into `&#39;`; reworded without one.

@@ -2,6 +2,11 @@
 
 Bland follows [semantic versioning](https://semver.org). Until 1.0, a minor version (0.2.0) may change an API or a token name; a patch (0.1.1) never does. Each entry says what a project has to change, if anything.
 
+## 0.1.2 (unreleased)
+
+- **Raised and sunken surfaces.** Three new tokens: `--surface-sunken` (a gray app background, a demo stage, a well), `--surface-raised` (a card on it) and `--surface-raised-hover`. Use them for a gray page with white cards: `--surface-200` under `--surface-100` mirrors in dark mode, so the page turned lighter than its cards; with these the page stays darkest and the cards lift. `--surface-200`'s description no longer suggests it for wells.
+- Nothing to change in a project. No component's look changes.
+
 ## 0.1.1 (2026-11-01)
 
 - **Fonts are swappable.** Three new tokens in `tokens.css`, named by role so any font fits: `--font-body` (Body styles, Inter), `--font-heading` (Display, Heading and Title; `var(--font-body)` until set) and `--font-code` (Code styles, Geist Mono). Every `--type-*` text style now reads one of them (`600 34px/40px var(--font-heading)`). Set them on `:root` in your `brand.css` to change every component's type, and load the font files yourself; skip `bland-ui/fonts.css` if you replace every font. The resolved styles are unchanged, so nothing changes for a project that keeps Inter and Geist Mono. See the README, "Your fonts".

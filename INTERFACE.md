@@ -30,6 +30,18 @@ when), `docs/components.md` (how to build one).
   when no `data-theme="light"` is set. **Both ways stay (Godwin 2026-10-27):**
   `data-theme` wins, else the system preference; a project's toggle sets
   `data-theme` on `<html>`.
+- **Surfaces that don't mirror (Godwin 2026-11-02).** The numbered surfaces
+  (`surface-100` … `600`) mirror between modes, so "darker in light" becomes
+  "lighter in dark". That breaks a gray page with white cards: mirrored, the
+  page turns lighter than the cards. Three Theme tokens hold the pairs the
+  mirror can't make: `surface-sunken` (Neutral50 / Neutral950: a gray app
+  background, a demo stage, a well), `surface-raised` (Neutral0 / Neutral900:
+  a card on it) and `surface-raised-hover` (Neutral50 / Neutral800). For
+  project layouts; no Bland component uses them, and components keep the
+  numbered steps for states and nesting. No `surface-raised` alias of
+  `surface-200`: raised means on top of sunken. The docs site's Playground and
+  variant frames are `surface-sunken` around a `surface-100` box, so demos sit
+  on the page color in both modes.
 
 ### Brand override (Godwin, 2026-10-26)
 - One package; a project brings its brand by overriding the 13 `--brand-*`

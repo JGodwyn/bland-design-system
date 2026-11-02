@@ -2019,3 +2019,11 @@ not wrapped; rail contents centred (logo and account icon were off).
 ### Own fonts on the Fonts tab; Brand page intro (2026-11-01)
 
 - Added the Your own font block (FontTester `OwnFont`, a CodeSnippet) and a pointer in How to use; rewrote the Brand theme intro and its search description to cover fonts and extra colors. A test checks the block. 717 passed.
+
+## Raised and sunken surfaces (2026-11-02)
+
+- Godwin's question from shadcn's docs (a screen recording): two grays equal in light, one lighter and one at the page color in dark. Explained as separate role tokens; Bland's numbered surfaces only mirror. Godwin's case: a surface-200 page with surface-100 cards turns inside out in dark. Agreed: `surface-sunken` (Neutral50/950), `surface-raised` (Neutral0/900), `surface-raised-hover` (Neutral50/800); no separate token equal to surface-200.
+- Figma: created the three Theme variables (ALL_FILLS, like the other surfaces) and reworded surface-200's description. Figma stored "Bland's" as `&#39;`; reworded both descriptions without the apostrophe.
+- Sync: drift check's local half as usual, but on the Figma side ran a short script returning only the four records and the meta hash (131f163, unchanged) instead of pasting the 17 KB check; the checksum after `--apply` (642, fce24ba5, equal both sides) is what proves nothing else differed.
+- Docs site: the Playground and variant frames (`.docs-frame`, `.docs-variant`) moved from surface-200 to surface-sunken; the white box inside stays surface-100 so demos sit on the page color. Checked in dark in the browser: frame, box and page all #0a0c10, the box's border shows it (the shadcn look).
+- 0.1.1 is already on npm, so version 0.1.2 and a CHANGELOG entry (unreleased until Godwin publishes).

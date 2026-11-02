@@ -578,7 +578,11 @@ code,
   font: var(--type-code-body-md);
 }
 
-/* A frame drawn as Figma's: a surface-200 card, space-md inside, around a bordered surface-100 box. */
+/*
+ * A frame drawn as Figma's: a surface-sunken card, space-md inside, around a bordered surface-100 box.
+ * Sunken, not surface-200, so in dark the frame stays at the page color instead of turning lighter than
+ * the demo box; the box keeps the page color either way, so demos sit on their real background.
+ */
 .docs-frame {
   container: docs-frame / inline-size;
 }
@@ -588,7 +592,7 @@ code,
 
   margin: 0;
   padding: var(--space-md);
-  background: var(--surface-200);
+  background: var(--surface-sunken);
   border-radius: var(--rad-lg);
   corner-shape: superellipse(2);
 }
