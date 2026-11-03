@@ -98,7 +98,7 @@ test('headers are 32 (sm) and 40 (md); flush drops the fill and the side padding
   }
   const plain = header(page.getByTestId('closed-sm'));
   const flush = header(page.getByTestId('closed-sm-flush'));
-  expect(await style(plain, 'background-color')).toBe(await tokenColor(page, '--surface-200'));
+  expect(await style(plain, 'background-color')).toBe(await tokenColor(page, '--surface-field'));
   expect(await style(plain, 'padding-left')).toBe('12px');
   expect(await style(flush, 'background-color')).toBe('rgba(0, 0, 0, 0)');
   expect(await style(flush, 'padding-left')).toBe('0px');
@@ -111,10 +111,10 @@ test('the title is bold while open', async ({ page }) => {
   expect(await style(header(page.getByTestId('open-sm')), 'font-weight')).toBe('500');
 });
 
-test('hover: the default header fills surface-300, the flush title underlines', async ({ page }) => {
+test('hover: the default header fills surface-field-hover, the flush title underlines', async ({ page }) => {
   const plain = header(page.getByTestId('closed-sm'));
   await plain.hover();
-  const hover = await tokenColor(page, '--surface-300');
+  const hover = await tokenColor(page, '--surface-field-hover');
   await expect.poll(() => style(plain, 'background-color')).toBe(hover);
 
   const flush = header(page.getByTestId('closed-sm-flush'));

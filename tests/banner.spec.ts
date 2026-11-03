@@ -14,10 +14,10 @@ test('a banner has no live role unless one is passed, and spans its container', 
   expect((await banner.boundingBox())!.width).toBe(frame.width);
 });
 
-test('uncolored is surface-100 with a border-bold inside stroke; colored takes the status tint and border, no shadow', async ({ page }) => {
+test('uncolored is surface-raised with a border-bold inside stroke; colored takes the status tint and border, no shadow', async ({ page }) => {
   for (const [status, tint] of [['info', 'brand'], ['danger', 'danger'], ['success', 'success'], ['warning', 'warning']]) {
     const plain = page.locator(`.bland-banner[data-status="${status}"][data-colored="false"]`).first();
-    expect(await css(plain, 'background-color')).toBe(await tokenColor(page, '--surface-100'));
+    expect(await css(plain, 'background-color')).toBe(await tokenColor(page, '--surface-raised'));
     expect(await css(plain, 'box-shadow')).toContain(await tokenColor(page, '--border-bold'));
 
     const colored = page.locator(`.bland-banner[data-status="${status}"][data-colored="true"]`).first();

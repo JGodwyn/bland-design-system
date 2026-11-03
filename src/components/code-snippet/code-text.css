@@ -7,7 +7,7 @@
  *     <span role="status">…</span>                                  visually hidden, says "Copied"
  *   </span>
  *
- * From Figma: surface-200 fill, stroke-xs border-subtle inside, rad-sm, no vertical padding; sm pads and gaps
+ * From Figma: surface-field fill, stroke-xs border-subtle inside, rad-sm, no vertical padding; sm pads and gaps
  * space-2xs, md and lg space-xs. Code/body-sm, -md, -lg in text-bold. The copy icon is icon/xs (sm, md) or
  * icon/sm (lg); Figma binds no color to it (hidden by default), so it takes icon-subtle. No hover in Figma.
  * When the code wraps, the copy button stays on the first line: it is one line tall and top aligned
@@ -25,7 +25,7 @@
   gap: var(--_pad);
   padding: var(--space-none) var(--_pad);
   vertical-align: baseline;
-  background-color: var(--surface-200);
+  background-color: var(--surface-field);
   box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-xs) var(--border-subtle);
 }
 

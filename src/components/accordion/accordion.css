@@ -32,7 +32,7 @@
   align-items: flex-start;
   gap: var(--space-sm);
   padding: var(--space-xs) var(--space-md);
-  background-color: var(--surface-200);
+  background-color: var(--surface-field);
   color: var(--text-bold);
   font: var(--type-body-lg);
   letter-spacing: var(--type-body-lg-letter-spacing);
@@ -113,7 +113,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .bland-accordion:not([data-flush], [data-disabled]) > .bland-accordion__header:hover {
-    background-color: var(--surface-300);
+    background-color: var(--surface-field-hover);
   }
 
   .bland-accordion[data-flush]:not([data-disabled]) > .bland-accordion__header:hover {

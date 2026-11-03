@@ -10,7 +10,7 @@ export interface NotificationProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   status?: NotificationStatus;
   /** horizontal is one line with inline actions; vertical adds a title, timestamp and actions under the text. */
   orientation?: NotificationOrientation;
-  /** The tinted status surface and border. `false` is surface-100 with border-bold and a neutral shadow. */
+  /** The tinted status surface and border. `false` is surface-raised with border-bold and a neutral shadow. */
   colored?: boolean;
   /** Shown above the description. */
   title?: ReactNode;

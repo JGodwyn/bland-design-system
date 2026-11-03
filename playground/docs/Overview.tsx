@@ -36,28 +36,26 @@ export function Overview() {
       <div className="docs-hero">
         <ul className="docs-stats docs-dots bland-smooth">
           {stats.map((s) => (
-            <li key={s.label} className="docs-stat-frame bland-smooth">
-              <span className="docs-stat bland-smooth">
-                <span className="docs-stat-n">{s.n}</span>
-                <span className="docs-stat-l">{s.label}</span>
-              </span>
+            <li key={s.label} className="docs-stat bland-smooth">
+              <span className="docs-stat-n">{s.n}</span>
+              <span className="docs-stat-l">{s.label}</span>
             </li>
           ))}
         </ul>
         <div className="docs-tile-frame bland-smooth">
           <a className="docs-tile docs-figma-link bland-focus-ring bland-smooth" href={FIGMA_URL} target="_blank" rel="noreferrer">
-            <Icon size="md">
+            <Icon>
               <FigmaLogo />
             </Icon>
             <span>View Figma file</span>
-            <Icon size="md" className="docs-tile-end">
+            <Icon className="docs-tile-end">
               <ArrowUpRightIcon />
             </Icon>
           </a>
         </div>
       </div>
       <Section title="Styles">
-        <ul className="docs-tile-frame docs-cards docs-style-cards bland-smooth">
+        <ul className="docs-cards docs-style-cards">
           {stylePageList.map((p) => (
             <li key={p.href}>
               <a className="docs-tile docs-style-card bland-focus-ring bland-smooth" href={p.href}>
@@ -69,7 +67,7 @@ export function Overview() {
         </ul>
       </Section>
       <Section title="Components">
-        <ul className="docs-tile-frame docs-cards bland-smooth">
+        <ul className="docs-cards">
           {componentPageList.map((p) => (
             <li key={p.href}>
               <a className="docs-tile bland-focus-ring bland-smooth" href={p.href}>

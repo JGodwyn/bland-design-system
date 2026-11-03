@@ -9,7 +9,7 @@
  *           <span class="bland-tab-bar__label">Home</span>
  *         </a>
  *
- * Height tab-bar/height, surface-100, a stroke-sm border-subtle divider along the top (drawn inside,
+ * Height tab-bar/height, surface-raised, a stroke-sm border-subtle divider along the top (drawn inside,
  * as Figma's rectangle is). Items share the width; icon/lg over a body-sm label, space-2xs apart.
  * Current: icon-brand and body-sm-bold text-brand. No hover state (touch), no press motion: it is used
  * all day. The Indicator sits on the icon's top right corner, space-2xs outside it (Figma: 18, -2 on a 24
@@ -18,7 +18,7 @@
 
 .bland-tab-bar {
   min-width: var(--space-none);
-  background-color: var(--surface-100);
+  background-color: var(--surface-raised);
   box-shadow: inset var(--space-none) var(--stroke-sm) var(--space-none) var(--space-none) var(--border-subtle);
 }
 

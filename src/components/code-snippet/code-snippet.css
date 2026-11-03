@@ -13,10 +13,10 @@
  *             <pre class="bland-code-snippet__pre"><code class="bland-code-snippet__code">…</code></pre>
  *       Button.bland-code-snippet__toggle                      Show more / Show less, over the code's bottom
  *
- * From Figma: root surface-100, stroke-sm border-subtle inside, rad-md (fullscreen rad-null), clips. Action bar
- * surface-100, gap space-lg, padding space-xs space-xs space-xs space-md (tabs: no vertical padding), a stroke-sm
+ * From Figma: root surface-raised, stroke-sm border-subtle inside, rad-md (fullscreen rad-null), clips. Action bar
+ * surface-raised, gap space-lg, padding space-xs space-xs space-xs space-md (tabs: no vertical padding), a stroke-sm
  * border-subtle divider along its bottom, 40 tall. Description body-lg text-subtle, fills. Language button
- * surface-200, stroke-xs border-subtle, rad-sm, padding space-2xs space-sm, gap space-2xs, Code/body-md
+ * surface-field, stroke-xs border-subtle, rad-sm, padding space-2xs space-sm, gap space-2xs, Code/body-md
  * text-bold, CaretDown icon/xs icon-subtle (Figma has no hover state for it). Copy is a ghost sm Icon Button.
  * Gutter padding space-md, a stroke-sm border-subtle line on its right, Code/body-md text-subtle. Code padding
  * space-md, Code/body-md in the Code/* colors. Collapsed caps the body at code-snippet/height-collapsed.
@@ -31,7 +31,7 @@
   min-width: var(--space-none);
   overflow: hidden;
   border: var(--stroke-sm) solid var(--border-subtle);
-  background-color: var(--surface-100);
+  background-color: var(--surface-raised);
 }
 
 .bland-code-snippet[data-fullscreen] {
@@ -51,6 +51,12 @@
   flex: 1;
   flex-direction: column;
   min-height: var(--space-none);
+}
+/* The selected file tab takes the snippet's own fill, so it runs into the code below it (Godwin 2026-11-02).
+   A File tab elsewhere keeps surface-100, the page's color. */
+.bland-code-snippet__files .bland-file-tabs__item[data-selected] {
+  --_fill: var(--surface-raised);
+  --_close-fill: var(--surface-raised-hover);
 }
 /* The snippet clips, so rings on its parts sit inside them. */
 .bland-code-snippet__files > .bland-tab-panel:focus-visible {
@@ -72,7 +78,7 @@
   align-items: center;
   gap: var(--space-lg);
   padding: var(--space-xs) var(--space-xs) var(--space-xs) var(--space-md);
-  background-color: var(--surface-100);
+  background-color: var(--surface-raised);
   box-shadow: inset var(--space-none) calc(var(--stroke-sm) * -1) var(--space-none) var(--space-none) var(--border-subtle);
 }
 .bland-code-snippet__bar[data-switcher="tabs"] {
@@ -99,7 +105,7 @@
   gap: var(--space-2xs);
   padding: var(--space-2xs) var(--space-sm);
   border: none;
-  background-color: var(--surface-200);
+  background-color: var(--surface-field);
   box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-xs) var(--border-subtle);
   font: var(--type-code-body-md);
   color: var(--text-bold);

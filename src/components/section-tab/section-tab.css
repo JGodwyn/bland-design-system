@@ -32,7 +32,7 @@
   --_fill: transparent;
   --_text: var(--text-subtle);
   --_icon: var(--icon-subtle);
-  --_count-fill: var(--surface-200);
+  --_count-fill: var(--surface-field);
   --_count-text: var(--text-subtle);
   --bland-radius: var(--rad-sm);
   --bland-icon-size: var(--icon-md);
@@ -140,7 +140,7 @@
     --_fill: var(--surface-200);
     --_text: var(--text-bold);
     --_icon: var(--icon-bold);
-    --_count-fill: var(--surface-300);
+    --_count-fill: var(--surface-field-hover);
   }
 }
 

@@ -28,7 +28,7 @@ export interface CodeTextProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 /**
- * Inline code inside running text: a `<code>` on surface-200 with a hairline border. Optionally a copy button
+ * Inline code inside running text: a `<code>` on surface-field with a hairline border. Optionally a copy button
  * that copies the code's text. Figma: Code snippet page, set "Code-text".
  */
 export function CodeText({

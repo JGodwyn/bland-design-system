@@ -86,11 +86,11 @@ test('a disabled checkbox does not toggle and greys its label', async ({ page })
   expect(await label(box).evaluate((e) => getComputedStyle(e).color)).toBe(await tokenColor(page, '--text-minimal'));
 });
 
-test('rest, hover and checked use the surface and Control/checked tokens', async ({ page }) => {
+test('rest, hover and checked use the field and Control/checked tokens', async ({ page }) => {
   const box = page.getByTestId('uncontrolled');
-  expect(await bg(box)).toBe(await tokenColor(page, '--surface-200'));
+  expect(await bg(box)).toBe(await tokenColor(page, '--surface-field'));
   await page.getByText('Uncontrolled', { exact: true }).hover();
-  await expect.poll(() => bg(box)).toBe(await tokenColor(page, '--surface-300'));
+  await expect.poll(() => bg(box)).toBe(await tokenColor(page, '--surface-field-hover'));
   await page.getByText('Uncontrolled', { exact: true }).click();
   await expect.poll(() => bg(box)).toBe(await tokenColor(page, '--control-checked-hover'));
   await page.mouse.move(0, 0);

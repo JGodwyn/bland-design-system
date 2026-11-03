@@ -61,7 +61,7 @@
 .bland-file-upload__dropzone {
   --bland-icon-size: var(--icon-md);
   --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
-  --_zone: var(--surface-200);
+  --_zone: var(--surface-field);
   --_disc: var(--surface-300);
   --_border: var(--border-input);
   --_icon: var(--icon-subtle);
@@ -93,7 +93,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .bland-file-upload:not([data-disabled]) .bland-file-upload__dropzone:hover {
-    --_zone: var(--surface-300);
+    --_zone: var(--surface-field-hover);
     --_disc: var(--surface-400);
   }
 }

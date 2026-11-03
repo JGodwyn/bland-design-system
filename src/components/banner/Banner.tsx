@@ -8,7 +8,7 @@ export type BannerOrientation = MessageOrientation;
 export interface BannerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   /** Sets the icon and its color, and when `colored` the surface and border. */
   status?: BannerStatus;
-  /** The tinted status surface and border. Default `false`: surface-100 with border-bold. */
+  /** The tinted status surface and border. Default `false`: surface-raised with border-bold. */
   colored?: boolean;
   /** horizontal is one row with inline actions; vertical puts a title over the text and actions under it. */
   orientation?: BannerOrientation;

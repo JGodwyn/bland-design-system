@@ -765,3 +765,17 @@ shell never produces. Also: don't point two Playwright runs at one log file.
 ## Docs server after new dependencies (2026-10-31)
 
 **Every Playwright test timed out in `beforeEach` after merging a PR that added npm packages.** The docs dev server had been running since before `npm install`, and pages that dynamically import the new packages never finished loading. → After `npm install` brings new dependencies, restart the docs server (`npm run docs:stop`, then `npm run docs`) before testing.
+
+## Screenshots miss small surface shifts (2026-11-02)
+
+**Moving a dozen components from Neutral950 to Neutral900 in dark changed no screenshot.** `toHaveScreenshot` compares each pixel with a color threshold (0.2 by default), and one dark neutral step is below it. → A token swap between near steps is checked by the behaviour specs that compare computed colors with `tokenColor`, not by the screenshots; name the token a part should use in its spec. Specs that compared against `--surface-100` still passed in light, because `surface-raised` has the same light value: compare against the token the CSS uses.
+
+**Rebinding a component's fills in Figma:** walk each variant's own nodes and stop at nested instances. They inherit the main component's binding; rebinding them creates overrides.
+
+**Variable order can't be changed from a plugin.** `VariableCollection.variableIds` is read-only and there is no reorder call for variables or groups (only for styles). → Sorting groups is a drag in the Variables panel; recreating variables would break every binding.
+
+## A token audit from code alone (2026-11-03)
+
+**Asked whether every token has a job, a code-only usage count flagged about 120 tokens as unused or redundant**, including shadow colors and elevation geometry that Figma binds on every elevated layer, and reserved tokens whose descriptions give them a role nothing else has. → A token is in use if Figma or code binds it (census the whole file with one `use_figma` script: `page.loadAsync()` on every page, then node, paint, gradient stop, effect, grid and text-segment bindings). Unused is not redundant: a token is only a problem when nothing uses it and no description gives it a role, or when two descriptions claim the same role.
+
+**A see-through fill stacks wherever nested frames repeat it.** Figma's Text Input carried the field fill on the field frame and on `main` and the add-ons inside it; while the fill was solid that was invisible, at 6% black it came out at 12 to 18%. → A translucent token goes on one layer only; scan for a field-token fill under another field-token fill after any solid-to-translucent change (`EXECUTIONS.md`, 2026-11-03).

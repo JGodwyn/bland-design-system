@@ -63,12 +63,12 @@ test('the hit area is control/xs (sm) or control/sm (md) around a 16 or 20 circl
   await expect(small).toBeChecked();
 });
 
-test('rest, hover and checked use the surface and Control/checked tokens; disabled stays put', async ({ page }) => {
+test('rest, hover and checked use the field and Control/checked tokens; disabled stays put', async ({ page }) => {
   const group = page.getByRole('radiogroup', { name: 'Size' });
   const small = group.getByRole('radio', { name: 'Small' });
-  expect(await bg(small)).toBe(await tokenColor(page, '--surface-200'));
+  expect(await bg(small)).toBe(await tokenColor(page, '--surface-field'));
   await group.getByText('Small').hover();
-  await expect.poll(() => bg(small)).toBe(await tokenColor(page, '--surface-300'));
+  await expect.poll(() => bg(small)).toBe(await tokenColor(page, '--surface-field-hover'));
   await group.getByText('Small').click();
   await expect.poll(() => bg(small)).toBe(await tokenColor(page, '--control-checked-hover'));
   await page.mouse.move(0, 0);

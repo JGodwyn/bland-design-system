@@ -44,7 +44,44 @@ when), `docs/components.md` (how to build one).
   `surface-raised-hover`), through a `--docs-page` color the page, top bar and
   toolbar share. The Playground and variant frames stay `surface-200` around a
   `surface-100` box (Godwin: their lighter gray frame in dark is wanted; a sunken
-  frame matched the page and showed nothing).
+  frame matched the page and showed nothing). Superseded in part on the same
+  day: components now use `surface-raised` (next entry).
+- **Raised parts and see-through fields (Godwin 2026-11-02).** The audit after
+  the raised and sunken surfaces: a part that is white in light should sit
+  above the page in dark, and a field should stay visible on a raised card or
+  a modal, which are Neutral900 in dark like the old field fill. Two rules:
+  - White parts take `surface-raised` (hover `surface-raised-hover`): Chip,
+    Pill, Code snippet and its action bar, Banner and Notification (uncolored),
+    Tab bar, Progress wizard markers. Pill disabled stays `surface-200`.
+  - Fields and small fills inside controls take `surface-field` /
+    `surface-field-hover`, **see-through in both modes** (Godwin: light too, so
+    a field on a gray page or the Sidebar doesn't vanish): `Neutral/Alpha/a6` /
+    `a10` (black) in light, new `Neutral/Alpha/white-a6` / `white-a10` in dark,
+    so the field is always one small step darker (light) or lighter (dark) than
+    whatever it sits on: on the page, a card or a modal. Same reasoning as
+    shadcn's dark inputs (white at about 5%) and Apple's fill colors. Used by
+    the TextInput, Dropdown and Messaging message bar tokens (so Text Input,
+    Text Area, Search, Numeric, the date and time fields, Dropdown, the chat
+    bar), Checkbox and Radio boxes (also in Menu), Chip count and close,
+    Section tab count, Code snippet language button, CodeText, the File Upload
+    drop zone and the Accordion header. Rejected: solid Neutral800 fields (1.50:1
+    on the dark page against 1.12 in light, too bright) and a field token per
+    background (components would have to know what they sit on).
+  - Kept: Sidebar panel, selected File tab, Indicator ring, Chat navbar, the
+    Segmented bar track (its own token), Slider dots, File Upload icon disc.
+  - The docs Elevation page is a sunken stage with raised cards.
+  - Code snippet file tabs (Godwin 2026-11-02): the selected tab takes the
+    snippet's own fill (`surface-raised`, close box `surface-raised-hover`) so
+    it runs into the code below; overridden in Code-snippet only. A File tab
+    elsewhere keeps `surface-100`, the page's color.
+  - Docs Overview, Godwin's Figma update (2026-11-02): stat cards sit straight on
+    the dotted page (surface-raised, rad-lg, no frame or border); the Figma link
+    is a raised tile (border-subtle, icon/lg) in a tray; style cards (88 tall,
+    icon on top, border-subtle) and component tiles (border-bold) without the
+    brand frames. Tokens changed from the Figma frame: the tray is
+    `surface-field`, not `surface-300` (in dark surface-300 is lighter than the
+    tile it holds; rebound in Figma too); the dots stay `border-subtle` (Figma
+    surface-600 is bright in dark).
 
 ### Brand override (Godwin, 2026-10-26)
 - One package; a project brings its brand by overriding the 13 `--brand-*`

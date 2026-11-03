@@ -48,12 +48,12 @@ test('a disabled pill does not toggle', async ({ page }) => {
   await expect(pill).toHaveAttribute('aria-pressed', 'false');
 });
 
-test('rest, hover and selected use the surface and Control/checked tokens; press scales to 0.97', async ({ page }) => {
+test('rest, hover and selected use the raised surface and Control/checked tokens; press scales to 0.97', async ({ page }) => {
   const pill = page.getByTestId('uncontrolled');
-  expect(await bg(pill)).toBe(await tokenColor(page, '--surface-100'));
+  expect(await bg(pill)).toBe(await tokenColor(page, '--surface-raised'));
 
   await pill.hover();
-  await expect.poll(() => bg(pill)).toBe(await tokenColor(page, '--surface-200'));
+  await expect.poll(() => bg(pill)).toBe(await tokenColor(page, '--surface-raised-hover'));
 
   await page.mouse.down();
   await expect

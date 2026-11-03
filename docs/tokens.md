@@ -133,3 +133,7 @@ Four Spacing variables added in Figma for the page grid (`docs/grid.md`): `Layou
 ## Sync of 2026-11-02 (raised and sunken surfaces)
 
 Three Theme variables added in Figma (Godwin): `Surface/surface-sunken` (Neutral50 / Neutral950), `Surface/surface-raised` (Neutral0 / Neutral900) and `Surface/surface-raised-hover` (Neutral50 / Neutral800), the light/dark pairs the mirrored numbered surfaces can't make (`INTERFACE.md`, "Light and dark"). `surface-200`'s description no longer says wells; it points to `surface-sunken`. Through the drift check (3 added, 1 changed) and `--apply`; the Figma side returned only the four records (meta unchanged), and the checksum confirms the rest: 642 variables, `fce24ba5`, equal in Figma and the repo. 592 tokens emitted. Figma turned an apostrophe in a new description into `&#39;`; reworded without one.
+
+## Sync of 2026-11-02 (see-through field fills)
+
+Added in Figma: `Neutral/Alpha/white-a6` and `white-a10` (Neutral0 at 6% and 10%), and Theme `Surface/surface-field` / `surface-field-hover` (Alpha a6 / a10 in light, white-a6 / white-a10 in dark). `TextInput/surface-rest`, `-hover`, `Dropdown/surface-rest`, `-hover` and `Messaging/surface-messagebar` moved to the same alphas; the a6 and a10 descriptions name the field use. Through the drift check (4 added, 7 changed) with the short Figma-side script, `--apply`, then the checksum: 646 variables, `43def3ff`, equal in Figma and the repo. 594 tokens emitted. Why: `INTERFACE.md`, "Raised parts and see-through fields".

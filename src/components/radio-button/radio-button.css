@@ -37,8 +37,8 @@
 }
 
 .bland-radio__input {
-  --_box: var(--surface-200);
-  --_box-hover: var(--surface-300);
+  --_box: var(--surface-field);
+  --_box-hover: var(--surface-field-hover);
   --_border: var(--border-input);
 
   appearance: none;

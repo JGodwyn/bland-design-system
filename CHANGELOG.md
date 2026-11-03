@@ -2,6 +2,14 @@
 
 Bland follows [semantic versioning](https://semver.org). Until 1.0, a minor version (0.2.0) may change an API or a token name; a patch (0.1.1) never does. Each entry says what a project has to change, if anything.
 
+## 0.1.3 (2026-11-02)
+
+- **Fields stay visible on cards and modals.** New tokens `--surface-field` and `--surface-field-hover`: see-through fills (black at 6% and 10% in light, white at 6% and 10% in dark) that always land one small step from whatever is under them. Text Input, Text Area, Search, Numeric, the date and time fields, Dropdown and the chat message bar use them through their own tokens, as do Checkbox and Radio boxes, Chip counts, Section tab counts, inline code, the Code snippet language button, the File Upload drop zone and the Accordion header. In dark these no longer blend into a raised card or a modal; in light they no longer vanish on a gray page.
+- **White parts lift in dark.** Chip, Pill, Code snippet, uncolored Banner and Notification, Tab bar and Progress wizard markers now use `--surface-raised`, so in dark they sit a step above the page instead of matching it.
+- **Code snippet file tabs:** the selected tab takes the snippet's own fill, so in dark it runs into the code instead of showing the page color. File tabs elsewhere are unchanged.
+- Light mode on a white page looks the same as before. Nothing to change in a project; if you styled your own fields with `--surface-200`, `--surface-field` is the better fit.
+- **Clearer token descriptions** (in `tokens.json` and the docs): `--surface-100` is the page and what sits flat on it, `--surface-raised` anything that sits on top (cards, banners, chips), `--surface-field` small fills inside controls, `--layout-margin-desktop` a landing page's wide margin and `--layout-margin-mobile` a Modal's gap from the screen edge. No values change.
+
 ## 0.1.2 (2026-11-02)
 
 - **Raised and sunken surfaces.** Three new tokens: `--surface-sunken` (a gray app background, a demo stage, a well), `--surface-raised` (a card on it) and `--surface-raised-hover`. Use them for a gray page with white cards: `--surface-200` under `--surface-100` mirrors in dark mode, so the page turned lighter than its cards; with these the page stays darkest and the cards lift. `--surface-200`'s description no longer suggests it for wells.

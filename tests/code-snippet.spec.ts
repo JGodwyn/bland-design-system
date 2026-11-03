@@ -43,6 +43,14 @@ test('file tabs switch the code, and the line numbers follow', async ({ page }) 
   await expect(snippet.getByRole('button', { name: 'Show more' })).toHaveCount(0);
 });
 
+test('the selected file tab takes the snippet fill (surface-raised), in dark too', async ({ page }) => {
+  await openStory(page, 'code-snippet', 'dark');
+  const snippet = page.getByTestId('collapsed');
+  const selected = snippet.locator('.bland-file-tabs__item[data-selected]');
+  const fill = await snippet.evaluate((e) => getComputedStyle(e).backgroundColor);
+  await expect.poll(() => selected.evaluate((e) => getComputedStyle(e).backgroundColor)).toBe(fill);
+});
+
 test('the dropdown switcher picks a language from a Menu', async ({ page }) => {
   const snippet = page.getByTestId('controlled');
   const trigger = snippet.getByRole('button', { name: 'Language: python' });

@@ -30,7 +30,7 @@
 .bland-progress-wizard__step {
   --_reached: var(--progress-fill-brand);
   --_bar: var(--progress-track);
-  --_marker-fill: var(--surface-100);
+  --_marker-fill: var(--surface-raised);
   --_marker-stroke: var(--stroke-sm);
   --_marker-border: var(--border-input);
   --_title: var(--text-bold);

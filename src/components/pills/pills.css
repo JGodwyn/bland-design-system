@@ -14,8 +14,8 @@
  */
 
 .bland-pill {
-  --_bg: var(--surface-100);
-  --_bg-hover: var(--surface-200);
+  --_bg: var(--surface-raised);
+  --_bg-hover: var(--surface-raised-hover);
   --_bg-disabled: var(--surface-200);
   --_text: var(--text-bold);
   --_icon: var(--icon-bold);

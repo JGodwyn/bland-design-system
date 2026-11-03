@@ -24,7 +24,7 @@
   padding: var(--space-none) var(--space-sm);
   border: var(--stroke-sm) solid var(--border-subtle);
   --bland-radius: var(--rad-sm); /* drawn by .bland-smooth */
-  background-color: var(--surface-100);
+  background-color: var(--surface-raised);
   color: var(--text-bold);
   font: var(--type-body-sm);
   letter-spacing: var(--type-body-sm-letter-spacing);
@@ -83,7 +83,7 @@
   height: var(--_trail);
   padding: var(--space-none) var(--space-2xs);
   --bland-radius: var(--rad-xs);
-  background-color: var(--surface-200);
+  background-color: var(--surface-field);
   color: var(--text-subtle);
   font: var(--type-body-sm-bold);
   font-variant-numeric: tabular-nums;
@@ -109,7 +109,7 @@
   padding: var(--space-none);
   border: none;
   --bland-radius: var(--rad-xs);
-  background-color: var(--surface-200);
+  background-color: var(--surface-field);
   color: var(--icon-subtle);
   cursor: pointer;
   touch-action: manipulation;

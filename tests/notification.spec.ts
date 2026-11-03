@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 
 const tints = { info: 'brand', danger: 'danger', success: 'success', warning: 'warning' } as const;
 
-test('colored uses the tinted surface and border; uncolored surface-100 and border-bold', async ({ page }) => {
+test('colored uses the tinted surface and border; uncolored surface-raised and border-bold', async ({ page }) => {
   for (const [status, tint] of Object.entries(tints)) {
     const colored = page.locator(`.bland-notification[data-status="${status}"][data-colored="true"]`).first();
     expect(await css(colored, 'background-color')).toBe(await tokenColor(page, `--surface-${tint}-light`));
@@ -17,7 +17,7 @@ test('colored uses the tinted surface and border; uncolored surface-100 and bord
     expect(await css(colored, 'box-shadow')).toContain(await tokenColor(page, `--shadow-${tint}-key`));
 
     const plain = page.locator(`.bland-notification[data-status="${status}"][data-colored="false"]`).first();
-    expect(await css(plain, 'background-color')).toBe(await tokenColor(page, '--surface-100'));
+    expect(await css(plain, 'background-color')).toBe(await tokenColor(page, '--surface-raised'));
     expect(await css(plain, 'box-shadow')).toContain(await tokenColor(page, '--border-bold'));
     expect(await css(plain, 'box-shadow')).toContain(await tokenColor(page, '--shadow-neutral-key'));
   }
