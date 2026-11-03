@@ -13,6 +13,7 @@ import {
 } from 'react';
 import { CaretDownIcon, SidebarSimpleIcon } from '../../icons';
 import { Icon } from '../icon/Icon';
+import { slideHeight, sliding } from '../motion/height';
 import { tokenMs } from '../overlay/floating';
 import { ScrollArea } from '../scroll-area/ScrollArea';
 import './sidebar.css';
@@ -114,8 +115,9 @@ export interface SidebarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
   /** Accessible name of the expand button. */
   expandLabel?: string;
   /**
-   * The logo or workspace switcher, fixed above the list. A function gets
-   * `{ rail }`, so it can draw a narrower version in the rail. It brings its own padding.
+   * The logo or workspace switcher, fixed above the list. It brings its own padding. A function gets `{ rail }`,
+   * so it can draw a narrower version in the rail (a logo mark); a plain node has none, so it fades out as the
+   * sidebar collapses and the rail shows the expand button in its place.
    */
   top?: Slot;
   /** The plan, account or settings, fixed under the list. As `top`. */
@@ -211,6 +213,11 @@ export function Sidebar({
   // A collapse pressed with the pointer closes the sidebar for good: hovering it does not open it again until
   // the pointer has left.
   const [suppressed, setSuppressed] = useState(false);
+  // Where that collapse was pressed. WebKit sends pointerenter again as the panel slides under a pointer that
+  // has not moved; an enter or move at this point is one of those, not the pointer coming back.
+  const collapsedAt = useRef<{ x: number; y: number } | null>(null);
+  const unmoved = (event: PointerEvent) =>
+    collapsedAt.current?.x === event.clientX && collapsedAt.current?.y === event.clientY;
   const wantPeek = isMinimized && !suppressed && (hover || keyboard);
   const wasMinimized = useRef(isMinimized);
 
@@ -236,14 +243,40 @@ export function Sidebar({
   }, [peek, instant]);
 
   const rail = isMinimized && peek === null;
+  // A top slot without a rail version draws nothing in the rail; the expand button takes its place.
+  const topSlot: Slot | undefined = top === undefined || typeof top === 'function' ? top : ({ rail }) => (rail ? null : top);
   // Rows sit where the rail puts them whenever the sidebar is minimized and not open, so the icons slide with
   // the panel as it opens or closes instead of jumping at either end.
   const compact = isMinimized && peek !== 'open';
 
+  // Opening: the slide out of the rail, while it runs. What waits for the full sidebar (the collapse button beside
+  // a top slot) comes in after it.
+  const [opening, setOpening] = useState(false);
+  const wasCompact = useRef(compact);
+  useLayoutEffect(() => {
+    const was = wasCompact.current;
+    wasCompact.current = compact;
+    if (compact || !was) {
+      setOpening(false);
+      return;
+    }
+    if (instant || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    setOpening(true);
+    const timer = window.setTimeout(() => setOpening(false), tokenMs('--duration-2xl') ?? 0);
+    return () => window.clearTimeout(timer);
+  }, [compact]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const setMinimized = (next: boolean, event: MouseEvent) => {
     // A click with no pointer (detail 0) came from Enter or Space.
     setInstant(event.detail === 0);
-    if (next && event.detail !== 0) setSuppressed(true);
+    if (next && event.detail !== 0) {
+      setSuppressed(true);
+      collapsedAt.current = { x: event.clientX, y: event.clientY };
+      // The pointer was over the full sidebar, so hover is on; left on, it would open the peek in the moment
+      // between the pointer leaving (which lifts the suppression) and hover's close delay running out.
+      clearHoverTimer();
+      setHover(false);
+    }
     if (minimized === undefined) setOwnMinimized(next);
     onMinimizedChange?.(next);
   };
@@ -330,7 +363,9 @@ export function Sidebar({
       data-minimized={isMinimized || undefined}
       data-layout={rail ? 'rail' : 'full'}
       data-compact={compact || undefined}
+      data-opening={opening || undefined}
       data-top={top !== undefined || undefined}
+      data-top-plain={(top !== undefined && typeof top !== 'function') || undefined}
       data-collapsible={collapsible || undefined}
       data-peek={peek ?? undefined}
       data-instant={instant || undefined}
@@ -338,13 +373,14 @@ export function Sidebar({
         onPointerEnter?.(event);
         if (event.pointerType !== 'mouse') return;
         setInstant(false);
+        if (unmoved(event)) return;
         if (hover) clearHoverTimer();
         else setHoverAfter(true, peekDelay ?? tokenMs('--duration-sidebar-peek-delay'));
       }}
       onPointerMove={(event: PointerEvent<HTMLDivElement>) => {
         onPointerMove?.(event);
         // Still moving: the wait to open starts again.
-        if (event.pointerType === 'mouse' && !hover && isMinimized && !suppressed) {
+        if (event.pointerType === 'mouse' && !hover && isMinimized && !suppressed && !unmoved(event)) {
           setHoverAfter(true, peekDelay ?? tokenMs('--duration-sidebar-peek-delay'));
         }
       }}
@@ -361,7 +397,7 @@ export function Sidebar({
       <div className="bland-sidebar__panel">
         {(top !== undefined || collapsible) && (
           <div className="bland-sidebar__header">
-            {top !== undefined && <SlotFade className="bland-sidebar__top" slot={top} rail={compact} instant={instant} />}
+            {topSlot !== undefined && <SlotFade className="bland-sidebar__top" slot={topSlot} rail={compact} instant={instant} />}
             {/* In the header's flow: beside the top slot, or in its place when there is none. */}
             {collapsible && (
               <button
@@ -406,13 +442,13 @@ export function Sidebar({
                     >
                       {content(item, false, true)}
                     </button>
-                    <ul id={nestId} className="bland-sidebar__nest" data-closed={closed || undefined}>
+                    <Nest id={nestId} closed={closed}>
                       {item.items.map((child) => (
                         <li key={child.id} className="bland-sidebar__entry">
                           {link(child, true)}
                         </li>
                       ))}
-                    </ul>
+                    </Nest>
                   </li>
                 );
               })}
@@ -422,6 +458,32 @@ export function Sidebar({
         {bottom !== undefined && <SlotFade className="bland-sidebar__bottom" slot={bottom} rail={compact} instant={instant} />}
       </div>
     </div>
+  );
+}
+
+/**
+ * A group's nested rows. They open and fold with their height, measured in pixels so every engine animates it
+ * (motion/height.ts); `data-instant` and reduced motion turn the CSS transition off, so the change is at once.
+ */
+function Nest({ id, closed, children }: { id: string; closed: boolean; children: ReactNode }) {
+  const ref = useRef<HTMLUListElement>(null);
+  const stop = useRef<() => void>(undefined);
+  // The state the height last showed (a second effect run in Strict Mode is not a change).
+  const shown = useRef(closed);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (shown.current === closed) return;
+    shown.current = closed;
+    stop.current?.();
+    // Mid-slide it starts from where it is; settled, from the other state's height.
+    const now = sliding(el) ? el.getBoundingClientRect().height : null;
+    stop.current = closed ? slideHeight(el, now ?? el.scrollHeight, 0) : slideHeight(el, now ?? 0, el.scrollHeight);
+  }, [closed]);
+  return (
+    <ul ref={ref} id={id} className="bland-sidebar__nest" data-closed={closed || undefined}>
+      {children}
+    </ul>
   );
 }
 

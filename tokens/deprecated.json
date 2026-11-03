@@ -1,0 +1,4 @@
+{
+  "$note": "Old CSS token names kept as aliases for one minor version (docs/release.md, \"Deprecation\"). Kept by hand: add an entry when a published token is renamed, remove it in the removeIn release. Entry: { \"name\": \"--old\", \"use\": \"--new\", \"since\": \"0.2.0\", \"removeIn\": \"0.3.0\" }.",
+  "tokens": []
+}

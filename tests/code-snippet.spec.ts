@@ -2,12 +2,25 @@
 import { expect, test } from '@playwright/test';
 import { openStory } from './stories';
 
-test.beforeEach(async ({ page, context }) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+// Chromium reads the real clipboard. WebKit and Firefox take no clipboard permissions from Playwright, so there
+// the test records what the page writes to it.
+test.beforeEach(async ({ page, context, browserName }) => {
+  if (browserName === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  else {
+    await page.addInitScript(() => {
+      const w = window as unknown as { __copied?: string };
+      navigator.clipboard.writeText = async (text: string) => {
+        w.__copied = text;
+      };
+    });
+  }
   await openStory(page, 'code-snippet', 'light');
 });
 
-const clipboard = (page: import('@playwright/test').Page) => page.evaluate(() => navigator.clipboard.readText());
+const clipboard = (page: import('@playwright/test').Page) =>
+  test.info().project.name === 'chromium'
+    ? page.evaluate(() => navigator.clipboard.readText())
+    : page.evaluate(() => (window as unknown as { __copied?: string }).__copied);
 
 test('collapsed caps the code; Show more expands it and Show less collapses it', async ({ page }) => {
   const snippet = page.getByTestId('collapsed');

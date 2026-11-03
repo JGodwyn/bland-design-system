@@ -21,8 +21,12 @@ test.beforeEach(async ({ page }) => {
   await openStory(page, 'accordion', 'light');
 });
 
-/** Chromium's accessibility node for a header: role and expanded state, as screen readers get them. */
+/**
+ * Chromium's accessibility node for a header: role and expanded state, as screen readers get them. It reads the
+ * tree over CDP, so other engines skip these checks (their DOM checks still run).
+ */
 async function axHeader(page: Page, name: string) {
+  if (test.info().project.name !== 'chromium') return null;
   const cdp = await page.context().newCDPSession(page);
   const { nodes } = await cdp.send('Accessibility.getFullAXTree');
   const node = nodes.find((n) => n.name?.value === name && n.role?.value !== 'StaticText' && n.role?.value !== 'InlineTextBox')!;
@@ -34,11 +38,13 @@ test('the header is a native disclosure button with an expanded state; a click o
   const item = page.getByTestId('group-1');
   // Chromium's summary role (DisclosureTriangle) reaches platform screen readers as a button.
   // In a name group Chromium says DisclosureTriangleGrouped.
-  expect(await axHeader(page, 'Second question')).toEqual({ role: expect.stringMatching(/^DisclosureTriangle/), expanded: false, disabled: false });
+  const ax = await axHeader(page, 'Second question');
+  if (ax) expect(ax).toEqual({ role: expect.stringMatching(/^DisclosureTriangle/), expanded: false, disabled: false });
   await expect(item.getByText(/description section/)).toBeHidden();
   await header(item).click();
   await expect(item).toHaveAttribute('open', '');
-  expect((await axHeader(page, 'Second question')).expanded).toBe(true);
+  const open = await axHeader(page, 'Second question');
+  if (open) expect(open.expanded).toBe(true);
   await expect(item.getByText(/description section/)).toBeVisible();
   await header(item).click();
   await expect(item).not.toHaveAttribute('open');
@@ -84,7 +90,8 @@ test('disabled: no toggling, out of the Tab order, minimal colors', async ({ pag
   const item = page.getByTestId('disabled');
   const summary = header(item);
   await expect(summary).toHaveAttribute('aria-disabled', 'true');
-  expect((await axHeader(page, 'Disabled')).disabled).toBe(true);
+  const ax = await axHeader(page, 'Disabled');
+  if (ax) expect(ax.disabled).toBe(true);
   await expect(summary).toHaveAttribute('tabindex', '-1');
   await summary.click();
   await expect(item).not.toHaveAttribute('open');
@@ -130,6 +137,41 @@ test('the caret turns over duration/md with easing/out, and not under reduced mo
 
   await page.emulateMedia({ reducedMotion: 'reduce' });
   expect(await style(caret, 'transition-duration')).toBe('0s');
+});
+
+test('the height eases open and folds closed in every engine; open stays until the fold ends', async ({ page }) => {
+  const item = page.getByTestId('closed-sm');
+  const height = () => item.evaluate((e) => Math.round(e.getBoundingClientRect().height));
+  const closed = await height();
+  await header(item).click();
+  const opening = await height();
+  await expect.poll(height).toBeGreaterThan(opening);
+  await expect(item).not.toHaveAttribute('style', /height/);
+  const open = await height();
+  expect(open).toBeGreaterThan(closed);
+  await header(item).click();
+  // Still open (the content shows) while it folds, then closed at the header's height. The caret turns back with
+  // the fold, not after it.
+  await expect(item).toHaveAttribute('open', '');
+  const caret = item.locator('.bland-accordion__caret');
+  await expect.poll(() => style(caret, 'transform')).not.toMatch(/^matrix\(-1, .*-1, 0, 0\)$/);
+  await expect(item).toHaveAttribute('open', '');
+  const folding = await height();
+  expect(folding).toBeGreaterThan(closed);
+  await expect(item).not.toHaveAttribute('open');
+  expect(await height()).toBe(closed);
+  await expect(item).not.toHaveAttribute('style', /height/);
+});
+
+test('under reduced motion it opens and closes at once', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const item = page.getByTestId('closed-sm');
+  await header(item).click();
+  await expect(item).toHaveAttribute('open', '');
+  expect(await item.getAttribute('style')).toBeFalsy();
+  await header(item).click();
+  await expect(item).not.toHaveAttribute('open');
+  expect(await item.getAttribute('style')).toBeFalsy();
 });
 
 test('the header takes keyboard focus with the focus ring', async ({ page }) => {

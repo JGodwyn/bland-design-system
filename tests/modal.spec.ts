@@ -74,7 +74,13 @@ test('right alignment puts the primary last, in the DOM too', async ({ page }) =
 });
 
 test('autoFocus inside wins; a form submits from the action bar and closes it', async ({ page }) => {
-  await page.getByTestId('form-trigger').click();
+  // Focus goes back to what had it when the modal opened. A press on a button in Safari moves focus off it (to
+  // the page), so WebKit opens this one from the keyboard.
+  const trigger = page.getByTestId('form-trigger');
+  if (test.info().project.name === 'webkit') {
+    await trigger.focus();
+    await page.keyboard.press('Enter');
+  } else await trigger.click();
   const modal = dialog(page, 'form-modal');
   const input = modal.getByLabel('File name');
   await expect(input).toBeFocused();
@@ -163,7 +169,8 @@ test('the backdrop dims the page with its Modal/backdrop step: subtle by default
 });
 
 for (const theme of ['light', 'dark'] as const) {
-  test(`an open modal looks the same (${theme})`, async ({ page }) => {
+  test(`an open modal looks the same (${theme})`, async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'screenshot baselines are Chromium (playwright.config.ts)');
     await openStory(page, 'modal', theme);
     const trigger = page.getByTestId('alert-trigger');
     await trigger.focus();

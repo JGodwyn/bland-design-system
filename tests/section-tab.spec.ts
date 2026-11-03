@@ -1,7 +1,7 @@
 // Behaviour of Section tab: React Aria tabs (arrow keys, Home/End, disabled skipped), panels, colors, sideways scroll.
 import { expect, test } from '@playwright/test';
 import { tokenColor } from './feedback-helpers';
-import { openStory } from './stories';
+import { openStory, clickToFocus } from './stories';
 
 test.beforeEach(async ({ page }) => {
   await openStory(page, 'section-tab', 'light');
@@ -71,7 +71,7 @@ test('the brand underline sits on the divider under the selected tab; hover fill
 test('the underline slides to a pressed tab, and jumps on arrow keys', async ({ page }) => {
   const list = page.getByRole('tablist', { name: 'Controlled' });
   const underline = list.locator('.bland-section-tabs__underline');
-  await list.getByRole('tab', { name: 'Settings' }).click();
+  await clickToFocus(list.getByRole('tab', { name: 'Settings' }));
   await expect(underline).toHaveAttribute('data-moving', '');
   expect(await underline.evaluate((e) => getComputedStyle(e).transitionProperty)).toContain('translate');
   await page.keyboard.press('ArrowLeft');

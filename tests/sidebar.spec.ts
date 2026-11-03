@@ -60,11 +60,19 @@ test('a disabled row cannot be followed or focused', async ({ page }) => {
   await expect(reports).not.toHaveAttribute('href');
 });
 
-test('the rail is an item plus space-sm each side, icons only, labels kept as names', async ({ page }) => {
-  for (const [size, w] of [['sm', 40], ['md', 48], ['lg', 56], ['xl', 64]] as const) {
+test('the rail is an item plus space-sm each side, its icons where the full sidebar has them, labels kept as names', async ({ page }) => {
+  for (const [size, w, shift] of [['sm', 40, 0], ['md', 48, 2], ['lg', 56, 2], ['xl', 64, 2]] as const) {
     const rail = page.getByTestId(`rail-${size}`);
     expect(await width(rail)).toBe(w);
     await expect(rail).toHaveAttribute('data-layout', 'rail');
+    // The list keeps space-sm in both, so an icon moves only by the row padding's 2px past the rail's centring.
+    const iconX = (nav: string) =>
+      page.evaluate((label) => {
+        const root = document.querySelector(`nav[aria-label="${label}"]`)!.closest('.bland-sidebar')!;
+        const icon = root.querySelector('.bland-sidebar__item .bland-sidebar__icon')!;
+        return icon.getBoundingClientRect().x - root.getBoundingClientRect().x;
+      }, nav);
+    expect((await iconX(`Size ${size}`)) - (await iconX(`Rail ${size}`))).toBe(shift);
   }
   const rail = page.getByTestId('rail-sm');
   await expect(rail.getByRole('link', { name: 'Inbox 8' })).toBeVisible();
@@ -89,16 +97,16 @@ test('the pointer over the rail opens the full sidebar over the page; leaving cl
   await expect(rail).toHaveAttribute('data-layout', 'rail');
 });
 
-test('the icons stay where the rail puts them through the peek: no jump at either end', async ({ page }) => {
+test('through the peek the icons ease 2px with the panel at md, and come back to the rail\'s place', async ({ page }) => {
   const rail = page.getByTestId('rail-md');
   const iconX = () =>
     rail.evaluate((sb) => Math.round(sb.querySelector('.bland-sidebar__icon')!.getBoundingClientRect().x - sb.getBoundingClientRect().x));
   expect(await iconX()).toBe(14);
   await rail.getByRole('link', { name: 'Home' }).hover();
-  // The rows slide from the rail's places to the full sidebar's, with the panel (duration/2xl, easing/drawer).
+  // The row padding eases from the rail's centring to the full sidebar's, with the panel (duration/2xl, easing/drawer).
   const t = await rail.getByRole('link', { name: 'Home' }).evaluate((e) => getComputedStyle(e).transitionProperty);
   expect(t).toContain('padding-inline-start');
-  await expect.poll(iconX).toBe(24);
+  await expect.poll(iconX).toBe(16);
   await page.mouse.move(900, 700);
   await expect(rail).not.toHaveAttribute('data-peek');
   expect(await iconX()).toBe(14);
@@ -160,6 +168,43 @@ test('the collapse button sits in flow: beside the logo, or in its place, never 
   const sm = page.locator('.bland-sidebar').filter({ has: page.getByRole('navigation', { name: 'Size sm' }) });
   const x = (sel: string) => sm.locator(sel).first().evaluate((e) => Math.round(e.getBoundingClientRect().x));
   expect(await x('.bland-sidebar__toggle-icon')).toBe(await x('.bland-sidebar__icon'));
+});
+
+test('a collapse after resting on the sidebar stays collapsed: the peek does not open under the pointer', async ({ page }) => {
+  const sidebar = page.getByTestId('slots');
+  const collapse = sidebar.getByRole('button', { name: 'Collapse sidebar' });
+  // Resting past the peek delay turns hover on, as a real pointer does before it clicks.
+  await collapse.hover();
+  await page.waitForTimeout(600);
+  // Every peek state it passes through after the press: closing to the rail, never open.
+  const seen = sidebar.evaluate(
+    (el) =>
+      new Promise<string[]>((resolve) => {
+        const states: string[] = [];
+        const mo = new MutationObserver(() => states.push(el.getAttribute('data-peek') ?? 'none'));
+        mo.observe(el, { attributes: true, attributeFilter: ['data-peek'] });
+        setTimeout(() => (mo.disconnect(), resolve(states)), 700);
+      }),
+  );
+  await collapse.click();
+  expect(await seen).not.toContain('open');
+  await expect(sidebar).toHaveAttribute('data-layout', 'rail');
+});
+
+test('beside a top slot the collapse button comes in after the sidebar is fully out, with a fade', async ({ page }) => {
+  const sidebar = page.getByTestId('plain-top');
+  const toggle = sidebar.locator('.bland-sidebar__toggle');
+  const opacity = () => toggle.evaluate((e) => Number(getComputedStyle(e).opacity));
+  await sidebar.getByRole('button', { name: 'Collapse sidebar' }).click();
+  await page.mouse.move(900, 700);
+  await expect(sidebar).toHaveAttribute('data-layout', 'rail');
+  await sidebar.getByRole('button', { name: 'Expand sidebar' }).click();
+  await page.mouse.move(900, 700);
+  // Through the slide out of the rail it waits, hidden; then it fades in.
+  await expect(sidebar).toHaveAttribute('data-opening');
+  expect(await opacity()).toBe(0);
+  await expect(sidebar).not.toHaveAttribute('data-opening');
+  await expect.poll(opacity).toBe(1);
 });
 
 test('a group opens and folds with its height', async ({ page }) => {

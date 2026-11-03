@@ -86,6 +86,13 @@ export function TextArea({
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     onChange?.(event);
     fit();
+    // Typing at the end keeps the last line in view. Chromium scrolls the viewport to the caret by itself;
+    // WebKit leaves a grown textarea's caret below the fold.
+    const el = event.currentTarget;
+    if (el.selectionEnd === el.value.length) {
+      const viewport = el.closest<HTMLElement>('.bland-scroll-area__viewport');
+      if (viewport) viewport.scrollTop = viewport.scrollHeight;
+    }
   };
 
   // Padding and the handle focus the textarea too.
@@ -151,7 +158,7 @@ export function TextArea({
         </ScrollArea>
         {resizable && (
           <span className="bland-text-area__resizer" aria-hidden="true" onPointerDown={startResize}>
-            {/* Figma: text-area-resizer (166:4939) */}
+            {/* Figma: _text-area-resizer (166:4939) */}
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeLinecap="round">
               <path d="M13.425 6.10114L4.93977 14.5864" />
               <path d="M13.3777 10.1937L9.13504 14.4363" />

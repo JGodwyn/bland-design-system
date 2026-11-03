@@ -22,7 +22,10 @@ const messages = stylelint.utils.ruleMessages(ruleName, {
 
 // Tokens
 
-const TOKENS = JSON.parse(readFileSync(new URL('../../tokens/tokens.json', import.meta.url), 'utf8')).tokens
+const TOKEN_FILE = JSON.parse(readFileSync(new URL('../../tokens/tokens.json', import.meta.url), 'utf8'))
+const TOKENS = TOKEN_FILE.tokens
+// Old names kept as aliases for one minor version (docs/release.md, "Deprecation"); Bland's own CSS never uses them.
+const DEPRECATED = new Map((TOKEN_FILE.deprecated ?? []).map((d) => [d.name, d]))
 
 const group = (t) => t.name.split('/')[0]
 const pxOf = (value) => (/^-?[\d.]+px$/.test(value) ? Number.parseFloat(value) : null)
@@ -368,6 +371,8 @@ const ruleFunction = (primary) => (root, result) => {
           if (fn === 'var') {
             const name = node.nodes[0]?.value ?? ''
             if (/^--(brand|neutral)-\d+$/.test(name)) flag(suggestPrimitive(prop, name), node)
+            const old = DEPRECATED.get(name)
+            if (old) flag(`var(${name}) is a deprecated name, kept only so projects have time to switch (${old.description}). Use var(${old.use}).`, node)
             // var(--x, fallback): the fallback is a hardcoded value too.
             const comma = node.nodes.findIndex((n) => n.type === 'div' && n.value === ',')
             if (comma !== -1) check(node.nodes.slice(comma + 1), flag)

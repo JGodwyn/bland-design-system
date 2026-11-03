@@ -53,9 +53,7 @@
   transform: scale(0.96);
   transition:
     opacity var(--duration-lg) var(--easing-out),
-    transform var(--duration-lg) var(--easing-out),
-    display var(--duration-lg) allow-discrete,
-    overlay var(--duration-lg) allow-discrete;
+    transform var(--duration-lg) var(--easing-out);
 }
 
 .bland-modal[data-size="md"] {
@@ -77,6 +75,13 @@
   transform: none;
 }
 
+/* Closing: the exit plays while the dialog is still open, then it closes (overlay/exit.ts). */
+.bland-modal[open][data-closing] {
+  opacity: 0;
+  transform: scale(0.96);
+  pointer-events: none;
+}
+
 @starting-style {
   .bland-modal[open] {
     opacity: 0;
@@ -89,13 +94,15 @@
   background: var(--_backdrop);
   opacity: 0;
   transition:
-    opacity var(--duration-lg) var(--easing-out),
-    display var(--duration-lg) allow-discrete,
-    overlay var(--duration-lg) allow-discrete;
+    opacity var(--duration-lg) var(--easing-out);
 }
 
 .bland-modal[open]::backdrop {
   opacity: 1;
+}
+
+.bland-modal[open][data-closing]::backdrop {
+  opacity: 0;
 }
 
 @starting-style {
@@ -270,9 +277,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   /* Opacity only: no scale. */
-  .bland-modal {
+  .bland-modal,
+  .bland-modal[open][data-closing] {
     transform: none;
-    transition-property: opacity, display, overlay;
+    transition-property: opacity;
   }
 
   @starting-style {

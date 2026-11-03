@@ -22,6 +22,7 @@ import {
   type Middleware,
   type Placement,
 } from '@floating-ui/react-dom';
+import { cancelExit, exitThenHide } from '../overlay/exit';
 import { sideOf, tokenMs, tokenPx, zoomAwarePlatform, zoomOf } from '../overlay/floating';
 import './tooltip.css';
 
@@ -154,9 +155,11 @@ export function Tooltip({
     const reference = elements.reference;
     if (!floating || !('showPopover' in floating)) return;
     if (!state.isOpen) {
-      if (floating.matches(':popover-open')) floating.hidePopover();
+      // The exit plays while it is still shown (overlay/exit.ts).
+      if (floating.matches(':popover-open')) exitThenHide(floating, () => floating.hidePopover());
       return;
     }
+    cancelExit(floating);
     if (!floating.matches(':popover-open')) floating.showPopover();
     if (!reference) return;
     return autoUpdate(reference, floating, update);

@@ -46,7 +46,11 @@ Raw material for the skill we package at the end of the project: what an agent n
 - Icons: Bland ships none for the project; pass any SVG (Phosphor React recommended). Icon-only controls need `aria-label`.
 - Variants are props (`size`, `emotion`, `type`), never class overrides. Defaults: most sizes default to sm or md; check the map.
 - Routers: links take `renderLink` (Breadcrumb, TabBar, Sidebar, Pagination, ListItem, Logo).
+- Sidebar peek: the minimized rail opens over the page, past its own box, so no ancestor may clip it (`overflow: hidden`) narrower than `--sidebar-width`.
+- Sidebar logo: pass `top` as `({ rail }) => rail ? <Mark /> : <Logo />` when the product has a logo mark; a plain `top` hides in the rail and the expand button takes its place.
 - Disabled uses the disabled tokens, never opacity.
+- Left to right only: right-to-left (RTL) layouts are not supported yet (Godwin 2026-11-03). Don't promise an RTL page with Bland; Toggle and Slider are known not to mirror.
+- Deprecated names (`docs/release.md`, "Deprecation"): an old token name, prop or component keeps working for one minor version, with a console warning in development for props and components. When the CHANGELOG or a warning names a replacement, switch to it in the same upgrade; never add new uses of a deprecated name.
 - ChatBubble audio: the project owns the `<audio>` element and its playback; the bubble only draws it (`playing`, `onPlayingChange`, `progress`, `duration`). Wire play/pause and progress to the project's own player.
 
 ## Open (decide before writing the skill)

@@ -113,7 +113,8 @@ test('basic and multi-select post their values through a hidden select', async (
 });
 
 for (const theme of ['light', 'dark'] as const) {
-  test(`open dropdowns look the same (${theme})`, async ({ page }) => {
+  test(`open dropdowns look the same (${theme})`, async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'screenshot baselines are Chromium (playwright.config.ts)');
     await openStory(page, 'dropdown', theme);
     for (const [id, open] of [
       ['basic', (p: Page) => button(p, 'basic').focus().then(() => p.keyboard.press('ArrowDown'))],

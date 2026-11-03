@@ -1,5 +1,5 @@
 /*
- * Text Area (Figma: Text-input page, set "Text Area", handle "text-area-resizer").
+ * Text Area (Figma: Text-input page, set "Text Area", handle "_text-area-resizer").
  *
  *   <div class="bland-text-area" data-status="default" style="--_rows: 4">
  *     <label class="bland-text-area__label">Label</label>
@@ -88,7 +88,7 @@
   opacity: 1;
 }
 
-/* Figma text-area-resizer: 16 square, 4 in from the bottom right corner, two Border/border-bold strokes. */
+/* Figma _text-area-resizer: 16 square, 4 in from the bottom right corner, two Border/border-bold strokes. */
 .bland-text-area__resizer {
   position: absolute;
   right: var(--space-xs);

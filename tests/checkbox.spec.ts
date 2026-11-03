@@ -1,6 +1,6 @@
 // Behaviour of Checkbox and Checkbox Group: native toggling, mixed, labels and hit areas, states, focus, groups.
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { openStory } from './stories';
+import { openStory, clickToFocus } from './stories';
 
 /** The computed color of a token, resolved the same way the browser resolves the box's background. */
 async function tokenColor(page: Page, token: string) {
@@ -25,7 +25,7 @@ test.beforeEach(async ({ page }) => {
 test('clicking the label or pressing Space toggles the native checkbox', async ({ page }) => {
   const box = page.getByTestId('uncontrolled');
   await expect(box).not.toBeChecked();
-  await page.getByText('Uncontrolled', { exact: true }).click();
+  await clickToFocus(page.getByText('Uncontrolled', { exact: true }), box);
   await expect(box).toBeChecked();
   await expect(box).toBeFocused();
   await page.keyboard.press('Space');

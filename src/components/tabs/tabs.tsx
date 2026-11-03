@@ -198,6 +198,9 @@ export function useSelectionIndicator(listRef: RefObject<HTMLElement | null>, se
       indicator.hidden = !el;
       if (!el) return;
       indicator.toggleAttribute('data-moving', animate);
+      // Dropping the transition should cancel a slide already running (CSS Transitions); WebKit lets it finish,
+      // so a key right after a click would glide on to the old tab and snap back.
+      if (!animate) for (const a of indicator.getAnimations()) a.cancel();
       // Rects keep fractions (offsetLeft rounds); divide by the CSS zoom, as the overlays do, since the
       // indicator's own lengths are drawn zoomed again.
       const zoom = (list as HTMLElement & { currentCSSZoom?: number }).currentCSSZoom ?? 1;

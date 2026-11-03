@@ -11,6 +11,7 @@ import {
 } from 'react';
 import { mergeProps, mergeRefs, useOverlay } from 'react-aria';
 import { autoUpdate, flip, offset, shift, size, useFloating, type Middleware, type Placement } from '@floating-ui/react-dom';
+import { cancelExit, exitThenHide } from './exit';
 import { sideOf, tokenPx, zoomAwarePlatform, zoomOf } from './floating';
 
 /**
@@ -56,8 +57,8 @@ export interface PopoverProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
 /**
  * The floating panel Menu and Dropdown share: a manual popover right after its trigger in the DOM (top layer, no
  * clipping, no z-index, inherits the theme), placed by Floating UI under the reference, space-xs away, and capped
- * to the screen space left (no max-height token: Godwin 2026-10-19). Motion is CSS (`@starting-style`, `display`
- * and `overlay` with `allow-discrete`); the children stay mounted until the exit has played.
+ * to the screen space left (no max-height token: Godwin 2026-10-19). Motion is CSS: `@starting-style` in, and
+ * out while still shown (overlay/exit.ts, so every engine plays it); the children stay mounted until then.
  */
 export function Popover({
   open,
@@ -123,14 +124,18 @@ export function Popover({
     if (!open) {
       // Focus goes back first, so hiding a panel that holds focus never drops it on the body.
       if (floating.contains(document.activeElement)) returnFocus?.current?.focus({ preventScroll: true });
-      if (floating.matches(':popover-open')) floating.hidePopover();
-      // Unmount the list once the exit transition has played (at once when there is none).
-      const animations = floating.getAnimations();
-      Promise.allSettled(animations.map((a) => a.finished)).then(() => {
+      // The exit plays while it is still shown; then it leaves the top layer and the list unmounts.
+      if (!floating.matches(':popover-open')) {
+        setMounted(false);
+        return;
+      }
+      exitThenHide(floating, () => {
+        floating.hidePopover();
         if (!openRef.current) setMounted(false);
       });
       return;
     }
+    cancelExit(floating);
     if (!floating.matches(':popover-open')) floating.showPopover();
     if (!reference) return;
     return autoUpdate(reference, floating, update);

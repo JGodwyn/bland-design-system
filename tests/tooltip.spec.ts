@@ -160,7 +160,8 @@ test('under CSS zoom the tooltip stays on its trigger, the gap zoomed with it', 
 });
 
 for (const theme of ['light', 'dark'] as const) {
-  test(`open tooltips look the same (${theme})`, async ({ page }) => {
+  test(`open tooltips look the same (${theme})`, async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'screenshot baselines are Chromium (playwright.config.ts)');
     await openStory(page, 'tooltip', theme);
     for (const name of ['top-start', 'left', 'bottom-end', 'Copy']) {
       const trigger = page.getByRole('button', { name, exact: true });

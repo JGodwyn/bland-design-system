@@ -1,6 +1,6 @@
 // Behaviour of Pill: toggling with aria-pressed, keyboard, disabled, state colors and sizes.
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { openStory } from './stories';
+import { openStory, clickToFocus } from './stories';
 
 /** The computed color of a token, resolved the same way the browser resolves the pill's background. */
 async function tokenColor(page: Page, token: string) {
@@ -23,7 +23,7 @@ test.beforeEach(async ({ page }) => {
 test('an uncontrolled pill toggles aria-pressed on click, Enter and Space', async ({ page }) => {
   const pill = page.getByTestId('uncontrolled');
   await expect(pill).toHaveAttribute('aria-pressed', 'false');
-  await pill.click();
+  await clickToFocus(pill);
   await expect(pill).toHaveAttribute('aria-pressed', 'true');
   await page.keyboard.press('Enter');
   await expect(pill).toHaveAttribute('aria-pressed', 'false');
@@ -89,7 +89,7 @@ test('the focus ring shows on keyboard focus only', async ({ page }) => {
   const pill = page.getByTestId('uncontrolled');
   const outline = () => pill.evaluate((e) => getComputedStyle(e).outlineStyle);
 
-  await pill.click();
+  await clickToFocus(pill);
   expect(await outline()).toBe('none');
   await page.keyboard.press('Shift+Tab');
   await page.keyboard.press('Tab');

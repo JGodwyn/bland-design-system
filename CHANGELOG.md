@@ -2,7 +2,12 @@
 
 Bland follows [semantic versioning](https://semver.org). Until 1.0, a minor version (0.2.0) may change an API or a token name; a patch (0.1.1) never does. Each entry says what a project has to change, if anything.
 
-## 0.1.3 (2026-11-02)
+## 0.1.3 (2026-11-03)
+
+- **Exit motion plays in Safari and Firefox.** Menu, Dropdown, Tooltip and Modal used to vanish there when they closed. They now play their exit there too, as they already did in Chromium. Accordion now animates its height in every browser.
+- **Safari fixes.** A Section tab or Segmented bar picked with a key right after a click goes straight to that tab. Before, it slid to the old tab and snapped back. A growing Text Area keeps the line you type in view.
+- **Sidebar:** the full sidebar's list now sits `--space-sm` from the edges (it was `--space-lg`), so icons stay put as it collapses. Counts, trailing icons and carets fade out as it collapses. A plain `top` slot fades out too, and the rail shows the expand button in its place.
+- **Renamed tokens keep their old names.** After a rename, the old name stays in `tokens.css` as an alias for one minor version (README and `docs/release.md`, "Deprecation"). No token has been renamed yet.
 
 - **Fields stay visible on cards and modals.** New tokens `--surface-field` and `--surface-field-hover`: see-through fills (black at 6% and 10% in light, white at 6% and 10% in dark) that always land one small step from whatever is under them. Text Input, Text Area, Search, Numeric, the date and time fields, Dropdown and the chat message bar use them through their own tokens, as do Checkbox and Radio boxes, Chip counts, Section tab counts, inline code, the Code snippet language button, the File Upload drop zone and the Accordion header. In dark these no longer blend into a raised card or a modal; in light they no longer vanish on a gray page.
 - **White parts lift in dark.** Chip, Pill, Code snippet, uncolored Banner and Notification, Tab bar and Progress wizard markers now use `--surface-raised`, so in dark they sit a step above the page instead of matching it.

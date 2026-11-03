@@ -47,6 +47,7 @@ Not set up yet: running the check on a schedule. It needs the Figma MCP, so it w
 
 ## What the build does
 
+- **Deprecated names** (`tokens/deprecated.json`, kept by hand) become `--old: var(--new)` aliases in every block that defines the new token, for one minor version after a rename (`docs/release.md`, "Deprecation").
 - **Primitives are not emitted, except the brand and neutral scales and the two font families.** `_Core Colors`, `_Functional Colors`, `_Units` and `_Typography` are hidden collections. The 13 `Brand/BrandN` steps are emitted as `--brand-N` in a `:root` block of their own, and every token whose alias chain ends in one holds `var(--brand-N)` (alpha steps a `color-mix`), so a project's override cascades (`brand.md`). Every exported token resolves through them to a final value.
 - **Alias chains resolve to values**, per mode. `tokens.json` keeps the first alias hop (`aliasOf`) so you can see which primitive a token points at.
 - **Alpha primitives** (`{color: alias, opacity: N}`) resolve to the source color at exactly N%, written as `rgb(r g b / N%)`.

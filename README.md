@@ -5,6 +5,7 @@ Godwin's design system: design tokens as CSS custom properties and React compone
 - Inter for text, Geist Mono for code, self-hosted; a project can set its own body, heading and code fonts (`--font-body`, `--font-heading`, `--font-code`).
 - Every component value is a token: rebranding or theming never touches component CSS.
 - React 19, React Aria for keyboard and screen reader behaviour, Floating UI for positioning.
+- Left to right only: right-to-left (RTL) layouts are not supported yet.
 
 ## Install
 

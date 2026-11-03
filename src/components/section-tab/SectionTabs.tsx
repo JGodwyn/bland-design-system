@@ -40,7 +40,7 @@ export interface SectionTabsProps
 
 /**
  * Underline tabs that switch between sections of a page. A 1px divider runs under the row and the selected tab's
- * 2px brand underline covers it. A row too long for its container scrolls sideways (fade plus scrollbar). The
+ * 2px brand underline covers it. A row too long for its container scrolls sideways (the fade alone, no scrollbar). The
  * selected tab's `panel` shows under the row. Figma: Section tab page, sets "Section-tab" and "_section-tab-item".
  */
 export function SectionTabs({

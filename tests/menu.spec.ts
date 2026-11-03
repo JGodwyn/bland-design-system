@@ -128,7 +128,8 @@ test('reduced motion drops the scale', async ({ page }) => {
 });
 
 for (const theme of ['light', 'dark'] as const) {
-  test(`an open menu looks the same (${theme})`, async ({ page }) => {
+  test(`an open menu looks the same (${theme})`, async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'screenshot baselines are Chromium (playwright.config.ts)');
     await openStory(page, 'menu', theme);
     const trigger = page.getByTestId('actions-trigger');
     await trigger.evaluate((el) => el.scrollIntoView({ block: 'start' }));

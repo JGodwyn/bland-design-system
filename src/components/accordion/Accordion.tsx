@@ -1,6 +1,17 @@
-import { useState, type DetailsHTMLAttributes, type MouseEvent, type ReactNode, type Ref, type SyntheticEvent } from 'react';
+import {
+  useLayoutEffect,
+  useRef,
+  useState,
+  type DetailsHTMLAttributes,
+  type MouseEvent,
+  type ReactNode,
+  type Ref,
+  type SyntheticEvent,
+} from 'react';
+import { mergeRefs } from 'react-aria';
 import { CaretDownIcon } from '../../icons';
 import { Icon } from '../icon/Icon';
+import { slideHeight, sliding } from '../motion/height';
 import './accordion.css';
 
 export type AccordionSize = 'sm' | 'md';
@@ -44,6 +55,7 @@ export function Accordion({
   disabled = false,
   className,
   onToggle,
+  ref,
   ...rest
 }: AccordionProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
@@ -55,6 +67,47 @@ export function Accordion({
     onOpenChange?.(next);
   };
 
+  // The height eases between the header alone and the whole item (motion/height.ts: every engine). Closing keeps
+  // the native `open` until the fold has played. A change the browser made (find in page, a `name` group closing
+  // this one) happens at once: drawing it open again would close the item that took its place.
+  const details = useRef<HTMLDetailsElement>(null);
+  const summary = useRef<HTMLElement>(null);
+  const byBrowser = useRef(false);
+  const stop = useRef<() => void>(undefined);
+  // The state the height last showed (a second effect run in Strict Mode is not a change).
+  const shown = useRef(isOpen);
+  const [closing, setClosing] = useState(false);
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (wasOpen !== isOpen) {
+    setWasOpen(isOpen);
+    setClosing(!isOpen && !byBrowser.current);
+  }
+
+  useLayoutEffect(() => {
+    const el = details.current;
+    const header = summary.current;
+    if (!el || !header) return;
+    if (shown.current === isOpen) return;
+    shown.current = isOpen;
+    stop.current?.();
+    if (byBrowser.current) {
+      byBrowser.current = false;
+      el.style.height = '';
+      return;
+    }
+    const now = el.getBoundingClientRect().height;
+    if (isOpen) {
+      stop.current = slideHeight(el, sliding(el) ? now : header.offsetHeight, el.scrollHeight);
+    } else {
+      stop.current = slideHeight(el, now, header.offsetHeight, () => setClosing(false));
+    }
+  }, [isOpen]);
+
+  // The fold has ended and `open` is gone: the item takes its own height again.
+  useLayoutEffect(() => {
+    if (!closing && !isOpen && details.current) details.current.style.height = '';
+  }, [closing, isOpen]);
+
   // React owns the open state: the click (also Enter and Space) is cancelled and the state decides.
   const handleClick = (event: MouseEvent<HTMLElement>) => {
     event.preventDefault();
@@ -65,7 +118,10 @@ export function Accordion({
   const handleToggle = (event: SyntheticEvent<HTMLDetailsElement>) => {
     onToggle?.(event as Parameters<NonNullable<typeof onToggle>>[0]);
     const now = event.currentTarget.open;
-    if (now !== isOpen) change(now);
+    if (now !== isOpen) {
+      byBrowser.current = true;
+      change(now);
+    }
   };
 
   return (
@@ -75,10 +131,14 @@ export function Accordion({
       data-size={size}
       data-flush={flush || undefined}
       data-disabled={disabled || undefined}
-      open={isOpen}
+      data-open={isOpen || undefined}
+      data-closing={closing || undefined}
+      ref={mergeRefs(details, ref)}
+      open={isOpen || closing}
       onToggle={handleToggle}
     >
       <summary
+        ref={summary}
         className="bland-accordion__header bland-focus-ring bland-smooth"
         aria-disabled={disabled || undefined}
         tabIndex={disabled ? -1 : undefined}

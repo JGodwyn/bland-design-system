@@ -1,7 +1,7 @@
 /*
  * Accordion (Figma: Accordion page, set "Accordion").
  *
- *   <details class="bland-accordion" data-size="sm" [data-flush] [data-disabled] [open]>
+ *   <details class="bland-accordion" data-size="sm" [data-flush] [data-disabled] [data-open] [open]>
  *     <summary class="bland-accordion__header bland-focus-ring bland-smooth">
  *       <span class="bland-accordion__title">Title</span>
  *       <span class="bland-icon bland-accordion__caret">…CaretDown…</span>
@@ -11,15 +11,21 @@
  *
  * Figma's root and content have no fill; only the header has one (none when flush). The item fills
  * its container: accordion/width (256) is Figma's frame default ("Use Fill container in layouts").
- * The caret rotates and the content's height animates over duration/md with easing/out
- * (::details-content and interpolate-size, Chromium); elsewhere it opens at once.
+ * The caret rotates and the item's height animates over duration/md with easing/out: the component sets
+ * pixel heights for the transition below (motion/height.ts), so it animates in every engine.
  */
 
 .bland-accordion {
   display: block;
   width: 100%;
   margin: var(--space-none);
-  interpolate-size: allow-keywords;
+  transition: height var(--duration-md) var(--easing-out);
+}
+
+/* While the height eases, the content is cut at the item's edge (the header's focus ring still shows). */
+.bland-accordion[style*="height"] {
+  overflow: clip;
+  overflow-clip-margin: var(--space-xs);
 }
 
 /* ---- Header: the summary. Padding by size; sm 4 + 24 + 4 = 32, md 8 + 24 + 8 = 40 ---- */
@@ -52,7 +58,7 @@
   padding-block: var(--space-sm);
 }
 
-.bland-accordion[open] > .bland-accordion__header {
+.bland-accordion[data-open] > .bland-accordion__header {
   font: var(--type-body-lg-bold);
 }
 
@@ -69,24 +75,13 @@
   transition: transform var(--duration-md) var(--easing-out);
 }
 
-/* Figma swaps CaretDown for CaretUp; code turns the one caret. */
-.bland-accordion[open] > .bland-accordion__header .bland-accordion__caret {
+/* Figma swaps CaretDown for CaretUp; code turns the one caret. The open state, not the native `open` (which
+   stays while the item folds), so the caret and the bold title change with the fold, not after it. */
+.bland-accordion[data-open] > .bland-accordion__header .bland-accordion__caret {
   transform: rotate(180deg);
 }
 
 /* ---- Content: Figma's description and slot, stacked space-lg apart ---- */
-
-.bland-accordion::details-content {
-  block-size: var(--space-none);
-  overflow: clip;
-  transition:
-    block-size var(--duration-md) var(--easing-out),
-    content-visibility var(--duration-md) var(--easing-out) allow-discrete;
-}
-
-.bland-accordion[open]::details-content {
-  block-size: auto;
-}
 
 .bland-accordion__content {
   display: flex;
@@ -121,7 +116,7 @@
     text-decoration-line: underline;
   }
 
-  .bland-accordion[data-flush][open]:not([data-disabled]) > .bland-accordion__header:hover {
+  .bland-accordion[data-flush][data-open]:not([data-disabled]) > .bland-accordion__header:hover {
     font: var(--type-body-lg-bold-underline);
   }
 }
@@ -145,8 +140,8 @@
   }
 
   /* The caret flips and the content opens at once. */
-  .bland-accordion__caret,
-  .bland-accordion::details-content {
+  .bland-accordion,
+  .bland-accordion__caret {
     transition: none;
   }
 }

@@ -1,6 +1,6 @@
 // Behaviour of Toggle: a native switch, label and hit area, sizes, knob position, state colors, focus.
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { openStory } from './stories';
+import { openStory, clickToFocus } from './stories';
 
 /** The computed color of a token, resolved the same way the browser resolves the track's background. */
 async function tokenColor(page: Page, token: string) {
@@ -26,7 +26,7 @@ test('it is a switch: clicking the label or pressing Space turns it on and off',
   const toggle = page.getByRole('switch', { name: 'Uncontrolled' });
   await expect(toggle).toHaveAttribute('type', 'checkbox');
   await expect(toggle).not.toBeChecked();
-  await page.getByText('Uncontrolled', { exact: true }).click();
+  await clickToFocus(page.getByText('Uncontrolled', { exact: true }), toggle);
   await expect(toggle).toBeChecked();
   await expect(toggle).toBeFocused();
   await page.keyboard.press('Space');

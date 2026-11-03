@@ -1,6 +1,6 @@
 // Behaviour of Table: table semantics, row selection (multiple and single), sorting, expand, sizes, hover, overflow.
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { openStory } from './stories';
+import { openStory, clickToFocus } from './stories';
 
 /** The computed color of a token, resolved the way the browser resolves a background. */
 async function tokenColor(page: Page, token: string) {
@@ -78,7 +78,8 @@ test('single: a Radio column selects one row at a time, under a blank header', a
   const table = page.getByTestId('single');
   await expect(table.locator('thead tr > :first-child')).toHaveText('');
   expect(await table.locator('thead tr > :first-child').evaluate((e) => e.tagName)).toBe('TD');
-  await table.getByRole('radio', { name: 'Select Grace Hopper' }).check();
+  const grace = table.getByRole('radio', { name: 'Select Grace Hopper' });
+  await clickToFocus(grace);
   await expect(table.getByRole('row').filter({ hasText: 'Grace Hopper' })).toHaveAttribute('aria-selected', 'true');
   await expect(table.getByRole('row').filter({ hasText: 'Ada Lovelace' })).toHaveAttribute('aria-selected', 'false');
   // Arrow keys move the selection within the radio group, natively.

@@ -56,3 +56,4 @@ The symptom-cause-rule entries are in `LEARNINGS.md` (Figma). Beyond those:
 - Gradient stops bind with `boundVariables: { color: figma.variables.createVariableAlias(v) }` per stop.
 - A usage census checks the paint bindings on every vector, inside instances too. Before calling a token unused, look at the layer it was made for.
 - Doc tables built from `_table-cell` instances: keep the first data row as a template, remove the rest, clone it per token and set the cell texts.
+- Sorting variant options (sm/md/lg, false/true) has no API: rename each value away and back with a read of `componentPropertyDefinitions` between steps (`LEARNINGS.md`, Figma).

@@ -18,6 +18,7 @@ import { useOverlayTriggerState } from 'react-stately';
 import { XIcon } from '../../icons';
 import { IconButton } from '../button/IconButton';
 import { Icon } from '../icon/Icon';
+import { cancelExit, exitThenHide, exiting } from '../overlay/exit';
 import { ScrollArea } from '../scroll-area/ScrollArea';
 import './modal.css';
 
@@ -151,7 +152,14 @@ export function Modal({
     const dialog = dialogRef.current;
     if (!dialog || !('showModal' in dialog)) return;
     if (state.isOpen) {
-      if (dialog.open) return;
+      if (dialog.open) {
+        // Opened again while its exit played: it stays.
+        if (exiting(dialog)) {
+          cancelExit(dialog);
+          shown.current = true;
+        }
+        return;
+      }
       shown.current = true;
       returnFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       dialog.showModal();
@@ -165,14 +173,16 @@ export function Modal({
     // Only a real close moves focus; a Modal that mounts closed leaves it alone.
     if (!shown.current) return;
     shown.current = false;
-    if (dialog.open) dialog.close();
-    // Back to the trigger, or to what had focus before it opened (the browser may already have moved it there).
-    const back = triggerRef.current ?? returnFocus.current;
-    if (back?.isConnected) back.focus({ preventScroll: true });
-    // Unmount the content once the exit transition has played (at once when there is none).
-    Promise.allSettled(dialog.getAnimations({ subtree: true }).map((a) => a.finished)).then(() => {
+    const close = () => {
+      if (dialog.open) dialog.close();
+      // Back to the trigger, or to what had focus before it opened (the browser may already have moved it there).
+      const back = triggerRef.current ?? returnFocus.current;
+      if (back?.isConnected) back.focus({ preventScroll: true });
       if (!openRef.current) setMounted(false);
-    });
+    };
+    // The exit plays while the dialog is still open (overlay/exit.ts); closed by the browser, it is gone already.
+    if (dialog.open) exitThenHide(dialog, close, { subtree: true });
+    else close();
   }, [state.isOpen]);
 
   // Closed by the browser (Escape's second press, a `<form method="dialog">`): the state follows.

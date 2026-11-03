@@ -21,8 +21,8 @@
  *
  * Collapse, expand and the hover peek all move the same way (duration/2xl, easing/drawer): the panel is
  * clipped from or to the rail's edge while the root's width follows, so the page slides in step. While
- * the sidebar is minimized and not open (data-compact) the rows take the rail's places, so their icons
- * slide with the panel instead of jumping at either end, and open groups fold away.
+ * the sidebar is minimized and not open (data-compact) the rows narrow to squares and open groups fold away;
+ * the list keeps its space-sm padding, so the icons stay put at sm and ease 2px at md and up (Godwin 2026-11-03).
  */
 
 .bland-sidebar {
@@ -33,7 +33,10 @@
   --_count-type: var(--type-body-sm-bold);
   --_count-spacing: var(--type-body-sm-bold-letter-spacing);
   --_rail: calc(var(--_item) + var(--space-sm) * 2);
-  --_list-pad: var(--space-lg);
+  /* The list sits space-sm from the edges in the full sidebar as in the rail, so the icons barely move as it
+     collapses or expands: not at all at sm, 2px at md and up, where the row padding is wider than the rail's
+     centring (Godwin 2026-11-03; Figma's space-lg is tightened). */
+  --_list-pad: var(--space-sm);
   --_icon-x: var(--_pad);
   --bland-icon-size: var(--icon-sm);
 
@@ -43,7 +46,6 @@
   width: var(--sidebar-width);
   height: 100%;
   min-height: var(--space-none);
-  interpolate-size: allow-keywords;
   transition: width var(--duration-2xl) var(--easing-drawer);
 }
 
@@ -78,9 +80,8 @@
   width: var(--_rail);
 }
 
-/* The rail's places: the list space-sm from the edges, each icon centred in a square row. */
+/* The rail's places: each icon centred in a square row. */
 .bland-sidebar[data-compact] {
-  --_list-pad: var(--space-sm);
   --_icon-x: calc((var(--_item) - var(--bland-icon-size)) / 2);
 }
 
@@ -135,7 +136,6 @@
 /* No top slot: the button takes the logo's place, lined up with the rows' icons, the list right under it. */
 .bland-sidebar:not([data-top]) .bland-sidebar__header {
   padding: var(--space-lg) var(--_list-pad) var(--space-none);
-  transition: padding-inline var(--duration-2xl) var(--easing-drawer);
 }
 
 .bland-sidebar[data-collapsible]:not([data-top]) .bland-sidebar__list {
@@ -228,26 +228,28 @@
 
 .bland-sidebar__list {
   padding: var(--space-lg) var(--_list-pad);
-  transition: padding-inline var(--duration-2xl) var(--easing-drawer);
 }
 
 /* ---- Groups: the nested rows open and fold with their height ---- */
 
+/* The component sets pixel heights for the height transition (Nest in Sidebar.tsx), so every engine eases it. */
 .bland-sidebar__nest {
   height: auto;
-  padding-top: var(--space-xs);
   overflow: clip;
   overflow-clip-margin: var(--space-xs);
   transition:
     height var(--duration-md) var(--easing-out),
-    padding-top var(--duration-md) var(--easing-out),
     visibility var(--duration-md) var(--easing-out);
+}
+
+/* The space-xs above the nested rows sits inside the measured height, on the first row. */
+.bland-sidebar__nest > :first-child {
+  padding-top: var(--space-xs);
 }
 
 /* Hidden as well as folded, so its links leave the Tab order and the accessibility tree. */
 .bland-sidebar__nest[data-closed] {
   height: var(--space-none);
-  padding-top: var(--space-none);
   visibility: hidden;
 }
 
@@ -365,12 +367,26 @@
   color: var(--_count-text);
   font: var(--_count-type);
   letter-spacing: var(--_count-spacing);
-  transition: background-color var(--duration-xs) var(--easing-out);
+  transition:
+    background-color var(--duration-xs) var(--easing-out),
+    opacity var(--duration-2xl) var(--easing-drawer);
 }
 
 /* Figma swaps CaretDown for CaretUp; code turns the one caret, as Accordion. */
 .bland-sidebar__chevron {
-  transition: transform var(--duration-md) var(--easing-out);
+  transition:
+    transform var(--duration-md) var(--easing-out),
+    opacity var(--duration-2xl) var(--easing-drawer);
+}
+
+/* What sits right of the label fades as the row narrows, gone by the time it reaches the rail, and back as it
+   widens, so it never lingers at the closing edge (Godwin 2026-11-03). */
+.bland-sidebar__trailing {
+  transition: opacity var(--duration-2xl) var(--easing-drawer);
+}
+
+.bland-sidebar[data-compact] :is(.bland-sidebar__count, .bland-sidebar__trailing, .bland-sidebar__chevron) {
+  opacity: 0;
 }
 
 .bland-sidebar__item[aria-expanded="true"] .bland-sidebar__chevron {
@@ -419,11 +435,49 @@
 .bland-sidebar[data-top] .bland-sidebar__toggle {
   justify-content: center;
   padding: var(--space-none);
+  /* Beside a top slot the collapse button comes in after the sidebar is fully out (data-opening is the slide), as
+     a fade, and leaves at once as it starts to close (Godwin 2026-11-03). */
+  transition:
+    color var(--duration-xs) var(--easing-out),
+    opacity var(--duration-md) var(--easing-out);
 }
 
-/* Beside a top slot there is no room in the rail; the button shows again when the rail opens. */
-.bland-sidebar[data-top][data-layout="rail"] .bland-sidebar__toggle {
+.bland-sidebar[data-top][data-opening] .bland-sidebar__toggle {
+  opacity: 0;
+  transition: color var(--duration-xs) var(--easing-out);
+}
+
+.bland-sidebar[data-top][data-compact] .bland-sidebar__toggle {
+  opacity: 0;
+  transition:
+    color var(--duration-xs) var(--easing-out),
+    opacity var(--duration-xs) var(--easing-out);
+}
+
+/* The rail's own expand button (a top slot with no rail version) shows as soon as the rail is in place. */
+.bland-sidebar[data-top-plain][data-layout="rail"] .bland-sidebar__toggle {
+  opacity: 1;
+  transition:
+    color var(--duration-xs) var(--easing-out),
+    opacity var(--duration-md) var(--easing-out);
+}
+
+/* Hidden in the rail beside a top slot's rail version, it starts from nothing when the peek shows it. */
+@starting-style {
+  .bland-sidebar[data-top][data-minimized] .bland-sidebar__toggle {
+    opacity: 0;
+  }
+}
+
+/* Beside a top slot's rail version there is no room in the rail; the button shows again when the rail opens. */
+.bland-sidebar[data-top]:not([data-top-plain])[data-layout="rail"] .bland-sidebar__toggle {
   display: none;
+}
+
+/* A top slot with no rail version leaves the rail to the expand button, in the rows' column. In the rail only,
+   and at once: the logo is gone there, so easing this padding would slide the logo as it fades back in. */
+.bland-sidebar[data-top-plain][data-layout="rail"] .bland-sidebar__header {
+  padding-inline-start: var(--_list-pad);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -439,8 +493,12 @@
 /* ---- Motion ---- */
 
 .bland-sidebar[data-instant],
-.bland-sidebar[data-instant] :is(.bland-sidebar__panel, .bland-sidebar__header, .bland-sidebar__list, .bland-sidebar__nest, .bland-sidebar__chevron) {
+.bland-sidebar[data-instant] :is(.bland-sidebar__panel, .bland-sidebar__header, .bland-sidebar__list, .bland-sidebar__nest, .bland-sidebar__chevron, .bland-sidebar__trailing) {
   transition: none;
+}
+
+.bland-sidebar[data-instant] .bland-sidebar__count {
+  transition-property: background-color;
 }
 
 .bland-sidebar[data-instant] :is(.bland-sidebar__item, .bland-sidebar__toggle) {

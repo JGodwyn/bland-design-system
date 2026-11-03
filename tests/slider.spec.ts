@@ -251,7 +251,8 @@ test('the tooltip shows on hover at once and while dragging', async ({ page }) =
 });
 
 for (const theme of themes) {
-  test(`tooltip screenshot, ${theme}`, async ({ page }) => {
+  test(`tooltip screenshot, ${theme}`, async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'screenshot baselines are Chromium (playwright.config.ts)');
     await openStory(page, 'slider', theme);
     await slider(page, 'Minimum Double md').focus();
     await page.keyboard.press('ArrowRight');

@@ -1,6 +1,6 @@
 // Behaviour of Button and Icon Button: activation, focus ring, disabled, loading, hover and press.
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { openStory } from './stories';
+import { openStory, clickToFocus } from './stories';
 
 /** The computed color of a token, resolved the same way the browser resolves the button's background. */
 async function tokenColor(page: Page, token: string) {
@@ -34,7 +34,7 @@ test('the focus ring shows on keyboard focus only', async ({ page }) => {
   const button = page.getByTestId('Counter');
   const outline = () => button.evaluate((e) => getComputedStyle(e).outlineStyle);
 
-  await button.click();
+  await clickToFocus(button);
   await expect(button).toBeFocused();
   expect(await outline()).toBe('none');
 

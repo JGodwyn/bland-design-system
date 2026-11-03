@@ -80,7 +80,8 @@ const prevent = { onClick: (e: { preventDefault(): void }) => e.preventDefault()
 
 /** A page-wide box: one sidebar per row, so collapsing one never moves another. Never narrower than the sidebar, so on a phone the demo scrolls instead of clipping it. */
 function Frame({ children, height = 'var(--sidebar-height)', width = '100%' }: { children: ReactNode; height?: string; width?: string }) {
-  const style: CSSProperties = { display: 'flex', height, width, minWidth: 'min-content', boxShadow: 'inset 0 0 0 var(--stroke-sm) var(--border-subtle)', overflow: 'hidden' };
+  // At least as wide as the full sidebar beside the page's padding, so a rail's peek fits inside the frame.
+  const style: CSSProperties = { display: 'flex', height, width, minWidth: 'calc(var(--sidebar-width) + var(--space-xl) * 2)', boxShadow: 'inset 0 0 0 var(--stroke-sm) var(--border-subtle)', overflow: 'hidden' };
   return (
     <div style={style} {...prevent}>
       {children}
@@ -91,7 +92,7 @@ function Frame({ children, height = 'var(--sidebar-height)', width = '100%' }: {
   );
 }
 
-const pad = { padding: 'var(--space-sm) var(--space-lg)' };
+const pad = { padding: 'var(--space-sm) var(--space-md)' };
 const Logo = ({ rail }: { rail: boolean }) => (
   <div style={{ ...pad, ...(rail ? { paddingInline: 0 } : {}), font: 'var(--type-title-md)', color: 'var(--text-bold)' }}>
     {rail ? 'B' : 'Bland'}
@@ -119,7 +120,9 @@ export default {
   usage: [
     'Pass `items`; every row is a link (`renderLink` renders your router\'s). A row with its own `items` opens and folds a group.',
     'Turn on `collapsible` to let people shrink it to the rail. Resting the pointer on the rail opens it over the page.',
+    'The open rail draws past its own box, over the page: keep the space beside the rail free of `overflow: hidden` up to the full sidebar width, or the peek is cut off.',
     'Put the logo or workspace switcher in `top`, and the account or settings in `bottom`.',
+    'For the rail, pass `top` as a function of `{ rail }` and return a logo mark when `rail` is true. A plain logo has no rail version, so the rail shows the expand button instead.',
     'On mobile, hide it and use TabBar.',
   ],
   components: ['Sidebar'],
@@ -191,6 +194,14 @@ export default {
               top={({ rail }) => <Logo rail={rail} />}
               bottom={({ rail }) => <Plan rail={rail} />}
             />
+          </Frame>
+        </div>
+      </div>
+      <div className="pg-stack">
+        <span className="pg-label">A plain <code>top</code> with no rail version: it fades out as the sidebar collapses, and the rail shows the expand button instead</span>
+        <div className="pg-stack">
+          <Frame height="var(--sidebar-height)">
+            <Sidebar aria-label="Plain top" data-testid="plain-top" items={items} collapsible top={<Logo rail={false} />} />
           </Frame>
         </div>
       </div>

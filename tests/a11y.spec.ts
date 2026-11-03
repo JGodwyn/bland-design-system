@@ -4,7 +4,8 @@ import { expect, test } from '@playwright/test';
 import { openStory, storyIds, themes } from './stories';
 
 /**
- * Known contrast exceptions, per theme, kept out of the scan. Each one is a token value, not component code.
+ * Known contrast exceptions, per theme, kept out of the contrast check (every other rule still runs on them).
+ * Each one is a token value, not component code.
  * - Danger primary Indicator and Badge labels stay white in dark (3.7:1), on purpose (CLAUDE.md, "Dark mode").
  * - Success primary Indicator and Badge labels stay white in light (4.47:1, just under 4.5:1), on purpose:
  *   Godwin kept the look on 2026-10-18 (CLAUDE.md, "Dark mode"; INTERFACE.md §1).
@@ -16,7 +17,8 @@ const knownContrast: Record<(typeof themes)[number], string[]> = {
 
 /**
  * Text in a disabled field (its helper text and add-on labels) is exempt from contrast (WCAG 1.4.3, inactive
- * components) and uses Text/text-minimal on purpose. axe only knows that for the input itself, so it skips these.
+ * components) and uses Text/text-minimal on purpose. axe only knows that for the input itself, so the contrast
+ * check skips these.
  */
 const disabledFieldText = [
   '.bland-text-input:has(.bland-text-input__input:disabled)',
@@ -42,10 +44,14 @@ for (const id of storyIds) {
   for (const theme of themes) {
     test(`${id} has no axe violations (${theme})`, async ({ page }) => {
       await openStory(page, id, theme);
-      const axe = new AxeBuilder({ page }).include(`[data-testid="frame-${theme}"]`);
-      for (const selector of [...knownContrast[theme], ...disabledFieldText]) axe.exclude(selector);
-      const results = await axe.analyze();
-      expect(results.violations.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
+      const frame = `[data-testid="frame-${theme}"]`;
+      // Every rule but contrast, with nothing excluded: the exemptions above are about contrast only.
+      const all = await new AxeBuilder({ page }).include(frame).disableRules(['color-contrast']).analyze();
+      // Contrast alone, without the exempt elements.
+      const contrast = new AxeBuilder({ page }).include(frame).withRules(['color-contrast']);
+      for (const selector of [...knownContrast[theme], ...disabledFieldText]) contrast.exclude(selector);
+      const violations = [...all.violations, ...(await contrast.analyze()).violations];
+      expect(violations.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
     });
   }
 }

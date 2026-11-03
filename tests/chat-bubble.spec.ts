@@ -1,6 +1,6 @@
 // Behaviour of Chat bubble: log semantics, receiver and sender sides, the audio play button, delivery status, typing, wrapping, focus.
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { openStory } from './stories';
+import { openStory, tabKey } from './stories';
 
 /** The computed color of a token, resolved the way the browser resolves a background. */
 async function tokenColor(page: Page, token: string) {
@@ -140,8 +140,8 @@ test('a document with href is a link; focus rings inside a sender bubble are whi
   const link = page.getByRole('log', { name: 'Interactive' }).getByRole('link', { name: 'Quarterly report.pdf' });
   await expect(link).toHaveAttribute('href', '#/components/chat-bubble');
   await link.focus();
-  await page.keyboard.press('Shift+Tab');
-  await page.keyboard.press('Tab');
+  await page.keyboard.press(`Shift+${tabKey()}`);
+  await page.keyboard.press(tabKey());
   await expect(link).toBeFocused();
   await expect(link).toHaveCSS('outline-color', await tokenColor(page, '--messaging-sender-content'));
 });

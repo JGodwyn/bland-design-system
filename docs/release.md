@@ -37,6 +37,17 @@ npm run typecheck && npm run lint:css && npm test && npm run test:package
 
 Move the CHANGELOG's "unreleased" heading to the version and date, then `npm version <patch|minor> --no-git-tag-version` for the next one (0.1.0 is set already), commit, and tag `v<version>`. Until 1.0, a minor may break an API; a patch never does (`CHANGELOG.md`).
 
+## Deprecation (Godwin 2026-11-03)
+
+When a token, prop or component is renamed or removed, the old name keeps working for a while, so a project can upgrade first and switch at its own pace. Even under 1.0, where a minor may break, Bland gives one minor version of warning.
+
+- **Renamed token:** the old name stays as an alias of the new one (`--old-name: var(--new-name);`) for one minor version, then goes. Its description in `tokens.json` and the CHANGELOG entry say "Deprecated: use `--new-name`", and the entry names the version that removes it. Bland's own CSS never uses the old name (the lint holds it).
+- **Renamed prop:** the component accepts the old prop for one minor version and maps it to the new one, with a `console.warn` in development only (`process.env.NODE_ENV !== 'production'`), once per component, naming the new prop. Types keep the old prop marked `@deprecated` so editors strike it through.
+- **Removed component:** one release marks it deprecated (a development warning on first render, `@deprecated` on its export, a CHANGELOG line with what to use instead), and the next minor removes it.
+- **A patch never deprecates or removes anything.** Every deprecation and removal gets a CHANGELOG line saying what a project has to change.
+- **How a token rename works** (built 2026-11-03): rename the variable in Figma and sync as usual, then add the old name to `tokens/deprecated.json` (kept by hand): `{ "name": "--old", "use": "--new", "since": "0.2.0", "removeIn": "0.3.0" }`. `npm run tokens` writes `--old: var(--new)` with a "Deprecated" comment in every block that defines `--new` (light, dark, the system-dark media query), so a themed alias follows dark mode and nested `data-theme` sections, and lists the entry under `deprecated` in `tokens.json`. The build stops if the old name still exists or the new one doesn't. The lint rejects the old name in Bland's CSS and names the new one. In the `removeIn` release, delete the entry. `npm run test:tokens` tests it. A rename that skips this list breaks projects: the drift check shows a renamed variable, so check for one before every sync.
+- Figma follows the same names: a renamed variable is renamed in Figma, and the old CSS name lives only in code during its minor.
+
 ## Package option A: public npm
 
 Name and license are done. Left:

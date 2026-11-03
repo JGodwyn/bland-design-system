@@ -30,15 +30,21 @@
   transform: scale(0.96);
   transition:
     opacity var(--duration-xs) var(--easing-out),
-    transform var(--duration-xs) var(--easing-out),
-    display var(--duration-xs) allow-discrete,
-    overlay var(--duration-xs) allow-discrete;
+    transform var(--duration-xs) var(--easing-out);
 }
 
 .bland-popover:popover-open {
   opacity: 1;
   transform: none;
   transition-duration: var(--duration-md);
+}
+
+/* Closing: the exit plays while it is still shown, then it leaves the top layer (overlay/exit.ts). */
+.bland-popover:popover-open[data-closing] {
+  opacity: 0;
+  transform: scale(0.96);
+  transition-duration: var(--duration-xs);
+  pointer-events: none;
 }
 
 @starting-style {
@@ -69,9 +75,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   /* Opacity only: no scale. */
-  .bland-popover {
+  .bland-popover,
+  .bland-popover:popover-open[data-closing] {
     transform: none;
-    transition-property: opacity, display, overlay;
+    transition-property: opacity;
   }
 
   @starting-style {

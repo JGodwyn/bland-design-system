@@ -1,6 +1,6 @@
 // Behaviour of Chip: sizes, the close button's name, keyboard, hit area and focus ring.
 import { expect, test } from '@playwright/test';
-import { openStory } from './stories';
+import { openStory, clickToFocus } from './stories';
 
 test.beforeEach(async ({ page }) => {
   await openStory(page, 'chip', 'light');
@@ -64,7 +64,7 @@ test('the close button focus ring shows on keyboard focus only', async ({ page }
   const close = page.locator('.bland-chip[data-size="md"][data-type="cancellable"] .bland-chip__close').first();
   const outline = () => close.evaluate((e) => getComputedStyle(e).outlineStyle);
 
-  await close.click();
+  await clickToFocus(close);
   await expect(close).toBeFocused();
   expect(await outline()).toBe('none');
 

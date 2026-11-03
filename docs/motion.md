@@ -37,6 +37,7 @@ The lint rejects raw `ms`/`s` values, easing keywords, `cubic-bezier()`, `steps(
 - **Reduced motion.** Every animation ships a `@media (prefers-reduced-motion: reduce)` fallback that keeps opacity and color changes and drops transform motion.
 - **Hover motion only for real hover.** Gate it behind `@media (hover: hover) and (pointer: fine)`, so touch devices don't get stuck hover states.
 - **Name the properties.** List exactly what transitions (`background-color, transform`), never `transition: all`. The lint rejects `all`.
+- **The same motion in every engine** (Godwin 2026-11-03). Use only CSS that Safari and Firefox animate too: no `height: auto` with `interpolate-size`, no exit through `overlay` / `display` transitions (both Chromium only). Heights ease between measured pixels (`motion/height.ts`); top-layer exits play on `[data-closing]` before the element is hidden (`overlay/exit.ts`). Corner smoothing is the one Chromium-only look, and stays so.
 - **Stagger** list items 30 to 80ms apart. There is no stagger token yet; add one in Figma when a component needs it.
 
 ## Pattern
