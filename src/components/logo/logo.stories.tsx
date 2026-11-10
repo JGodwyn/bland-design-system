@@ -6,7 +6,7 @@ const sizes: LogoSize[] = ['sm', 'lg'];
 const colors: LogoColor[] = ['default', 'on-color'];
 
 /**
- * A project's own logomark: a brand rounded square with a white bar. Bland ships none, so its drawing
+ * A project's own logomark, to show the `mark` slot: a brand rounded square with a white bar. Its drawing
  * is this story's choice; the Logo sizes it to logo/mark-*.
  */
 function ProjectMark({ inverse = false }: { inverse?: boolean }) {
@@ -31,27 +31,31 @@ function Backdrop({ color, children }: { color: LogoColor; children: ReactNode }
 export default {
   title: 'Logo',
   description:
-    'The product\'s wordmark, with an optional logomark before it. Pass `href` to make it the link home.',
+    'The Bland logo: the logomark and the wordmark. Pass `href` to make it the link home.',
   usage: [
-    '`children` replaces the Bland wordmark with your product\'s name.',
-    'Put your logomark in `mark`.',
-    'Use `color="on-color"` on brand fills: it is white in both themes. Use your logomark\'s white version there too.',
     '`size="sm"` fits top bars; `lg` is the default.',
+    'Use `color="on-color"` with `mono` on brand fills: the whole logo is white in both themes.',
+    '`mono` makes the logomark the wordmark\'s color, for one-color uses.',
+    '`mark={false}` shows the wordmark alone; any image or SVG in `mark` replaces Bland\'s logomark.',
+    'The wordmark is a drawing of the word Bland. A product with another name draws its own logo.',
   ],
   components: ['Logo'],
   demo: {
     component: 'Logo',
-    args: { size: 'lg', color: 'default', mark: 'none', children: 'Bland' },
+    args: { size: 'lg', color: 'default', mono: false, mark: 'Bland' },
     controls: {
-      children: { kind: 'text' },
-      mark: { kind: 'select', options: ['none', 'ProjectMark'] },
+      mark: { kind: 'select', options: ['Bland', 'none', 'ProjectMark'] },
     },
     render: ({ mark, color, ...args }) => (
       <Backdrop color={color as LogoColor}>
-        <Logo {...args} color={color as LogoColor} mark={mark === 'none' ? undefined : <ProjectMark inverse={color === 'on-color'} />} />
+        <Logo
+          {...args}
+          color={color as LogoColor}
+          mark={mark === 'Bland' ? undefined : mark === 'none' ? false : <ProjectMark inverse={color === 'on-color'} />}
+        />
       </Backdrop>
     ),
-    code: ({ mark, ...args }) => ({ ...args, mark: mark === 'none' ? undefined : '<ProjectMark />' }),
+    code: ({ mark, ...args }) => ({ ...args, mark: mark === 'Bland' ? undefined : mark === 'none' ? false : '<ProjectMark />' }),
   },
   render: () => (
     <>
@@ -76,21 +80,29 @@ export default {
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label"><code>mark</code>: your logomark before the wordmark; on a brand fill, its white version</span>
+        <span className="pg-label"><code>mono</code>: the logomark in the wordmark's color; with <code>on-color</code>, the logo for brand fills</span>
         <div className="pg-row">
           {sizes.map((size) => (
-            <Logo key={size} size={size} mark={<ProjectMark />} data-testid={`mark-${size}`} />
+            <Logo key={size} size={size} mono data-testid={`mono-${size}`} />
           ))}
           <Backdrop color="on-color">
-            <Logo color="on-color" mark={<ProjectMark inverse />} />
+            <Logo color="on-color" mono />
+          </Backdrop>
+          <Backdrop color="on-color">
+            <Logo size="sm" color="on-color" mono />
           </Backdrop>
         </div>
       </div>
 
       <div className="pg-stack">
-        <span className="pg-label">Your product name as <code>children</code></span>
+        <span className="pg-label"><code>mark</code>: <code>false</code> for the wordmark alone, or your own image or SVG</span>
         <div className="pg-row">
-          <Logo mark={<ProjectMark />}>Northwind</Logo>
+          {sizes.map((size) => (
+            <Logo key={size} size={size} mark={false} />
+          ))}
+          {sizes.map((size) => (
+            <Logo key={size} size={size} mark={<ProjectMark />} data-testid={`mark-${size}`} />
+          ))}
         </div>
       </div>
 

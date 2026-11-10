@@ -799,3 +799,186 @@ shell never produces. Also: don't point two Playwright runs at one log file.
 - **"Skip the first effect run" with a ref breaks in Strict Mode**: the effect runs twice on mount, so the second run looked like a change and slid every open Sidebar group in on load. → Compare with the last state the effect handled, not a mounted flag.
 - **A hover spec that clicks at once never has hover on**: Playwright moves and clicks within the peek delay, so a bug that needs a resting pointer (the Sidebar reopening after collapse) passed. → Rest past the delay before the press, and record every state with a MutationObserver: a wrong state that corrects itself passes a final-state check.
 - **A story frame with `overflow: hidden` clips anything that draws past the component's box** (the Sidebar's peek), and only at window widths where the docs column is narrow, so a 1024px test viewport never sees it. → Give such frames a minimum width that holds the open state; check docs pages at a narrower window too.
+
+## Vite public HTML (2026-11-06)
+
+- Symptom: `site/public/proto/headline.html` came back as the landing page's `index.html` in `npm run site`.
+- Cause: Vite's dev server does not serve `.html` files from `public/`; the SPA fallback answers instead.
+- Rule: a throwaway HTML page goes at the Vite root (`site/x.html`), not in `public/`.
+
+## Brand steps on a nested element (2026-11-07)
+
+- Symptom: a picture setting `--brand-*` on its own element kept Bland's blue in its Button and Toggle.
+- Cause: the brand-colored roles are computed where `tokens.css` declares them (`:root`, `[data-theme]`), from the brand steps there, and inherit as resolved colors.
+- Rule: to rebrand one area (a preview, an illustration), put the `--brand-*` steps and `data-theme="light"` (or dark) on the same element; the theme rule then recomputes every role from that element's steps. A project's real brand still goes at `:root` (`docs/brand.md`).
+
+## A fixed-width component in a grid cell (2026-11-07)
+
+- Symptom: Notification (width notification/width 384, max-width 100%) overflowed a 312px grid cell on phones and sliced its Reply button.
+- Cause: `max-width: 100%` on a centred grid item did not cap it at the cell in Chromium; the cell grew to the item's width.
+- Rule: size it as `width: min(var(--notification-width), 100%)` from the page, rather than relying on its `max-width`.
+
+## Still screenshots of a sweep (2026-11-07)
+
+- Symptom: a Chrome screenshot of the light/dark sweep showed the line about 6% away from the dark half's edge.
+- Cause: capture timing; sampled with `getComputedStyle` every 90ms, the `translate` and the `clip-path` moved together.
+- Rule: check paired motion by sampling both values in the page, not from one screenshot (Stageshow: film it).
+
+## Faded text and axe (2026-11-08)
+
+- Symptom: axe failed color-contrast at 1.02:1 on the landing page's props card.
+- Cause: the type hint on unselected options was `opacity: 0`, still in the tree, so axe measured near-white text.
+- Rule: text that is hidden on purpose gets `visibility: hidden` as well as the fade (transition both), never opacity alone.
+
+## Measuring inside a scaled ancestor (2026-11-08)
+
+- Symptom: in the landing page's feature row, the Segmented bar's white thumb sat off "Week" once its card came to the middle; the keyboard card's scripted focus ring sat on the label.
+- Cause: both measured with `getBoundingClientRect` (screen pixels) while their card had `scale: 0.797`, then drew those lengths inside the same scaled card. The tab indicator divided by CSS `zoom` only.
+- Rule: a length measured on screen and drawn back inside the element is divided by `rect.width / offsetWidth` of the container, which covers zoom and any scale transform (`src/components/tabs/tabs.tsx`).
+
+## Playwright's wheel in WebKit (2026-11-08)
+
+- Symptom: in `tests/feature-row.spec.ts`, `page.mouse.wheel(0, 600)` during the row's guidance glide left `scrollY` unchanged in WebKit, every run; the same steps in a standalone Playwright WebKit script scrolled 527 to 587px and the row settled on the next card.
+- Cause: not found; the difference is the test runner's WebKit context (same device, same viewport).
+- Rule: don't rely on the emulated wheel for page scrolling in WebKit specs; check scroll behaviour with `window.scrollTo` there, and keep wheel-specific checks to Chromium with a comment saying why.
+
+## An overshooting pop widens the page (2026-11-08)
+
+- Symptom: on a phone, the landing page's `scrollWidth` was 443 instead of 390 in a spec, though nothing in the section was wider than the screen once it had settled.
+- Cause: the "What you get" parts pop in on a back-out curve that swings past full size; a part as wide as the screen (Modal, File upload) grew past the edge for a moment, and transforms count toward scroll overflow.
+- Rule: a container whose children pop or scale past 1 gets `overflow-x: clip` (not hidden: no scroll container, sticky still works), or the overshoot stays under the room there is.
+
+## A scripted edit that matched the wrong copy (2026-11-08)
+
+- Symptom: `site/src/landing-values.css` held everything from the feature cards to What you get twice, after a script meant to delete one rule.
+- Cause: the script cut from my rule's comment to the first match of its `color: color-mix(…)` line, and the hero's rule earlier in the file has the identical line, so the cut ran backwards and the slice joined the file to an earlier copy of itself.
+- Rule: delete a block by an anchor that is unique to it (check the count first), or with Edit on the exact text; never search for a line two rules share.
+
+## Rects inside a turned ancestor (2026-11-08)
+
+- Symptom: on the landing page's tilted Segmented bar the thumb sat below its tab and 3px too wide.
+- Cause: `getBoundingClientRect` of a rotated element is its upright bounding box, so the rects no longer say where the tab is; dividing by the scale (the earlier fix) covers zoom and scale, not rotation.
+- Rule: when an element's rect size and its layout size (offsetWidth/Height, after dividing by the scale) disagree, something turns it: measure with layout offsets instead (`src/components/tabs/tabs.tsx`).
+
+## Wheel gestures in Playwright (2026-11-08)
+
+- Symptom: a spec's 14-event "flick" sometimes moved two slides in Chromium under load.
+- Cause: `page.mouse.wheel` waits between events, and under load the gaps outgrew the 200ms quiet window that ends a gesture.
+- Rule: test gesture logic with WheelEvents dispatched in the page at a fixed 16ms (a trackpad's rate); keep `mouse.wheel` only for checks that need the browser to scroll natively.
+
+## A font override in a dark area (2026-11-09)
+
+- Symptom: on the landing page's showcase, setting `--font-body` on a card with `data-theme="dark"` left its text in Inter.
+- Cause: `tokens.css` declares the `--type-*` composites (which read `var(--font-body)` / `var(--font-heading)`) in `:root, [data-theme="light"]` only, so a dark element inherits them already resolved from the nearest light ancestor or `:root`. `--font-heading` is `var(--font-body)` at `:root`, also resolved there.
+- Rule: to change fonts in one area, set `--font-body` and `--font-heading` on an element with `data-theme="light"` around the area, and put the dark `data-theme` (with any brand steps) on an element inside it (`site/src/showcase/Showcase.tsx`, `Themed`). A project's fonts at `:root` are unaffected.
+
+## Easing from one brand to another (2026-11-09)
+
+- Symptom: brand steps set as inline custom properties jump to the new brand; a transition on them does nothing.
+- Cause: an unregistered custom property is a token stream and cannot interpolate. Registered with `@property` (`syntax: '<color>'`), it can, and every role computed from it follows each frame. A child that only inherits a transitioning value does not ease in its own turn.
+- Rule: register the 26 steps (`landing-values.css`), list them in `transition-property`, and set the steps on every element that should ease on its own schedule (each showcase card holds its own, Bland's blue included).
+
+### `border-radius` beside `.bland-smooth` undoes the smoothing (2026-11-09, landing-showcase)
+
+- **Symptom:** the showcase's cards looked less rounded than Figma's rad-lg with 100% smoothing.
+- **Cause:** the card's own rule set `border-radius: var(--rad-lg)`. It has the same specificity as `.bland-smooth` and loads later, so it replaced the smoothing's `calc(var(--bland-radius) * 2)`: 16px with `corner-shape: superellipse(2)` is far squarer than Figma.
+- **Rule:** on a `.bland-smooth` element, set only `--bland-radius`, never `border-radius`.
+
+## Landing page: Figma kit (2026-11-09)
+
+- **Prettier rewrote the quotes.** Symptom: `npx prettier --write` turned every `'` into `"` in new site files. Cause: the repo has no Prettier config, so Prettier's defaults apply. Rule: don't run bare Prettier here; if formatting is needed, `--single-quote --print-width 160` matches the code.
+- **An inert element can't be hovered in Playwright.** Symptom: `locator.hover()` on an `inert` picture timed out ("<div> intercepts pointer events"). Cause: inert content takes no pointer events, so its parent receives them. Rule: hover the picture's wrapper (the element `usePlayback` observes), not the inert picture.
+- **A story step shorter than the poll can't be waited for.** Symptom: `toHaveAttribute('data-step', '11')` never matched a 200ms press step. Cause: Playwright's retries poll slower than the step lasts. Rule: assert the state the step leaves behind on the next, longer step.
+
+### A blurred text copy's room widens the page (2026-11-09, landing-footer)
+
+- **Symptom:** on a 320 phone the landing page scrolled sideways, 358 wide, once the footer was in.
+- **Cause:** each glow copy sits at `inset: -pad` (the character rise plus three blur radii, 96px) so its blur is not cut at the word's box. Absolutely positioned overflow still counts toward the page's scroll width.
+- **Rule:** a section with glow or blur copies around its text clips sideways (`overflow-x: clip`, which does not make it a scroll container), and a phone spec checks `document.documentElement.scrollWidth`, not the section's own.
+
+### Replacing "from my block to the end" of a shared file deletes what came after (2026-11-09, landing-faq)
+
+- **Symptom:** the footer lost its sizes, type and height: every `--landing-footer-*` value was gone from `landing-values.css`.
+- **Cause:** the FAQ session rewrote its own block with `s[:start] + new`, cutting the file at its block's heading. The footer session had appended its block after the FAQ's in the meantime, so it went too.
+- **Rule:** in a file other sessions append to, replace your block between its own start and end markers (the next `/* ---------- ` heading), or with an exact `old`→`new` string, never "to the end of the file". Re-read the file's tail right before writing. Restored from the footer session's transcript.
+
+### A visually hidden list without a size widens a phone page (2026-11-09, mobile pass)
+
+- **Symptom:** at 375 the landing page scrolled sideways, 877 wide, once "What you get" rendered its screen-reader list on phones.
+- **Cause:** `position: absolute; overflow: hidden; clip-path: inset(50%); white-space: nowrap` with no width: the box keeps its full one-line width, and `scrollWidth` counts it even though nothing paints.
+- **Rule:** a visually hidden element also gets one pixel of width and height (`--space-3xs`) and a negative margin. Check `scrollWidth` at 320 to 390 after anything new renders on phones.
+
+### The hero headline's scroll wave is about 140px on a phone (2026-11-09, mobile pass)
+
+- **Symptom:** on Godwin's phone the hero headline "almost never animates" from fill to outline.
+- **Cause:** the wave runs from `titleStart` 0.063 to `titleEnd` 0.12 of the hero track (4 screens, so 3 screens of travel): about 0.17 of a screen, roughly 140px at 844 tall, which one flick passes in a frame or two. Each frame also sets React state for the whole hero (every word's `--bold`, every description word's ink), which restyles and repaints 48 blurred, masked glow layers (6 words x 8). A phone drops those frames, so the start and end states are all that shows.
+- **Rule:** before tuning it, give the wave a phone-sized share of the track (or drive it from the time since the scroll started), and move per-frame values off React state onto CSS custom properties set on one element. Not changed yet: Godwin decides first.
+- **Update (2026-11-09, hero session):** Godwin asked for the footer's pace: the wave is 0.02 to 0.22 now (about 500px on an 850px screen). Measured in Chrome, the blurs were the cost: hiding the glow or its filter took frames from 100 ms+ (dev) to 8 ms, the masks barely mattered. `will-change: opacity` on `.hero__glow` keeps each blurred layer on the compositor, so a scroll frame only changes its opacity: production frames during the change went from a 42 ms p95 (about 70 fps) to 10 ms (120 fps). The dev server stays far slower on the first pass through the page (React's development build re-rendering every section on scroll); judge scroll performance on a production build (`vite build --config site/vite.config.ts`).
+
+### A pinned stage that shifts on a phone is a sizing problem, not a scrolling one (2026-11-09, mobile pass)
+
+- **Symptom:** on a real phone the pinned hero moved up a little as scrolling began. I answered it with a timer, then with captured swipes, then with gain and fling for those swipes, each patching the last, until Godwin asked for a step back.
+- **Cause:** the stage was `100svh` (the screen with the address bar shown). The bar slides away as the page scrolls, the screen grows, and the stage moved with it and left a band.
+- **Rule:** size a sticky full-screen stage `100lvh` and keep its content inside the small viewport (`100lvh - 100svh` extra padding or inset). Never replace native scrolling to hide a layout problem. Name the cause before writing a fix, and test scroll feel on a real phone: a desktop wheel or trackpad hides it.
+
+### Playwright can't judge scroll snapping (2026-11-09, mobile pass)
+
+- **Symptom:** with `mouse.wheel` flicks, Chromium snapped back to the start every time and WebKit skipped slides despite `scroll-snap-stop: always`, even on a minimal textbook page (a nested mandatory scroller).
+- **Cause:** synthetic wheel events carry no gesture phases (began, momentum, ended). Each one reaches the browser as its own gesture, so snapping runs per event instead of once per flick.
+- **Rule:** check snap and scroll feel on real hardware (a trackpad, a mouse wheel, a phone). Keep headless specs to structure (the snap points exist, each slide shows at its point), not gesture feel. Likewise, never infer gesture boundaries from wheel deltas in JavaScript; let native snapping decide.
+
+### Many large `will-change` layers run a phone out of GPU memory (2026-11-09, mobile pass)
+
+- **Symptom:** on a phone the hero headline blinked out for frames at a time while scrolling, leaving only its glow; on desktop it was fine.
+- **Cause:** 48 blurred copies, each its own compositor layer (`will-change: opacity`) padded for its blur: about 237 MB at 3x. Chrome's phone tile budget is far smaller, so it dropped tiles. Separately, setting React state every scroll frame re-rendered hundreds of spans: 40 to 100 ms a frame at 4x CPU throttle.
+- **Rule:** add up layer memory (width x height x DPR squared x 4) before reaching for `will-change`, on a 3x phone profile. Draw glows as a `text-shadow` on the element that already fades (its radius is twice a `blur()` filter's). Write per-frame scroll values to the DOM directly, and keep React state for discrete changes. Measure frame times with CPU throttling, not on a desktop.
+
+### A Figma SVG export can flatten strokes into megabytes (2026-11-10, mobile pass)
+
+- **Symptom:** the hero's 52px swatches icon was 2.3 MB, two thirds of the landing page's download; the other icons were 3 to 7 KB.
+- **Cause:** Figma exported its outside strokes as filled outlines traced in tiny segments (paths of up to 280,000 characters), while the other icons kept `stroke` attributes.
+- **Rule:** check the size of every exported SVG (`ls -laS`); anything past a few KB for an icon is a broken export. Re-export, or rebuild the outline as a stroke of its clean path, and compare the renders pixel by pixel before swapping.
+
+### Chrome DevTools MCP locked by another session (2026-11-10)
+
+- **Symptom:** every chrome-devtools tool fails with "The browser is already running for ~/.cache/chrome-devtools-mcp/chrome-profile".
+- **Cause:** one shared profile; another Claude session's DevTools browser holds it.
+- **Rule:** don't close the other session's browser. For performance numbers, run the Lighthouse CLI against the production preview instead (`npx -y lighthouse@13 http://localhost:5183/ --only-categories=performance --form-factor=mobile --chrome-flags="--headless=new"`, and `--preset=desktop`), three runs, median.
+
+### Per-character spans move the LCP element (2026-11-10, landing audit)
+
+- **Symptom:** after the phone headline grew, mobile LCP went from 0.92 s to 2.56 s in Lighthouse, with nothing heavier loaded.
+- **Cause:** the headline is one `inline-block` span per character, so no single text block in it is large; on a phone the four-line description became the largest text and so the LCP element. It fades in from opacity 0 after a 420 ms delay, and LCP waits for that paint. On desktop the headline stays LCP.
+- **Rule:** after changing hero type or a load animation, check which element Lighthouse names as LCP on mobile and desktop. Never start the LCP candidate at opacity 0 behind a delay; fade it from a visible state or with no delay.
+
+### A preview server's single-page fallback fakes robots.txt (2026-11-10, landing audit)
+
+- **Symptom:** Lighthouse reported `robots.txt` "not valid" with 14 errors, and `llms.txt` and the ARD manifest as malformed, though none of them exist.
+- **Cause:** `vite preview` (and Cloudflare Pages without a `404.html`) answers every unknown path with `index.html` and status 200.
+- **Rule:** for a client-rendered site, ship real `robots.txt`, `sitemap.xml` and a `404.html` in `site/public/`; read "invalid file" audits as "missing file" first. The skill's `analyze.sh` also finds nothing on such a page (the HTML is an empty root), so rely on the rendered audit.
+
+### Preload the weight the text really uses (2026-11-10, landing audit)
+
+- **Symptom:** preloading Inter 400 and 700 for the hero cut CLS from 0.058 to 0.025, not to 0.
+- **Cause:** the hero description is Inter 600 (`--landing-hero-description-font`), not 400; the font still arrived late and the paragraph re-flowed.
+- **Rule:** read the computed `font` of each shifting element before choosing preloads; the layout-shift sources (Lighthouse `cls-culprits-insight`, or a `layout-shift` observer) name the element, its font token names the weight.
+
+### Bland's classes without the component leave the CSS behind
+
+- **Symptom:** the 404 page's link buttons (`bland-button` classes on `<a>`) rendered as plain blue links in the build.
+- **Cause:** each component's CSS is imported by its `.tsx`; a page that imports only `Logo` from `src` gets Logo's CSS, and the unused Button module (with its CSS) is tree-shaken away.
+- **Rule:** a page that uses a component's classes without rendering the component imports that component's CSS file itself.
+
+### Lighthouse's simulated FCP counts every request made before the observed first paint
+
+- **Symptom:** mobile FCP and LCP jumped to 2.8 s in two of three runs while unthrottled first paint was 0.45 s and real throttled Chromium LCP stayed about 1.3 s.
+- **Cause:** Lantern builds its FCP estimate from all network requests started before the observed first paint. The landing hero's letters start at opacity 0, so its first contentful paint comes after the lazy `rest` chunk (188 KB) was requested, and the simulation loads that chunk before painting.
+- **Rule:** on a page whose first paint waits for an entrance, request below-the-fold chunks after the first paint, and judge mobile timing by several runs plus a real throttled browser, not one simulated number.
+
+- **A link to /docs/ on the site's dev server reloads the landing page.** Symptom: Read the docs did nothing in `npm run site` (5182). Cause: the docs are only copied under `/docs/` by `site:build`; the dev server's SPA fallback answers `/docs/` with the landing's index.html. Rule: dev-only routes to the other app go through `devDocsRedirect()` (to 5180); test links to /docs/ on `site:preview` (5183) or with `npm run docs` running.
+
+## `process` in library code breaks the declarations build (2026-11-10)
+
+- Symptom: `npm run typecheck` passes, `npm run build` / `npm pack` / `test:package` fail at `tsc -p tsconfig.build.json` with TS2591 "Cannot find name 'process'".
+- Cause: the build config has `types: []` (no Node types), while the root tsconfig has them. The Logo `children` deprecation warning was the first use of `process.env.NODE_ENV` in `src/`.
+- Rule: run `npm run build` (not only `typecheck`) after touching library code. A development-only warning declares `declare const process: { env: { NODE_ENV?: string } } | undefined;` in its own module and guards with `typeof process !== 'undefined'`.

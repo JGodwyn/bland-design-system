@@ -25,6 +25,7 @@
     "vite.config.ts",
     "playground",
     "tests",
-    "playwright.config.ts"
+    "playwright.config.ts",
+    "site"
   ]
 }

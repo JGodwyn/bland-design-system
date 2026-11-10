@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } fr
 import { IconButton } from '../../src/components/button/IconButton';
 import { EyeClosedIcon, MagnifyingGlassIcon } from '../../src/icons';
 import { Icon } from '../../src/components/icon/Icon';
+import { Logo } from '../../src/components/logo/Logo';
 import { ScrollArea } from '../../src/components/scroll-area/ScrollArea';
 import { SegmentedBar } from '../../src/components/segmented-bar/SegmentedBar';
 import { ComponentPage } from './ComponentPage';
@@ -176,9 +177,7 @@ export function DocsApp({ route }: { route: DocsRoute }) {
   return (
     <div className="docs" data-menu-open={menuOpen || undefined}>
       <header className="docs-topbar">
-        <a href="#/" className="docs-brand bland-focus-ring">
-          Bland
-        </a>
+        <Logo size="sm" href="#/" className="docs-brand" />
         <span className="docs-topbar-end">
           <span className="docs-topbar-hide" aria-hidden="true" data-off={!menuOpen || undefined} onClick={() => setMenuOpen(false)}>
             Hide
@@ -200,9 +199,7 @@ export function DocsApp({ route }: { route: DocsRoute }) {
 
       <aside className="docs-sidebar" id="docs-sidebar">
         <div className="docs-sidebar-head">
-          <a href="#/" className="docs-brand bland-focus-ring">
-            Bland
-          </a>
+          <Logo size="lg" href="#/" className="docs-brand" />
           <span className="docs-descriptor">Design system</span>
         </div>
         <ScrollArea className="docs-nav-scroll" fadeSize="sm">

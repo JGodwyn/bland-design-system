@@ -201,11 +201,29 @@ export function useSelectionIndicator(listRef: RefObject<HTMLElement | null>, se
       // Dropping the transition should cancel a slide already running (CSS Transitions); WebKit lets it finish,
       // so a key right after a click would glide on to the old tab and snap back.
       if (!animate) for (const a of indicator.getAnimations()) a.cancel();
-      // Rects keep fractions (offsetLeft rounds); divide by the CSS zoom, as the overlays do, since the
-      // indicator's own lengths are drawn zoomed again.
-      const zoom = (list as HTMLElement & { currentCSSZoom?: number }).currentCSSZoom ?? 1;
+      // Rects keep fractions (offsetLeft rounds); divide by how much larger the list draws than its own layout
+      // width, since the indicator's own lengths are drawn at that size again. That covers CSS zoom (the docs'
+      // zoom control) and any scale transform on an ancestor (a tab row inside a card that is scaled, 2026-11-08:
+      // measured while small, the indicator sat off its tab once the card grew). currentCSSZoom where the list
+      // has no width yet.
       const box = el.getBoundingClientRect();
       const origin = list.getBoundingClientRect();
+      const zoom =
+        list.offsetWidth > 0
+          ? origin.width / list.offsetWidth
+          : ((list as HTMLElement & { currentCSSZoom?: number }).currentCSSZoom ?? 1);
+      // A turned ancestor (the landing page tilts a tab row, 2026-11-08) makes every rect the turned shape's upright
+      // bounding box, so the rects no longer say where the tab is: then layout offsets, which no transform touches
+      // (whole pixels; the tab is inside the list, its offset parent, as the indicator is).
+      const turned =
+        Math.abs(box.width / zoom - el.offsetWidth) > 1 || Math.abs(box.height / zoom - el.offsetHeight) > 1;
+      if (turned && el.offsetParent === list) {
+        indicator.style.setProperty('--_ind-x', `${el.offsetLeft}px`);
+        indicator.style.setProperty('--_ind-y', `${el.offsetTop}px`);
+        indicator.style.setProperty('--_ind-w', `${el.offsetWidth}px`);
+        indicator.style.setProperty('--_ind-h', `${el.offsetHeight}px`);
+        return;
+      }
       indicator.style.setProperty('--_ind-x', `${(box.left - origin.left) / zoom - list.clientLeft}px`);
       indicator.style.setProperty('--_ind-y', `${(box.top - origin.top) / zoom - list.clientTop}px`);
       indicator.style.setProperty('--_ind-w', `${box.width / zoom}px`);

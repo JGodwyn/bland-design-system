@@ -1,33 +1,32 @@
 /*
- * Logo (Figma: Brand elements page, set "Logo").
+ * Logo (Figma: Brand elements page, sets "Logo" and "Logomark").
  *
- *   <span class="bland-logo" data-size="lg" data-color="default">          (or <a … bland-focus-ring> with href)
- *     <span class="bland-logo__mark" aria-hidden>…</span>                  (only with mark)
- *     <span class="bland-logo__wordmark">Bland</span>
+ *   <span class="bland-logo" data-size="lg" data-color="default" data-mono?>   (or <a … bland-focus-ring> with href)
+ *     <span class="bland-logo__mark" aria-hidden>                              (unless mark={false})
+ *       <svg class="bland-logo__logomark">                                     (Bland's mark; or the project's node)
+ *     </span>
+ *     <svg class="bland-logo__wordmark" role="img" aria-label="Bland">         (the outlined wordmark)
  *   </span>
  *
- * From Figma: a row centred on its cross axis, space-sm between mark and wordmark, no padding. lg: wordmark
- * Heading/heading-md, mark logo/mark-lg (40, the wordmark's height); sm: Title/title-md, logo/mark-sm (24).
- * Color default: Text/text-bold; on-color: Text/text-on-color (white in both modes). No hover in Figma.
+ * From Figma: a row centred on its cross axis, space-2xs between the mark's square and the wordmark, no padding.
+ * The mark's square is logo/mark-lg (40) or logo/mark-sm (24), the height of the logo; Bland's logomark sits
+ * centred in it space-xs in from each side (32 in the lg logo, 16 in the sm one). The wordmark is as tall as the
+ * square (its text box: 87 x 40, 24 tall on sm). Color default: wordmark Text/text-bold; on-color:
+ * Text/text-on-color (white in both modes). Mark colored: the tile is Surface/surface-brand; mono: the wordmark's
+ * color, Surface/surface-inverse on default and Icon/icon-on-color on on-color. No hover in Figma.
  */
 
 .bland-logo {
-  --_type: var(--type-heading-md);
-  --_spacing: var(--type-heading-md-letter-spacing);
   --_mark: var(--logo-mark-lg);
 
   display: inline-flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-2xs);
   color: var(--text-bold);
-  font: var(--_type);
-  letter-spacing: var(--_spacing);
   white-space: nowrap;
 }
 
 .bland-logo[data-size="sm"] {
-  --_type: var(--type-title-md);
-  --_spacing: var(--type-title-md-letter-spacing);
   --_mark: var(--logo-mark-sm);
 }
 
@@ -41,7 +40,7 @@
   text-decoration: none;
 }
 
-/* The project's mark fills the square, keeping its own aspect ratio. */
+/* The mark's square. Bland's logomark takes its color from here; a project's own mark keeps its own. */
 .bland-logo__mark {
   display: flex;
   flex: none;
@@ -49,10 +48,43 @@
   justify-content: center;
   width: var(--_mark);
   height: var(--_mark);
+  color: var(--surface-brand);
+}
+
+.bland-logo[data-mono] .bland-logo__mark {
+  color: var(--surface-inverse);
+}
+
+.bland-logo[data-mono][data-color="on-color"] .bland-logo__mark {
+  color: var(--icon-on-color);
 }
 
 .bland-logo__mark > :is(img, svg) {
   display: block;
   max-width: 100%;
   max-height: 100%;
+}
+
+.bland-logo__mark > .bland-logo__logomark {
+  width: calc(var(--_mark) - 2 * var(--space-xs));
+  height: calc(var(--_mark) - 2 * var(--space-xs));
+}
+
+/* The outlined wordmark: as tall as the logo, its width from the drawing. */
+.bland-logo__wordmark {
+  display: block;
+  flex: none;
+  width: auto;
+  height: var(--_mark);
+}
+
+/* Deprecated `children`: live text in place of the wordmark, in the text style the logo had before 0.2.0. */
+.bland-logo__text {
+  font: var(--type-heading-md);
+  letter-spacing: var(--type-heading-md-letter-spacing);
+}
+
+.bland-logo[data-size="sm"] .bland-logo__text {
+  font: var(--type-title-md);
+  letter-spacing: var(--type-title-md-letter-spacing);
 }

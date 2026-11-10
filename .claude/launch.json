@@ -22,6 +22,24 @@
         "--strictPort"
       ],
       "port": 5181
+    },
+    {
+      "name": "site",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "site"
+      ],
+      "port": 5182
+    },
+    {
+      "name": "site-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "site:preview"
+      ],
+      "port": 5183
     }
   ]
 }

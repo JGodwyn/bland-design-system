@@ -43,6 +43,8 @@
   letter-spacing: var(--type-body-lg-bold-letter-spacing);
   white-space: nowrap;
   user-select: none;
+  /* The hand on every button, links drawn as buttons too (Godwin 2026-11-10); disabled and loading change it below. */
+  cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   transition:
@@ -253,6 +255,11 @@
   --_border: var(--border-subtle);
 
   cursor: not-allowed;
+}
+
+/* Loading ignores clicks (guardLoading), so the pointer says it is busy instead of pressable. */
+.bland-button[aria-busy="true"]:not(:disabled, [aria-disabled="true"]) {
+  cursor: progress;
 }
 
 @media (prefers-reduced-motion: reduce) {

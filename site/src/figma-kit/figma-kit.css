@@ -1,0 +1,807 @@
+/*
+ * Landing page "Figma kit" (Figma 7078:34292). Tokens only; Figma's own values are --landing-figma-kit-* in
+ * landing-values.css, the motion's are --fk-* from tuning.ts. Mobile first: copy, checklist, then the picture (a
+ * compact file without the left panel); from breakpoint/md the picture has its panel; from xl Figma's two columns,
+ * the copy on columns 2 to 4 and the picture from column 5, running off the right edge.
+ */
+
+.fk {
+  /* The picture runs past the page's right edge. */
+  overflow-x: clip;
+  /* A phone: less room around the section (Godwin 2026-11-09); Figma's rhythm from breakpoint/md. */
+  padding-block: var(--space-3xl);
+  background: var(--surface-100);
+  color: var(--text-bold);
+}
+
+.fk__grid {
+  --bland-grid-margin: var(--space-lg);
+
+  row-gap: var(--space-2xl);
+  align-items: end;
+}
+
+.fk__copy,
+.fk__visual {
+  grid-column: 1 / -1;
+}
+
+.fk__copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xl);
+  max-width: var(--landing-figma-kit-copy-width);
+}
+
+/* A phone (Godwin 2026-11-09): the checklist the picture cycles through sits under the picture, so the two are
+   seen together. The copy's head and list take grid rows of their own there; from breakpoint/md the list is back in
+   the copy. */
+.fk__copy {
+  display: contents;
+}
+
+.fk__head,
+.fk__list {
+  grid-column: 1 / -1;
+  max-width: var(--landing-figma-kit-copy-width);
+}
+
+.fk__list {
+  order: 1;
+}
+
+.fk__head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xl);
+}
+
+/* The tag: Figma's brand-light pill with Body/body-lg-bold text-brand (as Brand theme's). */
+.fk__tag {
+  --bland-radius: var(--rad-md);
+
+  margin: 0;
+  padding-inline: var(--space-sm);
+  background: var(--surface-brand-light);
+  font: var(--type-body-lg-bold);
+  letter-spacing: var(--type-body-lg-bold-letter-spacing);
+  color: var(--text-brand);
+}
+
+.fk__title {
+  margin: 0;
+  font: var(--type-heading-sm);
+  letter-spacing: var(--landing-figma-kit-title-tracking);
+}
+
+.fk__line {
+  display: block;
+}
+
+.fk__word {
+  display: inline-block;
+}
+
+.fk__lede {
+  margin: 0;
+  color: var(--text-subtle);
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+}
+
+/* The Button's classes on a link: no link underline. */
+.fk__cta {
+  text-decoration: none;
+}
+
+/* ---------- The checklist: the current beat's row is lit ---------- */
+
+.fk__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fk__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-block: var(--space-sm);
+  box-shadow: inset 0 calc(-1 * var(--stroke-xs)) 0 var(--border-subtle);
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+  color: var(--text-subtle);
+  transition: color var(--duration-md) var(--easing-out);
+}
+
+/* The current beat's progress line: the theme section's 2px border-brand bar, filling along the row's rule
+   over the beat's time and pausing with the story. */
+.fk__fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--stroke-lg);
+  background: var(--border-brand);
+  transform-origin: left center;
+  animation: fk-fill var(--fk-beat) var(--easing-linear) both;
+}
+
+.fk__fill[data-paused] {
+  animation-play-state: paused;
+}
+
+@keyframes fk-fill {
+  from {
+    scale: 0 1;
+  }
+
+  to {
+    scale: 1 1;
+  }
+}
+
+.fk__icon {
+  color: var(--icon-subtle);
+  transition: color var(--duration-md) var(--easing-out);
+}
+
+.fk__item[data-lit] {
+  color: var(--text-bold);
+}
+
+.fk__item[data-lit] .fk__icon {
+  color: var(--icon-brand);
+}
+
+@media (min-width: 768px) {
+  .fk__title {
+    font: var(--type-heading-lg);
+    letter-spacing: var(--landing-figma-kit-title-tracking);
+  }
+}
+
+@media (min-width: 1280px) {
+  /* Figma: the copy column starts 68 above the picture and its checklist ends level with the picture's foot. */
+  .fk__copy {
+    grid-column: 2 / span 3;
+    justify-content: space-between;
+    min-height: calc(
+      var(--landing-figma-kit-picture-height) +
+        var(--landing-figma-kit-head-offset)
+    );
+  }
+
+  .fk__visual {
+    grid-column: 5 / span 4;
+  }
+
+  .fk__visual .fk-pic {
+    width: var(--landing-figma-kit-picture-width);
+  }
+}
+
+/* ---------- Entrance: words rise, then the blocks, then the picture's parts one after another ---------- */
+
+.fk__word,
+.fk__block,
+.fk__visual {
+  opacity: 0;
+}
+
+.fk[data-shown] .fk__word {
+  animation: fk-rise var(--fk-rise) var(--landing-ease-glide) both;
+  animation-delay: calc(var(--fk-block-stagger) + var(--d) * var(--fk-stagger));
+}
+
+/* The tag leads; every block after it waits for the headline's words. */
+.fk[data-shown] .fk__block {
+  animation: fk-rise var(--fk-rise) var(--landing-ease-glide) both;
+  animation-delay: calc(
+    var(--b) * var(--fk-block-stagger) + min(var(--b), 1) * var(--fk-words) *
+      var(--fk-stagger)
+  );
+}
+
+/* The picture's card fades in; its parts rise in after it in order (--p), the set's buttons in a wave (--i). */
+.fk[data-shown] .fk__visual {
+  animation: fk-fade var(--fk-parts-fade) var(--easing-out) both;
+  animation-delay: var(--fk-parts-delay);
+}
+
+.fk__visual :is(.fk-pic__panel, .fk-pic__mode, .fk-pic__set-box, .fk-pic__vars, .fk-pic__button) {
+  opacity: 0;
+}
+
+.fk[data-shown] .fk__visual :is(.fk-pic__panel, .fk-pic__mode, .fk-pic__set-box, .fk-pic__vars) {
+  animation: fk-part var(--fk-part-rise) var(--landing-ease-glide) both;
+  animation-delay: calc(var(--fk-parts-delay) + var(--p) * var(--fk-part-stagger));
+}
+
+.fk__visual .fk-pic__panel {
+  --p: 0;
+}
+
+.fk__visual .fk-pic__mode {
+  --p: 1;
+}
+
+.fk__visual .fk-pic__set-box {
+  --p: 2;
+}
+
+.fk__visual .fk-pic__vars {
+  --p: 3;
+}
+
+/* The cursor comes last, once there is something to point at (backwards only: after that its own opacity rules). */
+.fk[data-shown] .fk__visual .fk-pic__cursor {
+  animation: fk-fade var(--fk-part-rise) var(--easing-out) backwards;
+  animation-delay: calc(var(--fk-parts-delay) + 4 * var(--fk-part-stagger));
+}
+
+.fk[data-shown] .fk__visual .fk-pic__button {
+  animation: fk-button var(--fk-part-rise) var(--easing-out) both;
+  animation-delay: calc(
+    var(--fk-parts-delay) + 3 * var(--fk-part-stagger) + var(--i) *
+      var(--fk-button-stagger)
+  );
+}
+
+@keyframes fk-rise {
+  from {
+    opacity: 0;
+    translate: 0 var(--fk-rise-y);
+  }
+
+  to {
+    opacity: 1;
+    translate: none;
+  }
+}
+
+@keyframes fk-part {
+  from {
+    opacity: 0;
+    translate: 0 var(--fk-part-rise-y);
+  }
+
+  to {
+    opacity: 1;
+    translate: none;
+  }
+}
+
+/* A button appears as it would on a canvas: from just under full size, never from 0. */
+@keyframes fk-button {
+  from {
+    opacity: 0;
+    scale: var(--landing-figma-kit-button-from);
+  }
+
+  to {
+    opacity: 1;
+    scale: none;
+  }
+}
+
+@keyframes fk-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------- The picture: a simplified Bland Figma file ---------- */
+
+.fk-pic {
+  --bland-radius: var(--rad-lg);
+
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: var(--landing-figma-kit-picture-height-sm);
+  border: var(--stroke-sm) solid var(--border-subtle);
+  background: var(--surface-100);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* The Mode switch turns the whole file dark (data-theme on the picture): its surfaces and words ease there. */
+.fk-pic,
+.fk-pic__panel,
+.fk-pic__file,
+.fk-pic__pages,
+.fk-pic__canvas,
+.fk-pic__frame,
+.fk-pic__mode,
+.fk-pic__vars,
+.fk-pic__row,
+.fk-pic__var,
+.fk-pic__heading {
+  transition-property: background-color, color, border-color, box-shadow;
+  transition-duration: var(--duration-md);
+  transition-timing-function: var(--easing-out);
+}
+
+/* The left panel (Figma's 200 column with the logo): hidden on a phone. */
+.fk-pic__panel {
+  display: none;
+  flex: none;
+  flex-direction: column;
+  width: var(--landing-figma-kit-panel-width);
+  padding-block-start: var(--space-lg);
+  box-shadow: inset calc(-1 * var(--stroke-sm)) 0 0 var(--border-subtle);
+}
+
+.fk-pic__file {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding-inline: var(--space-lg);
+  padding-block-end: var(--space-lg);
+  box-shadow: inset 0 calc(-1 * var(--stroke-sm)) 0 var(--border-subtle);
+}
+
+.fk-pic__logo {
+  width: var(--logo-mark-lg);
+  height: var(--logo-mark-lg);
+  stroke-width: var(--landing-figma-kit-logo-stroke);
+  color: var(--icon-subtle);
+}
+
+.fk-pic__file-name {
+  margin: 0;
+  font: var(--type-body-md-bold);
+  letter-spacing: var(--type-body-md-bold-letter-spacing);
+  color: var(--text-bold);
+}
+
+/* Pages and Layers, Figma's two panel headings. */
+.fk-pic__heading {
+  margin: 0;
+  padding: var(--space-md) var(--space-lg) var(--space-xs);
+  font: var(--type-body-sm-bold);
+  letter-spacing: var(--type-body-sm-bold-letter-spacing);
+  color: var(--text-bold);
+}
+
+/* The file's pages as Figma names them, scrolled to Buttons, fading at both ends. */
+.fk-pic__pages {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  height: var(--landing-figma-kit-pages-height);
+  padding-inline: var(--space-sm);
+  overflow: hidden;
+  box-shadow: inset 0 calc(-1 * var(--stroke-sm)) 0 var(--border-subtle);
+  mask-image: linear-gradient(transparent, black var(--fade-md), black calc(100% - var(--fade-md)), transparent);
+}
+
+.fk-pic__divider {
+  flex: none;
+  height: var(--stroke-sm);
+  margin: var(--space-xs) var(--space-sm);
+  background: var(--border-subtle);
+}
+
+/* The layers run off the panel's foot, fading out. */
+.fk-pic__layers {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding-inline: var(--space-sm);
+  overflow: hidden;
+  mask-image: linear-gradient(black calc(100% - var(--fade-md)), transparent);
+}
+
+.fk-pic__row {
+  --bland-radius: var(--rad-xs);
+
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: var(--control-xs);
+  padding-inline: var(--space-sm);
+  font: var(--type-body-sm);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+  color: var(--text-subtle);
+  white-space: nowrap;
+}
+
+/* Figma's page names keep their own spaces (the indent before each bullet). */
+.fk-pic__page {
+  white-space: pre;
+}
+
+.fk-pic__row[data-current] {
+  background: var(--surface-200);
+  font: var(--type-body-sm-bold);
+  letter-spacing: var(--type-body-sm-bold-letter-spacing);
+  color: var(--text-bold);
+}
+
+.fk-pic__set {
+  padding-inline-start: var(--space-xl);
+  color: var(--landing-figma-kit-component);
+}
+
+.fk-pic__glyph {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* A variant row: one line with an ellipsis, as Figma's; the selected one wraps, the story's payoff. */
+.fk-pic__variant {
+  padding-inline-start: var(--space-3xl);
+  color: var(--landing-figma-kit-component);
+  transition: background-color var(--duration-md) var(--easing-out);
+}
+
+.fk-pic__variant-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fk-pic__variant[data-selected] {
+  padding-block: var(--space-xs);
+  background: var(--landing-figma-kit-selection-fill);
+  white-space: normal;
+}
+
+/* The canvas: Figma's gray, which goes dark with the file. */
+.fk-pic__canvas {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--surface-200);
+}
+
+/* The Button set fills the canvas under the Mode card and runs off its right and bottom edges. */
+.fk-pic__set-box {
+  position: absolute;
+  top: calc(var(--space-6xl) + var(--space-md));
+  left: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xs);
+}
+
+.fk-pic__frame-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font: var(--type-body-sm-bold);
+  letter-spacing: var(--type-body-sm-bold-letter-spacing);
+  color: var(--landing-figma-kit-component);
+}
+
+.fk-pic__frame {
+  --bland-radius: var(--rad-sm);
+
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  align-items: center;
+  justify-items: start;
+  gap: var(--space-lg) var(--space-xl);
+  padding: var(--space-xl);
+  border: var(--stroke-sm) dashed var(--landing-figma-kit-component);
+  background: var(--surface-raised);
+}
+
+/* The phone's canvas keeps two columns: ghost and stroke wait for the wider file. */
+.fk-pic__button[data-type="ghost"],
+.fk-pic__button[data-type="stroke"] {
+  display: none;
+}
+
+.fk-pic__button {
+  position: relative;
+  display: flex;
+  border-radius: var(--rad-md);
+  outline: var(--stroke-sm) solid transparent;
+  outline-offset: var(--space-xs);
+  transition-property: var(--landing-showcase-brand-props), outline-color;
+  transition-duration: var(--fk-hue);
+  transition-timing-function: var(--easing-out);
+  transition-delay: calc(var(--i) * var(--fk-hue-stagger));
+}
+
+.fk-pic__button[data-selected] {
+  z-index: 1;
+  outline-color: var(--landing-figma-kit-selection);
+}
+
+/* Where the cursor waits between loops: the canvas's open middle. */
+.fk-pic__rest {
+  position: absolute;
+  top: 50%;
+  left: 60%;
+}
+
+/* The frame's Mode switch, a card at the canvas's top right. */
+.fk-pic__mode {
+  --bland-radius: var(--rad-md);
+
+  /* Top left: from xl the picture's right side runs off the page, and a control there would be cut. */
+  position: absolute;
+  top: var(--space-lg);
+  left: var(--space-lg);
+  width: var(--landing-figma-kit-mode-width);
+  padding: var(--space-xs);
+  background: var(--surface-raised);
+  box-shadow: var(--elevation-neutral-near);
+}
+
+/* The Variables card: one real variable in its Light and Dark columns, two filler rows. */
+.fk-pic__vars {
+  --bland-radius: var(--rad-lg);
+
+  /* The canvas's right side, kept clear of the page's edge when the picture runs past it (--fk-cut). */
+  position: absolute;
+  right: calc(var(--space-sm) + var(--fk-cut, 0px));
+  bottom: var(--space-sm);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  width: min(
+    var(--landing-figma-kit-vars-width),
+    calc(100% - 2 * var(--space-sm))
+  );
+  padding: var(--space-sm);
+  background: var(--surface-100);
+  box-shadow:
+    var(--elevation-neutral-far),
+    inset 0 0 0 var(--stroke-sm) var(--border-subtle);
+  color: var(--text-bold);
+}
+
+.fk-pic__vars-head,
+.fk-pic__var {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--space-2xl) var(--space-2xl);
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+}
+
+/* A phone shows rest and hover only, so the card leaves the set room. */
+.fk-pic__var:nth-child(n + 4) {
+  display: none;
+}
+
+.fk-pic__vars-head {
+  padding-block-end: var(--space-sm);
+  font: var(--type-body-md-bold);
+  letter-spacing: var(--type-body-md-bold-letter-spacing);
+  color: var(--text-bold);
+}
+
+.fk-pic__vars-mode {
+  justify-self: center;
+  font: var(--type-body-sm);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+  color: var(--text-subtle);
+}
+
+.fk-pic__var {
+  --bland-radius: var(--rad-sm);
+}
+
+.fk-pic__var[data-current] {
+  background: var(--surface-300);
+}
+
+.fk-pic__var-name {
+  overflow: hidden;
+  font: var(--type-code-body-sm);
+  letter-spacing: var(--type-code-body-sm-letter-spacing);
+  color: var(--text-bold);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* A swatch draws the variable itself in its mode (data-theme on the swatch), so it changes with the brand. */
+.fk-pic__swatch {
+  --bland-radius: var(--rad-xs);
+
+  justify-self: center;
+  width: var(--icon-md);
+  height: var(--icon-md);
+  background: var(--fk-var);
+  box-shadow: inset 0 0 0 var(--stroke-xs) var(--border-subtle);
+  transition-property: var(--landing-showcase-brand-props), scale;
+  transition-duration: var(--fk-hue);
+  transition-timing-function: var(--easing-out);
+}
+
+.fk-pic__swatch[data-pressed] {
+  scale: var(--fk-press-scale);
+}
+
+/* The code card: the selected variant's names in code, sliding up under its button, over the set. */
+.fk-pic__code {
+  --bland-radius: var(--rad-md);
+
+  position: absolute;
+  top: calc(100% + var(--space-md));
+  left: calc(-1 * var(--space-xs));
+  padding: var(--space-sm) var(--space-md);
+  /* Dark (data-theme), as the Variables card, so it reads over the white frame. */
+  background: var(--surface-100);
+  box-shadow:
+    var(--elevation-neutral-far),
+    inset 0 0 0 var(--stroke-sm) var(--border-subtle);
+  font: var(--type-code-body-sm);
+  letter-spacing: var(--type-code-body-sm-letter-spacing);
+  color: var(--code-text);
+  /* On a phone the names wrap to two lines inside the canvas; from md they keep one. */
+  width: var(--landing-figma-kit-code-width-sm);
+  opacity: 0;
+  translate: 0 var(--space-lg);
+  transition:
+    opacity var(--fk-travel) var(--landing-ease-glide),
+    translate var(--fk-travel) var(--landing-ease-glide);
+}
+
+.fk-pic__code[data-shown] {
+  opacity: 1;
+  translate: none;
+}
+
+.fk-pic__code [data-token="function"] {
+  color: var(--code-function);
+}
+
+.fk-pic__code [data-token="keyword"] {
+  color: var(--code-keyword);
+}
+
+.fk-pic__code [data-token="string"] {
+  color: var(--code-string);
+}
+
+/* The cursor: an arrow whose tip sits on its target's centre, gliding between targets and sinking as it presses. */
+.fk-pic__cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  display: block;
+  width: var(--icon-lg);
+  height: var(--icon-lg);
+  pointer-events: none;
+  translate: var(--x) var(--y);
+  transition:
+    translate var(--fk-travel) var(--landing-ease-glide),
+    opacity var(--duration-md) var(--easing-out);
+}
+
+.fk-pic__cursor[data-hidden] {
+  opacity: 0;
+}
+
+.fk-pic__arrow {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* The arrow's tip (5, 3 on its 24 grid) on the point, not its box's corner. */
+  margin: calc(var(--icon-lg) * -0.125) 0 0 calc(var(--icon-lg) * -0.208);
+  fill: var(--icon-bold);
+  stroke: var(--icon-on-color);
+  stroke-width: var(--stroke-md);
+  transform-origin: 21% 12.5%;
+  transition: scale var(--duration-sm) var(--easing-out);
+}
+
+.fk-pic__cursor[data-pressed] .fk-pic__arrow {
+  scale: var(--fk-press-scale);
+}
+
+@media (min-width: 768px) {
+  .fk-pic {
+    height: var(--landing-figma-kit-picture-height);
+  }
+
+  .fk-pic__panel {
+    display: flex;
+  }
+
+  .fk-pic__vars {
+    right: calc(var(--space-lg) + var(--fk-cut, 0px));
+    bottom: var(--space-lg);
+    padding: var(--space-md);
+  }
+
+  .fk-pic__vars-head,
+  .fk-pic__var {
+    grid-template-columns: minmax(0, 1fr) var(--space-3xl) var(--space-3xl);
+    padding-inline: var(--space-sm);
+  }
+
+  .fk-pic__var:nth-child(n + 4) {
+    display: grid;
+  }
+
+  .fk-pic__swatch {
+    width: var(--icon-lg);
+    height: var(--icon-lg);
+  }
+
+  .fk-pic__frame {
+    grid-template-columns: repeat(4, max-content);
+  }
+
+  .fk-pic__code {
+    width: max-content;
+    white-space: nowrap;
+  }
+
+  .fk-pic__button[data-type="ghost"],
+  .fk-pic__button[data-type="stroke"] {
+    display: flex;
+  }
+}
+
+/* ---------- Reduced motion: fades only, the poster, no cursor ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .fk[data-shown] .fk__word,
+  .fk[data-shown] .fk__block,
+  .fk[data-shown] .fk__visual,
+  .fk[data-shown] .fk__visual :is(.fk-pic__panel, .fk-pic__mode, .fk-pic__set-box, .fk-pic__vars, .fk-pic__button) {
+    animation-name: fk-fade;
+    animation-timing-function: var(--easing-out);
+  }
+
+  .fk-pic,
+  .fk-pic *,
+  .fk-pic__code,
+  .fk-pic__button,
+  .fk-pic__swatch {
+    transition: none;
+  }
+}
+
+/* Figma's rhythm and margin from tablet up (a phone's are tighter, above). */
+@media (min-width: 768px) {
+  .fk {
+    padding-block: var(--landing-figma-kit-pad);
+  }
+
+  .fk__grid {
+    --bland-grid-margin: var(--space-xl);
+
+    row-gap: var(--space-3xl);
+  }
+}
+
+/* From tablet the checklist is back under the copy's head, beside or above the picture. */
+@media (min-width: 768px) {
+  .fk__copy {
+    display: flex;
+  }
+
+  .fk__head,
+  .fk__list {
+    grid-column: auto;
+    max-width: none;
+  }
+
+  .fk__list {
+    order: 0;
+  }
+}

@@ -1,0 +1,49 @@
+/* The 404 page: logo, title, one line and two link buttons, centred on the page. */
+body {
+  margin: var(--space-none);
+  background-color: var(--surface-100);
+  color: var(--text-bold);
+}
+
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xl);
+  min-height: 100svh;
+  padding: var(--space-2xl) var(--space-lg);
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.not-found__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-width: var(--empty-state-width-lg);
+}
+
+.not-found__title {
+  margin: var(--space-none);
+  font: var(--type-heading-md);
+  letter-spacing: var(--type-heading-md-letter-spacing);
+}
+
+.not-found__description {
+  margin: var(--space-none);
+  color: var(--text-subtle);
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+}
+
+.not-found__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.not-found__actions .bland-button {
+  text-decoration: none;
+}

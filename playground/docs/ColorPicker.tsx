@@ -6,6 +6,7 @@ import { Menu } from '../../src/components/menu/Menu';
 import { CaretDownIcon } from '../../src/icons';
 import { channelsOf, CHANNELS, clamp, FORMAT_KEY, FORMATS, formatColor, fromChannels, normalHex, parseColor, toHex, toHsv, type ColorFormat, type Hsv } from './colorFormats';
 import { KnobMark } from './icons';
+import './color-picker.css';
 
 function savedFormat(): ColorFormat {
   try {

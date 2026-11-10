@@ -102,9 +102,9 @@ The site is the whole playground, Brand theme page included; anything hosted pub
 
 ### Cloudflare Pages (Godwin's pick, 2026-10-29)
 
-The public site is the landing page at `/` and the docs at `/docs/`. Godwin designs the landing page in Figma; until it is built, `/` redirects to `/docs/` (`site/_redirects`).
+The public site is the landing page at `/` and the docs at `/docs/`. `/` is the landing page (the old redirect to `/docs/` was removed 2026-11-10); `site/public/_redirects` is empty. Any path with no file gets `404.html` with a 404 status (Cloudflare Pages does this once the file exists).
 
-- `npm run site:build` builds the docs and assembles `dist-site/`: `docs/` plus everything in `site/` (today only `_redirects`; the landing page goes there).
+- `npm run site:build` builds the docs and assembles `dist-site/`: the landing page at the root, `404.html` (logo, "Page not found", links home and to the docs), `docs/` beside it, and the files in `site/public/` as they are: `_redirects`, `_headers` (security headers and immutable caching for hashed assets), `llms.txt`, `favicon.svg`, `apple-touch-icon.png` and `og.png` (the share card). `robots.txt` is written by the build; with `SITE_URL` set in `site/vite.config.ts` the build also writes the canonical link, an absolute `og:image` and `og:url`, `sitemap.xml` (`/` and `/docs/`) and the agent manifest `/.well-known/ard.json` (one entry, `llms.txt`). **Set `SITE_URL` when the domain is known**; until then the build warns and leaves them out (landing audit 2026-11-10, `docs/landing-audit-2026-11-10.md`). The build preloads the hero's two Inter files (`site/vite.config.ts`).
 - `.node-version` (24) sets Node for Cloudflare's build image.
 - Checked 2026-10-29 with Cloudflare's own local server (`npx wrangler pages dev dist-site`): `/` answers 302 to `/docs/`, `/docs` 308 to `/docs/`, pages, fonts and images load, no failed requests.
 - Free plan. Public by default; Cloudflare Access (Zero Trust, free up to 50 people) can put it behind an email sign-in.

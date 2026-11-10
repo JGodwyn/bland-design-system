@@ -13,7 +13,9 @@ Raw material for the skill we package at the end of the project: what an agent n
 ## Brand and colors
 
 - A project's brand is 13 `--brand-*` steps and 13 `--neutral-*` steps at `:root`, made on the docs site's Brand theme page (copy its CSS): that is the default to suggest. `npm run brand -- generate "#hex"` is fine too when someone prefers it (Godwin 2026-10-31), but it runs only in a clone of the Bland repo: the `bland-ui` npm package has no command, so `npm run brand` inside the project itself fails. Fonts need no tool: write the `--font-*` lines by hand. Never edit Bland's tokens to rebrand.
+- To show another brand in one area only (a theme preview, an illustration), set its `--brand-*` steps and `data-theme="light"` (or `"dark"`) on the same element: the theme rule recomputes Bland's roles from that element's steps. Steps alone on a nested element change nothing, since the roles are computed at `:root` (2026-11-07, landing page; `LEARNINGS.md`).
 - The entered color lands unchanged on the step its lightness belongs on; Fix contrast moves the other steps only. Never change a project's brand color to clear a contrast miss; a miss on that color's own step is the project's to keep or answer with another color.
+- To change fonts in one area only, set `--font-body` and `--font-heading` on an element with `data-theme="light"`, and put a dark `data-theme` on an element inside it if the area is dark: the text styles are computed only in the light theme rule, so fonts set on a dark element alone change nothing (2026-11-09, landing page; `LEARNINGS.md`).
 - Up to three extra colors (`--extra name=#hex`), for the project's own UI: charts, illustrations, a section, a tag. Bland's components never read them.
 - A new extra's default color is the next one in harmony with the brand (complement, then the square); pass a hex to choose your own.
 - **Use roles, not steps.** Brand: Bland's Theme tokens (`--surface-brand`, `--text-brand`, …). Extras: `--name-surface`, `-surface-strong`, `-surface-light`, `-text`, `-icon`, `-border`, which switch in dark mode. Raw steps (`--name-600`) are the same in both modes: only for something meant to look identical in light and dark.
@@ -47,6 +49,7 @@ Raw material for the skill we package at the end of the project: what an agent n
 - Variants are props (`size`, `emotion`, `type`), never class overrides. Defaults: most sizes default to sm or md; check the map.
 - Routers: links take `renderLink` (Breadcrumb, TabBar, Sidebar, Pagination, ListItem, Logo).
 - Sidebar peek: the minimized rail opens over the page, past its own box, so no ancestor may clip it (`overflow: hidden`) narrower than `--sidebar-width`.
+- `Logo` is the Bland logo (logomark and drawn wordmark), not a slot for a project's name: a project with its own name renders its own logo. `mono` for one color, `color="on-color" mono` on brand fills, `mark={false}` for the wordmark alone. `children` is deprecated (0.2.0, removed in 0.3.0).
 - Sidebar logo: pass `top` as `({ rail }) => rail ? <Mark /> : <Logo />` when the product has a logo mark; a plain `top` hides in the rail and the expand button takes its place.
 - Disabled uses the disabled tokens, never opacity.
 - Left to right only: right-to-left (RTL) layouts are not supported yet (Godwin 2026-11-03). Don't promise an RTL page with Bland; Toggle and Slider are known not to mirror.

@@ -1,0 +1,428 @@
+/*
+ * Landing page hero (Figma 7097:36095, the 1440 x 1024 frame). Figma's values are in landing-values.css
+ * (Godwin 2026-11-06: follow Figma exactly); the rest are Bland tokens.
+ *
+ *   section.hero
+ *     header.hero__nav-wrap > nav.hero__nav       Logo, three text links, Figma and GitHub icon links
+ *     div.hero__copy                              h1.hero__title (with two glow copies) + div.hero__action
+ *     p.hero__description
+ */
+
+.hero {
+  height: var(--landing-hero-track);
+}
+
+/*
+ * The stage stays on screen while the track scrolls past (Figma's 1440 x 1024 frame is one screen of it). Its
+ * own theme: light whatever the system says, dark from the last phrase (Figma 7087:36040), easing between.
+ */
+.hero__stage {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* The large viewport: on a phone the address bar slides away as the page scrolls and the screen grows; a stage
+     sized to the small one then slid up with it and left a band below (Godwin 2026-11-09). The extra bottom padding
+     keeps the description inside the small viewport, so the bar never covers it. Same as svh on desktop. */
+  height: 100lvh;
+  padding-inline: var(--space-lg);
+  padding-bottom: calc(var(--landing-hero-gap-bottom) + 100lvh - 100svh);
+  overflow: hidden;
+  background: var(--surface-100);
+  color: var(--text-bold);
+  transition: background-color var(--landing-theme-glide) var(--landing-ease-glide);
+}
+
+/* Nav: surface-200 bar, rad-lg, padding space-sm space-lg, links gap space-sm. */
+.hero__nav-wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding-top: var(--space-lg);
+}
+
+.hero__nav {
+  --bland-radius: var(--rad-lg);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  width: 100%;
+  max-width: var(--landing-nav-width);
+  /* A phone's bar is taller and its text larger (Godwin 2026-11-10: bigger); Figma's space-sm bar from md. */
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--rad-lg);
+  background: var(--surface-200);
+  transition:
+    background-color var(--landing-theme-glide) var(--landing-ease-glide),
+    opacity var(--landing-glide) var(--landing-ease-glide),
+    transform var(--landing-glide) var(--landing-ease-glide);
+}
+
+/* Entrance: the nav slides down into place. */
+.hero[data-entered] .hero__nav {
+  transition-delay: 0ms, var(--landing-nav-delay), var(--landing-nav-delay);
+}
+
+.hero:not([data-entered]) .hero__nav {
+  opacity: 0;
+  transform: translateY(calc(var(--space-lg) * -1));
+}
+
+.hero__logo {
+  font: var(--landing-nav-logo-font);
+}
+
+.hero__links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Text links: Body/body-md text-bold, padding 0 space-xs, rad-md (Figma "Menu item"). */
+.hero__link {
+  --bland-radius: var(--rad-md);
+
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-xs);
+  border-radius: var(--rad-md);
+  color: var(--text-bold);
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.hero__link--icon {
+  position: relative;
+  padding: 0;
+  color: var(--icon-bold);
+}
+
+/* The icon is icon/md (20); an invisible layer makes the tap target control/xs (24, WCAG 2.5.8) without moving
+   anything (landing audit 2026-11-10). */
+.hero__link--icon::after {
+  content: '';
+  position: absolute;
+  inset: calc((var(--icon-md) - var(--control-xs)) / 2);
+}
+
+/* On a phone only Docs and GitHub sit beside the logo (Godwin 2026-11-10: add Docs, drop the Figma icon); the
+   other two text links and the Figma icon come back from breakpoint/sm. */
+.hero__links > li:not(:has(.hero__link--icon)):not(:first-child),
+.hero__links > li.hero__nav-figma {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hero__link:not(.hero__link--icon):hover {
+    text-decoration: underline;
+  }
+}
+
+/* Headline block: 848 wide, centred; the button sits over its middle (Figma: 32 below centre). */
+.hero__copy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2xl);
+  width: 100%;
+  max-width: var(--landing-hero-title-width);
+  margin-top: var(--landing-hero-gap-top);
+}
+
+.hero__title {
+  width: 100%;
+  margin: 0;
+  font: var(--landing-hero-title-font-sm);
+  letter-spacing: var(--landing-hero-title-tracking);
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
+/* Figma's three lines at every width (Godwin 2026-11-10: the phone's headline too). */
+.hero__break {
+  display: inline;
+}
+
+/*
+ * One word: its real text is the outline (no fill, a stroke-sm text-minimal edge, Figma's stroked copy); over it
+ * the bold fill, under it the glow. Scroll sets --bold from 1 to 0, word by word: the bold fill and its glow
+ * fade straight to the outline (Godwin 2026-11-07: no gray step).
+ */
+.hero__title {
+  position: relative;
+}
+
+.hero__word {
+  position: relative;
+  display: inline-block;
+}
+
+/*
+ * Entrance: every character rises into place from --landing-char-rise below, one after another
+ * (--landing-char-stagger apart, by its place in the headline, --c), fading in as it comes. All of a word's
+ * layers (outline, bold, glow) hold the same characters with the same --c, so they move as one.
+ */
+.hero__char {
+  display: inline-block;
+  transition:
+    opacity var(--landing-char-duration) var(--landing-ease-glide),
+    transform var(--landing-char-duration) var(--landing-ease-glide);
+  transition-delay: calc(var(--c) * var(--landing-char-stagger));
+}
+
+.hero:not([data-entered]) .hero__char {
+  opacity: 0;
+  transform: translateY(var(--landing-char-rise));
+  transition: none;
+}
+
+/*
+ * Figma's stroke is outside the letters, 1px. Here: a stroke-lg stroke painted under a fill in the stage's own
+ * color, so the inner half and the font's overlapping inner contours (the t and f bars, inside e) are covered
+ * and a clean stroke-sm edge shows outside.
+ */
+.hero__word-outline {
+  color: var(--surface-100);
+  -webkit-text-stroke: var(--stroke-lg) var(--text-minimal);
+  paint-order: stroke fill;
+  opacity: calc(1 - var(--bold));
+  will-change: opacity;
+  transition:
+    color var(--landing-theme-glide) var(--landing-ease-glide),
+    -webkit-text-stroke-color var(--landing-theme-glide) var(--landing-ease-glide);
+}
+
+.hero__word-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+/*
+ * The bold fill carries the glow as its own text shadow (Godwin 2026-11-09): Figma's purple a little above, blue a
+ * little below. It used to be 48 blurred copies (8 a word), 237 MB of GPU memory on a phone, more than Chrome keeps,
+ * so it dropped the headline for whole frames. Now each word is two layers, fill and outline, each on its own
+ * compositor layer, so scrolling changes only their opacity and nothing is repainted.
+ */
+.hero__word-bold {
+  color: var(--text-bold);
+  opacity: var(--bold);
+  text-shadow: var(--landing-hero-glow-shadow);
+  will-change: opacity;
+}
+
+/* The words paint over their glow: the block's own stacking context keeps z-index -1 inside it. */
+.hero__copy {
+  isolation: isolate;
+}
+
+/* On touch the button sits under the headline, always there once it comes in: after the headline's last character
+   has risen (data-ready, Godwin 2026-11-10), rising a little as it fades in. */
+.hero__action {
+  opacity: 0;
+  transform: translateY(var(--space-sm));
+  transition:
+    opacity var(--landing-glide) var(--landing-ease-glide),
+    transform var(--landing-glide) var(--landing-ease-glide);
+}
+
+.hero[data-ready] .hero__action {
+  opacity: 1;
+  transform: none;
+}
+
+.hero__action .bland-button {
+  box-shadow: var(--elevation-brand-far);
+  /* A real link drawn with the Button's classes (2026-11-10); the hand comes from Bland's Button. */
+  text-decoration: none;
+}
+
+/*
+ * Description: centred, 560 wide, Figma's 72 above the bottom of the screen. Its words start text-minimal and
+ * turn text-bold one by one as the track scrolls (Figma 7087:35855: inactive gray, active black).
+ */
+.hero__description {
+  position: relative;
+  max-width: var(--landing-hero-description-width);
+  margin: auto 0 0;
+  padding-top: var(--landing-hero-gap-middle);
+  color: var(--text-minimal);
+  font: var(--landing-hero-description-font);
+  letter-spacing: var(--landing-hero-description-tracking);
+  text-align: center;
+}
+
+/* Each word's ink: its color slides from text-minimal to text-bold with --ink (the mix is in landing-values.css,
+   the token lint's one exception, as color-mix is a raw color function). The scroll sets --ink every frame, so
+   the color has no transition of its own: one would restart every frame and chase the scroll, which stutters.
+   On load the words rise in after the headline, one after another (--d, their place in the description). */
+.hero__desc-word {
+  display: inline-block;
+  transition:
+    opacity var(--landing-char-duration) var(--landing-ease-glide),
+    transform var(--landing-char-duration) var(--landing-ease-glide);
+  transition-delay:
+    calc(var(--landing-description-delay) + var(--d) * var(--landing-description-stagger)),
+    calc(var(--landing-description-delay) + var(--d) * var(--landing-description-stagger));
+}
+
+.hero:not([data-entered]) .hero__desc-word {
+  opacity: 0;
+  transform: translateY(var(--landing-description-rise));
+  transition: none;
+}
+
+/*
+ * A lit phrase gets a highlighter stroke (Godwin 2026-11-07, in place of Figma's blue pill): a rough, translucent
+ * highlighter-yellow stroke (--landing-marker-color, Godwin 2026-11-10) over the lower part of the words, an SVG built in marker.ts and set by Hero.tsx as
+ * --landing-marker-image, stretched to each line. Drawn left to right in one stroke; the words stay as they are.
+ * Going out it wipes away toward the right: lit it grows from the left, unlit it shrinks to the right.
+ */
+.hero__phrase {
+  padding-inline: var(--space-xs);
+  background-image: var(--landing-marker-image);
+  background-repeat: no-repeat;
+  background-position: right;
+  background-size: 0% 100%;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: background-size var(--landing-glide-out) var(--landing-ease-glide);
+}
+
+.hero__phrase[data-lit] {
+  background-position: left;
+  /* Ink on yellow in both themes: once the hero is dark a lit phrase keeps the light theme's text, as a real
+     highlighter does (white on yellow is unreadable). Hero.tsx sets data-theme="light" on it. */
+  background-size: 100% 100%;
+  transition: background-size var(--landing-glide) var(--landing-ease-marker);
+}
+
+/*
+ * The newest marked phrase's icon pops in (Godwin 2026-11-07): from --landing-pop-from of its size and a small
+ * turn, past full size and back (--landing-ease-pop, a back-out curve whose overshoot DialKit sets), with a quick
+ * fade. When the next phrase is reached it leaves, smaller and quickly; the highlight stays.
+ */
+.hero__phrase-icon {
+  position: absolute;
+  width: var(--icon-w);
+  height: var(--icon-h);
+  opacity: 0;
+  transform: scale(var(--landing-pop-from)) rotate(-12deg);
+  transition:
+    opacity var(--landing-glide-out) var(--landing-ease-glide),
+    transform var(--landing-glide-out) var(--landing-ease-glide);
+  pointer-events: none;
+}
+
+.hero__phrase[data-current] .hero__phrase-icon {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity calc(var(--landing-pop) * 0.4) var(--landing-ease-glide),
+    transform var(--landing-pop) var(--landing-ease-pop);
+}
+
+@media (min-width: 640px) {
+  .hero__links > li:not(:has(.hero__link--icon)):not(:first-child),
+  .hero__links > li.hero__nav-figma {
+    display: list-item;
+  }
+}
+
+@media (min-width: 768px) {
+  .hero__nav-wrap {
+    padding-top: var(--landing-nav-top);
+  }
+
+  /* Figma's bar: space-sm tall padding, Body/body-md links. */
+  .hero__nav {
+    padding-block: var(--space-sm);
+  }
+
+  .hero__link {
+    font: var(--type-body-md);
+    letter-spacing: var(--type-body-md-letter-spacing);
+  }
+}
+
+/* From tablet width the desktop size. */
+@media (min-width: 768px) {
+  .hero__title {
+    font: var(--landing-hero-title-font);
+  }
+}
+
+/*
+ * The button comes out while the pointer is over the headline, or keyboard focus reaches it (Figma
+ * annotation). It sits over the middle of the headline, as in Figma. Only with a fine pointer: on touch it
+ * stays in the flow under the headline, always shown.
+ */
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) {
+  /* Magnetic: Hero.tsx eases --magnet-x / --magnet-y toward the pointer every frame (no CSS transition). */
+  /* As specific as the touch rule's ready state, so a fine pointer keeps the button hidden until hover. */
+  .hero .hero__action,
+  .hero[data-ready] .hero__action {
+    position: absolute;
+    top: calc(50% + var(--space-2xl));
+    left: 50%;
+    translate: var(--magnet-x, 0) var(--magnet-y, 0);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+    transition:
+      opacity var(--duration-md) var(--easing-out),
+      transform var(--duration-md) var(--easing-out);
+    pointer-events: none;
+  }
+
+  .hero[data-ready] .hero__copy:hover .hero__action,
+  .hero[data-ready] .hero__copy:focus-within .hero__action {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+    pointer-events: auto;
+  }
+}
+
+/* Reduced motion: no movement. Words, nav and icons only fade; pills appear without being drawn; the headline
+   and description change in steps (Hero.tsx), each crossfaded. */
+@media (prefers-reduced-motion: reduce) {
+  /* The touch button fades in without its rise (a fine pointer's rule, below, keeps its own centring). */
+  .hero__action {
+    transform: none;
+  }
+
+  .hero__nav,
+  .hero__char,
+  .hero__desc-word,
+  .hero__phrase-icon {
+    transform: none !important;
+  }
+
+  .hero__phrase,
+  .hero__phrase[data-lit] {
+    transition: none;
+  }
+
+  .hero__word-outline,
+  .hero__word-bold {
+    transition: opacity var(--duration-md) var(--easing-out);
+  }
+}
+
+/* Reduced motion: the button still fades in, without the scale. */
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) and (prefers-reduced-motion: reduce) {
+  .hero .hero__action,
+  .hero[data-ready] .hero__action {
+    transition-property: opacity;
+    transform: translate(-50%, -50%);
+  }
+}

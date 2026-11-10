@@ -1,0 +1,245 @@
+/*
+ * Landing page footer (Footer.tsx). Tokens and --landing-footer-* values (landing-values.css) only.
+ *
+ *   footer.ft[data-theme=dark]
+ *     div.ft__inner                       Figma's 848 column, centred, space-2xl apart
+ *       div.ft__block.ft__logo             Logo (mono), Figma's lg Logo at 1.2
+ *       h2.ft__title > span.ft__line > span.ft__word (glow x2, outline, bold)
+ *       div.ft__block.ft__install          CodeText lg, Figma's scaled instance
+ *       div.ft__block > CodeSnippet
+ *       nav.ft__block > ul.ft__links       three pills and the npm mark
+ *       p.ft__block.ft__copyright
+ */
+
+.ft {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--landing-footer-height);
+  padding: var(--landing-footer-pad) var(--layout-margin-mobile);
+  background: var(--surface-100);
+  color: var(--text-bold);
+  /* The glow copies have room around them for their blur; on a phone it reached past the screen's edge. */
+  overflow-x: clip;
+}
+
+.ft__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2xl);
+  width: 100%;
+  max-width: var(--landing-footer-width);
+  min-width: 0;
+}
+
+/* ---- Headline ---------------------------------------------------------------------------------------------- */
+
+.ft__title {
+  position: relative;
+  isolation: isolate;
+  margin: 0;
+  font: var(--landing-footer-title-font);
+  letter-spacing: var(--landing-footer-title-tracking);
+  overflow-wrap: break-word;
+}
+
+.ft__line {
+  display: block;
+}
+
+/*
+ * One word: its real text is the outline (no fill, a text-minimal edge, the hero's stroked copy); over it the bold
+ * fill, under it the glow. Scrolling in sets --bold from 0 to 1, word by word.
+ */
+.ft__word {
+  position: relative;
+  display: inline-block;
+}
+
+.ft__char {
+  display: inline-block;
+  transition:
+    opacity var(--ft-char) var(--landing-ease-glide),
+    transform var(--ft-char) var(--landing-ease-glide);
+  transition-delay: calc(var(--c) * var(--ft-char-stagger));
+}
+
+.ft:not([data-shown]) .ft__char {
+  opacity: 0;
+  transform: translateY(var(--ft-char-rise));
+  transition: none;
+}
+
+/* A stroke-lg stroke under a fill in the page color, so a clean stroke-sm edge shows outside (the hero's). */
+.ft__word-outline {
+  color: var(--surface-100);
+  -webkit-text-stroke: var(--stroke-lg) var(--text-minimal);
+  paint-order: stroke fill;
+  opacity: calc(1 - var(--bold));
+}
+
+.ft__word-bold {
+  position: absolute;
+  inset: 0;
+  color: var(--text-bold);
+  opacity: var(--bold);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Figma's two glow copies, each at 75%: pink blurred 16, one pixel up; Text/text-brand blurred 4, one pixel down. */
+.ft__glow {
+  position: absolute;
+  inset: calc(var(--ft-glow-pad) * -1);
+  z-index: -1;
+  padding: var(--ft-glow-pad);
+  opacity: calc(var(--bold) * var(--ft-glow-opacity));
+  pointer-events: none;
+  user-select: none;
+}
+
+.ft__glow--outer {
+  color: var(--landing-hero-glow-outer);
+  filter: blur(var(--ft-glow-outer-blur));
+  translate: 0 var(--landing-hero-glow-outer-y);
+}
+
+.ft__glow--inner {
+  color: var(--text-brand);
+  filter: blur(var(--ft-glow-inner-blur));
+  translate: 0 var(--landing-hero-glow-inner-y);
+}
+
+/* ---- The blocks under it ----------------------------------------------------------------------------------- */
+
+.ft__block {
+  min-width: 0;
+  max-width: 100%;
+  transition:
+    opacity var(--ft-block) var(--landing-ease-glide),
+    transform var(--ft-block) var(--landing-ease-glide);
+  transition-delay: calc(var(--ft-block-delay) + var(--b) * var(--ft-block-stagger));
+}
+
+.ft:not([data-shown]) .ft__block {
+  opacity: 0;
+  transform: translateY(var(--ft-block-rise));
+  transition: none;
+}
+
+/* The logo comes in with the headline's first characters, not after them: it sits above it (the blocks below wait). */
+.ft__logo {
+  transition-delay: 0ms;
+}
+
+/* Figma's Logo is the lg one at 1.2 (48 tall, the gap 2.4); zoom scales its mark, wordmark and gap together. */
+.ft__logo .bland-logo {
+  zoom: var(--landing-footer-logo-zoom);
+}
+
+/* Figma's Code-text is the lg one scaled up (30.8 on 16); zoom keeps its copy button and status with it. */
+.ft__install .bland-code-text {
+  zoom: var(--landing-footer-install-zoom);
+}
+
+.ft__block:has(.ft__snippet) {
+  align-self: stretch;
+}
+
+/* ---- Links ------------------------------------------------------------------------------------------------- */
+
+.ft__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Each item as tall as its pill or mark: a list item's line box adds descender room under them, which put the npm
+   mark's centre 2px above the pills'. */
+.ft__links > li {
+  display: flex;
+}
+
+/* Figma's Menu item pills: body-lg, padding space-2xs space-sm, space-xs between icon and label, rad-md. */
+.ft__link {
+  --bland-radius: var(--rad-md);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--rad-md);
+  background: var(--surface-200);
+  color: var(--text-bold);
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+  text-decoration: none;
+}
+
+.ft__link .bland-icon {
+  color: var(--icon-subtle);
+}
+
+.ft__link--primary {
+  background: var(--surface-inverse);
+  color: var(--text-inverse);
+}
+
+.ft__link--primary .bland-icon {
+  color: var(--icon-inverse);
+}
+
+/* Hover underlines the label only, as Bland's links do (body-lg-underline keeps its size). */
+@media (hover: hover) and (pointer: fine) {
+  .ft__link:hover .ft__label {
+    font: var(--type-body-lg-underline);
+    text-decoration: underline;
+  }
+
+  .ft__mark:hover {
+    color: var(--icon-subtle);
+  }
+}
+
+.ft__mark {
+  --bland-radius: var(--rad-sm);
+
+  display: inline-flex;
+  border-radius: var(--rad-sm);
+  color: var(--icon-bold);
+  /* Set space-2xs below the row's centre line (Godwin 2026-11-09: the wordmark read high beside the pills). */
+  translate: 0 var(--space-2xs);
+}
+
+.ft__npm {
+  display: block;
+  width: var(--landing-footer-npm-width);
+  height: var(--icon-md);
+}
+
+.ft__copyright {
+  margin: 0;
+  color: var(--text-subtle);
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+}
+
+/* ---- Reduced motion: no movement; the headline turns bold in one step (Footer.tsx), crossfaded ------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ft__char,
+  .ft__block {
+    transform: none !important;
+  }
+
+  .ft__word-outline,
+  .ft__word-bold,
+  .ft__glow {
+    transition: opacity var(--duration-md) var(--easing-out);
+  }
+}

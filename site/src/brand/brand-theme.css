@@ -1,0 +1,565 @@
+/*
+ * Landing page "Brand theme" (Figma 7066:28878). Tokens only; Figma's own values are --landing-brand-* in
+ * landing-values.css, the example brand's steps are .brand-pink there. Mobile first: the copy over the picture,
+ * scrolling normally; from breakpoint/md a sticky stepper beside it, Figma's columns 2 to 4 and 5 to 7 from xl.
+ */
+
+.brand-sec {
+  position: relative;
+  padding-block: var(--space-7xl);
+  background: var(--surface-100);
+  color: var(--text-bold);
+}
+
+.brand-sec__grid {
+  row-gap: var(--space-2xl);
+  align-items: center;
+}
+
+.brand-sec__copy {
+  --span-md: 3;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xl);
+}
+
+.brand-sec__visual {
+  --span-md: 3;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+@media (min-width: 768px) {
+  /* A track of one screen plus each step's share; the stage holds the screen while it passes. */
+  .brand-sec {
+    height: calc(100svh + var(--brand-sec-steps) * var(--brand-sec-screens-per-step) * 100svh);
+    padding-block: 0;
+  }
+
+  .brand-sec__stage {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    height: 100svh;
+  }
+
+  .brand-sec__grid {
+    width: 100%;
+  }
+}
+
+/* More room between the steps and the picture (Godwin 2026-11-08): the copy keeps clear of the picture by
+   space-3xl from breakpoint/md; from xl the picture also moves space-6xl into the empty eighth column. */
+@media (min-width: 768px) {
+  .brand-sec__copy {
+    padding-inline-end: var(--space-3xl);
+  }
+}
+
+@media (min-width: 1280px) {
+  .brand-sec__copy {
+    grid-column: 2 / span 3;
+    padding-inline-end: 0;
+  }
+
+  .brand-sec__visual {
+    margin-inline-start: var(--space-6xl);
+  }
+}
+
+/* The tag: Figma's brand-light pill with Body/body-lg-bold text-brand. */
+.brand-sec__tag {
+  --bland-radius: var(--rad-md);
+
+  margin: 0;
+  padding-inline: var(--space-sm);
+  background: var(--surface-brand-light);
+  font: var(--type-body-lg-bold);
+  letter-spacing: var(--type-body-lg-bold-letter-spacing);
+  color: var(--text-brand);
+}
+
+.brand-sec__steps {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Each step sits on a light rule; the current step's dark bar fills along it as you scroll through the step
+   (or, on a phone, over the step's time), after Granola's (Godwin 2026-11-08). --fill is set from the scroll in
+   BrandTheme.tsx. */
+.brand-sec__item {
+  position: relative;
+}
+
+.brand-sec__rule {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: var(--stroke-sm);
+  background: var(--border-subtle);
+}
+
+.brand-sec__fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--stroke-lg);
+  /* Brand blue (Godwin 2026-11-08). */
+  background: var(--border-brand);
+  transform-origin: left center;
+  scale: var(--fill, 0) 1;
+}
+
+/* Phone: the bar is the step's timer; its end moves on to the next step (onAnimationEnd). */
+.brand-sec[data-auto] .brand-sec__item[data-current] .brand-sec__fill {
+  animation: brand-sec-fill var(--brand-sec-phone-step) var(--easing-linear) both;
+}
+
+.brand-sec[data-auto][data-paused] .brand-sec__item[data-current] .brand-sec__fill {
+  animation-play-state: paused;
+}
+
+@media (min-width: 768px) {
+  .brand-sec[data-auto] .brand-sec__item[data-current] .brand-sec__fill {
+    animation: none;
+  }
+}
+
+@keyframes brand-sec-fill {
+  from {
+    scale: 0 1;
+  }
+
+  to {
+    scale: 1 1;
+  }
+}
+
+/* A step: its small line and its headline, laid over each other in a row that clips them. The row's height
+   eases between the two (--h-small, --h-big, measured in BrandTheme.tsx); on a change the layers roll through
+   the row (Web Animations there). The hidden layer is simply not shown. No scaling, blur or fade (Godwin
+   2026-11-08). */
+.brand-sec__step {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: calc(var(--h-small, var(--type-body-lg-line-height)) + 2 * var(--space-sm));
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: none;
+  text-align: start;
+  cursor: pointer;
+  transition: height var(--brand-sec-roll) var(--easing-out);
+}
+
+.brand-sec__item[data-current] .brand-sec__step {
+  height: calc(var(--h-big, var(--type-heading-lg-line-height)) + 2 * var(--space-sm));
+  cursor: default;
+}
+
+.brand-sec__layer {
+  position: absolute;
+  top: var(--space-sm);
+  right: 0;
+  left: 0;
+}
+
+.brand-sec__layer[data-layer="small"] {
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+  color: var(--text-subtle);
+}
+
+.brand-sec__layer[data-layer="big"] {
+  font: var(--type-heading-sm);
+  letter-spacing: var(--landing-brand-step-tracking);
+  color: var(--text-bold);
+  visibility: hidden;
+}
+
+@media (min-width: 768px) {
+  .brand-sec__layer[data-layer="big"] {
+    font: var(--type-heading-lg);
+    letter-spacing: var(--landing-brand-step-tracking);
+  }
+}
+
+.brand-sec__item[data-current] [data-layer="big"] {
+  visibility: visible;
+}
+
+.brand-sec__item[data-current] [data-layer="small"] {
+  visibility: hidden;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .brand-sec__item:not([data-current]) .brand-sec__step:hover [data-layer="small"] {
+    color: var(--text-bold);
+  }
+}
+
+/* Figma's card: surface-raised with a border-subtle line, the picture inset by it. */
+.brand-sec__card {
+  --bland-radius: var(--rad-lg);
+
+  position: relative;
+  display: grid;
+  /* One cell the card's own size, so a tall picture (the code) scrolls inside instead of growing the row. */
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  height: var(--landing-brand-picture-height);
+  overflow: hidden;
+  /* Tinted, not gray (Godwin 2026-11-08): each picture fills the card with the light tint of the brand it shows. */
+  background: var(--surface-brand-light);
+  box-shadow: inset 0 0 0 var(--stroke-sm) var(--border-subtle);
+}
+
+/* The three pictures share the card and crossfade. */
+.brand-sec__picture {
+  grid-area: 1 / 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity var(--brand-sec-crossfade) var(--easing-out);
+}
+
+.brand-sec__picture[data-current] {
+  opacity: 1;
+}
+
+.brand-sec__visual .brand-sec__note {
+  /* Fills the picture's width (Godwin 2026-11-08): Alert caps itself at alert/max-width (384); here it lines
+     up with the card above it instead. */
+  max-width: none;
+}
+
+/* ---------- 1 Pick: the picker and the scales it makes ---------- */
+
+.pick-pic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xl);
+  height: 100%;
+  padding-inline: var(--space-lg);
+  background: var(--surface-brand-light);
+  transition: background-color var(--features-hue) var(--easing-out);
+}
+
+.pick-pic__panel {
+  --bland-radius: var(--rad-md);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: min(var(--landing-features-form-width), 100%);
+  padding: var(--space-md);
+  background: var(--surface-raised);
+  box-shadow: var(--elevation-neutral-near);
+}
+
+.pick-pic__field {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-sm);
+}
+
+.pick-pic__swatch {
+  --bland-radius: var(--rad-sm);
+
+  flex: none;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  background: var(--surface-brand);
+  transition: background-color var(--features-hue) var(--easing-out);
+}
+
+.pick-pic__field .pick-pic__input {
+  flex: 1;
+  min-width: 0;
+}
+
+.pick-pic__hue {
+  position: relative;
+  height: var(--space-sm);
+  border-radius: var(--rad-rd);
+  background: var(--landing-brand-hue-strip);
+}
+
+.pick-pic__hue-dot {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--hue) * 100%);
+  width: var(--space-lg);
+  height: var(--space-lg);
+  border-radius: var(--rad-rd);
+  translate: -50% -50%;
+  background: var(--surface-brand);
+  box-shadow:
+    0 0 0 var(--stroke-lg) var(--surface-raised),
+    var(--elevation-neutral-near);
+  transition:
+    left var(--features-travel) var(--easing-in-out),
+    background-color var(--features-hue) var(--easing-out);
+}
+
+.pick-pic__scales {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: min(var(--landing-features-chart-width), 100%);
+}
+
+.pick-pic__scale {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.pick-pic__scale-name,
+.pick-pic__note {
+  font: var(--type-body-sm);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+  color: var(--text-subtle);
+}
+
+.pick-pic__steps {
+  display: grid;
+  grid-template-columns: repeat(13, minmax(0, 1fr));
+  gap: var(--space-2xs);
+}
+
+/* Each step takes its new color left to right, as if fanned out from the one you typed. */
+.pick-pic__step {
+  height: var(--space-xl);
+  border-radius: var(--rad-xs);
+  background: var(--s);
+  box-shadow: inset 0 0 0 var(--stroke-xs) var(--border-subtle);
+  transition: background-color var(--features-hue) var(--easing-out);
+  transition-delay: calc(var(--i) * var(--features-swatch-stagger) * 2);
+}
+
+.pick-pic__step[data-yours] {
+  box-shadow:
+    0 0 0 var(--stroke-lg) var(--surface-raised),
+    0 0 0 calc(var(--stroke-lg) * 2) var(--border-bold);
+}
+
+/* ---------- 2 Check: four pairings, one fixed ---------- */
+
+.check-pic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding-inline: var(--space-lg);
+  background: var(--surface-brand-light);
+  transition: background-color var(--features-hue) var(--easing-out);
+}
+
+.check-pic__list {
+  --bland-radius: var(--rad-md);
+
+  display: flex;
+  flex-direction: column;
+  width: min(var(--landing-features-chart-width), 100%);
+  padding: var(--space-xs);
+  background: var(--surface-raised);
+  box-shadow: var(--elevation-neutral-near);
+  transition:
+    opacity var(--duration-lg) var(--easing-out),
+    translate var(--duration-lg) var(--easing-out);
+}
+
+/* The loop's reset: the list leaves as one, then comes back failing again. */
+.check-pic__list[data-leaving] {
+  opacity: 0;
+  translate: 0 var(--space-xs);
+}
+
+.check-pic__row {
+  --bland-radius: var(--rad-sm);
+
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs);
+  border-radius: var(--rad-sm);
+  transition: background-color var(--duration-lg) var(--easing-out);
+}
+
+.check-pic__row[data-failing] {
+  background: var(--surface-danger-light);
+}
+
+.check-pic__sample {
+  --bland-radius: var(--rad-sm);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-6xl);
+  height: var(--control-sm);
+  background: var(--surface-100);
+  box-shadow: inset 0 0 0 var(--stroke-sm) var(--border-subtle);
+}
+
+.check-pic__link {
+  font: var(--type-body-md);
+  text-decoration: underline;
+  letter-spacing: var(--type-body-md-letter-spacing);
+  color: var(--text-link);
+}
+
+.check-pic__sample .check-pic__progress {
+  width: var(--space-4xl);
+}
+
+.check-pic__what {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.check-pic__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-body-sm-bold);
+  letter-spacing: var(--type-body-sm-bold-letter-spacing);
+  color: var(--text-bold);
+}
+
+.check-pic__mode {
+  font: var(--type-body-sm);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+  color: var(--text-subtle);
+}
+
+.check-pic__ratio {
+  font: var(--type-code-body-sm);
+  letter-spacing: var(--type-code-body-sm-letter-spacing);
+  color: var(--text-bold);
+}
+
+.check-pic__fix {
+  display: inline-flex;
+  transition: scale var(--duration-sm) var(--easing-out);
+}
+
+.check-pic__fix[data-pressed] {
+  scale: 0.97;
+}
+
+/* ---------- 3 Copy: the real brand.css and a card that wears it ---------- */
+
+/* The snippet sits inside the tinted card with room on every side (Godwin 2026-11-08: more padding outside the
+   code), running off only its foot, where the lines are filler. */
+.copy-pic {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--space-2xl) var(--space-2xl) 0;
+  background: var(--surface-brand-light);
+  transition: background-color var(--features-hue) var(--easing-out);
+}
+
+.copy-pic .copy-pic__code {
+  flex: 1;
+  min-height: 0;
+  box-shadow: var(--elevation-neutral-near);
+}
+
+/* The file card: a satellite straddling the snippet's lower right corner. A row (file icon, the file's name in
+   code type, the switch) over a rule and a preview that wears whatever is loaded. */
+.copy-pic__app {
+  --bland-radius: var(--rad-md);
+
+  position: absolute;
+  right: var(--space-lg);
+  bottom: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  width: var(--landing-brand-file-card-width);
+  background: var(--surface-raised);
+  box-shadow: var(--elevation-neutral-mid);
+}
+
+.copy-pic__file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.copy-pic__file-icon {
+  color: var(--icon-subtle);
+}
+
+.copy-pic__file-name {
+  flex: 1;
+  min-width: 0;
+  font: var(--type-code-body-md);
+  letter-spacing: var(--type-code-body-md-letter-spacing);
+  color: var(--text-bold);
+}
+
+.copy-pic__preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  box-shadow: inset 0 var(--stroke-sm) 0 var(--border-subtle);
+}
+
+.copy-pic__preview-lines {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+/* Placeholder lines (Stageshow: filler, not words, beside the real parts). */
+.copy-pic__bar {
+  height: var(--space-sm);
+  border-radius: var(--rad-rd);
+  background: var(--surface-200);
+}
+
+.copy-pic__bar--short {
+  width: 60%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-sec__fill {
+    transition: none;
+  }
+
+
+  .brand-sec__step,
+  .pick-pic__hue-dot,
+  .check-pic__list,
+  .check-pic__fix {
+    transition: none;
+  }
+
+  .brand-sec__picture {
+    transition: opacity var(--duration-md) var(--easing-out);
+  }
+}

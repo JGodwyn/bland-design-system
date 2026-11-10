@@ -1,0 +1,622 @@
+/*
+ * The feature cards' pictures (cards.ts), shown in the feature row (row/row.css lays out the cards). Tokens only;
+ * the few Figma or picture-specific values are --landing-features-* in landing-values.css, and story timings are
+ * --features-*, set on the row from timing.ts. The grid these were first built for was removed (Godwin 2026-11-08).
+ */
+
+/* Roll.tsx: the new value rises in from below as the old one leaves upward, in one grid cell. */
+.features-roll {
+  display: inline-grid;
+  min-width: 0;
+}
+
+.features-roll__value {
+  grid-area: 1 / 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.features-roll__value[data-roll="in"] {
+  animation: features-roll-in var(--duration-lg) var(--easing-out) both;
+}
+
+.features-roll__value[data-roll="out"] {
+  animation: features-roll-out var(--duration-lg) var(--easing-out) both;
+}
+
+@keyframes features-roll-in {
+  from {
+    opacity: 0;
+    translate: 0 60%;
+  }
+}
+
+@keyframes features-roll-out {
+  to {
+    opacity: 0;
+    translate: 0 -60%;
+  }
+}
+
+/* ---------- Over 45 components: a wall of parts, off both sides ---------- */
+
+.components-pic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.components-pic__wall {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.components-pic__row {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-xl);
+  white-space: nowrap;
+}
+
+.components-pic__part {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  opacity: 0;
+  translate: 0 var(--space-sm);
+  scale: var(--landing-features-arrive-scale);
+  transition:
+    opacity var(--features-arrive) var(--landing-ease-glide),
+    translate var(--features-arrive) var(--landing-ease-glide),
+    scale var(--features-arrive) var(--landing-ease-glide);
+  transition-delay: calc(var(--i) * var(--features-arrive-stagger));
+}
+
+.components-pic__part[data-width] > * {
+  flex: 1;
+}
+
+.components-pic__part[data-width="slider"],
+.components-pic__part[data-width="progress"] {
+  width: var(--landing-features-slider-width);
+}
+
+.components-pic__part[data-width="segments"],
+.components-pic__part[data-width="search"] {
+  width: var(--landing-features-field-width);
+}
+
+.components-pic:not([data-step="0"]) .components-pic__part {
+  opacity: 1;
+  translate: 0 0;
+  scale: 1;
+}
+
+/* The wall's Slider glides to its new value (Godwin 2026-11-08: it snapped). Bland's Slider moves at once on
+   purpose, since it follows a drag; only the picture's story moves it, so the transition is the picture's. */
+.components-pic .bland-slider__thumb {
+  transition:
+    left var(--features-travel) var(--easing-in-out),
+    background-color var(--duration-xs) var(--easing-ease);
+}
+
+.components-pic .bland-slider__bar {
+  transition:
+    left var(--features-travel) var(--easing-in-out),
+    right var(--features-travel) var(--easing-in-out);
+}
+
+/* ---------- Light and dark: one card, a line sweeping across ---------- */
+
+.theme-pic {
+  position: relative;
+  height: 100%;
+  cursor: col-resize;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* While dragged, or while a mouse is over the picture, the line and the dark half follow the pointer at once. */
+.theme-pic[data-dragging] .theme-pic__layer--dark,
+.theme-pic[data-dragging] .theme-pic__line {
+  transition: none;
+}
+
+.theme-pic__layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  padding-inline: var(--space-lg);
+  background: var(--surface-200);
+}
+
+@media (min-width: 768px) {
+  .theme-pic__layer {
+    padding-inline: var(--space-xl);
+  }
+}
+
+.theme-pic__layer--dark {
+  clip-path: inset(0 0 0 calc(var(--split) * 100%));
+  transition: clip-path var(--features-travel) var(--easing-in-out);
+}
+
+.theme-pic .theme-pic__card {
+  width: min(var(--notification-width), 100%);
+}
+
+.theme-pic__line {
+  position: absolute;
+  inset: 0;
+  translate: calc(var(--split) * 100%) 0;
+  pointer-events: none;
+  transition: translate var(--features-travel) var(--easing-in-out);
+}
+
+.theme-pic__line::before {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: var(--stroke-sm);
+  background: var(--border-bold);
+  content: "";
+}
+
+.theme-pic__grip {
+  position: absolute;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border-radius: var(--rad-rd);
+  translate: -50% -50%;
+  background: var(--surface-raised);
+  color: var(--icon-subtle);
+  box-shadow: var(--elevation-neutral-mid);
+  pointer-events: auto;
+  transition: scale var(--duration-sm) var(--easing-out);
+}
+
+/* The grip rides the line to the pointer's height (ThemePicture.tsx eases --grip-y every frame, so no transition
+   on top; one restarted at every pointer event and snapped) and grows while dragged, back to its size on release
+   (Godwin 2026-11-09). Before any script runs it sits at its rest. */
+.theme-pic__grip {
+  top: calc(var(--grip-y, var(--landing-features-grip-rest)) * 100%);
+}
+
+.theme-pic[data-dragging] .theme-pic__grip {
+  scale: var(--landing-features-grip-drag-scale);
+}
+
+/* ---------- One color to rebrand: a hex, its steps and the controls that follow ---------- */
+
+.rebrand-pic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xl);
+  height: 100%;
+  background: var(--surface-200);
+}
+
+.rebrand-pic__panel {
+  --bland-radius: var(--rad-md);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--surface-raised);
+  box-shadow: var(--elevation-neutral-near);
+}
+
+.rebrand-pic__hex {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font: var(--type-code-body-md);
+  letter-spacing: var(--type-code-body-md-letter-spacing);
+  color: var(--text-bold);
+}
+
+.rebrand-pic__dot {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  border-radius: var(--rad-rd);
+  background: var(--surface-brand);
+  transition: background-color var(--features-hue) var(--easing-out);
+}
+
+.rebrand-pic__steps {
+  display: flex;
+  gap: var(--space-2xs);
+}
+
+.rebrand-pic__step {
+  /* --s is var(--brand-<step>), set per step in RebrandPicture.tsx: the one place on the page that shows the raw
+     brand steps, since the steps themselves are what this picture is about. */
+  width: var(--space-lg);
+  height: var(--space-2xl);
+  border-radius: var(--rad-xs);
+  background: var(--s);
+  box-shadow: inset 0 0 0 var(--stroke-xs) var(--border-subtle);
+  transition: background-color var(--features-hue) var(--easing-out);
+  transition-delay: calc(var(--i) * var(--features-swatch-stagger));
+}
+
+.rebrand-pic__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.rebrand-pic__controls .rebrand-pic__progress {
+  width: var(--landing-features-progress-width);
+}
+
+/* ---------- Keyboard and screen reader: Tab moves focus, the caption reads it ---------- */
+
+.keyboard-pic {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xl);
+  height: 100%;
+  background: var(--surface-200);
+}
+
+.keyboard-pic__form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+  width: var(--landing-features-form-width);
+}
+
+.keyboard-pic__form > :first-child {
+  align-self: stretch;
+}
+
+/* Bland's focus ring (stroke-lg border-focused, space-2xs out from the control), drawn as its own layer. It jumps
+   from control to control at once, as a real focus ring does: keyboard moves are never animated (CLAUDE.md). */
+.keyboard-pic__ring {
+  --_out: calc(var(--space-2xs) + var(--stroke-lg));
+  --_r: var(--rad-md);
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(var(--w) + 2 * var(--_out));
+  height: calc(var(--h) + 2 * var(--_out));
+  border: var(--stroke-lg) solid var(--border-focused);
+  border-radius: calc(var(--_r) + var(--_out));
+  translate: calc(var(--x) - var(--_out)) calc(var(--y) - var(--_out));
+  pointer-events: none;
+}
+
+.keyboard-pic__ring[data-stop="1"] {
+  --_r: var(--rad-sm);
+}
+
+.keyboard-pic__bar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  width: var(--landing-features-form-width);
+}
+
+.keyboard-pic__key {
+  --bland-radius: var(--rad-sm);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--surface-raised);
+  box-shadow:
+    inset 0 calc(-1 * var(--stroke-lg)) 0 var(--border-subtle),
+    var(--elevation-neutral-near);
+  font: var(--type-code-body-sm);
+  letter-spacing: var(--type-code-body-sm-letter-spacing);
+  color: var(--text-subtle);
+  transition:
+    translate var(--duration-xs) var(--easing-out),
+    box-shadow var(--duration-xs) var(--easing-out);
+}
+
+.keyboard-pic__key[data-pressed] {
+  translate: 0 var(--stroke-sm);
+  box-shadow: inset 0 calc(-1 * var(--stroke-sm)) 0 var(--border-subtle);
+}
+
+.keyboard-pic__key-glyph {
+  color: var(--icon-subtle);
+}
+
+/* The screen reader's caption panel: dark, as VoiceOver draws it, on any page. */
+.keyboard-pic__caption {
+  --bland-radius: var(--rad-sm);
+
+  display: grid;
+  align-self: stretch;
+  min-width: 0;
+  overflow: hidden;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--surface-200);
+  font: var(--type-body-sm);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+  color: var(--text-bold);
+}
+
+.keyboard-pic__caption .features-roll {
+  display: grid;
+}
+
+/* Tabbing through the form yourself: Bland's own focus ring shows, so the scripted one goes. */
+.keyboard-pic[data-own-focus] .keyboard-pic__ring {
+  opacity: 0;
+}
+
+/* ---------- Charts in your colors: the palette under three kinds of color vision ---------- */
+
+.charts-pic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: var(--surface-200);
+}
+
+.charts-pic__filters {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.charts-pic__panel {
+  --bland-radius: var(--rad-md);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  /* Wide enough for the three views' pills; on a narrow phone the pills scroll sideways (Bland's tab rows). */
+  width: min(var(--landing-features-chart-width), 100% - 2 * var(--space-lg));
+  padding: var(--space-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--elevation-neutral-near);
+}
+
+/* The three views share one cell and crossfade. */
+.charts-pic__chart {
+  display: grid;
+}
+
+.charts-pic__view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  grid-area: 1 / 1;
+  opacity: 0;
+  transition: opacity var(--features-hue) var(--easing-out);
+}
+
+.charts-pic__view[data-shown] {
+  opacity: 1;
+}
+
+.charts-pic__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-sm);
+  height: var(--landing-features-chart-height);
+}
+
+/* Series 1 at the bottom of each column; the columns grow up from the axis, one after another. */
+.charts-pic__column {
+  display: flex;
+  flex: 1;
+  flex-direction: column-reverse;
+  gap: var(--space-3xs);
+  height: 100%;
+  transform-origin: bottom;
+  scale: 1 0;
+  transition: scale var(--features-arrive) var(--landing-ease-glide);
+  transition-delay: calc(var(--c) * var(--features-arrive-stagger) * 2);
+}
+
+.charts-pic__bars[data-grown] .charts-pic__column {
+  scale: 1 1;
+}
+
+.charts-pic__part {
+  height: calc(var(--v) * 100%);
+  border-radius: var(--rad-xs);
+}
+
+[data-series="1"] { background: var(--chart-1); }
+[data-series="2"] { background: var(--chart-2); }
+[data-series="3"] { background: var(--chart-3); }
+[data-series="4"] { background: var(--chart-4); }
+
+.charts-pic__legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font: var(--type-body-sm);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+  color: var(--text-subtle);
+}
+
+.charts-pic__legend-rest {
+  display: flex;
+  gap: var(--space-xs);
+  margin-inline-start: auto;
+}
+
+.charts-pic__key {
+  width: var(--space-sm);
+  height: var(--space-sm);
+  border-radius: var(--rad-xs);
+}
+
+/* ---------- Typed down to every prop: the Button and its completed prop ---------- */
+
+.props-pic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xl);
+  height: 100%;
+  background: var(--surface-200);
+}
+
+.props-pic__editor {
+  --bland-radius: var(--rad-md);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: var(--landing-features-form-width);
+  padding: var(--space-sm);
+  background: var(--surface-raised);
+  box-shadow: var(--elevation-neutral-near);
+  font: var(--type-code-body-md);
+  letter-spacing: var(--type-code-body-md-letter-spacing);
+  color: var(--code-text);
+}
+
+.props-pic__line {
+  display: flex;
+  align-items: baseline;
+  padding-inline: var(--space-sm);
+  font: inherit;
+  white-space: pre;
+}
+
+.props-pic__name { color: var(--code-function); }
+.props-pic__attr { color: var(--code-keyword); }
+.props-pic__string { display: inline-flex; color: var(--code-string); }
+
+.props-pic__caret {
+  align-self: stretch;
+  width: var(--stroke-sm);
+  margin-inline: var(--space-3xs);
+  background: var(--text-bold);
+  animation: props-pic-blink var(--duration-typing) var(--landing-ease-blink) infinite;
+}
+
+@keyframes props-pic-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.props-pic__menu {
+  position: relative;
+  padding-block-start: var(--space-xs);
+  box-shadow: inset 0 var(--stroke-sm) 0 var(--border-subtle);
+}
+
+/* The chosen option's fill slides to it (Stageshow: a selection that moves follows, never jumps). */
+.props-pic__highlight {
+  --bland-radius: var(--rad-sm);
+
+  position: absolute;
+  top: var(--space-xs);
+  right: 0;
+  left: 0;
+  height: calc(var(--type-code-body-md-line-height) + 2 * var(--space-xs));
+  background: var(--surface-field);
+  translate: 0 calc(var(--pick) * 100%);
+  transition: translate var(--duration-lg) var(--easing-out);
+  pointer-events: none;
+}
+
+.props-pic__list {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  outline-offset: var(--space-2xs);
+}
+
+.props-pic__list:focus-visible {
+  outline: var(--stroke-lg) solid var(--border-focused);
+}
+
+.props-pic__option {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  color: var(--code-string);
+  cursor: pointer;
+}
+
+.props-pic__type {
+  font: var(--type-body-sm);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+  color: var(--text-subtle);
+  /* Hidden, not just faded, on the other options: see-through text fails contrast checks and adds nothing. */
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity var(--duration-md) var(--easing-out),
+    visibility var(--duration-md) var(--easing-out);
+}
+
+.props-pic__option[aria-selected="true"] .props-pic__type {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Reduced motion: the poster (the last step) at once, so only opacity and color are left; no rises, rolls or
+   sweeps. */
+@media (prefers-reduced-motion: reduce) {
+  .row__picture .components-pic .components-pic__part {
+    translate: none;
+    scale: none;
+  }
+
+  .row__picture .features-roll__value[data-roll],
+  .props-pic__caret {
+    animation: none;
+  }
+
+  .charts-pic__column,
+  .props-pic__highlight {
+    transition: none;
+  }
+
+  /* No exit animation to wait for: the old value goes at once. */
+  .row__picture .features-roll__value[data-roll="out"] {
+    display: none;
+  }
+
+  .components-pic .bland-slider__thumb,
+  .components-pic .bland-slider__bar,
+  .theme-pic__grip,
+  .theme-pic__layer--dark,
+  .theme-pic__line,
+  .keyboard-pic__key {
+    transition: none;
+  }
+}

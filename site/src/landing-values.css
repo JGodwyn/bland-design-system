@@ -1,0 +1,391 @@
+/*
+ * The landing page's own values, read from the Figma frame 7079:35060 (Godwin 2026-11-06: the landing page
+ * follows Figma exactly and may break from Bland's text styles). This is the ONE file in site/ with raw values;
+ * the token lint skips it (stylelint.config.js) and every other landing stylesheet reads these through var().
+ * Desktop values are Figma's 1440 frame; below breakpoint/xl they scale with the viewport and stop at a floor.
+ */
+
+:root {
+  /* Hero headline "Bland by design. Built for purpose.": Figma's Inter Bold 128 / 112, letter spacing -8, 848
+     wide, made a quarter bigger (Godwin 2026-11-07): 160 / 140, -10, 1060 wide; same ratios, same three lines. */
+  --landing-hero-title-font: 700 clamp(56px, 11.111vw, 160px) / 0.875 var(--font-heading);
+  /* On a phone (Godwin 2026-11-10: bigger), Figma's three lines filling the screen: the widest, "for purpose.", is
+     5.3 times the size, so the size is the width less the stage's padding over 5.4, never above 96. */
+  --landing-hero-title-font-sm: 700 min(calc((100vw - 2 * var(--space-lg)) / 5.4), 96px) / 0.875 var(--font-heading);
+  --landing-hero-title-tracking: -0.0625em;
+  --landing-hero-title-width: 1060px;
+
+  /* Its glow: Figma's two copies behind it, each a progressive blur from the headline's top to its bottom, both at
+     75%. Purple (Figma's raw #eb09ff): blur 8 to 32, 1px above the title; blue (Text/text-brand): 32 to 8, 1px
+     below. CSS blur = 3/4 of Figma's radius (checked side by side 2026-11-07). Drawn as one text shadow per word
+     since 2026-11-09 (--landing-hero-glow-shadow below). */
+  --landing-hero-glow-outer: #eb09ff;
+  --landing-hero-glow-outer-y: -1px;
+  --landing-hero-glow-inner-y: 1px;
+  /* The four blur steps (--landing-hero-glow-blur-1 to -4, Figma's radii x the blur scale) and the glow's
+     opacity are set on the hero from site/src/hero/tuning.ts, so DialKit can tune them. */
+
+
+
+  /* Hero description: Heading/heading-lg's family, weight and size (Semi Bold 43 / 48) with letter spacing -2,
+     560 wide (four desktop columns). */
+  --landing-hero-description-font: 600 clamp(24px, 2.986vw, 43px) / 1.1163 var(--font-heading);
+  --landing-hero-description-tracking: -0.0465em;
+  --landing-hero-description-width: 560px;
+
+  /* Nav: 560 wide, 40 from the top. Its Logo is Figma's lg Logo at 60% (Semi Bold 20.4 / 24). */
+  --landing-nav-width: 560px;
+  --landing-nav-top: 40px;
+  --landing-nav-logo-font: 600 20.4px / 24px var(--font-heading);
+
+  /* Hero rhythm: nav to headline (Figma 178, 140 since the headline grew), and the least room between headline
+     and description (the description itself sits at the bottom of the screen; Figma's 116 no longer fits a 1024
+     tall screen under the bigger headline, so 64). */
+  --landing-hero-height: 1024px;
+  --landing-hero-gap-top: clamp(48px, 9.722vw, 140px);
+  --landing-hero-gap-middle: clamp(32px, 4.444vw, 64px);
+}
+
+
+/* The glow as one text shadow on each word's bold fill (2026-11-09, mobile pass: the 48 blurred copies ran a phone
+   out of GPU memory). Figma's purple runs from little blur at the top to the most at the bottom and the blue the
+   other way, so each colour takes its middle blur here, doubled (a text-shadow's blur radius is twice a blur()
+   filter's), both at the glow's opacity. Set on the hero, where the blur
+   and opacity values live. */
+.hero {
+  --landing-hero-glow-shadow:
+    0 var(--landing-hero-glow-outer-y) calc(2 * var(--landing-hero-glow-blur-2))
+      color-mix(in srgb, var(--landing-hero-glow-outer) calc(var(--landing-hero-glow-opacity) * 100%), transparent),
+    0 var(--landing-hero-glow-inner-y) calc(2 * var(--landing-hero-glow-blur-3))
+      color-mix(in srgb, var(--text-brand) calc(var(--landing-hero-glow-opacity) * 100%), transparent);
+}
+
+:root {
+  /* Every section headline's letter spacing (Godwin 2026-11-09: one letter spacing on every screen, desktop's):
+     Figma's -2 at Heading/heading-lg's 43, as a share of the size, so a phone's smaller heading keeps the same
+     tightness instead of Bland's 0. */
+  --landing-heading-tracking: -0.0465em;
+}
+
+:root {
+  /* The hero's track length, entrance and glide timings live in site/src/hero/tuning.ts (set on the hero). */
+  /* A phrase's icon sits this far from it. */
+  --landing-highlight-icon-gap: 12px;
+  /* Description sits Figma's 72 above the bottom of the screen. */
+  --landing-hero-gap-bottom: clamp(32px, 5vw, 72px);
+}
+
+:root {
+  /* The hero's glide curve (Godwin 2026-11-07: buttery, smoother than Bland's 250ms UI motion): a long ease-out,
+     a soft start that settles slowly. Its durations are in tuning.ts. */
+  --landing-ease-glide: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* The description's ink wash: each word's color slides from text-minimal to text-bold as Hero.tsx moves its
+   --ink from 0 to 1 (one text layer, so no double edges mid-fade). The scroll sets --ink every frame, so the
+   color never transitions. A rule here, not in hero.css, because the token lint rejects color-mix(). */
+.hero__desc-word {
+  /* At rest the words are fainter than text-minimal (Godwin 2026-11-07): text-minimal at --landing-description-rest
+     of the way from the page color (scroll.descriptionRest in tuning.ts). */
+  --_rest: color-mix(in oklab, var(--text-minimal) var(--landing-description-rest), var(--surface-100));
+
+  color: color-mix(in oklab, var(--text-bold) calc(var(--ink, 0) * 100%), var(--_rest));
+}
+
+:root {
+  /* The highlighter's ink (Godwin 2026-11-10: a saturated light yellow, like a highlighter pen), the same in light
+     and dark; marker.ts lays it at highlight.markerStrength. */
+  --landing-marker-color: #ffe733;
+  /* The highlighter's draw: quick to start, like a pen stroke, then settling. */
+  --landing-ease-marker: cubic-bezier(0.65, 0, 0.25, 1);
+}
+
+/* ---------- Feature cards' pictures, site/src/features/ (the grid, Figma 7064:28783, was removed 2026-11-08) ---------- */
+
+:root {
+  /* Picture parts: what they rise from as they arrive (Stageshow: never from nothing), and sizes the pictures
+     give their parts where Bland's own would be too wide for a 342 card (slider/width is 320, progress/width 256). */
+  --landing-features-arrive-scale: 0.97;
+  --landing-features-slider-width: 160px;
+  --landing-features-progress-width: 96px;
+  --landing-features-field-width: 200px;
+  /* A text caret blinks on and off, no fade (an editor's caret). */
+  --landing-ease-blink: steps(1);
+  /* The chart's panel: its three pills at Pill tabs sm (311) plus space-lg either side. */
+  --landing-features-chart-width: 344px;
+  /* The chart's plot height in "Charts in your colors". */
+  --landing-features-chart-height: 136px;
+  /* The light/dark line's grip rests below the card, never over its words (a fraction of the picture's height;
+     ThemePicture.tsx's GRIP_REST is the same). */
+  --landing-features-grip-rest: 0.84;
+  /* How much the grip grows while you drag it. */
+  --landing-features-grip-drag-scale: 1.25;
+  --landing-features-form-width: 296px;
+}
+
+/* "One color to rebrand": three brands' steps, `npm run brand -- generate "<hex>" --neutrals none` output. Blue is
+   Bland's own (the steps in tokens.css), set again so the picture can come back to it. */
+.rebrand-pic[data-brand="blue"] {
+  --brand-0: #ffffff;
+  --brand-50: #f0f5ff;
+  --brand-100: #dce9ff;
+  --brand-200: #bdd5ff;
+  --brand-300: #95bbff;
+  --brand-400: #659cff;
+  --brand-500: #387eff;
+  --brand-600: #0062ff;
+  --brand-700: #004dcc;
+  --brand-800: #003a9e;
+  --brand-900: #002873;
+  --brand-950: #001b55;
+  --brand-1000: #00113d;
+}
+
+.rebrand-pic[data-brand="green"] {
+  --brand-0: #ffffff;
+  --brand-50: #eff7f1;
+  --brand-100: #dcede0;
+  --brand-200: #bcddc5;
+  --brand-300: #92c8a3;
+  --brand-400: #5db17b;
+  --brand-500: #0f9d58;
+  --brand-600: #00884a;
+  --brand-700: #006c3a;
+  --brand-800: #00522b;
+  --brand-900: #003b1d;
+  --brand-950: #002a13;
+  --brand-1000: #001c0b;
+}
+
+.rebrand-pic[data-brand="orange"] {
+  --brand-0: #ffffff;
+  --brand-50: #fff3ef;
+  --brand-100: #ffe3db;
+  --brand-200: #fecaba;
+  --brand-300: #fca98f;
+  --brand-400: #f87f5b;
+  --brand-500: #f2541b;
+  --brand-600: #d54100;
+  --brand-700: #a93200;
+  --brand-800: #812400;
+  --brand-900: #5c1700;
+  --brand-950: #420e00;
+  --brand-1000: #2e0700;
+}
+
+/* ---------- Feature row (Figma 7141:36653), site/src/features/row/ ---------- */
+
+:root {
+  /* The middle card: Figma's 560 wide, 840 tall (Godwin 2026-11-08: a taller picture than Figma's 703 card
+     holds), never wider than the screen less space-xl a side, never taller than it less space-4xl above and
+     below. Its title is Heading/heading-lg with Figma's -2 letter spacing. */
+  --landing-row-card-width: min(560px, 100vw - 48px);
+  --landing-row-card-height: min(840px, 100svh - 96px);
+  --landing-row-title-tracking: var(--landing-heading-tracking);
+}
+
+/* ---------- Brand theme section (Figma 7066:28878), site/src/brand/ ---------- */
+
+:root {
+  /* The current step's headline: Heading/heading-lg with Figma's -2 letter spacing (Heading/heading-sm below md). */
+  --landing-brand-step-tracking: var(--landing-heading-tracking);
+  /* The copy picture's file card. */
+  --landing-brand-file-card-width: 216px;
+  /* The picture card: Figma's 416 x 360. */
+  --landing-brand-picture-height: 360px;
+  /* A hue strip for the picker: every hue at one lightness and chroma, in OKLCH (a picture, not a theme color). */
+  --landing-brand-hue-strip: linear-gradient(90deg in oklch longer hue, oklch(0.66 0.2 0), oklch(0.66 0.2 360));
+}
+
+/* The section's example brand, #e11d74: `npm run brand -- generate "#e11d74" --neutrals subtle` (brand and tinted
+   neutral steps). Its check fails one pairing (dark, progress fill on its track, 2.85:1 of 3:1) and suggests step
+   400 #ec6290 -> #f16694 (3.00:1), which the check picture's Fix applies (data-fixed). */
+.brand-pink {
+  --brand-0: #ffffff;
+  --brand-50: #fef0f3;
+  --brand-100: #fddde5;
+  --brand-200: #fabecd;
+  --brand-300: #f596b0;
+  --brand-400: #ec6290;
+  --brand-500: #e11d74;
+  --brand-600: #c70063;
+  --brand-700: #a0004e;
+  --brand-800: #7c003b;
+  --brand-900: #5b002a;
+  --brand-950: #43001d;
+  --brand-1000: #300013;
+  --neutral-0: #ffffff;
+  --neutral-50: #f2f2f2;
+  --neutral-100: #e7e5e5;
+  --neutral-200: #cdc9ca;
+  --neutral-300: #b5aeaf;
+  --neutral-400: #9b9294;
+  --neutral-500: #827a7c;
+  --neutral-600: #686061;
+  --neutral-700: #4f4849;
+  --neutral-800: #342f31;
+  --neutral-900: #1a1718;
+  --neutral-950: #0d0b0c;
+  --neutral-1000: #000000;
+}
+
+.brand-pink[data-fixed] {
+  --brand-400: #f16694;
+}
+
+/* ---------- What you get (Figma 7066:29609 and its states), site/src/what-you-get/ ---------- */
+
+:root {
+  /* The stage is Figma's 1440 x 1024 frame, scaled to fit the screen; the text block sits at Figma's x 296, 848
+     wide, centred on the frame's height. Its type is Figma's: Semi Bold 43 / 48, letter spacing -2. */
+  --landing-wyg-frame-width: 1440px;
+  --landing-wyg-frame-height: 1024px;
+  --landing-wyg-copy-left: 296px;
+  --landing-wyg-copy-width: 848px;
+  --landing-wyg-font: 600 43px / 48px var(--font-heading);
+  --landing-wyg-tracking: var(--landing-heading-tracking);
+  /* Parts at Figma's widths where Bland's fill their container: Text Input 287, Accordion 258, File upload 395. */
+  --landing-wyg-field-width: 287px;
+  --landing-wyg-accordion-width: 258px;
+  --landing-wyg-upload-width: 395px;
+  /* Segmented bar lg, four tabs: Figma's 256 (its 259 x 73 box is the bar turned 7.5°). */
+  --landing-wyg-tabs-width: 256px;
+  /* On a phone the parts shrink to this share of Figma's size, and the drawn icons (52 to 200 in Figma) to this
+     share of that (0.6 in all). */
+  --landing-wyg-parts-zoom-sm: 0.8;
+  /* The side-by-side pairs above the sentence are a little smaller still, so less runs off the screen. */
+  --landing-wyg-pair-zoom-sm: 0.7;
+  /* On a phone the pairs above the sentence stand side by side, narrower than Figma's (before the zoom). */
+  --landing-wyg-field-width-sm: 220px;
+  --landing-wyg-modal-width-sm: 300px;
+  --landing-wyg-upload-width-sm: 280px;
+  --landing-wyg-accordion-width-sm: 220px;
+  --landing-wyg-icon-zoom-sm: 0.75;
+}
+
+/* ---------- Components showcase (Figma 7071:32494), site/src/showcase/ ---------- */
+
+:root {
+  /* Figma's rhythm: 160 above the headline and below the button at 1440, scaling down to 64. The headline block
+     is 560 wide; the headline is Heading/heading-lg with Figma's -2 letter spacing. Cards are at least 200 tall. */
+  --landing-showcase-pad: clamp(64px, 11.111vw, 160px);
+  --landing-showcase-head-width: 560px;
+  --landing-showcase-title-tracking: var(--landing-heading-tracking);
+  /* Every card's one height (Godwin 2026-11-09: nothing a card does moves the panel). Figma's 200, raised to fit the
+     calendar's five weeks with its room; taller content scrolls inside. */
+  --landing-showcase-card-height: 256px;
+  /* The "Any color" swatch: every hue at one lightness and chroma, in OKLCH (a picture, not a theme color). */
+  --landing-showcase-any-color: conic-gradient(in oklch longer hue, oklch(0.7 0.18 0), oklch(0.7 0.18 360));
+}
+
+/* The 26 steps a brand override sets, registered as colors so each showcase card can ease from one brand to the
+   next (an unregistered custom property only jumps). Their values still come from tokens.css or an override; the
+   initial values are never seen. */
+@property --brand-0 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --brand-50 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --brand-100 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --brand-200 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --brand-300 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --brand-400 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --brand-500 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --brand-600 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --brand-700 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --brand-800 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --brand-900 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --brand-950 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --brand-1000 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --neutral-0 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --neutral-50 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --neutral-100 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --neutral-200 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --neutral-300 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --neutral-400 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --neutral-500 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --neutral-600 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --neutral-700 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --neutral-800 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --neutral-900 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --neutral-950 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --neutral-1000 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+
+/* Which properties a showcase card eases when its brand changes (a list, kept here beside the registrations). */
+:root {
+  --landing-showcase-brand-props: --brand-0, --brand-50, --brand-100, --brand-200, --brand-300, --brand-400, --brand-500, --brand-600, --brand-700, --brand-800, --brand-900, --brand-950, --brand-1000, --neutral-0, --neutral-50, --neutral-100, --neutral-200, --neutral-300, --neutral-400, --neutral-500, --neutral-600, --neutral-700, --neutral-800, --neutral-900, --neutral-950, --neutral-1000;
+}
+
+/* ---------- Figma kit (Figma 7078:34292, "Figma system"), site/src/figma-kit/ ---------- */
+
+:root {
+  /* Figma's rhythm: 190 above the copy and 182 under the checklist at 1440, scaling down to 64. The copy column is
+     416 wide and starts 68 above the picture; the headline is Heading/heading-lg with Figma's -2 letter spacing. */
+  --landing-figma-kit-pad: clamp(64px, 13.194vw, 190px);
+  --landing-figma-kit-copy-width: 416px;
+  --landing-figma-kit-head-offset: 68px;
+  --landing-figma-kit-title-tracking: var(--landing-heading-tracking);
+  /* The picture: Figma's 760 x 584 (it runs off the page's right edge from xl), its left panel 200 wide; on a phone
+     a 440 tall canvas without the panel. Its 40px FigmaLogo keeps Figma's 1.875 stroke. */
+  --landing-figma-kit-picture-width: 760px;
+  --landing-figma-kit-picture-height: 584px;
+  --landing-figma-kit-picture-height-sm: 440px;
+  --landing-figma-kit-panel-width: 200px;
+  /* The panel's Pages list: Figma's pages panel height, scrolled to Buttons. */
+  --landing-figma-kit-pages-height: 176px;
+  /* The code card on a phone, so its names wrap inside the canvas. */
+  --landing-figma-kit-code-width-sm: 232px;
+  --landing-figma-kit-logo-stroke: 1.875px;
+  /* Figma's own UI colors in the picture (a picture of Figma, not a theme color): the component purple of a
+     component set's dashed frame and label, and the selection blue. */
+  --landing-figma-kit-component: #9747ff;
+  --landing-figma-kit-selection: #0d99ff;
+  --landing-figma-kit-selection-fill: color-mix(in srgb, #0d99ff 14%, transparent);
+  /* The canvas cards: the Mode switch and the Variables card's width. */
+  --landing-figma-kit-mode-width: 168px;
+  --landing-figma-kit-vars-width: 344px;
+  /* A canvas button enters from this scale (docs/motion.md: 0.95 to 0.97, never 0). */
+  --landing-figma-kit-button-from: 0.96;
+}
+
+/* ---------- FAQ (Figma 7189:37802, "FAQs"), site/src/faq/ ---------- */
+
+:root {
+  /* Figma's 112 above the heading at 1440, scaling down to 64; the heading is Heading/heading-lg with Figma's -2
+     letter spacing. The rule between questions is Figma's dotted Line: round 1.5 (stroke-md) dots in
+     Border/border-bold, 4 (space-xs) apart, drawn as one dot per 4 x 1.5 tile. */
+  --landing-faq-pad: clamp(64px, 7.778vw, 112px);
+  --landing-faq-title-tracking: var(--landing-heading-tracking);
+  --landing-faq-dots: radial-gradient(circle closest-side, var(--border-bold) 100%, transparent) 0 0 / var(--space-xs) var(--stroke-md) repeat-x;
+}
+
+/* ---- Footer (Figma 7100:36365, site/src/footer/, side session landing-footer 2026-11-09) ---------------------- */
+:root {
+  /* Headline "Start Bland. End up yours.": Figma's Inter Bold 128 / 112, letter spacing -8, an 848 column. Its glow
+     reuses the hero's pink (--landing-hero-glow-outer) and offsets; blurs and opacity are in footer/tuning.ts. */
+  --landing-footer-title-font: 700 clamp(48px, 8.889vw, 128px) / 0.875 var(--font-heading);
+  --landing-footer-title-tracking: -0.0625em;
+  --landing-footer-width: 848px;
+  /* Figma's 1440 x 960 frame with the 692 tall column (logo, headline, install line, snippet, links, copyright)
+     centred in it (134 above and below; 174 before the logo was added, 2026-11-10); from breakpoint/md only, a
+     phone's footer is as tall as its content. */
+  --landing-footer-height: 0px;
+  --landing-footer-pad: clamp(96px, 9.306vw, 134px);
+  /* Figma's Logo is the lg one at 1.2 (48 tall); Bland's lg size as it is (40) on a phone. */
+  --landing-footer-logo-zoom: 1;
+  /* The npm mark's frame, 48 x 20 in Figma (its height is icon/md). */
+  --landing-footer-npm-width: 48px;
+  /* Figma's Code-text is the lg one at 30.8 (x1.926); smaller below breakpoint/xl so it fits a phone. */
+  --landing-footer-install-zoom: 1.25;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --landing-footer-height: 960px;
+    --landing-footer-logo-zoom: 1.2;
+    --landing-footer-install-zoom: 1.5;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --landing-footer-install-zoom: 1.926;
+  }
+}

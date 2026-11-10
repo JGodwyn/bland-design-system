@@ -21,9 +21,9 @@ export default defineConfig({
     { name: 'webkit', use: { ...devices['Desktop Safari'], viewport }, testIgnore: nonChromium },
     { name: 'firefox', use: { ...devices['Desktop Firefox'], viewport }, testIgnore: nonChromium },
   ],
-  webServer: {
-    command: 'npm run docs',
-    url: 'http://localhost:5180',
-    reuseExistingServer: true,
-  },
+  webServer: [
+    { command: 'npm run docs', url: 'http://localhost:5180', reuseExistingServer: true },
+    // The landing page (site/), for tests/site.spec.ts.
+    { command: 'npm run site', url: 'http://localhost:5182', reuseExistingServer: true },
+  ],
 });

@@ -1,0 +1,16 @@
+/* Page-wide styles for the landing page. Tokens only (npm run lint:css covers site/). */
+
+/* No blue flash on tap on phones (Godwin 2026-11-09). Press feedback and :focus-visible rings stay. */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-100);
+  color: var(--text-bold);
+}
+
+.landing {
+  display: block;
+}

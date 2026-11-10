@@ -1,0 +1,16 @@
+# Bland
+
+> Bland is a React design system on CSS design tokens. Give it one brand color and every button, field and chart follows, in light and dark. Published on npm as `bland-ui` (MIT).
+
+Install with `npm install bland-ui`, load `bland-ui/tokens.css`, then import components from `bland-ui`. Every component value is a CSS custom property, so a project rebrands by overriding the 13 `--brand-*` steps in its own `brand.css`.
+
+## Docs
+
+- [Documentation](/docs/): every component with live demos, props and the token reference
+- [Brand theme](/docs/#/brand): make a brand override from one color and check its pairings
+- [Components](/docs/#/components/button): the component pages, starting with Button
+
+## Package
+
+- [bland-ui on npm](https://www.npmjs.com/package/bland-ui): install, versions and the published files
+- [Source on GitHub](https://github.com/JGodwyn/bland-design-system): the components, tokens and docs site

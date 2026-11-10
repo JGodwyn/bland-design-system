@@ -1,0 +1,556 @@
+/*
+ * Landing page "Components showcase" (Figma 7071:32494). Tokens only; Figma's own values are --landing-showcase-*
+ * in landing-values.css. Mobile first: one card a row with the toolbar above the cards (the switches in reach
+ * before scrolling); two a row from breakpoint/md; from xl Figma's three a row on columns 2 to 7, toolbar below.
+ */
+
+.showcase {
+  /* The cards' pop swings past full size; on a phone that would scroll the page sideways while they pop in. */
+  overflow-x: clip;
+  /* A phone: less room around the section and the panel (Godwin 2026-11-09); Figma's rhythm from breakpoint/md. */
+  padding-block: var(--space-3xl);
+  background: var(--surface-100);
+  color: var(--text-bold);
+}
+
+.showcase__grid {
+  --bland-grid-margin: var(--space-md);
+
+  row-gap: var(--space-3xl);
+}
+
+.showcase__head,
+.showcase__panel-slot,
+.showcase__more {
+  grid-column: 1 / -1;
+}
+
+.showcase__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  justify-self: center;
+  max-width: var(--landing-showcase-head-width);
+  text-align: center;
+}
+
+.showcase__title {
+  margin: 0;
+  font: var(--type-heading-sm);
+  letter-spacing: var(--landing-showcase-title-tracking);
+}
+
+.showcase__lede {
+  margin: 0;
+  color: var(--text-subtle);
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+}
+
+.showcase__more {
+  justify-self: center;
+}
+
+/* The Button's classes on a link: no link underline. */
+.showcase__more a {
+  text-decoration: none;
+}
+
+/* ---------- The panel ---------- */
+
+.showcase__panel {
+  --bland-radius: var(--rad-lg);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  background: var(--surface-sunken);
+  color: var(--text-bold);
+}
+
+.showcase__cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-sm);
+}
+
+.showcase__card-slot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.showcase__card {
+  --bland-radius: var(--rad-lg);
+
+  display: flex;
+  min-width: 0; /* a wide part (the Slider's own width) never widens its card */
+  height: var(--landing-showcase-card-height); /* one height for every card in every set (Godwin 2026-11-09) */
+  overflow: clip;
+  background: var(--surface-raised);
+  color: var(--text-bold);
+}
+
+/* The card's scroll area: what outgrows the card scrolls inside it, with the fade and scrollbar. Its viewport is a
+   column, so the body fills it (and centres its part) until the part is taller, then grows and scrolls. */
+.showcase__card-scroll {
+  flex: 1;
+}
+
+.showcase__card-scroll > .bland-scroll-area__viewport,
+.showcase__card-scroll .bland-scroll-area__content {
+  display: flex;
+  flex-direction: column;
+}
+
+.showcase__card-scroll .bland-scroll-area__content {
+  flex: 1 0 auto;
+}
+
+/* The padding sits inside the scrolling viewport, so focus rings near the edge are never cut. */
+.showcase__card-body {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1 0 auto;
+  min-width: 0;
+  padding: var(--space-lg);
+}
+
+.showcase__card-body[data-top] {
+  justify-content: flex-start;
+}
+
+/* More room than Figma's space-lg around some parts (Godwin 2026-11-09): the Alert, Text Input and Segmented bar sit
+   space-2xl from the card's sides (and every field-wide part of the other sets, at the Text Input's width), the File upload space-xl all round, the Calendar space-xl above and below. */
+.showcase__card-body:is([data-card="input"], [data-card="segments"], [data-card="search"], [data-card="accordion"], [data-card="time"], [data-card="slider"], [data-card="dropdown"], [data-card="progress"]) {
+  padding-inline: var(--space-2xl);
+}
+
+/* The Alert stays on one line: the extra room only where the card is wide enough for it. */
+@media (min-width: 768px) {
+  .showcase__card-body[data-card="alert"] {
+    padding-inline: var(--space-2xl);
+  }
+}
+
+.showcase__card-body[data-card="upload"] {
+  padding: var(--space-xl);
+}
+
+.showcase__card-body[data-card="calendar"] {
+  padding-block: var(--space-xl);
+}
+
+/* The second set's Pills, in a wrapping row. */
+.showcase__row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xs);
+}
+
+/* Parts that fill their card in Figma (Text Input, Segmented bar, File upload); the Button hugs its label. */
+.showcase__fill {
+  align-self: stretch;
+  max-width: 100%;
+}
+
+/* The theme's circle reveal is a view transition of the panel alone (Showcase.tsx animates the new picture's
+   clip-path): no default cross-fade, the old picture simply stays underneath until the circle covers it. */
+.showcase__panel {
+  view-transition-name: showcase-panel;
+}
+
+::view-transition-old(showcase-panel),
+::view-transition-new(showcase-panel) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Brand colors ease from one brand to the next on the panel and on each card, which hold their own steps. Light and
+   dark flip at once (Godwin 2026-11-09): only the steps ease, never the surface itself. */
+.showcase__panel,
+.showcase__card {
+  transition-property: var(--landing-showcase-brand-props);
+  transition-duration: var(--showcase-brand-ease);
+  transition-timing-function: var(--easing-out);
+}
+
+/* ---------- Pressable parts: a plain button over a part with no press of its own ---------- */
+
+.showcase__tap {
+  position: relative;
+}
+
+.showcase__tap-target {
+  position: absolute;
+  inset: calc(-1 * var(--space-xs));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--rad-md);
+  background: transparent;
+  cursor: pointer;
+}
+
+.showcase__tap--round .showcase__tap-target {
+  border-radius: var(--rad-rd);
+}
+
+.showcase__tap-target:focus-visible {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--space-2xs);
+}
+
+.showcase__chat {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---------- Toolbar: font, theme, brand ---------- */
+
+.showcase__toolbar {
+  /* A phone (Godwin 2026-11-09, his mockup): the component set, the font field and the theme in one row, the
+     field taking the room between the two round buttons, and the swatch strip across the panel under them. */
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--space-sm);
+  row-gap: var(--space-lg);
+  order: -1;
+}
+
+.showcase__toolbar .showcase__looks {
+  display: contents;
+}
+
+.showcase__toolbar .showcase__font {
+  min-width: 0;
+}
+
+.showcase__font-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-align: start;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.showcase__toolbar .showcase__swatches {
+  grid-column: 1 / -1;
+}
+
+.showcase__font {
+  --bland-radius: var(--rad-md);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  height: var(--control-md);
+  margin: 0;
+  padding: var(--space-sm);
+  border: 0;
+  background: var(--surface-raised);
+  color: var(--text-bold);
+  font: var(--type-body-lg-bold);
+  letter-spacing: var(--type-body-lg-bold-letter-spacing);
+  cursor: pointer;
+  transition: transform var(--duration-sm) var(--easing-out);
+}
+
+/* No hover on the font button (Godwin 2026-11-09), a press instead. */
+.showcase__font:active {
+  transform: scale(0.97);
+}
+
+.showcase__font-mark {
+  --bland-radius: var(--rad-sm);
+
+  display: inline-flex;
+  padding: var(--space-xs);
+  background: var(--surface-200);
+  color: var(--icon-subtle);
+}
+
+.showcase__font-caret {
+  color: var(--icon-subtle);
+}
+
+.showcase__looks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.showcase__round {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-md);
+  height: var(--control-md);
+  margin: 0;
+  padding: var(--space-sm);
+  border: 0;
+  border-radius: var(--rad-rd);
+  background: var(--surface-raised);
+  color: var(--icon-bold);
+  cursor: pointer;
+  transition: transform var(--duration-sm) var(--easing-out);
+}
+
+/* The round buttons (component set, theme) sink while pressed; Showcase.tsx pops them back past full size as they let go. */
+.showcase__round:active {
+  transform: scale(var(--showcase-theme-sink));
+}
+
+.showcase__font:focus-visible,
+.showcase__round:focus-visible {
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: var(--space-2xs);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .showcase__round:hover {
+    background: var(--surface-raised-hover);
+  }
+}
+
+/* Swatches: control/xs wide, control/md tall, in one rounded strip; the ring slides to the active one. The presets are
+   a radio group; "Any color" is a button that opens the color picker. */
+.showcase__swatches {
+  position: relative;
+  display: flex;
+}
+
+/* On a phone the strip fills the panel's width: every swatch an equal share (--swatch-count, Showcase.tsx). */
+.showcase__presets {
+  display: flex;
+  flex: 1;
+}
+
+.showcase__presets .showcase__swatch {
+  flex: 1;
+}
+
+.showcase__swatch {
+  position: relative;
+  width: calc(100% / var(--swatch-count));
+  height: var(--control-md);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+}
+
+.showcase__presets .showcase__swatch:first-child {
+  border-start-start-radius: var(--rad-md);
+  border-end-start-radius: var(--rad-md);
+}
+
+.showcase__swatch--any {
+  border-start-end-radius: var(--rad-md);
+  border-end-end-radius: var(--rad-md);
+  background: var(--landing-showcase-any-color);
+}
+
+.showcase__swatch-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.showcase__swatch:has(.showcase__swatch-input:focus-visible),
+.showcase__swatch--any:focus-visible {
+  z-index: 2;
+  outline: var(--stroke-lg) solid var(--border-focused);
+  outline-offset: calc(var(--stroke-xl) + var(--space-2xs));
+}
+
+/*
+ * The ring wraps the whole active swatch (stroke-xl past each edge, so it may run past the strip). Its corners are
+ * rad-sm, and at either end of the strip the outer two follow the strip's rad-md, one stroke out, so the curves stay
+ * concentric; they ease as the ring arrives. White in both themes (icon-on-color is white in light and dark).
+ */
+.showcase__ring {
+  --ring-start: var(--rad-sm);
+  --ring-end: var(--rad-sm);
+
+  position: absolute;
+  top: calc(-1 * var(--stroke-xl));
+  left: calc(-1 * var(--stroke-xl));
+  z-index: 1;
+  left: calc(var(--active) * 100% / var(--swatch-count) - var(--stroke-xl));
+  width: calc(100% / var(--swatch-count) + 2 * var(--stroke-xl));
+  height: calc(var(--control-md) + 2 * var(--stroke-xl));
+  border: var(--stroke-xl) solid var(--icon-on-color);
+  border-radius: var(--ring-start) var(--ring-end) var(--ring-end) var(--ring-start);
+  box-shadow: var(--elevation-neutral-mid);
+  pointer-events: none;
+  transition-property: left, transform, border-radius;
+  transition-duration: var(--showcase-ring);
+  transition-timing-function: var(--easing-out);
+}
+
+.showcase__ring[data-edge="start"] {
+  --ring-start: calc(var(--rad-md) + var(--stroke-xl));
+}
+
+.showcase__ring[data-edge="end"] {
+  --ring-end: calc(var(--rad-md) + var(--stroke-xl));
+}
+
+/* Figma's 100% smoothing, as .bland-smooth draws it, per corner: twice each radius on a superellipse; the strip's ends too. */
+@supports (corner-shape: superellipse(2)) {
+  .showcase__ring {
+    border-radius: calc(2 * var(--ring-start)) calc(2 * var(--ring-end)) calc(2 * var(--ring-end)) calc(2 * var(--ring-start));
+    corner-shape: superellipse(2);
+  }
+
+  .showcase__presets .showcase__swatch:first-child {
+    border-start-start-radius: calc(2 * var(--rad-md));
+    border-end-start-radius: calc(2 * var(--rad-md));
+    corner-shape: superellipse(2);
+  }
+
+  .showcase__swatch--any {
+    border-start-end-radius: calc(2 * var(--rad-md));
+    border-end-end-radius: calc(2 * var(--rad-md));
+    corner-shape: superellipse(2);
+  }
+}
+
+/* ---------- Entrance: the cards pop in once, in reading order ---------- */
+
+.showcase__card {
+  opacity: 0;
+}
+
+.showcase[data-shown] .showcase__card {
+  animation: showcase-pop var(--showcase-pop) var(--showcase-ease-pop) both;
+  animation-delay: calc(var(--i) * var(--showcase-pop-stagger));
+}
+
+/* A set switched from the keyboard shows at once. */
+.showcase[data-instant] .showcase__card {
+  opacity: 1;
+  animation: none;
+}
+
+@keyframes showcase-pop {
+  from {
+    opacity: 0;
+    transform: scale(var(--showcase-pop-from));
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes showcase-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase[data-shown] .showcase__card {
+    animation-name: showcase-fade;
+    animation-timing-function: var(--easing-out);
+  }
+
+  .showcase__ring,
+  .showcase__font,
+  .showcase__round {
+    transition: none;
+  }
+
+  .showcase__font:active,
+  .showcase__round:active {
+    transform: none;
+  }
+}
+
+/* ---------- Breakpoints ---------- */
+
+@media (min-width: 768px) {
+  .showcase__title {
+    font: var(--type-heading-lg);
+    letter-spacing: var(--landing-showcase-title-tracking);
+  }
+
+  .showcase__cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* From tablet, the toolbar's own row: the two groups at either end, swatches control/xs wide. */
+  .showcase__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    order: 0;
+  }
+
+  .showcase__toolbar .showcase__looks {
+    display: flex;
+  }
+
+  .showcase__font-name {
+    flex: none;
+  }
+
+  .showcase__presets {
+    flex: none;
+  }
+
+  .showcase__swatch,
+  .showcase__presets .showcase__swatch {
+    flex: none;
+    width: var(--control-xs);
+  }
+
+  .showcase__ring {
+    left: calc(-1 * var(--stroke-xl));
+    width: calc(var(--control-xs) + 2 * var(--stroke-xl));
+    transform: translateX(calc(var(--active) * var(--control-xs)));
+  }
+}
+
+@media (min-width: 1280px) {
+  .showcase__panel-slot {
+    grid-column: 2 / -2;
+  }
+
+  .showcase__cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Figma's rhythm and margin from tablet up (a phone's are tighter, above). */
+@media (min-width: 768px) {
+  .showcase {
+    padding-block: var(--landing-showcase-pad);
+  }
+
+  .showcase__grid {
+    --bland-grid-margin: var(--space-xl);
+  }
+}

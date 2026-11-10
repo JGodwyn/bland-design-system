@@ -1,0 +1,508 @@
+/*
+ * Landing page "What you get" (WhatYouGet.tsx, slides.tsx). Tokens only; Figma's frame size, the text block's place
+ * are --landing-wyg-* in landing-values.css; every timing is --wyg-*, set on the section from tuning.ts (DialKit).
+ *
+ *   section.wyg[data-layout="stage"]                  tall track, breakpoint/md and up
+ *     div.wyg__stage                                  sticky, one screen; data-theme dark on "Dark mode that thinks"
+ *       div.wyg__frame                                Figma's 1440 x 1024 frame, scaled to fit (--wyg-scale)
+ *         div.wyg__copy > h2.wyg__tag + div.wyg__sentences > div.wyg__layer[data-entering|data-leaving] > p
+ *         div.wyg__parts > div.wyg__layer--parts > div.wyg__part (at --x, --y, turned --tilt, appearing or popping by --k)
+ *     ul.wyg__hidden                                  every sentence, for screen readers
+ *   section.wyg[data-layout="phone"]                  a phone: the same track; div.wyg__phone holds the copy and
+ *                                                     div.wyg__cluster of parts
+ */
+
+.wyg {
+  position: relative;
+  background: var(--surface-100);
+  color: var(--text-bold);
+}
+
+.wyg__tag,
+.wyg__sentence {
+  margin: var(--space-none);
+  font: var(--landing-wyg-font);
+  letter-spacing: var(--landing-wyg-tracking);
+}
+
+.wyg__tag {
+  color: var(--text-minimal);
+  transition: color var(--wyg-theme-glide) var(--landing-ease-glide);
+}
+
+/* Set on the sentence, not inherited from the section: the stage's data-theme changes Text/text-bold under it,
+   and an inherited color keeps the section's (light) value, so dark slides read black on black. */
+.wyg__sentence {
+  color: var(--text-bold);
+  transition: color var(--wyg-theme-glide) var(--landing-ease-glide);
+}
+
+.wyg__word {
+  display: inline-block;
+}
+
+/* ---------- The track: one screen for the stage plus screensPerSlide screens per slide after the first ---------- */
+
+/* The feature row's model (Godwin 2026-11-09): the page scrolls through the track and the slide follows it; once
+   scrolling stops between slides the page glides to the nearest (WhatYouGet.tsx). */
+.wyg[data-layout] {
+  height: calc(100svh + (var(--wyg-slides) - 1) * var(--wyg-screens) * 100svh);
+}
+
+/* ---------- The stage (breakpoint/md and up) ---------- */
+
+.wyg__stage {
+  position: sticky;
+  top: var(--space-none);
+  /* The large viewport, so the stage (and a dark slide's fill) reaches the screen's foot once a phone's address bar
+     slides away; on desktop it is the same as svh (Godwin 2026-11-09). */
+  height: 100lvh;
+  overflow: hidden;
+  background: var(--surface-100);
+  transition: background-color var(--wyg-theme-glide) var(--landing-ease-glide);
+}
+
+.wyg__frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--landing-wyg-frame-width);
+  height: var(--landing-wyg-frame-height);
+  translate: -50% -50%;
+  scale: var(--wyg-scale);
+}
+
+.wyg__copy {
+  position: absolute;
+  left: var(--landing-wyg-copy-left);
+  top: 50%;
+  width: var(--landing-wyg-copy-width);
+  translate: 0 -50%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xl);
+}
+
+/* The leaving sentence and the arriving one share one cell, so the block keeps the taller one's height. */
+.wyg__sentences {
+  display: grid;
+}
+
+.wyg__sentences > .wyg__layer {
+  grid-area: 1 / 1;
+}
+
+.wyg__parts,
+.wyg[data-layout="stage"] .wyg__layer--parts {
+  position: absolute;
+  inset: var(--space-none);
+}
+
+.wyg[data-layout="stage"] .wyg__part {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  translate: -50% -50%;
+}
+
+.wyg__part {
+  rotate: var(--tilt);
+}
+
+.wyg__part[data-vector] {
+  display: flex;
+  color: var(--icon-brand);
+  transition: color var(--wyg-theme-glide) var(--landing-ease-glide);
+}
+
+/* ---------- Text motion: the hero description's ---------- */
+
+/* A new sentence's words rise in one after another, once the last one has gone (duration/xs). */
+.wyg__layer[data-entering] .wyg__word {
+  animation: wyg-rise var(--wyg-rise) var(--landing-ease-glide) both;
+  animation-delay: calc(var(--duration-xs) + var(--d) * var(--wyg-stagger));
+}
+
+@keyframes wyg-rise {
+  from {
+    opacity: 0;
+    translate: 0 var(--wyg-rise-y);
+  }
+}
+
+/* What leaves goes quickly, text and parts together (exit quicker than entrance, docs/motion.md). */
+.wyg__layer[data-leaving] {
+  animation: wyg-leave var(--duration-xs) var(--easing-out) both;
+  pointer-events: none;
+}
+
+@keyframes wyg-leave {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------- Parts: components appear one after another, icons pop ---------- */
+
+/* Components rise into view a little, one after another (Godwin 2026-11-09: no pop on the components). transform,
+   not translate: translate places a part on the stage. */
+.wyg__layer--parts[data-entering] .wyg__part:not([data-vector]) {
+  animation: wyg-appear var(--duration-lg) var(--easing-out) both;
+  animation-delay: calc(var(--duration-xs) + var(--k) * var(--wyg-appear-stagger));
+}
+
+@keyframes wyg-appear {
+  from {
+    opacity: 0;
+    transform: translateY(var(--wyg-appear-y));
+  }
+}
+
+/* The drawn icons keep the hero icons' pop. */
+.wyg__layer--parts[data-entering] .wyg__part[data-vector] {
+  animation: wyg-pop var(--wyg-pop) var(--wyg-ease-pop) both;
+  animation-delay: calc(var(--duration-xs) + var(--k) * var(--wyg-pop-stagger));
+}
+
+@keyframes wyg-pop {
+  from {
+    opacity: 0;
+    scale: var(--wyg-pop-from);
+  }
+}
+
+/* ---------- The parts themselves ---------- */
+
+/* Modal's own card (modal.css), shown in place instead of opened as a dialog. */
+.bland-modal.wyg-modal {
+  position: relative;
+  inset: auto;
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  max-height: none;
+  opacity: 1;
+  transform: none;
+}
+
+.wyg-field {
+  width: var(--landing-wyg-field-width);
+}
+
+.wyg-tabs {
+  width: var(--landing-wyg-tabs-width);
+}
+
+.wyg-accordion {
+  width: var(--landing-wyg-accordion-width);
+}
+
+.wyg-upload {
+  width: var(--landing-wyg-upload-width);
+  max-width: 100%;
+}
+
+.wyg-chat {
+  margin: var(--space-none);
+  padding: var(--space-none);
+  list-style: none;
+}
+
+/* The button is pressed now and then: Bland's press feedback, scale 0.97 over duration/sm. */
+.wyg-press {
+  display: inline-flex;
+  animation: wyg-press var(--wyg-press-loop) var(--easing-out) infinite;
+}
+
+@keyframes wyg-press {
+  0%,
+  86%,
+  100% {
+    scale: 1;
+  }
+
+  90%,
+  93% {
+    scale: var(--wyg-press-scale);
+  }
+}
+
+/* The accessibility figure: arms and legs start together and spread out from the shoulders and hips (Figma
+   annotation), then close and spread again on a loop, like a star jump. */
+.wyg-figure__arm,
+.wyg-figure__leg {
+  transform-box: view-box;
+  animation: var(--wyg-figure-loop) var(--landing-ease-glide) infinite both;
+  animation-delay: calc(var(--duration-xs) + var(--wyg-pop) * 0.5);
+}
+
+.wyg-figure__arm[data-side="left"] {
+  --_closed: calc(var(--wyg-arm-closed) * -1);
+
+  animation-name: wyg-spread;
+}
+
+.wyg-figure__arm[data-side="right"] {
+  --_closed: var(--wyg-arm-closed);
+
+  animation-name: wyg-spread;
+}
+
+.wyg-figure__leg[data-side="left"] {
+  --_closed: calc(var(--wyg-leg-closed) * -1);
+
+  animation-name: wyg-spread;
+}
+
+.wyg-figure__leg[data-side="right"] {
+  --_closed: var(--wyg-leg-closed);
+
+  animation-name: wyg-spread;
+}
+
+@keyframes wyg-spread {
+  0%,
+  100% {
+    rotate: var(--_closed);
+  }
+
+  18%,
+  78% {
+    rotate: none;
+  }
+}
+
+/* The eye opens, stays open and blinks shut now and then. */
+.wyg-eye__open,
+.wyg-eye__closed {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: var(--wyg-blink-loop) var(--easing-out) infinite both;
+}
+
+.wyg-eye__open {
+  animation-name: wyg-eye-open;
+}
+
+.wyg-eye__closed {
+  animation-name: wyg-eye-closed;
+}
+
+@keyframes wyg-eye-open {
+  0% {
+    opacity: 0;
+    scale: 1 var(--wyg-lid-shut);
+  }
+
+  10%,
+  86%,
+  96%,
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+
+  90% {
+    opacity: 0;
+    scale: 1 var(--wyg-lid-shut);
+  }
+}
+
+@keyframes wyg-eye-closed {
+  0%,
+  89%,
+  91% {
+    opacity: 1;
+  }
+
+  8%,
+  86%,
+  94%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* The icon grid draws itself: the pixel grid, then the keylines, then the icon (Figma annotation). */
+.wyg-grid__line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: wyg-draw var(--wyg-draw) var(--landing-ease-glide) forwards;
+  animation-delay: calc(var(--duration-xs) + var(--wyg-pop) * 0.5 + var(--g) * var(--wyg-draw-stagger));
+}
+
+.wyg-grid__icon .wyg-grid__line {
+  animation-duration: var(--wyg-draw-icon);
+}
+
+@keyframes wyg-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.wyg-grid__frame,
+.wyg-grid__cross {
+  animation: wyg-fade-in var(--wyg-pop) var(--landing-ease-glide) both;
+}
+
+.wyg-grid__cross {
+  animation-delay: calc(var(--duration-xs) + var(--wyg-pop) * 0.5 + 60 * var(--wyg-draw-stagger) + var(--wyg-draw-icon));
+}
+
+@keyframes wyg-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---------- A phone: the same pinned stage, the parts under the sentence (Godwin 2026-11-09) ---------- */
+
+.wyg__phone {
+  position: absolute;
+  /* The content stays in the small viewport, so the address bar never covers it. */
+  inset: var(--space-none) var(--space-none) calc(100lvh - 100svh);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* More room between the words and the components than the blocks had (space-2xl). WhatYouGet.tsx zooms the
+     parts down when sentence and parts would not fit the screen together. */
+  gap: var(--space-4xl);
+  padding: var(--space-3xl) var(--layout-margin-mobile);
+}
+
+/* "What you get" sits close over its sentence (space-sm, was space-4xl). */
+.wyg__phone .wyg__copy {
+  position: static;
+  width: auto;
+  translate: none;
+  gap: var(--space-sm);
+}
+
+.wyg__phone .wyg__tag,
+.wyg__phone .wyg__sentence {
+  font: var(--type-heading-sm);
+}
+
+.wyg__phone .wyg__parts {
+  position: static;
+}
+
+.wyg__cluster {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xl);
+  row-gap: var(--space-2xl);
+}
+
+/* A part never runs wider than the screen; the widest (Modal, File upload) take the width there is. */
+.wyg__cluster .wyg__part {
+  max-width: 100%;
+  /* Figma's tilt, softened: a part as wide as the screen turned 10° runs into its neighbours. */
+  rotate: calc(var(--tilt) * var(--wyg-phone-tilt));
+}
+
+/* The parts above the sentence stand side by side (Godwin 2026-11-09: the stacked pairs took too much height), a
+   little narrower than Figma's, and may run past the screen's edges, which clip them. */
+.wyg__parts[data-half="top"] .wyg__cluster {
+  flex-wrap: nowrap;
+  gap: var(--space-lg);
+}
+
+/* The component pairs only: the drawn icons above and under a sentence keep one size. */
+.wyg__parts[data-half="top"] .wyg__cluster:is([data-slide="parts"], [data-slide="dark"], [data-slide="motion"]) {
+  zoom: var(--landing-wyg-pair-zoom-sm);
+}
+
+.wyg__parts[data-half="top"] .wyg__cluster .wyg__part {
+  flex: none;
+  max-width: none;
+}
+
+.wyg__phone .wyg-field {
+  width: var(--landing-wyg-field-width-sm);
+}
+
+.wyg__phone .wyg-modal {
+  width: var(--landing-wyg-modal-width-sm);
+}
+
+.wyg__phone .wyg-upload {
+  width: var(--landing-wyg-upload-width-sm);
+}
+
+.wyg__phone .wyg-accordion {
+  width: var(--landing-wyg-accordion-width-sm);
+}
+
+/* A phone's parts are smaller than Figma's (Godwin 2026-11-09), the drawn icons smaller still. WhatYouGet.tsx
+   zooms them down further when they and the sentence do not fit the screen together. */
+.wyg__phone .wyg__cluster {
+  zoom: var(--landing-wyg-parts-zoom-sm);
+}
+
+.wyg__cluster .wyg__part[data-vector] {
+  zoom: var(--landing-wyg-icon-zoom-sm);
+}
+
+/* A part that grows (the Accordion opening) sits over an unseen copy at its largest, so it never moves the page. */
+.wyg__reserve {
+  display: grid;
+}
+
+.wyg__reserve > * {
+  grid-area: 1 / 1;
+  align-self: start;
+}
+
+.wyg__reserve-room {
+  visibility: hidden;
+}
+
+/* ---------- Screen readers ---------- */
+
+/* One pixel square: clipped, but on a phone its full-width line still widened the page (2026-11-09). */
+.wyg__hidden {
+  position: absolute;
+  width: var(--space-3xs);
+  height: var(--space-3xs);
+  margin: calc(-1 * var(--space-3xs));
+  padding: var(--space-none);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Reduced motion: opacity and color only ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .wyg__layer[data-entering] .wyg__word,
+  .wyg__layer--parts[data-entering] .wyg__part:not([data-vector]),
+  .wyg__layer--parts[data-entering] .wyg__part[data-vector] {
+    animation-name: wyg-fade-in;
+    animation-duration: var(--duration-md);
+    animation-timing-function: var(--easing-out);
+  }
+
+  .wyg-press,
+  .wyg-figure__arm[data-side],
+  .wyg-figure__leg[data-side],
+  .wyg-eye__open,
+  .wyg-grid__line,
+  .wyg-grid__frame,
+  .wyg-grid__cross {
+    animation: none;
+  }
+
+  .wyg-eye__closed {
+    animation: none;
+    opacity: 0;
+  }
+
+  .wyg-grid__line {
+    stroke-dashoffset: 0;
+  }
+}

@@ -1,0 +1,109 @@
+/*
+ * The horizontal feature row (Figma 7141:36653). Tokens only; Figma's own values are --landing-row-* in
+ * landing-values.css. FeatureRow.tsx sets each card's translate, scale, opacity and z-index every frame, so
+ * nothing here transitions them.
+ */
+
+/* A tall track: one screen for the stage plus `screensPerCard` screens for each card after the first. */
+.row {
+  position: relative;
+  height: calc(100svh + (var(--row-count) - 1) * var(--row-screens-per-card) * 100svh);
+  background: var(--surface-100);
+  color: var(--text-bold);
+}
+
+.row__stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.row__card {
+  --bland-radius: var(--rad-lg);
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--landing-row-card-width);
+  height: var(--landing-row-card-height);
+  translate: -50% -50%;
+  transform-origin: center;
+  will-change: translate, scale, opacity;
+}
+
+.row__content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--rad-lg);
+  background: var(--surface-raised);
+}
+
+/* More room between the picture and the words above and under it (Godwin 2026-11-08): space-3xl, was space-xl. */
+.row__title {
+  margin: 0;
+  padding: var(--space-xl) var(--space-md) var(--space-3xl);
+  font: var(--type-heading-sm);
+  letter-spacing: var(--landing-row-title-tracking);
+  color: var(--text-bold);
+}
+
+@media (min-width: 768px) {
+  .row__title {
+    font: var(--type-heading-lg);
+    letter-spacing: var(--landing-row-title-tracking);
+  }
+}
+
+.row__picture {
+  --bland-radius: var(--rad-lg);
+
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--surface-200);
+}
+
+.row__description {
+  margin: 0;
+  padding: var(--space-3xl) var(--space-md) var(--space-xl);
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+  color: var(--text-bold);
+}
+
+/* Over a neighbour: a press brings it to the middle. */
+.row__pick {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+}
+
+/* The row's taller picture: the component wall's rows spread to fill it, so no empty band shows above or below. */
+.row__picture .components-pic__wall {
+  gap: var(--space-3xl);
+}
+
+/* ---------- A phone: the cards stacked (Godwin 2026-11-09) ---------- */
+
+.row[data-layout="stack"] {
+  display: flex;
+  flex-direction: column;
+  /* More room between features (Godwin 2026-11-09: space-xl was too tight). */
+  gap: var(--space-5xl);
+  height: auto;
+  /* Room from the hero above and the Brand theme below (Godwin 2026-11-09). */
+  padding: var(--space-7xl) var(--layout-margin-mobile);
+}
+
+.row[data-layout="stack"] .row__card {
+  position: relative;
+  top: auto;
+  left: auto;
+  width: 100%;
+  translate: none;
+  will-change: auto;
+}
