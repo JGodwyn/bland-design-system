@@ -1000,3 +1000,15 @@ shell never produces. Also: don't point two Playwright runs at one log file.
 - Symptom: reloading the landing page partway down jumps back to the top.
 - Cause: everything under the hero is a lazy chunk loaded after the hero paints, so when the browser restores the scroll the page is one screen tall and the position clamps to 0.
 - Rule: a page that grows after first paint keeps its own scroll memory (`site/src/scroll-memory.ts`: `scrollRestoration = 'manual'`, restore once the page is tall enough, give up if the reader scrolls first).
+
+### Pages custom domain stays pending through the API (2026-11-17)
+
+- Symptom: `POST /accounts/{id}/pages/projects/bland/domains` for blandui.com and www returned `initializing`, then `pending` with no error; the domains never answered.
+- Cause: the dashboard writes the domain's DNS record when you add a custom domain; the API does not. The blandui.com zone had no records at all.
+- Rule: after adding a Pages domain by API, add a proxied CNAME to `<project>.pages.dev` in the zone yourself (apex too, Cloudflare flattens it), then the certificate issues within minutes.
+
+### Claude in Chrome is not Dia (2026-11-17)
+
+- Symptom: Godwin was signed in to Cloudflare in Dia, but the browser the extension drove landed on Cloudflare's login page.
+- Cause: the Claude extension runs in a separate browser with its own sign-ins.
+- Rule: before driving a dashboard, ask which browser holds the sign-in; sign-ins and passwords stay Godwin's to enter.

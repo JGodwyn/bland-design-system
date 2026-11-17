@@ -1,6 +1,6 @@
 # Release
 
-How Bland goes live: the package and the docs site. The package is on public npm as `bland-ui` (0.1.0 on 2026-10-30, 0.1.1 prepared 2026-10-31); the docs site is not deployed yet (Cloudflare Pages, below). The `brand` command is not in the package: projects copy their `brand.css` from the docs site's Brand theme page, or run `npm run brand` in a clone of this repo.
+How Bland goes live: the package and the docs site. The package is on public npm as `bland-ui` (0.1.0 on 2026-10-30, 0.1.1 prepared 2026-10-31); the site is live at https://blandui.com since 2026-11-17 (Cloudflare Pages, below). The `brand` command is not in the package: projects copy their `brand.css` from the docs site's Brand theme page, or run `npm run brand` in a clone of this repo.
 
 ## What is ready
 
@@ -120,6 +120,8 @@ Go live (deploys on every push to `main` from then on): Cloudflare dashboard, Wo
 | Build output directory | `dist-site` |
 
 The site is then at `https://<project-name>.pages.dev` (a custom domain can be added in the project's settings). Cloudflare builds what is on GitHub, so local commits need a push first.
+
+**Live since 2026-11-17** at https://blandui.com: Pages project `bland` (https://bland-65y.pages.dev) in Godwin's account, built from `main` on every push (preview deployments off, build caching on, `NODE_VERSION` 24). Cloudflare's GitHub app is installed on `JGodwyn/bland-design-system` only. Domains `blandui.com` and `www.blandui.com`, each a proxied CNAME to `bland-65y.pages.dev` in the blandui.com zone. Created through the Cloudflare API MCP (`claude mcp add --transport http cloudflare https://mcp.cloudflare.com/mcp`); adding a domain to a Pages project through the API does not write its DNS record, the dashboard does (`LEARNINGS.md`).
 
 Or deploy from this Mac without Git (after `npx wrangler login` once):
 

@@ -2531,3 +2531,10 @@ Godwin tried the landing page on his phone and sent a list of changes.
 - Lint, typecheck, and the landing + docs specs: 394 passed, 2 skipped (Chromium, WebKit); hero and Figma kit specs rerun after the fix, 25 passed.
 - Domain candidates, checked by RDAP (404 = unregistered) on 2026-11-17: blandui.com, blandui.dev, bland-ui.dev, usebland.dev free; bland.design and bland-ui.com show no record. Taken: bland.dev (parked at Afternic), usebland.com, blanddesign.com.
 - Domain: Godwin bought blandui.com (2026-11-17). `SITE_URL = 'https://blandui.com'` in `site/vite.config.ts`; the build now writes the canonical link, absolute og:image and og:url, `sitemap.xml` (`/`, `/docs/`), the robots.txt Sitemap line and `/.well-known/ard.json`; `404.html` gets no canonical. `docs/release.md` and the CLAUDE.md roadmap updated. Site, footer, Figma kit and FAQ specs: 78 passed in Chromium and WebKit (Firefox does not launch on macOS 27, all 39 of its runs failed to start).
+
+### Site live on Cloudflare Pages (2026-11-17, top session)
+
+- Cloudflare API MCP added by Godwin; whoami jon.godwynn@gmail.com, one account, blandui.com zone active, no Pages projects.
+- GitHub link in Claude in Chrome: Godwin signed in to Cloudflare and GitHub himself; with his yes, authorized "Cloudflare Workers and Pages" and installed it on JGodwyn (personal) with Only select repositories: bland-design-system.
+- Pages project `bland` created by API (production branch main, `npm run site:build` into `dist-site`, previews off, NODE_VERSION 24): subdomain bland-65y.pages.dev. First deployment triggered by API: queued, clone, build, deploy all success in about 15 s of deploy.
+- Domains blandui.com and www.blandui.com added by API stayed pending: no DNS records. Added two proxied CNAMEs to bland-65y.pages.dev; verification went active, certificate pending at the time of writing.
