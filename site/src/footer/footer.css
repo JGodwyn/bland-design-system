@@ -216,6 +216,11 @@
   translate: 0 var(--space-2xs);
 }
 
+/* The GitHub mark is an icon, centred on the row like the pills; only the npm wordmark sits lower. */
+.ft__mark--icon {
+  translate: none;
+}
+
 .ft__npm {
   display: block;
   width: var(--landing-footer-npm-width);

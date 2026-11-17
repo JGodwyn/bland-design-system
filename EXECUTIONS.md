@@ -2538,3 +2538,8 @@ Godwin tried the landing page on his phone and sent a list of changes.
 - GitHub link in Claude in Chrome: Godwin signed in to Cloudflare and GitHub himself; with his yes, authorized "Cloudflare Workers and Pages" and installed it on JGodwyn (personal) with Only select repositories: bland-design-system.
 - Pages project `bland` created by API (production branch main, `npm run site:build` into `dist-site`, previews off, NODE_VERSION 24): subdomain bland-65y.pages.dev. First deployment triggered by API: queued, clone, build, deploy all success in about 15 s of deploy.
 - Domains blandui.com and www.blandui.com added by API stayed pending: no DNS records. Added two proxied CNAMEs to bland-65y.pages.dev; verification went active, certificate pending at the time of writing.
+
+### Footer links on GitHub (2026-11-17, top session)
+
+- Godwin: point the footer at GitHub now the repo is public. `FOOTER_LINKS` in `site/src/footer/Footer.tsx`: Changelog → GitHub `CHANGELOG.md`, MIT license → GitHub `LICENSE`, new GitHub mark (Figma's, left out while the repo was private) before the npm wordmark, named "Bland on GitHub", centred on the row (`.ft__mark--icon` drops the npm wordmark's space-2xs drop). The copyright already reads "Released under the MIT license" (no "All rights reserved").
+- Footer spec updated; 14 passed in Chromium and WebKit; lint and typecheck pass; checked in Chrome at 1440.

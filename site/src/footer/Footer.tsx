@@ -11,6 +11,7 @@ import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react
 import { CodeSnippet, CodeText, Icon, Logo } from '../../../src';
 import { clamp01, wave } from '../hero/story';
 import { footerStyle, useFooterTuning, type FooterTuning } from './tuning';
+import { GitHubIcon } from '../icons';
 import { LogIcon, MitIcon, NpmLogo, ReadCvLogoIcon } from './vectors';
 import './footer.css';
 
@@ -39,8 +40,10 @@ import { Button } from 'bland-ui';
  */
 export const FOOTER_LINKS = {
   docs: '/docs/',
-  changelog: 'https://www.npmjs.com/package/bland-ui?activeTab=code',
-  license: 'https://unpkg.com/bland-ui/LICENSE',
+  // The repo is public since 2026-11-10: the changelog and license are read on GitHub.
+  changelog: 'https://github.com/JGodwyn/bland-design-system/blob/main/CHANGELOG.md',
+  license: 'https://github.com/JGodwyn/bland-design-system/blob/main/LICENSE',
+  github: 'https://github.com/JGodwyn/bland-design-system',
   npm: 'https://www.npmjs.com/package/bland-ui',
 };
 
@@ -236,6 +239,19 @@ export function Footer() {
                   <MitIcon />
                 </Icon>
                 <span className="ft__label">MIT license</span>
+              </a>
+            </li>
+            <li>
+              <a
+                className="ft__mark ft__mark--icon bland-focus-ring bland-smooth"
+                href={FOOTER_LINKS.github}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Bland on GitHub"
+              >
+                <Icon size="md">
+                  <GitHubIcon />
+                </Icon>
               </a>
             </li>
             <li>

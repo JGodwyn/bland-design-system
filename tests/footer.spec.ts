@@ -46,8 +46,9 @@ test('Figma copy, landmark and links; dark whatever the system theme', async ({ 
   await expect(ft(page).locator('pre code')).toContainText('<Button emotion="brand" type="primary">Ship it</Button>');
   const nav = ft(page).getByRole('navigation', { name: 'Footer' });
   await expect(nav.getByRole('link', { name: 'Read the docs' })).toHaveAttribute('href', '/docs/');
-  await expect(nav.getByRole('link', { name: 'Changelog' })).toHaveAttribute('href', /npmjs\.com\/package\/bland-ui/);
-  await expect(nav.getByRole('link', { name: 'MIT license' })).toHaveAttribute('href', /bland-ui\/LICENSE$/);
+  await expect(nav.getByRole('link', { name: 'Changelog' })).toHaveAttribute('href', 'https://github.com/JGodwyn/bland-design-system/blob/main/CHANGELOG.md');
+  await expect(nav.getByRole('link', { name: 'MIT license' })).toHaveAttribute('href', 'https://github.com/JGodwyn/bland-design-system/blob/main/LICENSE');
+  await expect(nav.getByRole('link', { name: 'Bland on GitHub' })).toHaveAttribute('href', 'https://github.com/JGodwyn/bland-design-system');
   await expect(nav.getByRole('link', { name: 'bland-ui on npm' })).toHaveAttribute('href', 'https://www.npmjs.com/package/bland-ui');
   await expect(ft(page).getByText('© 2026 Godwin John. Released under the MIT license.')).toBeVisible();
   // The page's colors are the dark theme's whatever the system says.
