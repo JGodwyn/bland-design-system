@@ -1,73 +1,98 @@
-// Step 2, "See every pairing in light and dark, and fix the ones that fail." A checklist of four real pairings for
-// #e11d74, each drawn in its own theme beside its ratio and a Pass or Fails badge. The numbers are the brand
-// tool's (`npm run brand -- check`, 2026-11-08): the light button label and link are 5.82:1, the dark link 9.22:1,
-// and the dark progress fill against its track 2.85:1, under 3:1. On a loop the failing row's Fix is pressed:
-// step 400 moves from #ec6290 to #f16694, the tool's own suggestion, the ratio rolls to 3.00:1 and the badge
-// turns to Pass; then the list starts over. Decorative: aria-hidden and inert.
-import { Badge, Button, ProgressBar } from '../../../../src';
+// Step 2, the contrast check, as a small copy of what the Brand theme page does when you change the color
+// (playground/docs/BrandPage.tsx, Contrast; Godwin 2026-11-11: "mirror, however minified, what happens on the Brand
+// theme page"). The color card goes from Bland's blue to #e11d74 and its shades follow; the page's "Contrast
+// warning" Banner folds in with Fix contrast and Show breakdown; the breakdown opens on the one real miss the brand
+// tool finds for this color (dark, progress fill on its track, 2.85:1, needs 3:1, lighten 400), in its own card
+// under the panel as a table row (Figma 7250:44499: the panel is the color, eight shades and the Banner; the
+// thirteen-step strip is gone, Godwin 2026-11-11: "mirror what's on Figma, throw what isn't useful away"); Fix contrast is
+// pressed, step 400 takes the tool's #f16694 and the warning folds away, as on the page, where only a miss shows.
+// Then the color goes back to blue. Decorative: aria-hidden and inert.
+import type { CSSProperties } from 'react';
+import { Banner, Button, CodeText } from '../../../../src';
 import { useLoop } from '../../features/playback';
 import { Roll } from '../../features/Roll';
 
-type Row = { id: string; mode: 'light' | 'dark'; label: string; ratio: string; needs: string; sample: 'button' | 'link' | 'progress' };
-const ROWS: Row[] = [
-  { id: 'button', mode: 'light', label: 'Button label', ratio: '5.82', needs: '4.5', sample: 'button' },
-  { id: 'link', mode: 'light', label: 'Link on the page', ratio: '5.82', needs: '4.5', sample: 'link' },
-  { id: 'dark-link', mode: 'dark', label: 'Link on the page', ratio: '9.22', needs: '4.5', sample: 'link' },
-  { id: 'progress', mode: 'dark', label: 'Progress on its track', ratio: '2.85', needs: '3', sample: 'progress' },
+/** Eight of the thirteen shades, light to dark, as Figma's row. */
+const SHADES = [100, 200, 300, 400, 500, 600, 800, 900] as const;
+
+type Frame = { brand: 'blue' | 'pink'; warning?: true; breakdown?: true; press?: true; fixed?: true; hold: number };
+// 0 Bland's blue: nothing to report. 1 the color changes. 2 the warning folds in. 3 the breakdown opens. 4 Fix
+// contrast goes down. 5 fixed: step 400 moves and the warning folds away. Then back to blue.
+const FRAMES: Frame[] = [
+  { brand: 'blue', hold: 1300 },
+  { brand: 'pink', hold: 700 },
+  { brand: 'pink', warning: true, hold: 1500 },
+  { brand: 'pink', warning: true, breakdown: true, hold: 1900 },
+  { brand: 'pink', warning: true, breakdown: true, press: true, hold: 160 },
+  { brand: 'pink', fixed: true, hold: 2600 },
 ];
-
-// 0 the failing row stands out; 1 Fix goes down; 2 fixed, the ratio rolls and the badge passes; 3 the list fades
-// out to start again (the loop's reset, as one move).
-const HOLD = [1800, 160, 2800, 360];
-const POSTER = 2;
-
-function Sample({ row }: { row: Row }) {
-  if (row.sample === 'button')
-    return (
-      <Button emotion="brand" type="primary" size="xs">
-        Save
-      </Button>
-    );
-  if (row.sample === 'link') return <span className="check-pic__link">Docs</span>;
-  return <ProgressBar value={64} showValue={false} aria-label="" className="check-pic__progress" />;
-}
+const HOLD = FRAMES.map((f) => f.hold);
+const POSTER = 3;
 
 export function CheckPicture({ active, reduced }: { active: boolean; reduced: boolean }) {
   const step = useLoop(active, reduced, HOLD, 0, POSTER);
-  const fixed = step === 2 || step === 3;
+  const frame = FRAMES[step] ?? FRAMES[0]!;
+  const pink = frame.brand === 'pink';
   return (
-    <div className="check-pic brand-pink" data-theme="light" data-step={step} aria-hidden inert>
-      <div className="check-pic__list bland-smooth" data-leaving={step === 3 || undefined}>
-        {ROWS.map((row) => {
-          const failing = row.id === 'progress' && !fixed;
-          return (
-            <div key={row.id} className="check-pic__row" data-failing={failing || undefined}>
-              <span className="check-pic__sample bland-smooth brand-pink" data-theme={row.mode} data-fixed={(row.id === 'progress' && fixed) || undefined}>
-                <Sample row={row} />
-              </span>
-              <span className="check-pic__what">
-                <span className="check-pic__label">{row.label}</span>
-                <span className="check-pic__mode">
-                  {row.mode === 'light' ? 'Light' : 'Dark'} · needs {row.needs}:1
-                </span>
-              </span>
-              <span className="check-pic__ratio">
-                <Roll value={`${row.id === 'progress' && fixed ? '3.00' : row.ratio}:1`} />
-              </span>
-              {row.id === 'progress' && !fixed ? (
-                <span className="check-pic__fix" data-pressed={step === 1 || undefined}>
-                  <Button emotion="brand" type="secondary" size="xs">
-                    Fix
+    <div
+      className={`check-pic${pink ? ' brand-pink' : ''}`}
+      data-theme="light"
+      data-step={step}
+      data-fixed={frame.fixed || undefined}
+      aria-hidden
+      inert
+    >
+      <div className="check-pic__panel bland-smooth">
+        <div className="check-pic__color">
+          <span className="check-pic__swatch bland-smooth" />
+          <span className="check-pic__hex">
+            <Roll value={pink ? '#E11D74' : '#387EFF'} />
+          </span>
+        </div>
+        <div className="check-pic__steps">
+          {SHADES.map((s, i) => (
+            <span
+              key={s}
+              className="check-pic__step bland-smooth"
+              data-moved={(frame.fixed && s === 400) || undefined}
+              style={{ '--s': `var(--brand-${s})`, '--i': i } as CSSProperties}
+            />
+          ))}
+        </div>
+        <div className="check-pic__fold" data-open={frame.warning || undefined}>
+          <div className="check-pic__fold-inner">
+            <Banner
+              status="warning"
+              colored
+              orientation="vertical"
+              title="Contrast warning"
+              className="check-pic__banner"
+              actions={
+                <>
+                  <span className="check-pic__press" data-pressed={frame.press || undefined}>
+                    <Button size="xs">Fix contrast</Button>
+                  </span>
+                  <Button size="xs" type="stroke">
+                    {frame.breakdown ? 'Hide breakdown' : 'Show breakdown'}
                   </Button>
-                </span>
-              ) : (
-                <Badge emotion="success" type="secondary" size="md">
-                  Pass
-                </Badge>
-              )}
-            </div>
-          );
-        })}
+                </>
+              }
+            >
+              1 of 35 color pairs is harder to read than it should be.
+            </Banner>
+          </div>
+        </div>
+      </div>
+      {/* The breakdown, detached from the panel above (Figma annotation, 2026-11-11). */}
+      <div className="check-pic__fold check-pic__detail" data-open={frame.breakdown || undefined}>
+        <div className="check-pic__fold-inner">
+          <div className="check-pic__finding bland-smooth">
+            <span className="check-pic__cell check-pic__cell--name">
+              <CodeText size="lg">progress</CodeText>
+            </span>
+            <span className="check-pic__cell">Fill on its track in dark: 2.85:1, needs 3:1</span>
+          </div>
+        </div>
       </div>
     </div>
   );

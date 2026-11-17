@@ -1,13 +1,13 @@
-// The FAQ's copy (docs/landing-copy.md, "FAQ"; change it there first). Figma 7189:37802's twelve questions, in its
+// The FAQ's copy (docs/landing-copy.md, "FAQ"; change it there first). Figma 7189:37802's questions, in its
 // order (Godwin's redesign, 2026-11-09); the first answer is Figma's own, the rest are written for them. Every
 // answer is checked against the repo: package.json, docs/brand.md, docs/release.md, docs/agent-skill.md, CLAUDE.md.
 import type { ReactNode } from 'react';
 import { CodeText } from '../../../src';
 
 /** The heading in its two lines, broken after "questions" at every width (Godwin 2026-11-09). */
-export const FAQ_TITLE = ['Some questions', 'about Bland'];
+export const FAQ_TITLE = ['Frequently asked', 'questions'];
 export const FAQ_LINE =
-  'Common questions about brand tokens, light and dark modes, and how the system behaves when you change the color.';
+  'Brand tokens, light and dark themes, and what changes when you change the color.';
 
 /** Inline code in an answer: Bland's own CodeText at the answer's size. */
 const C = ({ children }: { children: string }) => <CodeText size="sm">{children}</CodeText>;
@@ -15,7 +15,7 @@ const C = ({ children }: { children: string }) => <CodeText size="sm">{children}
 export const QUESTIONS: { q: string; a: ReactNode }[] = [
   {
     q: 'How do brand tokens work?',
-    a: 'Change the brand token once, and every button, field, chart, and surface updates automatically. The system keeps the same names, sizes, and states, so your design stays consistent.',
+    a: 'Override the brand color once and every button, field, chart and surface updates, in light and dark. Component names, sizes and states stay the same, so nothing else in your code changes.',
   },
   {
     q: 'Do I need to write custom CSS?',
@@ -35,10 +35,6 @@ export const QUESTIONS: { q: string; a: ReactNode }[] = [
         until you set <C>{'data-theme="light"'}</C> or <C>{'"dark"'}</C>, on the whole page or on one section.
       </>
     ),
-  },
-  {
-    q: 'Is this ready for production?',
-    a: 'Bland is on npm at version 0.1, and every component is checked for keyboard use and accessibility in Chromium, WebKit and Firefox. Before 1.0 a minor release can change an API, but an old name keeps working, with a warning, for one minor version, so you can upgrade at your own pace.',
   },
   {
     q: 'How can I customize the spacing between elements?',
@@ -81,11 +77,11 @@ export const QUESTIONS: { q: string; a: ReactNode }[] = [
     ),
   },
   {
-    q: 'How do tokens integrate with design systems?',
-    a: "They are this one's foundation. Each Figma variable becomes a CSS token with the same name, and every component reads only tokens, so a change in Figma reaches the code in one sync. Use the same tokens in your own UI and it matches.",
+    q: 'How do Figma and code stay in sync?',
+    a: "Each Figma variable becomes a CSS token with the same name, and every component reads only tokens, so a change in Figma reaches the code in one sync. Use the same tokens in your own UI and it matches.",
   },
   {
     q: 'Are there performance considerations for token usage?',
-    a: 'Very few. Tokens are CSS variables in one stylesheet, so light, dark and your brand are all applied by plain CSS, with no JavaScript doing the theming.',
+    a: 'Minimal. Tokens are CSS variables in one stylesheet, so light, dark and your brand are applied by CSS alone, with no JavaScript doing the theming.',
   },
 ];

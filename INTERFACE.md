@@ -2584,3 +2584,37 @@ Reverses "Code has no picker" (Font tester: six presets) and "Code keeps Geist M
 - One address setting (2026-11-10): `SITE_URL` in `site/vite.config.ts` (unset until the domain is known) drives the canonical link, absolute `og:image` / `og:url`, `sitemap.xml`, the robots.txt Sitemap line and `/.well-known/ard.json` (Agentic Resource Discovery, one `text/markdown` entry for `llms.txt`, identifier `urn:air:<host>:docs:bland`). robots.txt is generated, no longer in `site/public/`.
 
 - **Read the docs in dev** (Godwin 2026-11-10): the site's dev server (5182) has no docs, so `/docs/` fell through to the landing page and the button seemed dead. `devDocsRedirect()` in `site/vite.config.ts` redirects `/docs/…` to the docs dev server on 5180 (the `#/` route survives); the built site serves the docs at `/docs/` as before. Run `npm run docs` beside `npm run site` to follow the links.
+
+- **Landing copy voice** (Godwin 2026-11-11, from `docs/landing-copy-review.md`): confident and specific, every claim checkable (a count, a standard, a browser), the product or reader as the subject, never a personified component; the name's joke stays only in the hero title and the footer ("Start Bland. Ship yours."). Counts as Mantine counts: 60+ components (61 exports), 600 design tokens, 1,200+ Figma variants in 50 public sets. The FAQ names no version number, and the copyright reads "© 2026 Godwin John. Released under the MIT license." The live copy is `docs/landing-copy.md`.
+- Brand theme pictures, 2026-11-11 (Godwin): **the check picture mirrors the Brand theme page's check**, small: the color card (swatch and hex) and the shades, then the page's own "Contrast warning" Banner (warning, colored, vertical; its words) folding in with Fix contrast and Show breakdown, the breakdown's one row (the real miss for #e11d74: dark, progress fill on its track, 2.85:1, needs 3:1, lighten 400), Fix contrast pressed, shade 400 moving to the tool's #f16694 (ringed) and the warning folding away, then back to blue (folds are grid rows 0fr to 1fr, as the page's). **The pick picture's scales** are now rounded pills of 13 flush shades (brand, then a thinner neutral pill), your color a raised knob with a raised ring on step 500. **The copy picture's file card** is in Bland's dark theme (`data-theme="dark"`, with the brand on it when loaded).
+
+### Landing illustrations from Figma "Updated illustrations" (Godwin 2026-11-11, Figma 7256:45124)
+
+- Rebrand card: a hex + 8 shades panel, a Button and ticked Checkbox, a sent ChatBubble with an Avatar, and a strip of five color tabs at the foot (blue #0062FF, violet #7C3AED, green #16A34A, red #E5182E, amber #F59E0B). The tabs take turns being active (it rises) and the active color rebrands the picture, its tinted ground included. Scales are real `npm run brand -- generate` output keyed by `[data-rebrand]` in landing-values.css; tabs show the raw pick (the tool dulls near-black and amber, so black was dropped for violet).
+- Light/dark card: a date TextInput (md) with Bland's Calendar (md) open under it, split by the same draggable line.
+- Keyboard card: SectionTabs over the form, four focus stops (selected tab, Email, checkbox, Sign in); a brand dot left of the form marks the focused control (Figma's indicator).
+- Brand theme pick: swatch + hex, "500 is your brand color, unchanged", 8 shades and a hue strip whose knob slides from blue to #e11d74; a Neutrals card under it.
+- Brand theme check: the breakdown is its own card under the panel, not inside it (Figma annotation).
+- Brand theme copy: avatar initial B.
+
+### Landing illustrations, second pass (Godwin 2026-11-11)
+
+- Every illustration ground is gray (`surface-200`), the Brand theme card and the rebrand picture included; no brand tint behind them any more. The light/dark picture uses `surface-sunken`, so in dark the raised Calendar reads lighter than its ground.
+- No shadows on the illustrations' own parts (calendar popover, chart and editor panels, check panel, code and file cards, keycap, hue knob); only Bland's components keep theirs. The light/dark grip has a `stroke-sm` `border-bold` edge in place of its shadow.
+- Color rows follow Figma: each shade tucked a quarter under the one before (`-space-md`), the lighter on top; rebrand and pick shades `rad-md`, thin rows `rad-sm`. The single swatch beside a hex is one radius step up (rebrand and pick `rad-sm`, check `rad-md`).
+- Rebrand tabs: 48 square, `rad-md`, overlapping, running under the card's edge; the current one rises `space-2xl` over `RISE_MS` (640) with `easing/in-out`; shades change with a doubled stagger.
+- Keyboard card: keycap white, `rad-md`, body-lg; caption `surface-inverse` / `text-inverse`, `rad-md`, hugging its words (Figma 7249:44005). The scripted ring and the dot glide between controls over `duration/lg`; a real focus ring still jumps.
+- Check picture as Figma 7250:44499: color, eight shades, the Banner; the breakdown is a detached table-like row (`CodeText` token, then the miss).
+- The landing page keeps its scroll on a refresh or back/forward (`site/src/scroll-memory.ts`).
+
+### Landing illustrations, third pass (Godwin 2026-11-16)
+
+- Feature row titles all wrap to two balanced lines: a 9em measure (`--landing-row-title-measure`) plus `text-wrap: balance`, since the shortest title is 9.4em on one line. No orphans. (Reversed 2026-11-17, below.)
+- Grounds: the rebrand picture and every Brand theme picture are tinted with the brand they show again (`surface-brand-light`, easing in-out); the other feature cards stay gray, the light/dark one sunken.
+- Rebrand: Avatar lg (Figma's). The current color tab grows taller out of the stack (height 48 to 88, `RISE_MS` in-out), it no longer jumps.
+- Keyboard: keycap and caption ease to each new word's width (`Roll`'s `fit`, measured in layout pixels) and their words cross over in-out; the loop runs 30% slower (holds / 0.7). Captions shortened so they fit a phone: "Sign up, tab 1 of 3", "Email, text field", "Remember me, checked/unchecked", "Sign in, button"; the checkbox reads "Remember me".
+- Copy card skeleton lines are `surface-300`: `surface-200` is the dark card's own color, so they had vanished.
+
+### Feature row titles wrap only when needed (2026-11-17)
+- Godwin: forcing every title onto two lines (the 9em measure of 2026-11-16) made short ones like "Accessible by default" break oddly. The measure and `--landing-row-title-measure` are gone; a title now wraps only when its card is too narrow, and `text-wrap: balance` evens the lines so no word sits alone. On the 560 card: "60+ components, one set of tokens", "Light and dark, designed separately" and "Chart palettes from your brand" take two lines; the other three one.
+  - **"Is this ready for production?" removed** (Godwin 2026-11-17): the hero already calls Bland production-ready, and the pre-1.0 caveat confused more than it helped. Eleven questions now.

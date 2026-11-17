@@ -2470,3 +2470,64 @@ Godwin tried the landing page on his phone and sent a list of changes.
 - npm had 0.1.3; the Unreleased CHANGELOG held a Logo change that needs a minor, so the version is 0.2.0 and the entry is dated 2026-11-10.
 - Ran typecheck, lint:css, test:lint, test:tokens, test:brand, test:drift (all pass), `npm test` (1400 passed, 12 skipped, 4 failed under load; the four pass alone with `--workers=1`), `npm audit --omit=dev` (0), `npm pack --dry-run` (77 files, 154.5 kB).
 - `npm run build` failed in the declarations step: `Logo.tsx` read `process.env.NODE_ENV` and `tsconfig.build.json` has `types: []`. Dead end avoided: no `@types/node` in the library build. Fixed with a module-local `declare const process` in `Logo.tsx`. Then `npm run test:package` passed.
+
+## Landing page copy review (2026-11-10)
+
+- Godwin: the landing copy sounds like a pet project in places; review it against other design systems and plan the tweaks.
+- Read the live copy in `site/src/` (hero, features/cards.ts, what-you-get/slides.tsx, brand, showcase, figma-kit, faq, footer, 404, index.html, llms.txt).
+- Read Mantine, Chakra, React Aria, Untitled UI, Radix Themes and Carbon homepages: category plus outcome heroes, generous counts (Mantine 120+ components and 70 hooks, Untitled 10,000+ components and variants), capability headings with checkable facts, one light touch at most.
+- Counted from `dist/index.js`: 61 exported components (excluding Icon and the icons), 41 icons, about 600 unique custom properties in tokens.css. So "60+ components" and "600 design tokens".
+- Found two factual errors: the FAQ says version 0.1 (0.2.0 is out), and the footer's "All rights reserved" contradicts the MIT license.
+- Wrote `docs/landing-copy-review.md`: voice rules, current → proposed for every section. Not applied yet.
+
+## Landing page copy applied (2026-11-11)
+
+- Godwin: hero option B, apply the other suggestions, add the Figma variant count.
+- Applied in `site/src/`: hero description (same five tagged phrases and icons; "color." became "brand color", "dark." became "dark mode."), meta and og descriptions in `site/index.html`, the six feature cards, the six What you get slides, the Brand section (tag, steps, button, note), the showcase heading and line, the Figma kit line, the FAQ title, line and four answers, the footer headline and copyright. Code comments that quoted the old lines updated too.
+- Specs updated to the new strings: feature-row, footer, brand-theme, faq, showcase, what-you-get.
+- Figma count (read only, `use_figma` with `page.loadAsync()` over every page in one call): 52 public component sets, 1,281 variants; 33 private sets, 601 variants; 2,684 icon components. The Figma kit line now opens "Over 1,200 variants across 50 component sets".
+- Checked in Chrome at localhost:5182. Two lines broke the layout and were shortened: the first brand step (five lines as a headline) and the footer headline ("Start with Bland. Ship your brand." ran to four lines; now "Start Bland. Ship yours.", two). The brand note was reworded to match the new voice.
+- Dead end: the page was blank at first because two site servers shared 5182 (LEARNINGS.md); stopped the one this session started.
+- First spec run used a shell glob that matched nothing (`tests/hero*.spec.ts`), and its output was cut by `tail`; reran with the full output saved to the scratchpad.
+- `docs/landing-copy.md` rewritten to the live copy; `docs/landing-copy-review.md` marked applied.
+- Specs: 113 of 116 passed on the first full run. The footer specs counted five headline words (now four), and the hero description ran a line past Figma's block (ends at 992, not 952). Measured candidates in Chrome: option B with the tags' original wording ("button, field, chart", "dark.") keeps the old line count, so the hero uses that. Footer and hero specs rerun: 22 passed. WebKit not run for the landing specs.
+- Godwin: "React design system" on one line in the hero. `white-space: nowrap` on every `.hero__phrase` (one rule, so no highlight breaks across lines); measured first in Chrome: still five lines, "React design system" now opens line 2. site.spec.ts (phone at 320 included): 15 passed.
+- Godwin (2026-11-11): the check picture should mirror the Brand theme page; rounder scales on the pick picture in a new direction; a dark brand.css card. Read `playground/docs/BrandPage.tsx` (Contrast: a warning Banner only while something misses, Fix contrast, Show breakdown, the breakdown's Theme, Where, Contrast, Fix). Rebuilt CheckPicture as that flow in small; the pick scales as pills with a knob (brand step 500 through `--s`, the lint rejects the primitive in CSS); the file card `data-theme="dark"`. Specs: the check's warning, its words, the breakdown text, the fix (data-fixed, shade 400 rgb(241, 102, 148), the fold closed), two pills and the knob's hex, the dark card; 34 section specs pass in Chromium and WebKit. Chrome: the check ran 0, 1, 2 (warning), 3, 4, 5 (fixed), 0. Lint and typecheck pass.
+
+## Landing illustrations from Figma 7256:45124 (2026-11-11, side session)
+
+1. Read the six frames and annotations through the Figma MCP.
+2. Rebuilt RebrandPicture (tabs strip, five generated vibrant scales), ThemePicture (date field + Calendar; sm calendar was narrower than the field, moved to md), KeyboardPicture (tabs stop, focus dot), PickPicture (hue strip knob, Neutrals card), CheckPicture (breakdown detached), CopyPicture (avatar B).
+3. First tab set used near-black and amber; the brand tool shifts them to readable but dull shades, so the tabs show the raw hex via `--s` and black became violet.
+4. Specs: rebrand order and green's surface-brand rgb(0,141,60), reduced-motion poster green; pick spec reads the rolled hex and checks the knob moves right. lint:css, typecheck, feature-row + brand-theme specs: 87 passed, 2 skipped. Checked in Chrome at :5182.
+
+## Landing illustrations, second pass (2026-11-11, side session)
+
+1. Read Figma 7243:40822 (tabs: 48 squares, rad-md, -12 overlap, descending z), 7249:44005 (keycap and caption) and 7250:44499 (check).
+2. CSS: gray grounds, sunken theme ground, shadows off, overlapping shades, rounder swatches, tab rise (new RISE_MS in timing.ts), keyboard ring/dot transitions, keycap and caption restyle; avatar top-aligned with its bubble.
+3. CheckPicture: 13-step strip replaced by eight overlapping shades; breakdown as a two-cell row with CodeText.
+4. Refresh landed at the top: the sections under the hero load after the hero paints, so the browser's restore ran on a one-screen page. Added scroll-memory.ts (sessionStorage, restore once the page is tall enough, gives up on user input or after 4 s). Checked in Chrome: reload at 9000 comes back to 9000.
+5. Specs: gray ground checks, new breakdown text, `.first()` on the pick swatch (two swatches now). Feature row + Brand theme pass in Chromium and WebKit (one WebKit axe load flake passed on rerun).
+
+## Landing illustrations, third pass (2026-11-16, side session)
+
+1. Measured the six row titles at 43px in Chrome: 405 to 674px on one line; a 9em measure (387px) breaks each in two, balance evens them. Checked: all six are two lines.
+2. Rebrand: Avatar lg, tab height grows from the stack (bottom-aligned row), tint back.
+3. Keyboard: Roll gained `fit` (hidden sizer, offsetWidth, width transition); sampled in Chrome, the caption eases 115 → 167 → 202px instead of snapping. Holds × 1/0.7. Shorter captions; specs updated.
+4. Brand theme: tints back on the card and the three pictures; copy skeleton bars on surface-300 (surface-200 matched the dark card).
+5. lint:css, typecheck, feature-row + brand-theme in Chromium and WebKit: 92 passed, 2 skipped.
+
+## 2026-11-17: feature titles, wrap only when needed
+- Godwin: the forced two-line titles looked weird. Removed `max-inline-size: var(--landing-row-title-measure)` and the content-box sizing from `.row__title` (row.css) and the token from landing-values.css; kept `text-wrap: balance`. Checked in Chrome at 1440: three titles on two lines, three on one. Stylelint clean; feature-row spec 58 passed, 2 skipped.
+10. Godwin: the production answer did not read straight. Rewritten to lead with "Yes, with one thing to know", then the tests, then the one caveat (a pre-1.0 update can rename a prop or token; the old name works with a warning until the next minor; the changelog says what to change). No version number.
+11. Godwin: remove the production question (the hero already says production-ready). Removed from `questions.tsx` and `docs/landing-copy.md` (list renumbered); spec counts 11 questions and 10 rules.
+
+### Landing page final checks before launch (2026-11-17, top session)
+
+- `npm run site:build`: builds clean (only Vite's chunk-size warning on the lazy `rest` chunk, 196 KB gzipped).
+- Links: collected every `<a href>` on the built page at http://localhost:5183 after scrolling every lazy section in: 13 links. Internal: `/`, `/docs/`, `/docs/#/components/button`, `/docs/#/brand` all load their pages (docs headings Bland Design System, Button, Brand theme). External: GitHub repo, the Figma file, unpkg LICENSE answer 200; npm and figma.com answer 403 to curl (bot walls), fine in a browser.
+- Fixed: the hero's Figma icon pointed at the generic `https://www.figma.com/community`. It now uses `FIGMA_KIT_URL`, moved to `site/src/links.ts` so the hero imports it without pulling the lazy Figma kit section into the first load (`FigmaKit.tsx` re-exports it).
+- Still open: `SITE_URL` in `site/vite.config.ts` is empty, so no canonical link, no sitemap.xml, og:image stays relative (social previews need an absolute URL). Set it once the domain is bought. The docs tab title is still "Bland playground" (`playground/index.html`).
+- Lint, typecheck, and the landing + docs specs: 394 passed, 2 skipped (Chromium, WebKit); hero and Figma kit specs rerun after the fix, 25 passed.
+- Domain candidates, checked by RDAP (404 = unregistered) on 2026-11-17: blandui.com, blandui.dev, bland-ui.dev, usebland.dev free; bland.design and bland-ui.com show no record. Taken: bland.dev (parked at Afternic), usebland.com, blanddesign.com.
+- Domain: Godwin bought blandui.com (2026-11-17). `SITE_URL = 'https://blandui.com'` in `site/vite.config.ts`; the build now writes the canonical link, absolute og:image and og:url, `sitemap.xml` (`/`, `/docs/`), the robots.txt Sitemap line and `/.well-known/ard.json`; `404.html` gets no canonical. `docs/release.md` and the CLAUDE.md roadmap updated. Site, footer, Figma kit and FAQ specs: 78 passed in Chromium and WebKit (Firefox does not launch on macOS 27, all 39 of its runs failed to start).

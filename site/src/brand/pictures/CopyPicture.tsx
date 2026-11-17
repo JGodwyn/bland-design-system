@@ -57,7 +57,8 @@ export function CopyPicture({ active, reduced }: { active: boolean; reduced: boo
         lineNumbers={false}
       />
       {/* A satellite: the file as the app loads it (icon, name, a switch), over a preview that wears it. */}
-      <div className="copy-pic__app bland-smooth">
+      {/* In Bland's dark theme (Godwin 2026-11-11), with the brand on itself too, so its dark roles follow. */}
+      <div className={`copy-pic__app bland-smooth${loaded ? ' brand-pink' : ''}`} data-theme="dark">
         <div className="copy-pic__file">
           <Icon size="sm" className="copy-pic__file-icon">
             <FileIcon />
@@ -66,7 +67,7 @@ export function CopyPicture({ active, reduced }: { active: boolean; reduced: boo
           <Toggle aria-label="brand.css" checked={loaded} onCheckedChange={(on) => setMine({ on, step })} />
         </div>
         <div className="copy-pic__preview" aria-hidden inert>
-          <Avatar size="sm" initials="M" />
+          <Avatar size="sm" initials="B" />
           <span className="copy-pic__preview-lines">
             <span className="copy-pic__bar" />
             <span className="copy-pic__bar copy-pic__bar--short" />

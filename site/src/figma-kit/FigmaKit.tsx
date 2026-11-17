@@ -16,13 +16,14 @@ import { figmaKitStyle, useFigmaKitTuning } from './tuning';
 import { CodeIcon, DiamondsFourIcon, ToggleRightIcon } from './vectors';
 import './figma-kit.css';
 
-/** Where "Get the Figma kit" goes. Godwin has not named one yet (2026-11-09): the Bland file itself until then. */
-export const FIGMA_KIT_URL = 'https://www.figma.com/design/32J76yQH71a7sENjf60RqD/Bland-Design-System';
+import { FIGMA_KIT_URL } from '../links';
+
+export { FIGMA_KIT_URL };
 
 /** Figma's copy (docs/landing-copy.md, "Figma kit"). The headline breaks after the comma, as in Figma. */
 const HEADLINE = ['The whole system,', 'in Figma.'];
 const DESCRIPTION =
-  'Every component starts in the Figma kit and lands in code with the same names, sizes and states. When a token changes in Figma, code catches up in one sync.';
+  'Over 1,200 variants across 50 component sets, each starting in Figma and landing in code with the same names, sizes and states. When a token changes in Figma, code follows in a single sync.';
 const CHECKLIST: { icon: ReactNode; text: string }[] = [
   { icon: <DiamondsFourIcon />, text: 'Variables for every token' },
   { icon: <CodeIcon />, text: 'Same names as the code' },

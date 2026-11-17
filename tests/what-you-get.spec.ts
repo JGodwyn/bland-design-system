@@ -8,7 +8,7 @@ import AxeBuilder from '@axe-core/playwright';
 const site = 'http://localhost:5182/';
 const sec = (page: Page) => page.locator('section.wyg');
 const SLIDES = ['parts', 'dark', 'motion', 'everyone', 'tokens', 'icons'];
-const FIRST_WORDS = ['Every part', 'Dark mode', 'Motion with', 'Works for', 'Nothing hardcoded', 'Your icons'];
+const FIRST_WORDS = ['Complete coverage', 'A dedicated', 'Purposeful motion', 'Tested in', 'Token-driven', 'Bring your'];
 
 /** Scrolls the page to slide `i`'s place in the track (k / 5 of it) and waits for that slide's parts. */
 async function goTo(page: Page, i: number) {
@@ -41,7 +41,7 @@ test('the tag names the section; every sentence is there for screen readers', as
   await expect(sec(page).locator('.wyg__parts')).toHaveAttribute('inert', '');
 });
 
-test('scrolling down moves through the six slides; "Dark mode that thinks" turns the stage dark', async ({ page }) => {
+test('scrolling down moves through the six slides; "A dedicated dark theme" turns the stage dark', async ({ page }) => {
   await page.goto(site);
   for (const [i, id] of SLIDES.entries()) {
     await goTo(page, i);
@@ -253,7 +253,7 @@ test.describe('with reduced motion', () => {
 test.describe('on a phone', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
 
-  test('the Accordion on "Motion with manners" opens without moving the sentence', async ({ page }) => {
+  test('the Accordion on "Purposeful motion" opens without moving the sentence', async ({ page }) => {
     // Godwin 2026-11-09: on a phone its opening pushed the page down.
     await page.goto(site);
     await goTo(page, 2);

@@ -21,7 +21,7 @@ const targets = (page: Page) =>
 
 test('the headline, nine cards in Figma order, the toolbar and the link to every component', async ({ page }) => {
   await open(page);
-  await expect(page.getByRole('heading', { level: 2, name: 'Components showcase' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 2, name: 'See it in your brand' })).toBeVisible();
   await expect(cards(page)).toHaveCount(9);
   const order = await cards(page).evaluateAll((els) => els.map((el) => el.querySelector<HTMLElement>('.showcase__card-body')!.dataset.card));
   expect(order).toEqual(CARD_ORDER);

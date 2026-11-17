@@ -30,7 +30,7 @@ test('the row has the six cards, the first one in the middle and live', async ({
   await page.goto(site);
   await expect(cards(page)).toHaveCount(6);
   await goTo(page, 0);
-  await expect(cards(page).first().getByRole('heading', { level: 2 })).toHaveText('Over 45 components that fit together');
+  await expect(cards(page).first().getByRole('heading', { level: 2 })).toHaveText('60+ components, one set of tokens');
   // Only the middle card is reachable; the others are hidden from screen readers and inert.
   for (let i = 1; i < 6; i++) await expect(cards(page).nth(i)).toHaveAttribute('aria-hidden', 'true');
   expect(await cards(page).nth(1).locator('.row__content').evaluate((el) => (el as HTMLElement).inert)).toBe(true);
@@ -121,7 +121,7 @@ test('a card plays as soon as it shows, before it reaches the middle', async ({ 
   await goTo(page, 1);
   // The rebrand card is the neighbour on the right: its colors already change.
   const rebrand = cards(page).nth(2).locator('.rebrand-pic');
-  await expect(rebrand).toHaveAttribute('data-brand', 'green', { timeout: 4000 });
+  await expect(rebrand).toHaveAttribute('data-brand', 'violet', { timeout: 4000 });
   await expect(cards(page).nth(2)).not.toHaveAttribute('data-centered', 'true');
 });
 
@@ -203,12 +203,12 @@ test.describe('on a phone', () => {
 
 // docs/landing-copy.md, "Feature cards".
 const TITLES = [
-  'Over 45 components that fit together',
-  'Light and dark, each designed',
-  'One color rebrands it all',
-  'Works without a mouse',
-  'Charts in your colors',
-  'Typed down to every prop',
+  '60+ components, one set of tokens',
+  'Light and dark, designed separately',
+  'Rebrand with one color',
+  'Accessible by default',
+  'Chart palettes from your brand',
+  'Fully typed in TypeScript',
 ];
 const card = (page: Page, i: number) => cards(page).nth(i);
 
@@ -249,12 +249,17 @@ test('the rebrand story loops while its card shows, on roles computed from its o
   await page.goto(site);
   await goTo(page, 2);
   const rebrand = card(page, 2).locator('.rebrand-pic');
+  // The tabs take turns: blue, violet, green, red, amber, then blue again.
+  await expect(rebrand).toHaveAttribute('data-brand', 'violet', { timeout: 5000 });
   await expect(rebrand).toHaveAttribute('data-brand', 'green', { timeout: 5000 });
-  await expect(rebrand).toHaveAttribute('data-brand', 'orange', { timeout: 5000 });
-  // Orange's step 600 (npm run brand -- generate "#f2541b") through Surface/surface-brand; toHaveCSS retries while
+  // Green's step 600 (npm run brand -- generate "#16a34a") through Surface/surface-brand; toHaveCSS retries while
   // the dot eases between hues.
-  await expect(card(page, 2).locator('.rebrand-pic__dot')).toHaveCSS('background-color', 'rgb(213, 65, 0)');
-  await expect(rebrand).toHaveAttribute('data-brand', 'blue', { timeout: 5000 });
+  await expect(card(page, 2).locator('.rebrand-pic__dot')).toHaveCSS('background-color', 'rgb(0, 141, 60)');
+  // The active tab rises; it is the current brand.
+  await expect(rebrand.locator('.rebrand-pic__tab[data-current]')).toHaveCount(1);
+  // The ground is the brand's light tint (green's step 50, #f0f7f1; toHaveCSS retries while it eases).
+  await expect(rebrand).toHaveCSS('background-color', 'rgb(240, 247, 241)');
+  await expect(rebrand).toHaveAttribute('data-brand', 'red', { timeout: 5000 });
 });
 
 test('hovering the middle card pauses its story; leaving resumes it', async ({ page }) => {
@@ -304,13 +309,13 @@ test('Tab goes through the sign-in form and the caption reads each control', asy
   const caption = c.locator('.keyboard-pic__caption .features-roll__value:not([data-roll="out"])');
   await c.getByRole('textbox', { name: 'Email' }).focus();
   await expect(c.locator('.keyboard-pic')).toHaveAttribute('data-own-focus', 'true');
-  await expect(caption).toHaveText('Email, edit text');
+  await expect(caption).toHaveText('Email, text field');
   await page.keyboard.press('Tab');
-  const box = c.getByRole('checkbox', { name: 'Keep me signed in' });
+  const box = c.getByRole('checkbox', { name: 'Remember me' });
   await expect(box).toBeFocused();
   // The loop may have ticked it before focus came in; the caption reads the box as it is, and Space flips both.
   const ticked = await box.isChecked();
-  const state = (on: boolean) => `Keep me signed in, checkbox, ${on ? 'checked' : 'not checked'}`;
+  const state = (on: boolean) => `Remember me, ${on ? 'checked' : 'unchecked'}`;
   await expect(caption).toHaveText(state(ticked));
   await page.keyboard.press('Space');
   await expect(caption).toHaveText(state(!ticked));
@@ -363,7 +368,7 @@ test.describe('pictures under reduced motion', () => {
   test('each picture shows its poster and nothing loops', async ({ page }) => {
     await page.goto(site);
     await goTo(page, 2);
-    await expect(card(page, 2).locator('.rebrand-pic')).toHaveAttribute('data-brand', 'orange');
+    await expect(card(page, 2).locator('.rebrand-pic')).toHaveAttribute('data-brand', 'green');
     await goTo(page, 3);
     await expect(card(page, 3).locator('.keyboard-pic__caption .features-roll__value:not([data-roll="out"])')).toHaveText(
       'Sign in, button',
@@ -374,7 +379,7 @@ test.describe('pictures under reduced motion', () => {
     await expect(part).toHaveCSS('opacity', '1');
     await expect(part).toHaveCSS('translate', 'none');
     await page.waitForTimeout(3000);
-    await expect(card(page, 2).locator('.rebrand-pic')).toHaveAttribute('data-brand', 'orange');
+    await expect(card(page, 2).locator('.rebrand-pic')).toHaveAttribute('data-brand', 'green');
   });
 });
 

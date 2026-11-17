@@ -12,6 +12,7 @@ import { Icon, Logo } from '../../../src';
 // Button's CSS for the link below, which uses its classes without the component.
 import '../../../src/components/button/button.css';
 import { FigmaLogoIcon, GitHubIcon } from '../icons';
+import { FIGMA_KIT_URL } from '../links';
 import { clamp01, wave } from './story';
 import { heroStyle, useHeroTuning, type HeroTuning } from './tuning';
 import { markerImage } from './marker';
@@ -35,11 +36,11 @@ type Phrase = { text: string; icon: string; side: 'before' | 'after'; width: num
  * to 52 with the stroke outside, and were squeezed into Figma's 40 to 50 frames).
  */
 const DESCRIPTION_PARTS: (string | Phrase)[] = [
-  'A',
+  'A production-ready',
   { text: 'React design system', icon: reactIcon, side: 'before', width: 58, height: 52 },
-  'that comes alive when you give it a',
-  { text: 'color.', icon: swatchesIcon, side: 'before', width: 52, height: 52 },
-  'Pick one, and every',
+  'built on tokens. Set one',
+  { text: 'brand color', icon: swatchesIcon, side: 'before', width: 52, height: 52 },
+  'and every',
   { text: 'button, field, chart', icon: diamondsIcon, side: 'before', width: 52, height: 52 },
   'follows, in',
   { text: 'light', icon: sunIcon, side: 'before', width: 52, height: 52 },
@@ -385,7 +386,7 @@ export function Hero() {
                 </li>
               ))}
               <li className="hero__nav-figma">
-                <a className="hero__link hero__link--icon bland-focus-ring bland-smooth" href="https://www.figma.com/community">
+                <a className="hero__link hero__link--icon bland-focus-ring bland-smooth" href={FIGMA_KIT_URL}>
                   <Icon size="md" label="Figma kit">
                     <FigmaLogoIcon />
                   </Icon>

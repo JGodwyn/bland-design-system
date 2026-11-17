@@ -23,37 +23,37 @@ export type PictureProps = {
 };
 
 /** Figma's order, then the two added in code. */
-// The copy is docs/landing-copy.md, "Feature cards" (Godwin 2026-11-08): change it there first.
+// The copy is docs/landing-copy.md, "Feature cards" (Godwin 2026-11-08; reworded 2026-11-11): change it there first.
 export const FEATURES: { title: string; description: string; Picture: ComponentType<PictureProps> }[] = [
   {
-    title: 'Over 45 components that fit together',
-    description: 'Built on one set of tokens and rules, so whatever you put together looks like one product.',
+    title: '60+ components, one set of tokens',
+    description: 'Forms, navigation, overlays, tables, date pickers and messaging, built on the same 600 design tokens, so every screen stays consistent.',
     Picture: ComponentsPicture,
   },
   {
-    title: 'Light and dark, each designed',
-    description: 'Each theme is drawn on its own, not flipped. Drag the line to compare.',
+    title: 'Light and dark, designed separately',
+    description: 'Dark is its own palette, not an inverted light theme. Every surface, shadow and color is tuned for it. Drag the divider to compare.',
     Picture: ThemePicture,
   },
   {
-    title: 'One color rebrands it all',
-    description: 'Change one hex and every button, toggle and bar follows.',
+    title: 'Rebrand with one color',
+    description: 'Enter your brand color and Bland builds the full scale, tints the neutrals and updates every component.',
     Picture: RebrandPicture,
   },
   {
-    title: 'Works without a mouse',
-    description: 'Every control takes the keyboard and tells screen readers what it is. Tab through the form to try it.',
+    title: 'Accessible by default',
+    description: 'Full keyboard support, managed focus and screen reader labels on every control, built on React Aria. Tab through the form to try it.',
     Picture: KeyboardPicture,
   },
   // Added in code (Godwin 2026-11-08); not in the Figma frame yet.
   {
-    title: 'Charts in your colors',
-    description: 'Your brand leads, and every series stays clear for color-blind readers. Switch the view to check.',
+    title: 'Chart palettes from your brand',
+    description: 'Eight series colors led by your brand, each checked for contrast and kept distinct for color-blind readers. Switch the view to compare.',
     Picture: ChartsPicture,
   },
   {
-    title: 'Typed down to every prop',
-    description: 'Your editor offers every option and flags the wrong ones before they ship. Pick one to see it.',
+    title: 'Fully typed in TypeScript',
+    description: 'Every prop and variant is typed, so your editor suggests the valid options and flags the wrong ones before they ship. Pick one to see it.',
     Picture: PropsPicture,
   },
 ];

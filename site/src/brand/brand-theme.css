@@ -221,7 +221,8 @@
   grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   height: var(--landing-brand-picture-height);
   overflow: hidden;
-  /* Tinted, not gray (Godwin 2026-11-08): each picture fills the card with the light tint of the brand it shows. */
+  /* Tinted, not gray (Godwin 2026-11-08, again 2026-11-16 after trying gray): each picture fills the card with
+     the light tint of the brand it shows. */
   background: var(--surface-brand-light);
   box-shadow: inset 0 0 0 var(--stroke-sm) var(--border-subtle);
 }
@@ -246,18 +247,18 @@
   max-width: none;
 }
 
-/* ---------- 1 Pick: the picker and the scales it makes ---------- */
+/* ---------- 1 Pick (Figma 7250:44428): the color, its shades, a sliding hue knob, the neutrals ---------- */
 
 .pick-pic {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-xl);
+  gap: var(--space-sm);
   height: 100%;
-  padding-inline: var(--space-lg);
+  padding-inline: var(--space-2xl);
   background: var(--surface-brand-light);
-  transition: background-color var(--features-hue) var(--easing-out);
+  transition: background-color var(--features-hue) var(--easing-in-out);
 }
 
 .pick-pic__panel {
@@ -265,16 +266,15 @@
 
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
-  width: min(var(--landing-features-form-width), 100%);
+  gap: var(--space-sm);
+  width: 100%;
   padding: var(--space-md);
   background: var(--surface-raised);
-  box-shadow: var(--elevation-neutral-near);
 }
 
-.pick-pic__field {
+.pick-pic__head {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: var(--space-sm);
 }
 
@@ -282,188 +282,233 @@
   --bland-radius: var(--rad-sm);
 
   flex: none;
-  width: var(--control-sm);
-  height: var(--control-sm);
+  width: var(--icon-lg);
+  height: var(--icon-lg);
   background: var(--surface-brand);
   transition: background-color var(--features-hue) var(--easing-out);
 }
 
-.pick-pic__field .pick-pic__input {
-  flex: 1;
+.pick-pic__swatch--sm {
+  width: var(--icon-md);
+  height: var(--icon-md);
+}
+
+.pick-pic__hex {
+  font: var(--type-title-lg);
+  letter-spacing: var(--type-title-lg-letter-spacing);
+  color: var(--text-bold);
+}
+
+.pick-pic__label {
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+  color: var(--text-bold);
+}
+
+.pick-pic__note {
+  font: var(--type-body-md);
+  letter-spacing: var(--type-body-md-letter-spacing);
+  color: var(--text-subtle);
+}
+
+/* Eight shades, each rounded and tucked a quarter under the one before, the lighter on top (Figma's rows).
+   --s is var(--brand-<step>) or var(--neutral-<step>), set per shade in the component; each takes its new color
+   left to right. */
+.pick-pic__shades {
+  display: flex;
+  isolation: isolate;
+  height: var(--space-4xl);
+}
+
+.pick-pic__shades--thin {
+  height: var(--space-xl);
+}
+
+.pick-pic__shades--thin .pick-pic__shade {
+  --bland-radius: var(--rad-sm);
+}
+
+.pick-pic__shade + .pick-pic__shade {
+  margin-inline-start: calc(-1 * var(--space-md));
+}
+
+.pick-pic__shade {
+  --bland-radius: var(--rad-md);
+
+  position: relative;
+  z-index: calc(8 - var(--i));
+  flex: 1 1 0;
   min-width: 0;
+  background: var(--s);
+  transition: background-color var(--features-hue) var(--easing-in-out);
+  transition-delay: calc(var(--i) * var(--features-swatch-stagger) * 2);
 }
 
 .pick-pic__hue {
   position: relative;
-  height: var(--space-sm);
+  height: var(--space-md);
+  margin-block-start: var(--space-xs);
   border-radius: var(--rad-rd);
   background: var(--landing-brand-hue-strip);
 }
 
+/* The knob slides along the strip from one color's hue to the next. */
 .pick-pic__hue-dot {
   position: absolute;
   top: 50%;
   left: calc(var(--hue) * 100%);
-  width: var(--space-lg);
-  height: var(--space-lg);
+  width: var(--control-xs);
+  height: var(--control-xs);
   border-radius: var(--rad-rd);
   translate: -50% -50%;
   background: var(--surface-brand);
-  box-shadow:
-    0 0 0 var(--stroke-lg) var(--surface-raised),
-    var(--elevation-neutral-near);
+  box-shadow: 0 0 0 var(--stroke-xl) var(--surface-raised);
   transition:
     left var(--features-travel) var(--easing-in-out),
     background-color var(--features-hue) var(--easing-out);
 }
 
-.pick-pic__scales {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-  width: min(var(--landing-features-chart-width), 100%);
-}
-
-.pick-pic__scale {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.pick-pic__scale-name,
-.pick-pic__note {
-  font: var(--type-body-sm);
-  letter-spacing: var(--type-body-sm-letter-spacing);
-  color: var(--text-subtle);
-}
-
-.pick-pic__steps {
-  display: grid;
-  grid-template-columns: repeat(13, minmax(0, 1fr));
-  gap: var(--space-2xs);
-}
-
-/* Each step takes its new color left to right, as if fanned out from the one you typed. */
-.pick-pic__step {
-  height: var(--space-xl);
-  border-radius: var(--rad-xs);
-  background: var(--s);
-  box-shadow: inset 0 0 0 var(--stroke-xs) var(--border-subtle);
-  transition: background-color var(--features-hue) var(--easing-out);
-  transition-delay: calc(var(--i) * var(--features-swatch-stagger) * 2);
-}
-
-.pick-pic__step[data-yours] {
-  box-shadow:
-    0 0 0 var(--stroke-lg) var(--surface-raised),
-    0 0 0 calc(var(--stroke-lg) * 2) var(--border-bold);
-}
-
-/* ---------- 2 Check: four pairings, one fixed ---------- */
+/* ---------- 2 Check: the Brand theme page's check, small ---------- */
 
 .check-pic {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: var(--space-sm);
   height: 100%;
   padding-inline: var(--space-lg);
   background: var(--surface-brand-light);
-  transition: background-color var(--features-hue) var(--easing-out);
+  transition: background-color var(--features-hue) var(--easing-in-out);
 }
 
-.check-pic__list {
+.check-pic__panel {
   --bland-radius: var(--rad-md);
 
   display: flex;
   flex-direction: column;
+  gap: var(--space-sm);
   width: min(var(--landing-features-chart-width), 100%);
-  padding: var(--space-xs);
+  padding: var(--space-md);
   background: var(--surface-raised);
-  box-shadow: var(--elevation-neutral-near);
-  transition:
-    opacity var(--duration-lg) var(--easing-out),
-    translate var(--duration-lg) var(--easing-out);
 }
 
-/* The loop's reset: the list leaves as one, then comes back failing again. */
-.check-pic__list[data-leaving] {
-  opacity: 0;
-  translate: 0 var(--space-xs);
-}
-
-.check-pic__row {
-  --bland-radius: var(--rad-sm);
-
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+/* The page's color card, small: the swatch and its hex (Figma 7250:44499). */
+.check-pic__color {
+  display: flex;
   align-items: center;
   gap: var(--space-sm);
-  padding: var(--space-xs);
-  border-radius: var(--rad-sm);
-  transition: background-color var(--duration-lg) var(--easing-out);
 }
 
-.check-pic__row[data-failing] {
-  background: var(--surface-danger-light);
+.check-pic__swatch {
+  --bland-radius: var(--rad-md);
+
+  width: var(--control-xs);
+  height: var(--control-xs);
+  background: var(--surface-brand);
+  transition: background-color var(--features-hue) var(--easing-out);
 }
 
-.check-pic__sample {
+.check-pic__hex {
+  font: var(--type-body-lg-bold);
+  letter-spacing: var(--type-body-lg-bold-letter-spacing);
+  color: var(--text-bold);
+}
+
+/* Figma's thin row: eight shades 24 tall, each tucked a quarter under the one before, the lighter on top. */
+.check-pic__steps {
+  display: flex;
+  isolation: isolate;
+  height: var(--control-xs);
+}
+
+.check-pic__step {
   --bland-radius: var(--rad-sm);
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--space-6xl);
-  height: var(--control-sm);
-  background: var(--surface-100);
-  box-shadow: inset 0 0 0 var(--stroke-sm) var(--border-subtle);
+  position: relative;
+  z-index: calc(8 - var(--i));
+  flex: 1 1 0;
+  min-width: 0;
+  background: var(--s);
+  transition: background-color var(--features-hue) var(--easing-in-out);
+  transition-delay: calc(var(--i) * var(--features-swatch-stagger) * 2);
 }
 
-.check-pic__link {
-  font: var(--type-body-md);
-  text-decoration: underline;
-  letter-spacing: var(--type-body-md-letter-spacing);
-  color: var(--text-link);
+.check-pic__step + .check-pic__step {
+  margin-inline-start: calc(-1 * var(--space-md));
 }
 
-.check-pic__sample .check-pic__progress {
-  width: var(--space-4xl);
+/* The shade Fix contrast moved: ringed for a moment. */
+.check-pic__step[data-moved] {
+  box-shadow: inset 0 0 0 var(--stroke-lg) var(--border-bold);
+  transition-delay: 0s;
 }
 
-.check-pic__what {
+/* As the page's docs-fold: the space opens and closes with the content (grid rows 0fr to 1fr). */
+.check-pic__fold {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--duration-lg) var(--easing-out),
+    opacity var(--duration-lg) var(--easing-out);
+}
+
+.check-pic__fold[data-open] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.check-pic__fold-inner {
   display: flex;
   flex-direction: column;
-  min-width: 0;
-}
-
-.check-pic__label {
+  gap: var(--space-sm);
+  min-height: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font: var(--type-body-sm-bold);
-  letter-spacing: var(--type-body-sm-bold-letter-spacing);
-  color: var(--text-bold);
 }
 
-.check-pic__mode {
-  font: var(--type-body-sm);
-  letter-spacing: var(--type-body-sm-letter-spacing);
-  color: var(--text-subtle);
+.check-pic__panel .check-pic__fold[data-open] > .check-pic__fold-inner {
+  padding-block-start: var(--space-xs);
 }
 
-.check-pic__ratio {
-  font: var(--type-code-body-sm);
-  letter-spacing: var(--type-code-body-sm-letter-spacing);
-  color: var(--text-bold);
+.check-pic .check-pic__banner {
+  width: 100%;
 }
 
-.check-pic__fix {
+.check-pic__press {
   display: inline-flex;
   transition: scale var(--duration-sm) var(--easing-out);
 }
 
-.check-pic__fix[data-pressed] {
+.check-pic__press[data-pressed] {
   scale: 0.97;
+}
+
+/* The breakdown's one row, in its own card under the panel. */
+.check-pic__detail {
+  width: min(var(--landing-features-chart-width), 100%);
+}
+
+/* Figma's detached table row: the token in code type, then what misses, on white cells. */
+.check-pic__finding {
+  --bland-radius: var(--rad-md);
+
+  display: flex;
+  align-items: flex-start;
+  background: var(--surface-raised);
+}
+
+.check-pic__cell {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-sm) var(--space-md);
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+  color: var(--text-bold);
+}
+
+.check-pic__cell--name {
+  flex: none;
 }
 
 /* ---------- 3 Copy: the real brand.css and a card that wears it ---------- */
@@ -477,13 +522,12 @@
   height: 100%;
   padding: var(--space-2xl) var(--space-2xl) 0;
   background: var(--surface-brand-light);
-  transition: background-color var(--features-hue) var(--easing-out);
+  transition: background-color var(--features-hue) var(--easing-in-out);
 }
 
 .copy-pic .copy-pic__code {
   flex: 1;
   min-height: 0;
-  box-shadow: var(--elevation-neutral-near);
 }
 
 /* The file card: a satellite straddling the snippet's lower right corner. A row (file icon, the file's name in
@@ -498,7 +542,6 @@
   flex-direction: column;
   width: var(--landing-brand-file-card-width);
   background: var(--surface-raised);
-  box-shadow: var(--elevation-neutral-mid);
 }
 
 .copy-pic__file {
@@ -535,11 +578,12 @@
   gap: var(--space-xs);
 }
 
-/* Placeholder lines (Stageshow: filler, not words, beside the real parts). */
+/* Placeholder lines (Stageshow: filler, not words, beside the real parts). Surface-300: on the dark card
+   surface-200 is the card's own color and the lines vanished (Godwin 2026-11-16). */
 .copy-pic__bar {
   height: var(--space-sm);
   border-radius: var(--rad-rd);
-  background: var(--surface-200);
+  background: var(--surface-300);
 }
 
 .copy-pic__bar--short {
@@ -554,8 +598,8 @@
 
   .brand-sec__step,
   .pick-pic__hue-dot,
-  .check-pic__list,
-  .check-pic__fix {
+  .check-pic__fold,
+  .check-pic__press {
     transition: none;
   }
 

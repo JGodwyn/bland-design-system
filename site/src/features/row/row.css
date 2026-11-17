@@ -42,9 +42,12 @@
 }
 
 /* More room between the picture and the words above and under it (Godwin 2026-11-08): space-3xl, was space-xl. */
+/* A title wraps only when its card is too narrow for it, and then into balanced lines, so no word is left alone
+   (Godwin 2026-11-17: forcing every title onto two lines broke short ones like "Accessible by default" oddly). */
 .row__title {
   margin: 0;
   padding: var(--space-xl) var(--space-md) var(--space-3xl);
+  text-wrap: balance;
   font: var(--type-heading-sm);
   letter-spacing: var(--landing-row-title-tracking);
   color: var(--text-bold);

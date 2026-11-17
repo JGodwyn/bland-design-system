@@ -26,6 +26,22 @@
   animation: features-roll-out var(--duration-lg) var(--easing-out) both;
 }
 
+/* A fitted roll eases its width to the new value's (Roll's `fit`); the values centre in it while it moves. */
+.features-roll[data-fit] {
+  position: relative;
+  justify-items: center;
+  width: var(--roll-w, auto);
+  max-width: 100%;
+  transition: width var(--duration-lg) var(--easing-in-out);
+}
+
+.features-roll__sizer {
+  position: absolute;
+  visibility: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 @keyframes features-roll-in {
   from {
     opacity: 0;
@@ -136,7 +152,8 @@
   grid-template-columns: minmax(0, 1fr);
   place-items: center;
   padding-inline: var(--space-lg);
-  background: var(--surface-200);
+  /* Sunken, so the open Calendar (raised) reads lighter than the ground in dark too (Godwin 2026-11-11). */
+  background: var(--surface-sunken);
 }
 
 @media (min-width: 768px) {
@@ -150,8 +167,24 @@
   transition: clip-path var(--features-travel) var(--easing-in-out);
 }
 
-.theme-pic .theme-pic__card {
-  width: min(var(--notification-width), 100%);
+.theme-pic__date {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: min(var(--landing-features-chart-width), 100%);
+}
+
+/* The Calendar as a popover sits under its field: Menu's panel look (raised, near elevation), drawn inline so the
+   line's clip covers it. */
+.theme-pic__calendar {
+  --bland-radius: var(--rad-md);
+
+  overflow: hidden;
+  background: var(--surface-raised);
+}
+
+.theme-pic__calendar > * {
+  width: 100%;
 }
 
 .theme-pic__line {
@@ -183,7 +216,7 @@
   translate: -50% -50%;
   background: var(--surface-raised);
   color: var(--icon-subtle);
-  box-shadow: var(--elevation-neutral-mid);
+  box-shadow: inset 0 0 0 var(--stroke-sm) var(--border-bold);
   pointer-events: auto;
   transition: scale var(--duration-sm) var(--easing-out);
 }
@@ -199,16 +232,29 @@
   scale: var(--landing-features-grip-drag-scale);
 }
 
-/* ---------- One color to rebrand: a hex, its steps and the controls that follow ---------- */
+/* ---------- Rebrand with one color (Figma 7243:40822): tabs that take turns rebranding the picture ---------- */
 
+/* The tint behind the panel is the active brand's own lightest role, so it changes with the tab. */
 .rebrand-pic {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-xl);
   height: 100%;
-  background: var(--surface-200);
+  overflow: hidden;
+  /* The active brand's own lightest role, so the ground changes with the tab (Godwin 2026-11-16: back to the tint). */
+  background: var(--surface-brand-light);
+  transition: background-color var(--features-hue) var(--easing-in-out);
+}
+
+.rebrand-pic__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+  /* Clear of the tabs at the foot. */
+  margin-block-end: var(--space-4xl);
 }
 
 .rebrand-pic__panel {
@@ -216,55 +262,104 @@
 
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-sm);
+  width: min(var(--landing-features-form-width), 100%);
   padding: var(--space-md);
   background: var(--surface-raised);
-  box-shadow: var(--elevation-neutral-near);
 }
 
 .rebrand-pic__hex {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  font: var(--type-code-body-md);
-  letter-spacing: var(--type-code-body-md-letter-spacing);
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
   color: var(--text-bold);
 }
 
 .rebrand-pic__dot {
+  --bland-radius: var(--rad-sm);
+
   flex: none;
-  width: var(--icon-sm);
-  height: var(--icon-sm);
-  border-radius: var(--rad-rd);
+  width: var(--icon-md);
+  height: var(--icon-md);
   background: var(--surface-brand);
   transition: background-color var(--features-hue) var(--easing-out);
 }
 
-.rebrand-pic__steps {
+/* Eight shades, each rounded and tucked a quarter under the one before (Figma's row: -12 on 48, the lighter on
+   top). --s is var(--brand-<step>), set per shade in the component. */
+.rebrand-pic__shades {
   display: flex;
-  gap: var(--space-2xs);
+  isolation: isolate;
+  height: var(--space-4xl);
 }
 
-.rebrand-pic__step {
-  /* --s is var(--brand-<step>), set per step in RebrandPicture.tsx: the one place on the page that shows the raw
-     brand steps, since the steps themselves are what this picture is about. */
-  width: var(--space-lg);
-  height: var(--space-2xl);
-  border-radius: var(--rad-xs);
+.rebrand-pic__shade {
+  --bland-radius: var(--rad-md);
+
+  position: relative;
+  z-index: calc(8 - var(--i));
+  flex: 1 1 0;
+  min-width: 0;
   background: var(--s);
-  box-shadow: inset 0 0 0 var(--stroke-xs) var(--border-subtle);
-  transition: background-color var(--features-hue) var(--easing-out);
-  transition-delay: calc(var(--i) * var(--features-swatch-stagger));
+  transition: background-color var(--features-hue) var(--easing-in-out);
+  transition-delay: calc(var(--i) * var(--features-swatch-stagger) * 2);
 }
 
-.rebrand-pic__controls {
+.rebrand-pic__shade + .rebrand-pic__shade {
+  margin-inline-start: calc(-1 * var(--space-md));
+}
+
+.rebrand-pic__row,
+.rebrand-pic__chat {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
-.rebrand-pic__controls .rebrand-pic__progress {
-  width: var(--landing-features-progress-width);
+.rebrand-pic__chat {
+  align-items: flex-start;
+}
+
+.rebrand-pic__thread {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The color tabs at the foot (Figma: 48 wide, rad-md, each tucked a quarter under its left neighbour). They run on
+   under the card's edge, which cuts them, so all four corners round and the lower two hide. The current one grows
+   taller out of the stack (Godwin 2026-11-16: it gets longer, it doesn't jump), to Figma's 88. */
+.rebrand-pic__tabs {
+  position: absolute;
+  bottom: calc(-1 * var(--space-lg));
+  left: 50%;
+  display: flex;
+  align-items: flex-end;
+  isolation: isolate;
+  translate: -50% 0;
+}
+
+.rebrand-pic__tab {
+  --bland-radius: var(--rad-md);
+
+  position: relative;
+  z-index: calc(5 - var(--i));
+  flex: none;
+  width: var(--space-4xl);
+  height: var(--space-4xl);
+  /* --s is the tab's hex, as picked (RebrandPicture.tsx). */
+  background: var(--s);
+  transition: height var(--features-rise) var(--easing-in-out);
+}
+
+.rebrand-pic__tab + .rebrand-pic__tab {
+  margin-inline-start: calc(-1 * var(--space-md));
+}
+
+.rebrand-pic__tab[data-current] {
+  height: calc(var(--space-4xl) + var(--space-3xl));
 }
 
 /* ---------- Keyboard and screen reader: Tab moves focus, the caption reads it ---------- */
@@ -281,16 +376,37 @@
 }
 
 .keyboard-pic__form {
+  --bland-radius: var(--rad-lg);
+
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-md);
   width: var(--landing-features-form-width);
+  padding: var(--space-lg);
+  background: var(--surface-raised);
 }
 
-.keyboard-pic__form > :first-child {
+/* The tabs and the field span the panel. */
+.keyboard-pic__form > :nth-child(-n + 2) {
   align-self: stretch;
 }
+
+/* Figma's indicator: a brand dot left of the panel, level with the control that has focus. It jumps with focus,
+   as the ring does (keyboard moves are never animated). */
+.keyboard-pic__dot {
+  position: absolute;
+  top: 0;
+  left: calc(50% - var(--landing-features-form-width) / 2 - var(--space-xl));
+  width: var(--space-sm);
+  height: var(--space-sm);
+  border-radius: var(--rad-rd);
+  translate: 0 calc(var(--y) - 50%);
+  background: var(--surface-brand);
+  transition: translate var(--duration-lg) var(--easing-in-out);
+}
+
+
 
 /* Bland's focus ring (stroke-lg border-focused, space-2xs out from the control), drawn as its own layer. It jumps
    from control to control at once, as a real focus ring does: keyboard moves are never animated (CLAUDE.md). */
@@ -307,66 +423,70 @@
   border-radius: calc(var(--_r) + var(--_out));
   translate: calc(var(--x) - var(--_out)) calc(var(--y) - var(--_out));
   pointer-events: none;
+  /* The scripted ring glides from control to control (Godwin 2026-11-11: smoother); a real ring still jumps. */
+  transition:
+    translate var(--duration-lg) var(--easing-in-out),
+    width var(--duration-lg) var(--easing-in-out),
+    height var(--duration-lg) var(--easing-in-out),
+    border-radius var(--duration-lg) var(--easing-in-out);
 }
 
-.keyboard-pic__ring[data-stop="1"] {
+.keyboard-pic__ring[data-stop="0"],
+.keyboard-pic__ring[data-stop="2"] {
   --_r: var(--rad-sm);
 }
 
 .keyboard-pic__bar {
+  position: absolute;
+  bottom: var(--space-xl);
+  left: 50%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-sm);
   width: var(--landing-features-form-width);
+  translate: -50% 0;
 }
 
+/* Figma 7249:44005: the keycap is a small white chip and the caption VoiceOver's dark one, both rad-md and flat,
+   both hugging their words. */
 .keyboard-pic__key {
-  --bland-radius: var(--rad-sm);
+  --bland-radius: var(--rad-md);
 
   display: inline-flex;
   flex: none;
   align-items: center;
-  gap: var(--space-xs);
-  padding: var(--space-xs) var(--space-sm);
+  padding: var(--space-2xs) var(--space-md);
   background: var(--surface-raised);
-  box-shadow:
-    inset 0 calc(-1 * var(--stroke-lg)) 0 var(--border-subtle),
-    var(--elevation-neutral-near);
-  font: var(--type-code-body-sm);
-  letter-spacing: var(--type-code-body-sm-letter-spacing);
-  color: var(--text-subtle);
-  transition:
-    translate var(--duration-xs) var(--easing-out),
-    box-shadow var(--duration-xs) var(--easing-out);
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+  color: var(--text-bold);
+  transition: translate var(--duration-xs) var(--easing-out);
 }
 
 .keyboard-pic__key[data-pressed] {
   translate: 0 var(--stroke-sm);
-  box-shadow: inset 0 calc(-1 * var(--stroke-sm)) 0 var(--border-subtle);
-}
-
-.keyboard-pic__key-glyph {
-  color: var(--icon-subtle);
 }
 
 /* The screen reader's caption panel: dark, as VoiceOver draws it, on any page. */
 .keyboard-pic__caption {
-  --bland-radius: var(--rad-sm);
+  --bland-radius: var(--rad-md);
 
   display: grid;
-  align-self: stretch;
+  max-width: 100%;
   min-width: 0;
   overflow: hidden;
-  padding: var(--space-xs) var(--space-sm);
-  background: var(--surface-200);
-  font: var(--type-body-sm);
-  letter-spacing: var(--type-body-sm-letter-spacing);
-  color: var(--text-bold);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--surface-inverse);
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+  color: var(--text-inverse);
+  white-space: nowrap;
 }
 
-.keyboard-pic__caption .features-roll {
-  display: grid;
+/* The keycap's and caption's words cross over gently: in-out, on the chips' own easing. */
+.keyboard-pic__bar .features-roll__value[data-roll] {
+  animation-timing-function: var(--easing-in-out);
 }
 
 /* Tabbing through the form yourself: Bland's own focus ring shows, so the scripted one goes. */
@@ -400,7 +520,6 @@
   width: min(var(--landing-features-chart-width), 100% - 2 * var(--space-lg));
   padding: var(--space-lg);
   background: var(--surface-raised);
-  box-shadow: var(--elevation-neutral-near);
 }
 
 /* The three views share one cell and crossfade. */
@@ -497,7 +616,6 @@
   width: var(--landing-features-form-width);
   padding: var(--space-sm);
   background: var(--surface-raised);
-  box-shadow: var(--elevation-neutral-near);
   font: var(--type-code-body-md);
   letter-spacing: var(--type-code-body-md-letter-spacing);
   color: var(--code-text);
@@ -616,7 +734,12 @@
   .theme-pic__grip,
   .theme-pic__layer--dark,
   .theme-pic__line,
-  .keyboard-pic__key {
+  .keyboard-pic__key,
+  .features-roll[data-fit],
+  .keyboard-pic__ring,
+  .keyboard-pic__dot,
+  .rebrand-pic__tab,
+  .rebrand-pic__shade {
     transition: none;
   }
 }

@@ -11,6 +11,7 @@ import './landing.css';
 import { DialRoot } from 'dialkit';
 import 'dialkit/styles.css';
 import { Hero } from './hero/Hero';
+import { rememberScroll } from './scroll-memory';
 
 // The hero is in this script; every section under it is one chunk (rest.tsx) loaded once the hero has painted, so the hero
 // shows without waiting for the rest of the page (Godwin 2026-11-10). Both lazy parts share that chunk.
@@ -46,6 +47,8 @@ function Landing() {
     </>
   );
 }
+
+rememberScroll();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -982,3 +982,21 @@ shell never produces. Also: don't point two Playwright runs at one log file.
 - Symptom: `npm run typecheck` passes, `npm run build` / `npm pack` / `test:package` fail at `tsc -p tsconfig.build.json` with TS2591 "Cannot find name 'process'".
 - Cause: the build config has `types: []` (no Node types), while the root tsconfig has them. The Logo `children` deprecation warning was the first use of `process.env.NODE_ENV` in `src/`.
 - Rule: run `npm run build` (not only `typecheck`) after touching library code. A development-only warning declares `declare const process: { env: { NODE_ENV?: string } } | undefined;` in its own module and guards with `typeof process !== 'undefined'`.
+
+## Two site dev servers on 5182 (2026-11-11)
+
+- Symptom: the landing page was blank in Chrome at localhost:5182, with no console error; `import('/src/main.tsx')` failed with "Failed to fetch dynamically imported module".
+- Cause: an older `npm run site -- --host` (wildcard address) still held 5182, and a new `npm run site` took `localhost:5182` beside it, since Vite only warns when the port is in use on a wildcard address. The page and its modules came from different servers. `preview_start` also asked for 5183, which the `site` script ignores.
+- Rule: before starting the site server, check `lsof -iTCP:5182 -sTCP:LISTEN`. If one is already running, use it, or stop the extra one, so only one process serves the port.
+
+## Longer copy in a headline slot (2026-11-11)
+
+- Symptom: reworded landing copy that read fine in a doc ran to five lines as the Brand section's current step, and to four lines in the footer headline (Inter Bold 128 in an 848 column, designed for two).
+- Cause: those strings are drawn as headlines, and the Figma frames were sized for the old, shorter lines.
+- Rule: after changing landing copy, look at every string that becomes a headline in the browser and keep it within the frame's line count. Body lines can grow; headline lines can't.
+
+### Landing: refresh lands at the top (2026-11-11)
+
+- Symptom: reloading the landing page partway down jumps back to the top.
+- Cause: everything under the hero is a lazy chunk loaded after the hero paints, so when the browser restores the scroll the page is one screen tall and the position clamps to 0.
+- Rule: a page that grows after first paint keeps its own scroll memory (`site/src/scroll-memory.ts`: `scrollRestoration = 'manual'`, restore once the page is tall enough, give up if the reader scrolls first).

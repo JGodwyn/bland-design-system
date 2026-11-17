@@ -1,5 +1,5 @@
 // Landing page "Brand theme" (Figma 7066:28878 and its two states 7066:28914, 7066:28936; Godwin 2026-11-08): a
-// three-step stepper. The tag "One color in. A whole theme out." names the section; the steps (pick, check,
+// three-step stepper. The tag "From one color to a complete theme." names the section; the steps (pick, check,
 // copy) are a fixed list in that order; the current one becomes the headline in its place (rolling in, below)
 // with a blue bar filling under it. Beside them, one picture card that plays the current step's story (Stageshow
 // faux UI from real Bland components, its own idea per step: pictures/), and Figma's info Alert under it.
@@ -22,9 +22,9 @@ import './brand-theme.css';
 
 /** Figma's copy; docs/landing-copy.md, "Your brand, in one color". */
 const STEPS = [
-  { title: 'Pick your color. Any hex. It never moves.', Picture: PickPicture },
-  { title: 'See every pairing in light and dark, and fix the ones that fail.', Picture: CheckPicture },
-  { title: 'Copy the CSS. One file, loaded last. Done.', Picture: CopyPicture },
+  { title: 'Choose your brand color. Bland builds the scale around it.', Picture: PickPicture },
+  { title: 'Check contrast in light and dark, with a fix for any pairing that falls short.', Picture: CheckPicture },
+  { title: 'Copy one CSS file, and every component takes on your brand.', Picture: CopyPicture },
 ];
 
 const wide = () => window.matchMedia('(min-width: 768px)').matches;
@@ -182,7 +182,7 @@ export function BrandTheme() {
         <div className="brand-sec__grid bland-grid">
           <div className="brand-sec__copy">
             <h2 id="brand-sec-title" className="brand-sec__tag bland-smooth">
-              One color in. A whole theme out.
+              From one color to a complete theme.
             </h2>
             <ol ref={list} className="brand-sec__steps">
               {STEPS.map((s, i) => (
@@ -215,7 +215,7 @@ export function BrandTheme() {
                 location.href = '/docs/#/brand';
               }}
             >
-              Open Brand theme
+              Open the Brand theme tool
             </Button>
           </div>
           <div className="brand-sec__visual">
@@ -227,8 +227,8 @@ export function BrandTheme() {
               ))}
             </div>
             <Alert role={undefined} className="brand-sec__note">
-              Bland ships blue so it has something to show. Give it your brand color and it works out the other
-              twelve shades, tints the grays toward it, and checks the contrast for you. Your fonts too.
+              Bland ships in blue by default. Enter your brand color and it generates the other twelve shades, tints
+              the neutrals toward it and checks the contrast. Your fonts can be set the same way.
             </Alert>
           </div>
         </div>

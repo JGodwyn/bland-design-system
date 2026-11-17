@@ -125,7 +125,7 @@
 
 /* "One color to rebrand": three brands' steps, `npm run brand -- generate "<hex>" --neutrals none` output. Blue is
    Bland's own (the steps in tokens.css), set again so the picture can come back to it. */
-.rebrand-pic[data-brand="blue"] {
+[data-rebrand="blue"] {
   --brand-0: #ffffff;
   --brand-50: #f0f5ff;
   --brand-100: #dce9ff;
@@ -141,37 +141,73 @@
   --brand-1000: #00113d;
 }
 
-.rebrand-pic[data-brand="green"] {
+/* The rebrand card's tabs (Godwin 2026-11-11: more vibrant), `npm run brand -- generate "<hex>"` output; blue above
+   is Bland's own. */
+[data-rebrand="violet"] {
   --brand-0: #ffffff;
-  --brand-50: #eff7f1;
-  --brand-100: #dcede0;
-  --brand-200: #bcddc5;
-  --brand-300: #92c8a3;
-  --brand-400: #5db17b;
-  --brand-500: #0f9d58;
-  --brand-600: #00884a;
-  --brand-700: #006c3a;
-  --brand-800: #00522b;
-  --brand-900: #003b1d;
-  --brand-950: #002a13;
-  --brand-1000: #001c0b;
+  --brand-50: #f5f3fe;
+  --brand-100: #e8e4fc;
+  --brand-200: #d3cbfa;
+  --brand-300: #bbacf7;
+  --brand-400: #a086f3;
+  --brand-500: #8b60f0;
+  --brand-600: #7c3aed;
+  --brand-700: #622dbe;
+  --brand-800: #4b2193;
+  --brand-900: #35166c;
+  --brand-950: #260e50;
+  --brand-1000: #1a0839;
 }
 
-.rebrand-pic[data-brand="orange"] {
+[data-rebrand="green"] {
   --brand-0: #ffffff;
-  --brand-50: #fff3ef;
-  --brand-100: #ffe3db;
-  --brand-200: #fecaba;
-  --brand-300: #fca98f;
-  --brand-400: #f87f5b;
-  --brand-500: #f2541b;
-  --brand-600: #d54100;
-  --brand-700: #a93200;
-  --brand-800: #812400;
-  --brand-900: #5c1700;
-  --brand-950: #420e00;
-  --brand-1000: #2e0700;
+  --brand-50: #f0f7f1;
+  --brand-100: #ddeedf;
+  --brand-200: #bddfc2;
+  --brand-300: #94cc9d;
+  --brand-400: #5fb672;
+  --brand-500: #16a34a;
+  --brand-600: #008d3c;
+  --brand-700: #00702e;
+  --brand-800: #005521;
+  --brand-900: #003c15;
+  --brand-950: #002a0d;
+  --brand-1000: #001d06;
 }
+
+[data-rebrand="red"] {
+  --brand-0: #ffffff;
+  --brand-50: #fff2f1;
+  --brand-100: #fee2e0;
+  --brand-200: #fcc8c4;
+  --brand-300: #f9a6a0;
+  --brand-400: #f37c76;
+  --brand-500: #ec5150;
+  --brand-600: #e5182e;
+  --brand-700: #b61022;
+  --brand-800: #8c0817;
+  --brand-900: #64020d;
+  --brand-950: #480006;
+  --brand-1000: #320003;
+}
+
+[data-rebrand="amber"] {
+  --brand-0: #ffffff;
+  --brand-50: #fef2e4;
+  --brand-100: #fde1c2;
+  --brand-200: #fac486;
+  --brand-300: #f59e0b;
+  --brand-400: #d18600;
+  --brand-500: #b27100;
+  --brand-600: #9a6100;
+  --brand-700: #7b4c00;
+  --brand-800: #5f3a00;
+  --brand-900: #442800;
+  --brand-950: #311c00;
+  --brand-1000: #221200;
+}
+
+
 
 /* ---------- Feature row (Figma 7141:36653), site/src/features/row/ ---------- */
 
@@ -358,7 +394,7 @@
 
 /* ---- Footer (Figma 7100:36365, site/src/footer/, side session landing-footer 2026-11-09) ---------------------- */
 :root {
-  /* Headline "Start Bland. End up yours.": Figma's Inter Bold 128 / 112, letter spacing -8, an 848 column. Its glow
+  /* Headline "Start Bland. Ship yours.": Figma's Inter Bold 128 / 112, letter spacing -8, an 848 column. Its glow
      reuses the hero's pink (--landing-hero-glow-outer) and offsets; blurs and opacity are in footer/tuning.ts. */
   --landing-footer-title-font: 700 clamp(48px, 8.889vw, 128px) / 0.875 var(--font-heading);
   --landing-footer-title-tracking: -0.0625em;

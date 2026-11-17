@@ -3,7 +3,7 @@
  * are --landing-wyg-* in landing-values.css; every timing is --wyg-*, set on the section from tuning.ts (DialKit).
  *
  *   section.wyg[data-layout="stage"]                  tall track, breakpoint/md and up
- *     div.wyg__stage                                  sticky, one screen; data-theme dark on "Dark mode that thinks"
+ *     div.wyg__stage                                  sticky, one screen; data-theme dark on "A dedicated dark theme"
  *       div.wyg__frame                                Figma's 1440 x 1024 frame, scaled to fit (--wyg-scale)
  *         div.wyg__copy > h2.wyg__tag + div.wyg__sentences > div.wyg__layer[data-entering|data-leaving] > p
  *         div.wyg__parts > div.wyg__layer--parts > div.wyg__part (at --x, --y, turned --tilt, appearing or popping by --k)

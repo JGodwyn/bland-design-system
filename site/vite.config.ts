@@ -61,11 +61,11 @@ function devDocsRedirect(): Plugin {
 
 /**
  * The site's own address, for what needs a full URL: the canonical link, og:image and og:url, sitemap.xml, the
- * Sitemap line in robots.txt and the agent manifest (/.well-known/ard.json). Set it once the domain is known
- * (landing audit 2026-11-10), with no trailing slash, e.g. 'https://bland.example'. Until then the build leaves
- * these out (robots.txt without a Sitemap line, og:image relative) and says so.
+ * Sitemap line in robots.txt and the agent manifest (/.well-known/ard.json). No trailing slash. blandui.com,
+ * bought by Godwin 2026-11-17. Left undefined, the build leaves these out (robots.txt without a Sitemap line,
+ * og:image relative) and says so.
  */
-const SITE_URL: string | undefined = undefined;
+const SITE_URL: string | undefined = 'https://blandui.com';
 
 /** Writes the files and tags that need SITE_URL (see above), and robots.txt either way. */
 function siteAddress(): Plugin {

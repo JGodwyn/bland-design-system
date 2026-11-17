@@ -39,7 +39,7 @@ test('Figma copy, landmark and links; dark whatever the system theme', async ({ 
   await toEnd(page);
   await expect(ft(page)).toHaveAttribute('data-theme', 'dark');
   await expect(page.getByRole('contentinfo')).toHaveCount(1);
-  await expect(page.getByRole('heading', { level: 2, name: 'Start Bland. End up yours.' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 2, name: 'Start Bland. Ship yours.' })).toBeVisible();
   await expect(ft(page).locator('.bland-code-text code')).toHaveText('npm install bland-ui');
   await expect(ft(page).getByRole('button', { name: 'Copy install command' })).toBeVisible();
   await expect(ft(page).locator('pre code')).toContainText(`import 'bland-ui/styles.css';`);
@@ -49,7 +49,7 @@ test('Figma copy, landmark and links; dark whatever the system theme', async ({ 
   await expect(nav.getByRole('link', { name: 'Changelog' })).toHaveAttribute('href', /npmjs\.com\/package\/bland-ui/);
   await expect(nav.getByRole('link', { name: 'MIT license' })).toHaveAttribute('href', /bland-ui\/LICENSE$/);
   await expect(nav.getByRole('link', { name: 'bland-ui on npm' })).toHaveAttribute('href', 'https://www.npmjs.com/package/bland-ui');
-  await expect(ft(page).getByText('© 2026 Bland Design System. All rights reserved.')).toBeVisible();
+  await expect(ft(page).getByText('© 2026 Godwin John. Released under the MIT license.')).toBeVisible();
   // The page's colors are the dark theme's whatever the system says.
   const bg = await ft(page).evaluate((el) => getComputedStyle(el).backgroundColor);
   await page.emulateMedia({ colorScheme: 'dark' });
@@ -98,17 +98,17 @@ test('the headline fills from outline to bold, word by word, as the footer scrol
   await open(page);
   await scrollFooterTo(page, 0.25);
   await expect(ft(page)).toHaveAttribute('data-shown', 'true');
-  await expect.poll(() => boldness(page)).toEqual([0, 0, 0, 0, 0]);
+  await expect.poll(() => boldness(page)).toEqual([0, 0, 0, 0]);
   // Midway: the first words are bolder than the last.
   await scrollFooterTo(page, 0.55);
   await expect
     .poll(async () => {
       const b = await boldness(page);
-      return b[0]! > b[4]! && b[0]! > 0 && b[4]! < 1;
+      return b[0]! > b[3]! && b[0]! > 0 && b[3]! < 1;
     })
     .toBe(true);
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-  await expect.poll(() => boldness(page)).toEqual([1, 1, 1, 1, 1]);
+  await expect.poll(() => boldness(page)).toEqual([1, 1, 1, 1]);
   // Bold: the fill shows and the outline is gone; the glow is on.
   const word = ft(page).locator('[data-word]').first();
   await expect(word.locator('.ft__word-bold')).toHaveCSS('opacity', '1');
@@ -116,7 +116,7 @@ test('the headline fills from outline to bold, word by word, as the footer scrol
   await expect(word.locator('.ft__glow--outer')).toHaveCSS('opacity', '0.75');
   // Scrolling back takes it back to the outline.
   await scrollFooterTo(page, 0.2);
-  await expect.poll(() => boldness(page)).toEqual([0, 0, 0, 0, 0]);
+  await expect.poll(() => boldness(page)).toEqual([0, 0, 0, 0]);
 });
 
 test('the blocks come in once, after the headline', async ({ page }) => {
@@ -134,7 +134,7 @@ test('reduced motion: the headline turns bold in one step, nothing moves', async
   await open(page);
   await scrollFooterTo(page, 0.25);
   await expect(ft(page)).toHaveAttribute('data-shown', 'true');
-  await expect.poll(() => boldness(page)).toEqual([1, 1, 1, 1, 1]);
+  await expect.poll(() => boldness(page)).toEqual([1, 1, 1, 1]);
   await expect(ft(page).locator('.ft__char').first()).toHaveCSS('transform', 'none');
   await expect(ft(page).locator('.ft__block').first()).toHaveCSS('transform', 'none');
 });

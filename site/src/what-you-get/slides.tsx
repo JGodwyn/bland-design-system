@@ -57,7 +57,7 @@ export type Part = {
 export type Slide = {
   id: string;
   text: string;
-  /** "Dark mode that thinks" turns the stage dark. */
+  /** "A dedicated dark theme" turns the stage dark. */
   dark?: boolean;
   parts: Part[];
 };
@@ -155,7 +155,7 @@ const CRUMBS = ['Crumb', 'Crumb', 'Crumb', 'Crumb', 'Crumb'].map((label) => ({ l
 export const SLIDES: Slide[] = [
   {
     id: 'parts',
-    text: 'Every part a project needs. Buttons and fields, menus and modals, tables and date pickers, chat and file upload.',
+    text: 'Complete coverage. From buttons and fields to data tables, date pickers, chat and file upload.',
     parts: [
       { id: 'field', box: [199, 191, 290, 89], tilt: 10, render: (p) => <TypingField {...p} /> },
       { id: 'modal', box: [806, 123, 414, 272], tilt: -10, render: () => <ModalCard /> },
@@ -187,7 +187,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: 'dark',
-    text: 'Dark mode that thinks. Not an inverted page: surfaces, shadows and colors each have a dark version made for it.',
+    text: 'A dedicated dark theme. Surfaces, shadows and colors are defined for dark mode, not inverted from light.',
     dark: true,
     parts: [
       { id: 'tabs', box: [247, 227, 259, 73], tilt: -7.5, render: (p) => <CyclingTabs {...p} /> },
@@ -213,7 +213,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: 'motion',
-    text: 'Motion with manners. Quick, quiet animations that step aside when someone asks for reduced motion.',
+    text: 'Purposeful motion. Short, consistent transitions that respect the reduced-motion setting.',
     parts: [
       {
         id: 'accordion',
@@ -248,7 +248,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: 'everyone',
-    text: 'Works for everyone. Keyboard, focus and screen reader behaviour from React Aria, checked in Chromium, WebKit and Firefox.',
+    text: 'Tested in every engine. Automated accessibility and behaviour tests run in Chromium, WebKit and Firefox.',
     parts: [
       { id: 'figure', box: [737, 221, 96, 96], vector: true, render: () => <AccessFigure /> },
       { id: 'eye', box: [325, 769, 72, 72], vector: true, render: () => <BlinkEye /> },
@@ -256,7 +256,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: 'tokens',
-    text: 'Nothing hardcoded. Every color, size and space comes from a token, so a rebrand never touches component code.',
+    text: 'Token-driven. Every color, size and spacing value is a design token, so a rebrand never touches component code.',
     parts: [
       { id: 'swatches', box: [752, 258, 52, 52], vector: true, render: () => <SwatchesIcon /> },
       { id: 'type', box: [836, 226, 52, 52], vector: true, render: () => <TextAaIcon /> },
@@ -270,7 +270,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: 'icons',
-    text: 'Your icons. Bring Phosphor, Lucide or your own SVGs. Bland sizes and colors them.',
+    text: 'Bring your own icons. Use Phosphor, Lucide or your own SVGs. Bland sizes and colors them to match.',
     parts: [
       { id: 'grid', box: [912, 185, 200, 200], vector: true, render: () => <IconGrid /> },
       { id: 'shapes', box: [296, 776, 80, 80], vector: true, render: () => <ShapesIcon /> },

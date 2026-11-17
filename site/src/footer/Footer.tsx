@@ -1,6 +1,6 @@
 // Landing page footer (Figma 7100:36365; plan agreed with Godwin 2026-11-09, the frame has no annotations). Dark
 // whatever the system theme, as Figma draws it and as the hero ends. Figma's column: Bland's Logo (the mono mark,
-// Figma's white tile on dark), the headline "Start Bland. End up yours." with its glow, Bland's CodeText
+// Figma's white tile on dark), the headline "Start Bland. Ship yours." with its glow, Bland's CodeText
 // `npm install bland-ui` (copy on), Bland's CodeSnippet with the imports, the links row, the copyright.
 //
 // Motion, the hero's story run the other way: the headline starts as its outline; when a fifth of the footer is on
@@ -17,7 +17,7 @@ import './footer.css';
 /** Figma's two lines. */
 const TITLE_LINES = [
   ['Start', 'Bland.'],
-  ['End', 'up', 'yours.'],
+  ['Ship', 'yours.'],
 ];
 const TITLE_WORDS = TITLE_LINES.flat();
 
@@ -253,7 +253,7 @@ export function Footer() {
         </nav>
 
         <p className="ft__block ft__copyright" style={block(3)}>
-          © 2026 Bland Design System. All rights reserved.
+          © 2026 Godwin John. Released under the MIT license.
         </p>
       </div>
     </footer>

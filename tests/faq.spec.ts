@@ -14,14 +14,14 @@ async function open(page: Page) {
   await expect(sec(page)).toHaveAttribute('data-shown', 'true');
 }
 
-test("Figma's heading, line and twelve questions, the first open, after the Figma kit", async ({ page }) => {
+test("Figma's heading, line and eleven questions, the first open, after the Figma kit", async ({ page }) => {
   await open(page);
   await expect(sec(page)).toHaveAttribute('data-theme', 'light');
-  await expect(page.getByRole('heading', { level: 2, name: 'Some questions about Bland' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 2, name: 'Frequently asked questions' })).toBeVisible();
   // Two lines, broken after "questions" (Godwin 2026-11-09).
-  await expect(sec(page).locator('.faq__title-line')).toHaveText(['Some questions', 'about Bland']);
-  await expect(sec(page).getByText(/^Common questions about brand tokens/)).toBeVisible();
-  await expect(items(page)).toHaveCount(12);
+  await expect(sec(page).locator('.faq__title-line')).toHaveText(['Frequently asked', 'questions']);
+  await expect(sec(page).getByText(/^Brand tokens, light and dark themes/)).toBeVisible();
+  await expect(items(page)).toHaveCount(11);
   await expect(items(page).locator('summary').first()).toHaveText('How do brand tokens work?');
   await expect(items(page).locator('summary').last()).toHaveText('Are there performance considerations for token usage?');
   await expect(items(page).first()).toHaveAttribute('open', '');
@@ -29,7 +29,7 @@ test("Figma's heading, line and twelve questions, the first open, after the Figm
   await expect(items(page).first()).toHaveAttribute('data-size', 'md');
   await expect(items(page).first()).toHaveAttribute('data-flush', 'true');
   // Figma's dotted rules between the questions, hidden from screen readers.
-  await expect(sec(page).locator('.faq__rule')).toHaveCount(11);
+  await expect(sec(page).locator('.faq__rule')).toHaveCount(10);
   await expect(sec(page).locator('.faq__rule').first()).toHaveAttribute('aria-hidden', 'true');
   // Between the Figma kit and whatever follows it.
   const prev = await sec(page).evaluate((el) => el.previousElementSibling?.className);
@@ -112,7 +112,7 @@ test('on a phone the column fits and the page never scrolls sideways', async ({ 
   const head = (await sec(page).locator('.faq__head').boundingBox())!;
   expect(box!.y).toBeGreaterThan(head.y + head.height);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
-  await expect(page.getByRole('heading', { level: 2, name: 'Some questions about Bland' })).toHaveCSS('font-size', '27px');
+  await expect(page.getByRole('heading', { level: 2, name: 'Frequently asked questions' })).toHaveCSS('font-size', '27px');
 });
 
 test.describe('reduced motion', () => {

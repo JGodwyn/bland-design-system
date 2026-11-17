@@ -10,6 +10,8 @@ export const ARRIVE_STAGGER_MS = 40;
 export const TRAVEL_MS = 900;
 /** A color change between brands: distant hues pass through mud however they go, so keep it short. */
 export const HUE_MS = 220;
+/** A color tab rising or settling in the rebrand picture (Godwin 2026-11-11: smoother). */
+export const RISE_MS = 640;
 /** The brand steps change left to right, this far apart. */
 export const SWATCH_STAGGER_MS = 30;
 
@@ -25,5 +27,6 @@ export const featuresStyle = {
   '--features-arrive-stagger': `${ARRIVE_STAGGER_MS}ms`,
   '--features-travel': `${TRAVEL_MS}ms`,
   '--features-hue': `${HUE_MS}ms`,
+  '--features-rise': `${RISE_MS}ms`,
   '--features-swatch-stagger': `${SWATCH_STAGGER_MS}ms`,
 };

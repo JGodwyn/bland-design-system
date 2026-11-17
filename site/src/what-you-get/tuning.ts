@@ -41,7 +41,7 @@ const config = {
     phoneTilt: [0.4, 0, 1, 0.05],
   },
   theme: {
-    // The stage's change into and out of Dark mode on "Dark mode that thinks" (hero: theme glide).
+    // The stage's change into and out of Dark mode on "A dedicated dark theme" (hero: theme glide).
     glideMs: [1260, 100, 3000, 10],
   },
   parts: {

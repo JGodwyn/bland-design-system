@@ -259,9 +259,9 @@ export function Showcase() {
       <div className="showcase__grid bland-grid">
         <div className="showcase__head">
           <h2 id="showcase-title" className="showcase__title">
-            Components showcase
+            See it in your brand
           </h2>
-          <p className="showcase__lede">Plain until it&rsquo;s yours. The same components, any brand. Switch the color and watch them follow.</p>
+          <p className="showcase__lede">One set of components, any brand. Change the color, font or theme and watch every component update.</p>
         </div>
 
         <div ref={panelRef} className="showcase__panel-slot">

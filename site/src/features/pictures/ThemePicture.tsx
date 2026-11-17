@@ -1,4 +1,4 @@
-// "Light and dark, built in": one component (Stageshow bento kind), a Notification drawn twice, light under and
+// "Light and dark, designed separately": a date field and its open Calendar (Figma 7246:43336), drawn twice, light under and
 // dark over, the dark copy clipped to the right of a dividing line (nested data-theme, Bland's real switch, so the
 // dark half is Bland's own dark mode, not a filter). On a loop the line sweeps left, holds, sweeps back and holds.
 // It is a real slider too (Godwin 2026-11-08): drag anywhere on the picture, or focus the grip and use the arrow
@@ -6,7 +6,7 @@
 // it moves over the picture; on touch, where you touch) and grows while you drag, back to its size on release
 // (Godwin 2026-11-09). What you set holds until the story's next move (the loop pauses while you are on the card).
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react';
-import { Button, Icon, Notification, CaretLeftIcon, CaretRightIcon } from '../../../../src';
+import { Calendar, CalendarBlankIcon, Icon, TextInput, CaretLeftIcon, CaretRightIcon } from '../../../../src';
 import { useLoop } from '../playback';
 import { TRAVEL_MS } from '../timing';
 import type { PictureProps } from '../cards';
@@ -31,23 +31,23 @@ const GRIP_REST = 0.84;
 /** The grip follows its target with this much inertia, a time constant (Godwin 2026-11-09: it snapped). */
 const GRIP_SMOOTHING_MS = 110;
 
+/** What the line divides (Figma 7246:43336, 2026-11-11): a date field with Bland's Calendar open under it. */
 function Scene() {
   return (
     <div className="theme-pic__scene">
-      <Notification
-        className="theme-pic__card"
-        colored={false}
-        icon={false}
-        title="Mira commented"
-        timestamp="2m"
-        actions={
-          <Button emotion="brand" type="primary" size="sm">
-            Reply
-          </Button>
-        }
-      >
-        Love the new header.
-      </Notification>
+      <div className="theme-pic__date">
+        <TextInput
+          size="md"
+          label="Label"
+          placeholder="dd/mm/yyyy"
+          readOnly
+          tabIndex={-1}
+          iconEnd={<CalendarBlankIcon />}
+        />
+        <div className="theme-pic__calendar bland-smooth">
+          <Calendar size="md" locale="en-GB" firstDayOfWeek="sun" defaultFocusedValue="2024-11-11" value="2024-11-11" />
+        </div>
+      </div>
     </div>
   );
 }

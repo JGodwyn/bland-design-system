@@ -7,9 +7,9 @@ import AxeBuilder from '@axe-core/playwright';
 const site = 'http://localhost:5182/';
 const sec = (page: Page) => page.locator('section.brand-sec');
 const STEPS = [
-  'Pick your color. Any hex. It never moves.',
-  'See every pairing in light and dark, and fix the ones that fail.',
-  'Copy the CSS. One file, loaded last. Done.',
+  'Choose your brand color. Bland builds the scale around it.',
+  'Check contrast in light and dark, with a fix for any pairing that falls short.',
+  'Copy one CSS file, and every component takes on your brand.',
 ];
 
 /** Scrolls to the middle of step `i`'s share of the track and waits for it to be the current step. */
@@ -26,9 +26,9 @@ const picture = (page: Page, i: number) => sec(page).locator('.brand-sec__pictur
 test('the tag names the section; the three steps are a list in order', async ({ page }) => {
   await page.goto(site);
   await expect(sec(page)).toHaveAttribute('data-theme', 'light');
-  await expect(page.getByRole('heading', { level: 2, name: 'One color in. A whole theme out.' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 2, name: 'From one color to a complete theme.' })).toBeVisible();
   await expect(sec(page).locator('.brand-sec__step [data-layer="big"]')).toHaveText(STEPS);
-  await expect(sec(page).getByRole('button', { name: 'Open Brand theme' })).toBeVisible();
+  await expect(sec(page).getByRole('button', { name: 'Open the Brand theme tool' })).toBeVisible();
 });
 
 test('scrolling down moves through the steps; the current one is the headline', async ({ page }) => {
@@ -116,28 +116,29 @@ test('pressing a step scrolls to it', async ({ page }) => {
   await expect(sec(page).getByRole('button', { name: STEPS[2] })).toHaveAttribute('aria-current', 'step', { timeout: 5000 });
 });
 
-test('the pick picture types #e11d74 and Bland roles follow its steps', async ({ page }) => {
+test('the pick picture slides to #e11d74 and Bland roles follow its steps', async ({ page }) => {
   await page.goto(site);
   await goTo(page, 0);
   const pick = picture(page, 0).locator('.pick-pic');
   await expect(pick).toHaveAttribute('data-brand', 'pink', { timeout: 6000 });
-  await expect(pick.locator('input')).toHaveValue('#e11d74');
+  await expect(pick.locator('.pick-pic__hex .features-roll__value:not([data-roll="out"])')).toHaveText('#E11D74');
   // Surface/surface-brand is step 600 of the generated scale (#c70063).
-  await expect(pick.locator('.pick-pic__swatch')).toHaveCSS('background-color', 'rgb(199, 0, 99)');
+  await expect(pick.locator('.pick-pic__swatch').first()).toHaveCSS('background-color', 'rgb(199, 0, 99)');
 });
 
-test('the check picture fixes the failing pairing: 2.85:1 becomes 3.00:1', async ({ page }) => {
+test("the check picture plays the Brand theme page's check: warning, breakdown, fix", async ({ page }) => {
   await page.goto(site);
   await goTo(page, 1);
   const check = picture(page, 1).locator('.check-pic');
-  await expect(check.locator('.check-pic__row[data-failing]')).toContainText('2.85:1');
-  await expect(check).toHaveAttribute('data-step', '2', { timeout: 5000 });
-  await expect(check.locator('.check-pic__row').last().locator('.features-roll__value:not([data-roll="out"])')).toHaveText('3.00:1');
-  // The fixed step 400 is the tool's suggestion, on the dark progress fill.
-  await expect(check.locator('.check-pic__row').last().locator('.bland-progress-bar__fill')).toHaveCSS(
-    'background-color',
-    'rgb(241, 102, 148)',
-  );
+  // The page's warning, with its two actions, folds in once the color is #e11d74.
+  await expect(check.locator('.check-pic__fold[data-open]').first()).toContainText('Contrast warning', { timeout: 6000 });
+  await expect(check.getByText('1 of 35 color pairs is harder to read than it should be.')).toBeAttached();
+  // The breakdown names the real miss.
+  await expect(check.locator('.check-pic__finding')).toContainText('Fill on its track in dark: 2.85:1, needs 3:1');
+  // Fix contrast: step 400 takes the tool's suggestion and the warning folds away.
+  await expect(check).toHaveAttribute('data-fixed', 'true', { timeout: 6000 });
+  await expect(check.locator('.check-pic__step[data-moved]')).toHaveCSS('background-color', 'rgb(241, 102, 148)');
+  await expect(check.locator('.check-pic__fold').first()).not.toHaveAttribute('data-open', 'true');
 });
 
 test('the copy picture holds the real brand.css and its toggle works', async ({ page }) => {
@@ -178,9 +179,9 @@ test.describe('under reduced motion', () => {
     await goTo(page, 0);
     await expect(picture(page, 0).locator('.pick-pic')).toHaveAttribute('data-brand', 'pink');
     await goTo(page, 1);
-    await expect(picture(page, 1).locator('.check-pic')).toHaveAttribute('data-step', '2');
+    await expect(picture(page, 1).locator('.check-pic')).toHaveAttribute('data-step', '3');
     await page.waitForTimeout(2500);
-    await expect(picture(page, 1).locator('.check-pic')).toHaveAttribute('data-step', '2');
+    await expect(picture(page, 1).locator('.check-pic')).toHaveAttribute('data-step', '3');
   });
 });
 
@@ -215,4 +216,27 @@ test('the note under the picture is as wide as the picture, and the steps keep c
   const copy = (await sec(page).locator('.brand-sec__steps').boundingBox())!;
   // At least space-3xl (40) between the steps and the picture.
   expect(cardBox.x - (copy.x + copy.width)).toBeGreaterThanOrEqual(40);
+});
+
+test("the copy picture's file card is in Bland's dark theme", async ({ page }) => {
+  await page.goto(site);
+  await goTo(page, 2);
+  const app = picture(page, 2).locator('.copy-pic__app');
+  await expect(app).toHaveAttribute('data-theme', 'dark');
+  // Surface/surface-raised in dark (Neutral 900), not the light card.
+  await expect(app).not.toHaveCSS('background-color', 'rgb(255, 255, 255)');
+});
+
+test("the pick picture's hue knob slides along the strip to your color, over a Neutrals card", async ({ page }) => {
+  await page.goto(site);
+  await goTo(page, 0);
+  const pick = picture(page, 0).locator('.pick-pic');
+  const knob = pick.locator('.pick-pic__hue-dot');
+  await expect(pick).toHaveAttribute('data-brand', 'blue', { timeout: 6000 });
+  const before = (await knob.boundingBox())!.x;
+  await expect(pick).toHaveAttribute('data-brand', 'pink', { timeout: 6000 });
+  // Pink's hue (357) sits right of blue's (264) on the strip; the knob eases there.
+  await expect.poll(async () => (await knob.boundingBox())!.x - before, { timeout: 3000 }).toBeGreaterThan(20);
+  await expect(pick.locator('.pick-pic__panel')).toHaveCount(2);
+  await expect(pick.getByText('Neutrals')).toBeAttached();
 });

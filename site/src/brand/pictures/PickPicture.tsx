@@ -1,71 +1,63 @@
-// Step 1, "Pick your color. Any hex. It never moves." A picker panel: a hex typed into a Text Input, a hue strip
-// whose dot slides to the color, and under it the 13 brand steps and the 13 neutrals `npm run brand` makes from
-// that one hex (the neutrals tinted toward it, --neutrals subtle). Step 500 is the hex itself, marked. On a loop
-// the field goes from Bland's blue to #e11d74 and back, retyped each time; the steps fan out left to right as
-// each hex lands. The picture sets the brand on itself with data-theme, so Bland's own roles follow (LEARNINGS,
-// "Brand steps on a nested element"). Decorative: aria-hidden and inert.
+// Step 1, "Choose your brand color." As Figma 7250:44428 (Godwin 2026-11-11): a panel with the swatch and its hex,
+// "500 is your brand color, unchanged", eight of the brand shades and a hue strip; under it a Neutrals card with
+// its shades. On a loop the hue strip's knob slides from one color to the other ("this should slide from one
+// color to the other"), from Bland's blue to #e11d74 and back: the hex rolls and the shades follow left to right.
+// The shades are `npm run brand -- generate "#e11d74" --neutrals subtle` output (.brand-pink); the picture sets the
+// brand on itself with data-theme, so Bland's own roles follow. Decorative: aria-hidden and inert.
 import type { CSSProperties } from 'react';
-import { TextInput } from '../../../../src';
 import { useLoop } from '../../features/playback';
+import { Roll } from '../../features/Roll';
 
-const STEPS = [0, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1000] as const;
-const BLUE = '#387eff';
-const PINK = '#e11d74';
-/** Where the hue strip's dot sits for each color: its OKLCH hue over 360 (blue 264, pink 357). */
-const HUE = { blue: 264 / 360, pink: 357 / 360 };
-const TYPE_MS = 70;
-
-type Frame = { brand: 'blue' | 'pink'; typed: string; hold: number };
-/** Type a hex one character at a time, after the field is cleared. */
-const typing = (brand: Frame['brand'], hex: string): Frame[] => [
-  { brand: brand === 'pink' ? 'blue' : 'pink', typed: '', hold: 260 },
-  ...Array.from(hex, (_, i) => ({ brand: brand === 'pink' ? ('blue' as const) : ('pink' as const), typed: hex.slice(0, i + 1), hold: TYPE_MS })),
-  { brand, typed: hex, hold: 2600 },
-];
-// 0 Bland's blue, as shipped; then pink typed in; then blue typed back in; loop from the pink.
-const FRAMES: Frame[] = [{ brand: 'blue', typed: BLUE, hold: 1400 }, ...typing('pink', PINK), ...typing('blue', BLUE)];
-const HOLD = FRAMES.map((f) => f.hold);
-const POSTER = 1 + PINK.length + 1;
+/** Eight of the thirteen shades, light to dark, as Figma's rows. */
+const SHADES = [100, 200, 300, 400, 500, 600, 800, 900] as const;
+/** Where the hue strip's knob sits for each color: its OKLCH hue over 360 (blue 264, pink 357). */
+const BRANDS = {
+  blue: { hex: '#387EFF', hue: 264 / 360 },
+  pink: { hex: '#E11D74', hue: 357 / 360 },
+} as const;
+const ORDER = ['blue', 'pink'] as const;
+const HOLD = [2200, 2600];
+const POSTER = 1;
 
 export function PickPicture({ active, reduced }: { active: boolean; reduced: boolean }) {
-  const step = useLoop(active, reduced, HOLD, 1, POSTER);
-  const frame = FRAMES[step] ?? FRAMES[0]!;
+  const step = useLoop(active, reduced, HOLD, 0, POSTER);
+  const brand = ORDER[step] ?? 'blue';
+  const b = BRANDS[brand];
   return (
     <div
-      className={`pick-pic${frame.brand === 'pink' ? ' brand-pink' : ''}`}
+      className={`pick-pic${brand === 'pink' ? ' brand-pink' : ''}`}
       data-theme="light"
-      data-brand={frame.brand}
+      data-brand={brand}
       data-step={step}
       aria-hidden
       inert
-      style={{ '--hue': HUE[frame.brand] } as CSSProperties}
+      style={{ '--hue': b.hue } as CSSProperties}
     >
       <div className="pick-pic__panel bland-smooth">
-        <div className="pick-pic__field">
+        <div className="pick-pic__head">
           <span className="pick-pic__swatch bland-smooth" />
-          <TextInput size="sm" label="Brand color" value={frame.typed} readOnly tabIndex={-1} className="pick-pic__input" />
+          <Roll value={b.hex} className="pick-pic__hex" />
+        </div>
+        <span className="pick-pic__note">500 is your brand color, unchanged</span>
+        <div className="pick-pic__shades">
+          {SHADES.map((s, i) => (
+            <span key={s} className="pick-pic__shade bland-smooth" style={{ '--s': `var(--brand-${s})`, '--i': i } as CSSProperties} />
+          ))}
         </div>
         <div className="pick-pic__hue">
           <span className="pick-pic__hue-dot" />
         </div>
       </div>
-      <div className="pick-pic__scales">
-        {(['brand', 'neutral'] as const).map((scale) => (
-          <div key={scale} className="pick-pic__scale">
-            <span className="pick-pic__scale-name">{scale === 'brand' ? 'Brand' : 'Neutrals'}</span>
-            <div className="pick-pic__steps">
-              {STEPS.map((s, i) => (
-                <span
-                  key={s}
-                  className="pick-pic__step"
-                  data-yours={(scale === 'brand' && s === 500) || undefined}
-                  style={{ '--s': `var(--${scale}-${s})`, '--i': i } as CSSProperties}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
-        <span className="pick-pic__note">500 is your color, unchanged</span>
+      <div className="pick-pic__panel bland-smooth">
+        <div className="pick-pic__head">
+          <span className="pick-pic__swatch pick-pic__swatch--sm bland-smooth" />
+          <span className="pick-pic__label">Neutrals</span>
+        </div>
+        <div className="pick-pic__shades pick-pic__shades--thin">
+          {SHADES.map((s, i) => (
+            <span key={s} className="pick-pic__shade bland-smooth" style={{ '--s': `var(--neutral-${s})`, '--i': i } as CSSProperties} />
+          ))}
+        </div>
       </div>
     </div>
   );

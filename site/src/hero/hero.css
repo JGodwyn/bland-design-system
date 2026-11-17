@@ -287,8 +287,10 @@
  * highlighter-yellow stroke (--landing-marker-color, Godwin 2026-11-10) over the lower part of the words, an SVG built in marker.ts and set by Hero.tsx as
  * --landing-marker-image, stretched to each line. Drawn left to right in one stroke; the words stay as they are.
  * Going out it wipes away toward the right: lit it grows from the left, unlit it shrinks to the right.
+ * A phrase never breaks across lines (Godwin 2026-11-11: "React design system" on one line), so its stroke is one piece.
  */
 .hero__phrase {
+  white-space: nowrap;
   padding-inline: var(--space-xs);
   background-image: var(--landing-marker-image);
   background-repeat: no-repeat;
