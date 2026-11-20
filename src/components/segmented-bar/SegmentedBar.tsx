@@ -3,7 +3,7 @@ import { Icon } from '../icon/Icon';
 import { Tab, TabPanel, useSelectionIndicator, useTabs, type TabItemBase, type TabsSelectionProps } from '../tabs/tabs';
 import './segmented-bar.css';
 
-export type SegmentedBarSize = 'md' | 'lg';
+export type SegmentedBarSize = 'sm' | 'md' | 'lg';
 
 /** One segment (Figma `_segmented-bar-item`). */
 export interface SegmentedBarItem extends TabItemBase {
@@ -18,7 +18,7 @@ export interface SegmentedBarProps
     Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
   /** The segments, in order, 2 to 4. Give each a `panel` to make the bar tabs. */
   items: SegmentedBarItem[];
-  /** The bar height. md 32 (default), lg 40. */
+  /** The bar height. sm 24 (body-md labels, xs icons, rad-sm corners), md 32 (default), lg 40. */
   size?: SegmentedBarSize;
   /** Disables every segment. */
   disabled?: boolean;

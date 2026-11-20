@@ -1012,3 +1012,15 @@ shell never produces. Also: don't point two Playwright runs at one log file.
 - Symptom: Godwin was signed in to Cloudflare in Dia, but the browser the extension drove landed on Cloudflare's login page.
 - Cause: the Claude extension runs in a separate browser with its own sign-ins.
 - Rule: before driving a dashboard, ask which browser holds the sign-in; sign-ins and passwords stay Godwin's to enter.
+
+## Token checksum sort (2026-11-20)
+
+- Symptom: after a sync, `npm run tokens:checksum` and `scripts/figma/checksum.js` gave different hashes, though every one of the 661 records hashed the same on both sides.
+- Cause: both scripts sorted ids with `localeCompare`. Figma's plugin sandbox and Node's ICU order `7331:364` and `73:16841` differently (one by code unit, one treating `:` as punctuation); the first ids where both forms meet arrived with the Sheet tokens.
+- Rule: sort by plain code-unit comparison (`a < b ? -1 : …`) in anything hashed on both sides. Fixed in both checksum scripts.
+
+## Cloned Figma variants keep raw min sizes (2026-11-20)
+
+- Symptom: Toggle xs variants cloned from sm showed at sm size although width and height were bound to the new xs tokens.
+- Cause: the sm track carried raw `minWidth` 40 / `minHeight` 24, which the clone kept and which beat the bound size.
+- Rule: after cloning a variant to a smaller size, clear `minWidth` / `minHeight` on the root and its sized parts (as the Calendar roots needed on 2026-10-15).

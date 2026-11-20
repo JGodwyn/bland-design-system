@@ -49,6 +49,17 @@ test('selected segment: Segment/selected fill, the near elevation and the bold l
   expect(await group.evaluate((e) => e.getBoundingClientRect().height)).toBe(32);
 });
 
+test('sm: a 24 track of 20 segments, body-md labels, rad-sm (4) corners', async ({ page }) => {
+  const group = page.getByRole('radiogroup', { name: 'Three sm' });
+  const item = group.locator('.bland-segmented-bar__item', { hasText: 'Week' });
+  expect(await group.evaluate((e) => e.getBoundingClientRect().height)).toBe(24);
+  expect(await item.evaluate((e) => e.getBoundingClientRect().height)).toBe(20);
+  expect(await item.evaluate((e) => getComputedStyle(e).fontSize)).toBe('14px');
+  for (const part of [group, item, group.locator('.bland-segmented-bar__thumb')]) {
+    expect(await part.evaluate((e) => getComputedStyle(e).getPropertyValue('--bland-radius').trim())).toBe('4px');
+  }
+});
+
 test('the selected segment slides to a pressed one', async ({ page }) => {
   const group = page.getByRole('radiogroup', { name: 'Range' });
   const thumb = group.locator('.bland-segmented-bar__thumb');

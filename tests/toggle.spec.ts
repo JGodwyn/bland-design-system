@@ -42,9 +42,10 @@ test('controlled: onCheckedChange reports the new state', async ({ page }) => {
 });
 
 test('tracks and knobs follow toggle/* and control/*, and the knob slides to the end when on', async ({ page }) => {
-  for (const [id, track, knobSize] of [
-    ['uncontrolled', [40, 24], 16],
-    ['uncontrolled-md', [56, 32], 24],
+  for (const [id, track, knobSize, inset] of [
+    ['uncontrolled-xs', [32, 16], 12, 2],
+    ['uncontrolled', [40, 24], 16, 4],
+    ['uncontrolled-md', [56, 32], 24, 4],
   ] as const) {
     const toggle = page.getByTestId(id);
     const t = (await toggle.boundingBox())!;
@@ -52,11 +53,20 @@ test('tracks and knobs follow toggle/* and control/*, and the knob slides to the
     const k = () => knob(toggle).boundingBox();
     const off = (await k())!;
     expect([off.width, off.height]).toEqual([knobSize, knobSize]);
-    expect([off.x - t.x, off.y - t.y]).toEqual([4, 4]);
+    expect([off.x - t.x, off.y - t.y]).toEqual([inset, inset]);
 
     await toggle.click();
-    await expect.poll(async () => (await k())!.x - t.x).toBe(t.width - knobSize - 4);
+    await expect.poll(async () => (await k())!.x - t.x).toBe(t.width - knobSize - inset);
   }
+});
+
+test('xs: a body-md label, and the 16 track centred on its first line', async ({ page }) => {
+  const toggle = page.getByTestId('uncontrolled-xs');
+  const text = label(toggle).locator('.bland-toggle__label');
+  expect(await text.evaluate((e) => getComputedStyle(e).fontSize)).toBe('14px');
+  const t = (await toggle.boundingBox())!;
+  const l = (await text.boundingBox())!;
+  expect(t.y - l.y).toBe(2);
 });
 
 test('the label is the hit area: clicking beside the track toggles it', async ({ page }) => {

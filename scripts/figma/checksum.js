@@ -13,6 +13,7 @@ const value = v => {
   return typeof v === 'number' ? Math.round(v * 10000) / 10000 : v;
 };
 const vars = (await figma.variables.getLocalVariablesAsync()).map(v => [strip(v.id), v.name, v.variableCollectionId.replace(/^VariableCollectionId:/, ''), v.resolvedType, v.description, Object.fromEntries(Object.entries(v.valuesByMode).map(([m, x]) => [m, value(x)]))]);
-vars.sort((a, b) => a[0].localeCompare(b[0]));
+// Plain code-unit order, not localeCompare (engines disagree on ids like 7331:364 vs 73:16841).
+vars.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
 const fnv = s => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193) >>> 0; return h.toString(16); };
 return { count: vars.length, hash: fnv(JSON.stringify(vars)) };

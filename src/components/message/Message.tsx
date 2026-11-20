@@ -13,6 +13,7 @@ export type MessageOrientation = 'horizontal' | 'vertical';
 
 const statusIcons = {
   info: InfoIcon,
+  neutral: InfoIcon, // Alert only: a subdued note
   danger: WarningOctagonIcon,
   success: CheckCircleIcon,
   warning: WarningCircleIcon,
@@ -22,7 +23,7 @@ const statusIcons = {
 export type MessageIcon = boolean | ReactNode;
 
 /** The leading status icon, colored by the status (message.css). Decorative: the text carries the meaning. */
-export function StatusIcon({ status, icon = true }: { status: MessageStatus; icon?: MessageIcon }) {
+export function StatusIcon({ status, icon = true }: { status: MessageStatus | 'neutral'; icon?: MessageIcon }) {
   if (icon === false || icon === null) return null;
   const Svg = statusIcons[status];
   return <Icon className="bland-message__icon">{icon === true || icon === undefined ? <Svg /> : icon}</Icon>;

@@ -12,7 +12,9 @@
  *   Tabs (items with panels): the track is role="tablist" and each item a role="tab" with the focus ring;
  *   the selected panel follows the bar.
  *
- * Track: Segment/track, rad-md, space-2xs inset, height segment/md or segment/lg; it fills its container.
+ * Track: Segment/track, rad-md, space-2xs inset, height segment/sm, segment/md or segment/lg; it fills its
+ * container. sm (Godwin 2026-11-20): 20 high segments, body-md, icon/xs, rad-sm on the track, segments, thumb
+ * and focus ring (Godwin set the radius by hand in Figma).
  * Items share the track equally; each is rad-md (Godwin raised it from rad-sm in Figma, 2026-10-19) with
  * Figma's padding. Selected: body-lg-bold over the thumb, the track's sliding indicator (tabs.css) with
  * the Segment/selected fill and Elevation/neutral/near; selected disabled: surface-200, no elevation.
@@ -21,11 +23,17 @@
  */
 
 .bland-segmented-bar {
+  --_radius: var(--rad-md);
+
   min-width: var(--space-none);
 }
 
+.bland-segmented-bar[data-size="sm"] {
+  --_radius: var(--rad-sm);
+}
+
 .bland-segmented-bar__track {
-  --bland-radius: var(--rad-md);
+  --bland-radius: var(--_radius);
 
   position: relative;
   display: flex;
@@ -33,6 +41,10 @@
   height: var(--segment-md);
   padding: var(--space-2xs);
   background-color: var(--segment-track);
+}
+
+.bland-segmented-bar[data-size="sm"] .bland-segmented-bar__track {
+  height: var(--segment-sm);
 }
 
 .bland-segmented-bar[data-size="lg"] .bland-segmented-bar__track {
@@ -43,7 +55,7 @@
   --_fill: transparent;
   --_text: var(--text-subtle);
   --_icon: var(--icon-subtle);
-  --bland-radius: var(--rad-md);
+  --bland-radius: var(--_radius);
   --bland-icon-size: var(--icon-sm);
 
   position: relative;
@@ -68,6 +80,15 @@
     color var(--duration-xs) var(--easing-ease);
 }
 
+.bland-segmented-bar[data-size="sm"] .bland-segmented-bar__item {
+  --bland-icon-size: var(--icon-xs);
+
+  gap: var(--space-2xs);
+  padding: var(--space-none) var(--space-xs);
+  font: var(--type-body-md);
+  letter-spacing: var(--type-body-md-letter-spacing);
+}
+
 .bland-segmented-bar[data-size="lg"] .bland-segmented-bar__item {
   --bland-icon-size: var(--icon-md);
 
@@ -81,7 +102,7 @@
 
 .bland-segmented-bar__input {
   /* Its own radius, for the focus ring: .bland-smooth would otherwise give it none. */
-  --bland-radius: var(--rad-md);
+  --bland-radius: var(--_radius);
 
   position: absolute;
   inset: var(--space-none);
@@ -105,7 +126,7 @@
 /* ---- Selected, hover, disabled. Focus is .bland-focus-ring. ---- */
 
 .bland-segmented-bar__thumb {
-  --bland-radius: var(--rad-md);
+  --bland-radius: var(--_radius);
 
   background-color: var(--segment-selected);
   box-shadow: var(--elevation-neutral-near);
@@ -121,6 +142,10 @@
   --_icon: var(--icon-bold);
 
   font: var(--type-body-lg-bold);
+}
+
+.bland-segmented-bar[data-size="sm"] .bland-segmented-bar__item[data-selected] {
+  font: var(--type-body-md-bold);
 }
 
 @media (hover: hover) and (pointer: fine) {

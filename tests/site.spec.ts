@@ -32,7 +32,7 @@ test.describe('on a phone', () => {
     // Docs stays beside the logo (Godwin 2026-11-10); the other text links make way; the icon links stay.
     await expect(page.locator('.hero').getByRole('link', { name: 'Docs', exact: true })).toBeVisible();
     await expect(page.locator('.hero').getByRole('link', { name: 'Components', exact: true })).toBeHidden();
-    await expect(page.getByRole('link', { name: 'GitHub' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'GitHub', exact: true })).toBeVisible();
     // The Figma icon makes way on a phone too (Godwin 2026-11-10).
     await expect(page.locator('.hero').getByRole('link', { name: 'Figma kit' })).toBeHidden();
     // The headline is Figma's three lines, filling the screen; the button comes once its entrance is done.

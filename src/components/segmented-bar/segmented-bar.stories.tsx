@@ -3,7 +3,7 @@ import type { Story } from '../../../playground/story';
 import { InfoIcon, UserIcon } from '../../icons';
 import { SegmentedBar, type SegmentedBarItem, type SegmentedBarSize } from './SegmentedBar';
 
-const sizes: SegmentedBarSize[] = ['md', 'lg'];
+const sizes: SegmentedBarSize[] = ['sm', 'md', 'lg'];
 const names = ['Day', 'Week', 'Month', 'Year'];
 const segments = (n: number, extra: Partial<SegmentedBarItem> = {}): SegmentedBarItem[] =>
   names.slice(0, n).map((label) => ({ id: label.toLowerCase(), label, ...extra }));

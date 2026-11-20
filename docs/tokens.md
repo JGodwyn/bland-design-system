@@ -48,6 +48,7 @@ Not set up yet: running the check on a schedule. It needs the Figma MCP, so it w
 ## What the build does
 
 - **Deprecated names** (`tokens/deprecated.json`, kept by hand) become `--old: var(--new)` aliases in every block that defines the new token, for one minor version after a rename (`docs/release.md`, "Deprecation").
+- **Held-back variables:** `sheet/*` and `Sheet/*` are skipped with `Fade/*-clear` until the Sheet component ships (Godwin 2026-11-20).
 - **Primitives are not emitted, except the brand and neutral scales and the two font families.** `_Core Colors`, `_Functional Colors`, `_Units` and `_Typography` are hidden collections. The 13 `Brand/BrandN` steps are emitted as `--brand-N` in a `:root` block of their own, and every token whose alias chain ends in one holds `var(--brand-N)` (alpha steps a `color-mix`), so a project's override cascades (`brand.md`). Every exported token resolves through them to a final value.
 - **Alias chains resolve to values**, per mode. `tokens.json` keeps the first alias hop (`aliasOf`) so you can see which primitive a token points at.
 - **Alpha primitives** (`{color: alias, opacity: N}`) resolve to the source color at exactly N%, written as `rgb(r g b / N%)`.
@@ -134,6 +135,12 @@ Four Spacing variables added in Figma for the page grid (`docs/grid.md`): `Layou
 ## Sync of 2026-11-02 (raised and sunken surfaces)
 
 Three Theme variables added in Figma (Godwin): `Surface/surface-sunken` (Neutral50 / Neutral950), `Surface/surface-raised` (Neutral0 / Neutral900) and `Surface/surface-raised-hover` (Neutral50 / Neutral800), the light/dark pairs the mirrored numbered surfaces can't make (`INTERFACE.md`, "Light and dark"). `surface-200`'s description no longer says wells; it points to `surface-sunken`. Through the drift check (3 added, 1 changed) and `--apply`; the Figma side returned only the four records (meta unchanged), and the checksum confirms the rest: 642 variables, `fce24ba5`, equal in Figma and the repo. 592 tokens emitted. Figma turned an apostrophe in a new description into `&#39;`; reworded without one.
+
+## Sync of 2026-11-20 (Toggle xs, Segmented bar sm, surface alpha; Sheet held)
+
+Fifteen variables added in Figma (Godwin): `toggle/track-xs` 32, `toggle/height-xs` 16, `toggle/knob-xs` 12, `segment/sm` 24, Theme `Surface/surface-alpha` / `-alpha-hover` (Alpha a6 / a10 in light, white-a6 / white-a10 in dark), and nine for the Sheet designed in Figma (`sheet/*`, `Sheet/*`). Through the drift check (15 added, nothing changed or removed) and `--apply`; checksum 661 variables, `9527f708`, equal in Figma and the repo. **The Sheet tokens are held back** (Godwin): `scripts/tokens/core.ts` skips `sheet/*` and `Sheet/*` like `Fade/*-clear`, so their names are not published before the Sheet component is built; drop that pattern in the release that adds Sheet. 600 tokens emitted, 14 skipped.
+
+The first checksum disagreed although every record matched: the scripts sorted ids with `localeCompare`, and Figma's sandbox and Node's ICU order `7331:364` and `73:16841` differently. Both checksum scripts now sort by plain code-unit order (`LEARNINGS.md`).
 
 ## Sync of 2026-11-02 (see-through field fills)
 

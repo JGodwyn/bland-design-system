@@ -1,13 +1,17 @@
 import type { ChangeEvent, InputHTMLAttributes, ReactNode, Ref } from 'react';
 import './toggle.css';
 
-export type ToggleSize = 'sm' | 'md';
+export type ToggleSize = 'xs' | 'sm' | 'md';
 
 export interface ToggleProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'role' | 'size' | 'children'> {
   /** Clickable, beside the track. Leave it out and give the toggle an `aria-label`. */
   children?: ReactNode;
-  /** sm: a 40 x 24 track with a 16 knob (default). md: 56 x 32 with a 24 knob. The label is body-lg in both. */
+  /**
+   * xs: a 32 x 16 track with a 12 knob and a body-md label, below the 24px touch target, so only for dense
+   * layouts (the label stays the hit area). sm: 40 x 24 with a 16 knob (default). md: 56 x 32 with a 24 knob.
+   * sm and md labels are body-lg.
+   */
   size?: ToggleSize;
   /** On or off, controlled. */
   checked?: boolean;

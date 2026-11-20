@@ -62,7 +62,7 @@ export {
 } from './components/breadcrumb/Breadcrumb';
 export { Accordion, type AccordionProps, type AccordionSize } from './components/accordion/Accordion';
 export * from './icons';
-export { Alert, type AlertProps, type AlertStatus } from './components/alert/Alert';
+export { Alert, type AlertProps, type AlertSize, type AlertStatus } from './components/alert/Alert';
 export { Banner, type BannerProps, type BannerStatus, type BannerOrientation } from './components/banner/Banner';
 export { Toast, type ToastProps, type ToastStatus } from './components/toast/Toast';
 export {

@@ -9,7 +9,9 @@ for (const f of readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {
   const chunk = JSON.parse(readFileSync(join(dir, f), 'utf8'));
   if (chunk.variables) vars.push(...chunk.variables);
 }
-vars.sort((a, b) => String(a[0]).localeCompare(String(b[0])));
+// Plain code-unit order, not localeCompare: Figma's sandbox and Node's ICU order ids like
+// "7331:364" and "73:16841" differently, so the hashes stopped matching (2026-11-20).
+vars.sort((a, b) => (String(a[0]) < String(b[0]) ? -1 : String(a[0]) > String(b[0]) ? 1 : 0));
 
 const fnv = (s: string) => {
   let h = 0x811c9dc5;

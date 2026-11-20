@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { Story } from '../../../playground/story';
 import { Toggle, type ToggleSize } from './Toggle';
 
-const sizes: ToggleSize[] = ['sm', 'md'];
+const sizes: ToggleSize[] = ['xs', 'sm', 'md'];
 const states = [false, true];
 
 /** A controlled toggle that reports its state, so tests/toggle.spec.ts can check onCheckedChange. */
@@ -23,6 +23,7 @@ export default {
     'Use it for settings that apply immediately. In a form people submit, use Checkbox.',
     'Name the setting, not the action: Notifications, not Turn on notifications.',
     'Without a visible label, give it an `aria-label`.',
+    'Keep `size="xs"` for dense layouts such as table rows and toolbars: its track is under the 24px touch target, so keep a label beside it.',
   ],
   components: ['Toggle'],
   demo: {
@@ -78,6 +79,9 @@ export default {
           <Controlled />
           <Toggle size="md" data-testid="uncontrolled-md">
             Medium
+          </Toggle>
+          <Toggle size="xs" data-testid="uncontrolled-xs">
+            Small
           </Toggle>
           <Toggle disabled data-testid="disabled">
             Disabled

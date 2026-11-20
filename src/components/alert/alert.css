@@ -1,7 +1,7 @@
 /*
  * Alert (Figma: Alert page, set "Alert"). Status colors and the icon come from message.css.
  *
- *   <div class="bland-alert bland-message" data-status="danger" role="alert">
+ *   <div class="bland-alert bland-message" data-status="danger" data-size="md" role="alert">
  *     <span class="bland-icon bland-message__icon">…</span>
  *     <span class="bland-alert__label">Enter a valid email address</span>
  *   </div>
@@ -16,4 +16,24 @@
   min-width: var(--space-none);
   color: var(--_s-text);
   font: var(--type-body-lg);
+}
+
+/* Neutral, Alert's own status (Godwin 2026-11-20): a subdued note, the info icon and the text in the subtle
+   gray. Only the two tokens Alert draws with; Banner, Toast and Notification have no neutral. */
+.bland-alert[data-status="neutral"] {
+  --_s-icon: var(--icon-subtle);
+  --_s-text: var(--text-subtle);
+}
+
+/* sm (Godwin 2026-11-20): body-md and a 16 icon. The icon keeps message.css's space-2xs above it, which
+   centres 16 on a 20 line as it centres 20 on a 24 one. */
+.bland-alert[data-size="sm"] {
+  --bland-icon-size: var(--icon-sm);
+
+  gap: var(--space-xs);
+  letter-spacing: var(--type-body-md-letter-spacing);
+}
+
+.bland-alert[data-size="sm"] .bland-alert__label {
+  font: var(--type-body-md);
 }

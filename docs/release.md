@@ -123,6 +123,8 @@ The site is then at `https://<project-name>.pages.dev` (a custom domain can be a
 
 **Live since 2026-11-17** at https://blandui.com: Pages project `bland` (https://bland-65y.pages.dev) in Godwin's account, built from `main` on every push (preview deployments off, build caching on, `NODE_VERSION` 24). Cloudflare's GitHub app is installed on `JGodwyn/bland-design-system` only. Domains `blandui.com` and `www.blandui.com`, each a proxied CNAME to `bland-65y.pages.dev` in the blandui.com zone. Created through the Cloudflare API MCP (`claude mcp add --transport http cloudflare https://mcp.cloudflare.com/mcp`); adding a domain to a Pages project through the API does not write its DNS record, the dashboard does (`LEARNINGS.md`).
 
+**Analytics (2026-11-17):** Cloudflare Web Analytics on the blandui.com zone (site tag `87ac42d0076b440d9a199c572911d2f4`, automatic install, every path). Cloudflare's edge adds its beacon script to HTML pages served to browsers (`curl` without a browser user agent gets the page without it), so there is no code in the repo and nothing to redeploy. No cookies and no personal data, so no consent banner. Visits, pages, referrers, countries and browsers are in the dashboard under Analytics & Logs, Web Analytics. The docs use hash routes, so docs pages likely all count as `/docs/`. `_headers` sets no `script-src`; a future Content-Security-Policy must allow `static.cloudflareinsights.com` (script) and `cloudflareinsights.com` (connect).
+
 Or deploy from this Mac without Git (after `npx wrangler login` once):
 
 ```bash

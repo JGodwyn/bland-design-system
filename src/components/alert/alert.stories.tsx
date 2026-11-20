@@ -1,36 +1,40 @@
 import type { Story } from '../../../playground/story';
 import { PlusIcon } from '../../icons';
 import { TextInput } from '../text-input/TextInput';
-import { Alert, type AlertStatus } from './Alert';
+import { Alert, type AlertSize, type AlertStatus } from './Alert';
 
-const statuses: AlertStatus[] = ['info', 'danger', 'success', 'warning'];
+const statuses: AlertStatus[] = ['info', 'danger', 'success', 'warning', 'neutral'];
+const sizes: AlertSize[] = ['sm', 'md'];
 
 export default {
   title: 'Alert',
   description:
     'A short inline message tied to a field or element, such as validation feedback. It sits right next to what it describes and has no surface of its own.',
   usage: [
-    '`status` sets the icon and text color: `info`, `danger`, `success` or `warning`.',
+    '`status` sets the icon and text color: `info`, `danger`, `success` or `warning`, or `neutral` for a quiet note that needs no color, such as a hint under a field.',
+    '`size="sm"` sets smaller text and icon, for dense layouts and small fields.',
     'Link it to the field it describes with `aria-describedby`, so screen readers read the two together.',
     'For a message about a whole page or section, use Banner. For feedback after an action, use Toast or Notification.',
   ],
   components: ['Alert'],
   demo: {
     component: 'Alert',
-    args: { children: 'Enter an email address like name@example.com', status: 'danger', icon: true },
+    args: { children: 'Enter an email address like name@example.com', status: 'danger', size: 'md', icon: true },
     controls: { children: { kind: 'text' }, icon: { kind: 'boolean' }, role: false },
     render: (args) => <Alert {...(args as object)}>{args.children}</Alert>,
   },
   render: () => (
     <>
-      <div className="pg-stack">
-        <span className="pg-label"><code>status</code>: <code>info</code>, <code>danger</code>, <code>success</code>, <code>warning</code></span>
-        {statuses.map((status) => (
-          <Alert key={status} status={status}>
-            Alerts display messages about an element ({status})
-          </Alert>
-        ))}
-      </div>
+      {sizes.map((size) => (
+        <div key={size} className="pg-stack">
+          <span className="pg-label"><code>size="{size}"</code>, <code>status</code>: <code>info</code>, <code>danger</code>, <code>success</code>, <code>warning</code>, <code>neutral</code></span>
+          {statuses.map((status) => (
+            <Alert key={status} status={status} size={size}>
+              Alerts display messages about an element ({status})
+            </Alert>
+          ))}
+        </div>
+      ))}
 
       <div className="pg-stack">
         <span className="pg-label"><code>icon={false}</code>, and another icon in its place</span>

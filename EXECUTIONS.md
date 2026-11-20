@@ -2543,3 +2543,33 @@ Godwin tried the landing page on his phone and sent a list of changes.
 
 - Godwin: point the footer at GitHub now the repo is public. `FOOTER_LINKS` in `site/src/footer/Footer.tsx`: Changelog → GitHub `CHANGELOG.md`, MIT license → GitHub `LICENSE`, new GitHub mark (Figma's, left out while the repo was private) before the npm wordmark, named "Bland on GitHub", centred on the row (`.ft__mark--icon` drops the npm wordmark's space-2xs drop). The copyright already reads "Released under the MIT license" (no "All rights reserved").
 - Footer spec updated; 14 passed in Chromium and WebKit; lint and typecheck pass; checked in Chrome at 1440.
+
+### Web analytics (2026-11-17)
+
+- Godwin: track who visits Bland. Picked Cloudflare Web Analytics (the site is on Cloudflare already, free, no cookies). Through the Cloudflare API MCP: the blandui.com zone already had RUM on with an auto-install Web Analytics site (created 19:44 UTC today, every host and path), so nothing to create.
+- Checked live: `curl` alone shows no beacon, `curl` with a browser user agent and `Accept: text/html` shows `static.cloudflareinsights.com/beacon.min.js` + `data-cf-beacon` on `/` and `/docs/`. Recorded in `docs/release.md` (Cloudflare Pages), including the CSP hosts a future policy must allow.
+
+### Sheet in Figma (2026-11-17)
+
+- Godwin asked for a Sheets page and a designed Sheet (drawer) component, Figma only, no code yet. The 2026-11-03 audit (finding 5) listed Sheet as missing.
+- Read the Modals page first (`Modal`, `_modal-title`, `_modal-body`, `_modal-action-bar`, tokens, page frame layout). Godwin's choices (question card): sides right, left and bottom; side sheets flush to the screen edge with square corners; widths sm 384, md 512, lg 640.
+- One `use_figma` write: 9 variables, the page `     •  Sheet` after Segmented bar (`7331:373`), and the `Sheet` set `7331:680` (7 variants: `Side` right/left × `Size` sm/md/lg, plus `Side=bottom, Size=sm`). Modal's three parts are nested as exposed instances (title divider and action bar divider on for side sheets; a vertical fill action bar on the bottom sheet). Booleans `👀 Title`, `👀 Actions`, `👀 Handle`. `Elevation/neutral/far`, `Sheet/surface`, a stroke-sm `border-subtle` on the inner edge only.
+- Second call: a How to use column with two demos on `Sheet/backdrop` (desktop 1024 x 640 with a right md sheet, phone 384 x 720 with a bottom sheet). Checked light and dark by screenshot: readable in both; the light grip (Neutral300 on white) is faint but it is decorative, the close button is the real way out.
+- Not done: no token sync into the repo (`npm run tokens:drift` will now report the 9 new variables), no code.
+
+### Toggle xs, Segmented bar sm, Alert sm and neutral in Figma (2026-11-20)
+
+- Godwin asked for an sm Toggle (it already had sm, so he confirmed an xs below it), an sm Segmented bar, an sm Alert and a gray Alert. Figma only.
+- Toggle: cloned the six sm variants to xs, copied property references, rebound track, knob, padding and label style; 3 new Sizing tokens. The clones kept the sm track's raw `minWidth`/`minHeight` (40/24), so the first screenshot showed xs at sm size; cleared them. Sorted Size to xs, sm, md (rename to a temporary value and back with reads between, `LEARNINGS.md`), relaid the set in size columns, grew the Switch frame to 520 tall.
+- Segmented bar: `segment/sm`; six item variants and nine bar variants cloned from md, bar instances swapped to the sm items. First try failed: copying property references reached sublayers of the nested instances ("Cannot set component property references on instance sublayer"); the copy now stops at instances. Page frame widened to 1184.
+- Alert: renamed the four variants to `Size=md, Status=…`, cloned them to sm, cloned info to neutral at both sizes (6 icon paints rebound from icon-brand to icon-subtle, text to text-subtle). Frame widened to 1100. Checked all three in light and dark by screenshot.
+- Godwin changed the sm segmented track and segments to radius 4 by hand; checked it is bound to `rad-sm` (it is) and moved the six sm focus rings from rad-md to rad-sm to match.
+- Alpha tint: proposed a size-named scale of four (`surface-alpha-xs…lg`); Godwin pointed out sizes are for dimensions and asked why more than one. Settled on two, `Surface/surface-alpha` and `-alpha-hover`, on existing primitives (a6/a10, white-a6/white-a10). The Colors page lists only primitives, so no doc page change.
+
+### 0.2.1: Toggle xs, Segmented bar sm, Alert sm and neutral, surface alpha in code (2026-11-20)
+
+- Godwin: apply the latest changes to code, docs and changelog, Sheet excepted, and push the site live. Asked two things first: Sheet tokens left out of this release, version 0.2.1 (all additions; a 0.3.0 would also have to remove Logo's `children`).
+- Token sync through the drift check: 15 added (6 ours, 9 Sheet). Corrected the surface-alpha descriptions in Figma first (they said black; the value is Neutral1000), wrote the result with the same text, `--apply`, `npm run tokens`. Sheet held back by a skip pattern in `core.ts`. Checksums disagreed (8829eee vs 9527f708) with every record equal: `localeCompare` ordering differs between Figma and Node once `7331:` and `73:` ids coexist; both scripts now use code-unit order, and both give 661 / `9527f708`.
+- Code: Toggle xs, SegmentedBar sm, Alert size + neutral, `AlertSize` exported, stories and JSDoc. Checked in Chrome at localhost:5180 (xs track 16 at 2px down a 20 line, sm bar 24 / 20, rad 4; Alert sm and neutral in light and dark).
+- Specs: new checks for each; one old Alert test measured the first icon on the page, now an sm one, so it targets md. 44 pass in Chromium and WebKit (Firefox does not launch on macOS 27, as known). Re-baselined the six screenshots of the three stories.
+- Version 0.2.1, CHANGELOG entry (also fixed a missing line break in the 0.2.0 entry). npm publish is Godwin's step.
