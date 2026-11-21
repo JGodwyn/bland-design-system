@@ -228,19 +228,9 @@
   color: var(--_icon);
 }
 
-/* The spinner follows the label's color; in an Icon Button, the icon's. One turn per duration/spin. */
+/* The spinner (a decorative Spinner, which turns itself) follows the label's color; in an Icon Button, the icon's. */
 .bland-button__spinner {
   color: var(--_text);
-}
-
-.bland-button__spinner > svg {
-  animation: bland-button-spin var(--duration-spin) var(--easing-linear) infinite;
-}
-
-@keyframes bland-button-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .bland-icon-button .bland-button__spinner {
@@ -281,10 +271,5 @@
 
   .bland-button:active:not(:disabled, [aria-disabled="true"]) {
     transform: none;
-  }
-
-  /* No rotation; the spinner's shape and aria-busy still say it is loading. */
-  .bland-button__spinner > svg {
-    animation: none;
   }
 }

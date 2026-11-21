@@ -1,6 +1,6 @@
 import { createContext, useContext, type ButtonHTMLAttributes, type MouseEvent, type ReactNode } from 'react';
-import { SpinnerIcon } from '../../icons';
 import { Icon } from '../icon/Icon';
+import { Spinner } from '../spinner/Spinner';
 import './button.css';
 
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
@@ -45,13 +45,9 @@ export interface ButtonProps extends ButtonBaseProps {
   loading?: boolean | 'start' | 'end';
 }
 
-/** Spinner in the icon slot; the button's CSS rotates it and colors it like the label. */
+/** A decorative Spinner in the icon slot, sized by the slot and colored like the label; the button's `aria-busy` says it is loading. */
 export function ButtonSpinner() {
-  return (
-    <Icon className="bland-button__spinner">
-      <SpinnerIcon />
-    </Icon>
-  );
+  return <Spinner decorative className="bland-button__spinner" />;
 }
 
 /** Blocks the click while loading, so an action that is running is not started twice. */

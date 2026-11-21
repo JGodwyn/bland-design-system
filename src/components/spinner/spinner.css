@@ -1,0 +1,134 @@
+/*
+ * Spinner: a loading indicator, a turning ring or fading spokes, with an optional label.
+ *
+ *   <span class="bland-spinner" role="status" data-type="ring|spokes" data-size data-color
+ *         data-label-placement="end|bottom" data-show-label>
+ *     <svg class="bland-spinner__mark"/> <span class="bland-spinner__label">Loading</span>
+ *   </span>
+ *
+ * Without data-size the mark takes --bland-icon-size, so it fits the icon slot it sits in (Button's).
+ * Ring and spokes are drawn on a 20 grid and scale, so their weight stays 10% of the size.
+ */
+
+.bland-spinner {
+  --_size: var(--bland-icon-size, var(--icon-md));
+  --_type: var(--type-body-md);
+  --_line: var(--type-body-md-line-height);
+  --_tracking: var(--type-body-md-letter-spacing);
+  --_mark: currentColor;
+  --_label: var(--text-subtle);
+
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  vertical-align: middle;
+}
+
+.bland-spinner[data-size="xs"] { --_size: var(--icon-xs); }
+.bland-spinner[data-size="sm"] { --_size: var(--icon-sm); }
+.bland-spinner[data-size="md"] { --_size: var(--icon-md); }
+.bland-spinner[data-size="lg"] { --_size: var(--icon-lg); }
+
+.bland-spinner[data-size="xl"],
+.bland-spinner[data-size="2xl"] {
+  --_type: var(--type-body-lg);
+  --_line: var(--type-body-lg-line-height);
+  --_tracking: var(--type-body-lg-letter-spacing);
+}
+
+.bland-spinner[data-size="xl"] { --_size: var(--spinner-xl); }
+.bland-spinner[data-size="2xl"] { --_size: var(--spinner-2xl); }
+
+.bland-spinner[data-color="subtle"] { --_mark: var(--icon-subtle); }
+.bland-spinner[data-color="brand"] { --_mark: var(--icon-brand); }
+
+.bland-spinner[data-color="on-color"] {
+  --_mark: var(--icon-on-color);
+  --_label: var(--text-on-color);
+}
+
+.bland-spinner__mark {
+  display: block;
+  flex: none;
+  width: var(--_size);
+  height: var(--_size);
+  color: var(--_mark);
+}
+
+/* ---- Label: beside (first-line rule) or under ---- */
+
+.bland-spinner__label {
+  font: var(--_type);
+  letter-spacing: var(--_tracking);
+  color: var(--_label);
+}
+
+/* Beside (start or end): the mark and the label's first line are centred on each other; a wrapping label stays at the top. */
+.bland-spinner[data-show-label]:is([data-label-placement="start"], [data-label-placement="end"]) > .bland-spinner__mark {
+  margin-block-start: max(var(--space-none), calc((var(--_line) - var(--_size)) / 2));
+}
+
+.bland-spinner[data-show-label]:is([data-label-placement="start"], [data-label-placement="end"]) > .bland-spinner__label {
+  margin-block-start: max(var(--space-none), calc((var(--_size) - var(--_line)) / 2));
+}
+
+/* Before: the label comes first on screen; the mark is hidden from screen readers, so reading order is unchanged. */
+.bland-spinner[data-label-placement="start"] {
+  flex-direction: row-reverse;
+}
+
+.bland-spinner[data-label-placement="bottom"] {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Hidden label: read to screen readers, kept inside the spinner so it never widens the page. */
+.bland-spinner:not([data-show-label]) > .bland-spinner__label {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- Motion ---- */
+
+/* Ring: one turn per duration/spin. */
+.bland-spinner[data-type="ring"] > .bland-spinner__mark {
+  animation: bland-spinner-turn var(--duration-spin) var(--easing-linear) infinite;
+}
+
+@keyframes bland-spinner-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+ * Spokes: each one comes in at full strength and fades over the lap, an eighth of a lap after the one before,
+ * so the bright spoke goes round clockwise. Opacity only, so it keeps going under reduced motion.
+ */
+.bland-spinner__spoke {
+  animation: bland-spinner-fade var(--duration-spin) var(--easing-linear) infinite;
+  animation-delay: calc(var(--duration-spin) * (var(--_i) - 8) / 8);
+}
+
+@keyframes bland-spinner-fade {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The ring stands still; its shape and the status still say it is loading. */
+  .bland-spinner[data-type="ring"] > .bland-spinner__mark {
+    animation: none;
+  }
+}

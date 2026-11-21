@@ -1,0 +1,123 @@
+/*
+ * Link: a text link, in running text or on its own. Figma: Link page, set "Link" (7393:725).
+ *
+ *   <a class="bland-link bland-focus-ring bland-smooth" data-size="md" data-underline="always" data-color="link">
+ *     <span class="bland-icon bland-link__icon">…</span>Text<span class="bland-link__end">…</span>
+ *   </a>
+ *
+ * An inline <a>, so it wraps with the text around it. Without data-size it keeps the surrounding font.
+ * The underline is text-decoration (stroke-sm, space-2xs below the text); hover thickens it to stroke-lg, or
+ * draws it when it shows on hover only. Icons are inline-flex boxes, so the underline skips them.
+ * No pressed, visited or disabled state (INTERFACE.md, "Link").
+ */
+.bland-link {
+  --bland-radius: var(--rad-xs); /* drawn by .bland-smooth: the focus ring's corners */
+  --_ring: var(--stroke-lg);
+
+  color: var(--text-link);
+  text-decoration-line: underline;
+  text-decoration-thickness: var(--stroke-sm);
+  text-underline-offset: var(--space-2xs);
+  text-decoration-skip-ink: auto;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* ---- Size: a text style for links on their own; none keeps the surrounding font ---- */
+
+.bland-link[data-size="sm"] {
+  --bland-icon-size: var(--icon-xs);
+  --_ring: var(--stroke-sm); /* Godwin 2026-11-21: the sm ring is stroke-sm */
+
+  font: var(--type-body-sm);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+}
+
+.bland-link[data-size="md"] {
+  --bland-icon-size: var(--icon-sm);
+
+  font: var(--type-body-md);
+  letter-spacing: var(--type-body-md-letter-spacing);
+}
+
+.bland-link[data-size="lg"] {
+  --bland-icon-size: var(--icon-md);
+
+  font: var(--type-body-lg);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+}
+
+/* ---- Color ---- */
+
+.bland-link[data-color="inherit"] {
+  color: inherit;
+}
+
+/* ---- Underline ---- */
+
+.bland-link[data-underline="hover"] {
+  text-decoration-line: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bland-link[data-underline="always"]:hover {
+    text-decoration-thickness: var(--stroke-lg);
+  }
+
+  .bland-link[data-underline="hover"]:hover {
+    text-decoration-line: underline;
+  }
+}
+
+/* ---- Focus: the shared ring, thinner on sm ---- */
+
+.bland-link.bland-focus-ring:focus-visible {
+  outline-width: var(--_ring);
+}
+
+/* ---- Icons: sized with the text, in the link color, centred on the line ---- */
+
+.bland-link__icon {
+  color: var(--icon-link);
+  vertical-align: middle;
+}
+
+.bland-link[data-color="inherit"] .bland-link__icon {
+  color: inherit;
+}
+
+/* No size: the icon follows the surrounding text. */
+.bland-link:not([data-size]) .bland-link__icon {
+  width: 1em;
+  height: 1em;
+}
+
+.bland-link__icon--start {
+  margin-inline-end: var(--space-xs);
+}
+
+.bland-link__icon--end {
+  margin-inline-start: var(--space-xs);
+}
+
+/* The icons and the word joiner beside them never break apart. */
+.bland-link__start,
+.bland-link__end {
+  white-space: nowrap;
+}
+
+/* Read by screen readers after an external link's text; not shown. Held inside the link's box (the link is its
+   containing block, inset 0) so its unclipped width never widens the page. */
+.bland-link:has(> .bland-link__hidden) {
+  position: relative;
+}
+
+.bland-link__hidden {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

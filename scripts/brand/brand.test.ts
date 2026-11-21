@@ -293,7 +293,7 @@ test('fonts: Bland’s own stacks come from tokens.css, and the text styles read
   // Headings follow the body font until a project sets their own.
   assert.match(css, /^\s*--font-heading: var\(--font-body\);$/m);
   const styles = [...css.matchAll(/^\s*(--type-[a-z0-9-]+):\s*(.+);$/gm)].filter(([, name]) => !/-(line-height|letter-spacing)$/.test(name!));
-  assert.equal(styles.length, 23);
+  assert.equal(styles.length, 25); // 23, plus body-md-underline and body-sm-underline (Link, 2026-11-21)
   const role = (name: string) => (name.startsWith('--type-code-') ? 'code' : /^--type-(display|heading|title)-/.test(name) ? 'heading' : 'body');
   for (const [, name = '', value = ''] of styles) assert.ok(value.endsWith(`var(--font-${role(name)})`), `${name}: ${value}`);
 });

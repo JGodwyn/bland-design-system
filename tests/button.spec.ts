@@ -70,7 +70,7 @@ test('loading sets aria-busy, keeps the accessible name and ignores clicks', asy
     const cs = getComputedStyle(e);
     return [cs.animationName, cs.animationDuration, cs.animationTimingFunction, cs.animationIterationCount];
   });
-  expect(spin).toEqual(['bland-button-spin', '0.8s', 'linear', 'infinite']);
+  expect(spin).toEqual(['bland-spinner-turn', '0.8s', 'linear', 'infinite']);
 
   // Not loading: no aria-busy at all.
   await expect(page.getByTestId('Counter')).not.toHaveAttribute('aria-busy');

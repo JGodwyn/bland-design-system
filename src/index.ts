@@ -100,6 +100,14 @@ export {
   type ListItemLinkProps,
 } from './components/list/ListItem';
 export {
+  Link,
+  type LinkProps,
+  type LinkRenderProps,
+  type LinkSize,
+  type LinkUnderline,
+  type LinkColor,
+} from './components/link/Link';
+export {
   EmptyState,
   type EmptyStateProps,
   type EmptyStateSize,
@@ -155,6 +163,7 @@ export {
   type ModalBackdrop,
 } from './components/modal/Modal';
 export { Sheet, type SheetProps, type SheetSide, type SheetSize } from './components/sheet/Sheet';
+export { Popover, type PopoverProps, type PopoverSize, type PopoverPlacement } from './components/popover/Popover';
 export {
   SectionTabs,
   type SectionTabsProps,
@@ -171,6 +180,24 @@ export {
 } from './components/segmented-bar/SegmentedBar';
 export { TabBar, type TabBarProps, type TabBarItem, type TabBarLinkProps } from './components/tab-bar/TabBar';
 export { Sidebar, type SidebarProps, type SidebarItem, type SidebarLinkProps, type SidebarSlotState } from './components/sidebar/Sidebar';
+export {
+  Skeleton,
+  SkeletonGroup,
+  type SkeletonProps,
+  type SkeletonGroupProps,
+  type SkeletonShape,
+  type SkeletonTextType,
+  type SkeletonSize,
+  type SkeletonRadius,
+} from './components/skeleton/Skeleton';
+export {
+  Spinner,
+  type SpinnerProps,
+  type SpinnerType,
+  type SpinnerSize,
+  type SpinnerColor,
+  type SpinnerLabelPlacement,
+} from './components/spinner/Spinner';
 export {
   Pagination,
   type PaginationProps,

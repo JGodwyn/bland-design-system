@@ -1,6 +1,7 @@
 /* Playground chrome only; not part of Bland. */
 /* Shows the keyboard focus ring without focus, for stories. Same values as .bland-focus-ring in base.css. */
 .pg-focus .bland-focus-ring { outline: var(--stroke-lg) solid var(--border-focused); outline-offset: var(--space-2xs); }
+.pg-focus .bland-link[data-size="sm"] { outline-width: var(--stroke-sm); }
 body { margin: 0; }
 /* No grey or blue flash on tap (mobile WebKit and Chrome): presses show through each control's own hover, pressed and focus states. Inherited, so this covers the whole site. */
 html { -webkit-tap-highlight-color: transparent; }

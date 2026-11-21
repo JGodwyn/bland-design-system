@@ -148,6 +148,8 @@ properties" and "edit sublayers" across two `use_figma` calls.
 `overflowDirection` stopped at the first text layer. → Guard with
 `'prop' in node` before reading a property generically.
 
+- **`outlineStroke()` returns its vector on the page, not in the stroke's parent** (2026-11-21, Spinner): outlining a line inside a component left the component empty and the spokes on the page at component-relative x/y. Read x/y, `appendChild` into the parent, set x/y again.
+
 ## Fonts
 
 **Fontsource *variable* packages register a different family name**
@@ -1031,3 +1033,20 @@ shell never produces. Also: don't point two Playwright runs at one log file.
 - Cause: an inside stroke is drawn on the frame itself, under its children. The variants' inner `Base` frame repeated the hover fill and covered it.
 - Rule: when auditing a stroke in Figma, look at a screenshot, not only the bindings; a child with a fill hides the parent's inside stroke. Keep the fill on one layer.
 
+
+**A file named like another but for its case breaks the typecheck (2026-11-21).** Renaming `overlay/Popover.tsx` to `overlay/Floating.tsx` beside the existing `overlay/floating.ts` gave TS1149 ("differs from already included file name only in casing"): macOS's disk is case-insensitive, so `../overlay/floating` and `../overlay/Floating` are one file to it and two to TypeScript. → Never give two files in one folder names that differ only in case; the helper became `FloatingPanel.tsx`.
+
+## Link: hidden instances, word joiners, propagated underlines (2026-11-21)
+
+- **Hidden Figma instances list no children.** A script reading `instance.children` on an instance with `visible = false` got an empty array, though the vectors were there. → To bind or read inside a hidden instance, show it, work, and hide it again in the same script.
+- **A word joiner lands in the accessible name.** Gluing an icon to its word with U+2060 put the joiner inside the link's name ("GitHub⁠ (opens in a new tab)"), so `getByRole` with the plain name found nothing. → Put the joiner inside the aria-hidden span that holds the icon.
+- **A propagated underline is not a computed style.** The parent `<a>`'s `text-decoration-line: underline` draws under a child span's text, but the span's computed `text-decoration-line` stays `none`. → Assert decorations on the element that sets them.
+- **A clipped screen-reader span still widens the page.** The external link's hidden " (opens in a new tab)" was `position: absolute` with no positioned ancestor, so its unclipped width counted toward the page's scroll width: the Link docs page scrolled 108px sideways at 320px, while no visible element was too wide. → Give such a span `inset: 0` inside a `position: relative` parent (here `.bland-link:has(> .bland-link__hidden)`); when hunting sideways scroll, check absolutely positioned and clipped elements too.
+- **A Figma duration must be a `TIMING` variable.** `duration/pulse` made with `createVariable(…, 'FLOAT')` built as `--duration-pulse: 1.6px`; the token build formats by the variable's type, and every Motion duration is `TIMING` (seconds). → Create durations with `'TIMING'` (no `scopes` on that type: setting them throws), and read a new token's line in `tokens.css` after `npm run tokens`.
+- **A new story missing from a running docs server.** A server started before `src/components/<new>/<new>.stories.tsx` existed kept answering "No story called …" (the eager glob in `playground/docs/data.ts` was not refreshed). → `touch playground/docs/data.ts` and reload, or restart the server.
+- **`--update-snapshots` can keep a stale baseline.** After a story change the re-run "passed" and left the old PNG. → For a new story you are still shaping, delete its PNGs and take them again, then open the files (under a new name if an image viewer caches).
+
+## A turning element's box (2026-11-21, Spinner)
+
+- Symptom: a 20px spinner measured 27px wide in Playwright. Cause: `boundingBox()` returns the rotated square's box mid-turn. Rule: emulate `reducedMotion: 'reduce'` (or stop the animation) before measuring anything that rotates.
+- **A variant cloned into its set loses its layers' property links**: `variant.clone()` appended to the set kept the label's text and visibility but `componentPropertyReferences` came back `{}`, so `👀 Label` did nothing on the new variants. → After cloning variants, set `componentPropertyReferences` again on every linked layer (2026-11-21, Spinner).

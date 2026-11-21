@@ -136,6 +136,18 @@ Four Spacing variables added in Figma for the page grid (`docs/grid.md`): `Layou
 
 Three Theme variables added in Figma (Godwin): `Surface/surface-sunken` (Neutral50 / Neutral950), `Surface/surface-raised` (Neutral0 / Neutral900) and `Surface/surface-raised-hover` (Neutral50 / Neutral800), the light/dark pairs the mirrored numbered surfaces can't make (`INTERFACE.md`, "Light and dark"). `surface-200`'s description no longer says wells; it points to `surface-sunken`. Through the drift check (3 added, 1 changed) and `--apply`; the Figma side returned only the four records (meta unchanged), and the checksum confirms the rest: 642 variables, `fce24ba5`, equal in Figma and the repo. 592 tokens emitted. Figma turned an apostrophe in a new description into `&#39;`; reworded without one.
 
+## Sync of 2026-11-21 (Spinner sizes)
+
+Two Sizing variables added in Figma for the Spinner: `spinner/xl` (alias unit/32) and `spinner/2xl` (alias unit/48). Drift check: 2 added, nothing else; `--apply`, only `00.json` and `07.json` changed. Checksum 670 / `9ce36001`, equal in Figma and the repo. 623 tokens emitted.
+
+## Sync of 2026-11-21 (Skeleton pulse, Link underline styles)
+
+One variable added in Figma for the Skeleton, Motion `duration/pulse` 1.6 s (`TIMING`, like the other durations), and the two text styles the Link session added (`Body/body-md-underline`, `Body/body-sm-underline`), whose sync was still pending. Drift check: 1 added, text styles changed; `--apply`. The pulse was first made a `FLOAT`, which the build writes as `1.6px`; it was recreated as `TIMING` in Figma and synced again (the old id shows as removed). Checksum 668 / `e9f9fdb3`, equal in Figma and the repo. 621 tokens emitted.
+
+## Sync of 2026-11-21 (Popover)
+
+Five variables added in Figma for the Popover: `unit/320`, `popover/width-sm` (alias unit/256), `popover/width-md` (alias unit/320), `Popover/surface` and `Popover/border` (the Menu panel's primitives). Synced through the drift check (5 added) and `--apply`; only `00.json` and `07.json` changed. Checksum 667 / `e5833034`, equal in Figma and the repo. 614 tokens emitted.
+
 ## Sync of 2026-11-20 (Toggle xs, Segmented bar sm, surface alpha; Sheet held)
 
 Fifteen variables added in Figma (Godwin): `toggle/track-xs` 32, `toggle/height-xs` 16, `toggle/knob-xs` 12, `segment/sm` 24, Theme `Surface/surface-alpha` / `-alpha-hover` (Alpha a6 / a10 in light, white-a6 / white-a10 in dark), and nine for the Sheet designed in Figma (`sheet/*`, `Sheet/*`). Through the drift check (15 added, nothing changed or removed) and `--apply`; checksum 661 variables, `9527f708`, equal in Figma and the repo. **The Sheet tokens are held back** (Godwin): `scripts/tokens/core.ts` skips `sheet/*` and `Sheet/*` like `Fade/*-clear`, so their names are not published before the Sheet component is built; drop that pattern in the release that adds Sheet. 600 tokens emitted, 14 skipped.

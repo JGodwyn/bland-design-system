@@ -8,8 +8,8 @@ import { RangeCalendar } from '../calendar/Calendar';
 import { fromDate, fromRange, useDateOptProp, useRangeProp, type DateRange } from '../calendar/dates';
 import { FieldButton, FieldShell, Segments } from '../date-field/DateField';
 import { actionButtonSize, useFieldOpen, useInstant, type DatePickerBaseProps } from '../date-picker/DatePicker';
-import { Popover } from '../overlay/Popover';
-import '../overlay/popover.css';
+import { FloatingPanel } from '../overlay/FloatingPanel';
+import '../overlay/floating-panel.css';
 import './date-range-picker.css';
 
 export type { DateRange } from '../calendar/dates';
@@ -187,7 +187,7 @@ function DateRangePickerInner({
       )}
       {startName && <input type="hidden" name={startName} value={fromDate(state.value?.start) ?? ''} />}
       {endName && <input type="hidden" name={endName} value={fromDate(state.value?.end) ?? ''} />}
-      <Popover
+      <FloatingPanel
         open={state.isOpen}
         reference={anchor}
         placement="bottom-start"
@@ -227,7 +227,7 @@ function DateRangePickerInner({
             }
           />
         </div>
-      </Popover>
+      </FloatingPanel>
     </div>
   );
 }

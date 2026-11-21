@@ -7,7 +7,7 @@
  *       <div class="bland-text-input bland-date-field">End date …</div>
  *     </div>
  *     <span class="bland-date-range-picker__helper">Helper text</span>
- *     <div class="bland-popover">…the Range calendar</div>
+ *     <div class="bland-floating">…the Range calendar</div>
  *   </div>
  *
  * Fills its container (Figma's 582 is its frame); the two fields share it equally, space-sm apart. One helper

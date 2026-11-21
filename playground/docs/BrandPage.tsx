@@ -14,7 +14,8 @@ import { CodeSnippet } from '../../src/components/code-snippet/CodeSnippet';
 import { EmptyState } from '../../src/components/empty-state/EmptyState';
 import { Icon } from '../../src/components/icon/Icon';
 import { Indicator } from '../../src/components/indicator/Indicator';
-import { Popover } from '../../src/components/overlay/Popover';
+import { Link } from '../../src/components/link/Link';
+import { FloatingPanel } from '../../src/components/overlay/FloatingPanel';
 import { Pagination } from '../../src/components/pagination/Pagination';
 import { ProgressBar } from '../../src/components/progress-bar/ProgressBar';
 import { Radio } from '../../src/components/radio-button/Radio';
@@ -493,7 +494,7 @@ function PickSwatch({
           {shown.toUpperCase()}
         </button>
       </Swatch>
-      <Popover
+      <FloatingPanel
         open={!!picking}
         reference={anchor}
         placement="bottom"
@@ -504,7 +505,7 @@ function PickSwatch({
         aria-label={pickerLabel}
       >
         <ColorPicker value={color} onChange={onChange} onDraggingChange={onDraggingChange} />
-      </Popover>
+      </FloatingPanel>
     </>
   );
 }
@@ -1012,9 +1013,9 @@ function Sample() {
         <Badge>Badge</Badge>
         <Badge type="secondary">Badge</Badge>
         <Indicator size="lg">3</Indicator>
-        <a href="#/brand" className="docs-brand-link" onClick={(e) => e.preventDefault()}>
+        <Link href="#/brand" size="lg" onClick={(e) => e.preventDefault()}>
           A link
-        </a>
+        </Link>
       </div>
       <div className="docs-brand-sample-row">
         <Toggle defaultChecked>Toggle</Toggle>

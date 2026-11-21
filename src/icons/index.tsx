@@ -132,6 +132,14 @@ export const ArrowUpIcon = (p: P) => (
   </svg>
 );
 
+/** Figma: ArrowUpRight (6080:105636). Link's external mark, for links that open in a new tab. */
+export const ArrowUpRightIcon = (p: P) => (
+  <svg {...stroked} {...p}>
+    <path d="M8 24L24 8" />
+    <path d="M11 8H24V21" />
+  </svg>
+);
+
 /** Figma: ArrowDown (6080:105456). A Table header sorted descending (Figma's default sort icon). */
 export const ArrowDownIcon = (p: P) => (
   <svg {...stroked} {...p}>

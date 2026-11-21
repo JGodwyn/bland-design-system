@@ -4,7 +4,7 @@
  *   <nav class="bland-breadcrumb" aria-label="Breadcrumb">
  *     <ol class="bland-breadcrumb__list">
  *       <li class="bland-breadcrumb__item">
- *         <a class="bland-breadcrumb__crumb bland-breadcrumb__link bland-focus-ring bland-smooth" href="/">…</a>
+ *         <a class="bland-link bland-breadcrumb__crumb bland-breadcrumb__link bland-focus-ring bland-smooth" href="/">…</a>
  *         <span class="bland-icon bland-breadcrumb__separator">CaretRight</span>
  *       </li>
  *       <li class="bland-breadcrumb__item">
@@ -55,22 +55,25 @@
   white-space: nowrap;
 }
 
-/* ---- Link: an ancestor page ---- */
+/* ---- Link: an ancestor page ----
+ * Link's classes (link/link.css) give the color, the underline geometry and the focus ring; a crumb is a Link
+ * with the underline on hover only. Compound selectors, so they win whichever file loads first. */
 
-.bland-breadcrumb__link {
-  color: var(--text-link);
-  text-decoration: none;
+.bland-breadcrumb__link.bland-link {
+  --bland-radius: var(--rad-sm);
+
+  text-decoration-line: none;
 }
 
 .bland-breadcrumb__link .bland-breadcrumb__icon {
   color: var(--icon-link);
 }
 
-/* Hover underlines the label only (body-lg-underline keeps its size). */
+/* Hover underlines the label (stroke-sm, as Link's underline="hover"); the icon is a flex item without text. */
 @media (hover: hover) and (pointer: fine) {
-  .bland-breadcrumb__link:hover .bland-breadcrumb__label {
-    font: var(--type-body-lg-underline);
-    text-decoration: underline;
+  .bland-breadcrumb__link.bland-link:hover {
+    text-decoration-line: underline;
+    text-decoration-thickness: var(--stroke-sm);
   }
 }
 

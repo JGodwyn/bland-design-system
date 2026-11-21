@@ -1752,11 +1752,6 @@ code,
   align-items: center;
   gap: var(--space-md);
 }
-.docs-brand-link {
-  font: var(--type-body-lg);
-  color: var(--text-link);
-}
-
 /* Grid page: each Figma grid frame drawn with the tokens .bland-grid uses there, scaled to fit. */
 /* The Grid page sits on the grid it documents: an inset .bland-grid in place of the docs column's flex
    stack, sections and the frame list nested grids (same width, so their columns line up), notes at a

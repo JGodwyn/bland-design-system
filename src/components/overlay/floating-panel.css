@@ -1,7 +1,7 @@
 /*
- * Floating panel shared by Menu and Dropdown (overlay/Popover.tsx).
+ * Floating panel shared by Menu and Dropdown (overlay/FloatingPanel.tsx).
  *
- *   <div class="bland-popover" popover="manual" data-side="bottom" data-placement="bottom-start">
+ *   <div class="bland-floating" popover="manual" data-side="bottom" data-placement="bottom-start">
  *     …the panel (.bland-menu)
  *   </div>
  *
@@ -10,7 +10,7 @@
  * width. The root has no box of its own: the panel inside draws it.
  */
 
-.bland-popover {
+.bland-floating {
   /* Reset the popover's UA box. */
   position: fixed;
   inset: auto;
@@ -33,14 +33,14 @@
     transform var(--duration-xs) var(--easing-out);
 }
 
-.bland-popover:popover-open {
+.bland-floating:popover-open {
   opacity: 1;
   transform: none;
   transition-duration: var(--duration-md);
 }
 
 /* Closing: the exit plays while it is still shown, then it leaves the top layer (overlay/exit.ts). */
-.bland-popover:popover-open[data-closing] {
+.bland-floating:popover-open[data-closing] {
   opacity: 0;
   transform: scale(0.96);
   transition-duration: var(--duration-xs);
@@ -48,41 +48,41 @@
 }
 
 @starting-style {
-  .bland-popover:popover-open {
+  .bland-floating:popover-open {
     opacity: 0;
     transform: scale(0.96);
   }
 }
 
 /* Opened from the keyboard or open from the start: no motion, in or out. */
-.bland-popover[data-instant] {
+.bland-floating[data-instant] {
   transition: none;
 }
 
 /* Scale from the trigger: the edge facing it, at the aligned end. */
-.bland-popover[data-side="bottom"] { transform-origin: top center; }
-.bland-popover[data-side="top"] { transform-origin: bottom center; }
-.bland-popover[data-side="left"] { transform-origin: center right; }
-.bland-popover[data-side="right"] { transform-origin: center left; }
-.bland-popover[data-placement="bottom-start"] { transform-origin: top left; }
-.bland-popover[data-placement="bottom-end"] { transform-origin: top right; }
-.bland-popover[data-placement="top-start"] { transform-origin: bottom left; }
-.bland-popover[data-placement="top-end"] { transform-origin: bottom right; }
-.bland-popover[data-placement="left-start"] { transform-origin: top right; }
-.bland-popover[data-placement="left-end"] { transform-origin: bottom right; }
-.bland-popover[data-placement="right-start"] { transform-origin: top left; }
-.bland-popover[data-placement="right-end"] { transform-origin: bottom left; }
+.bland-floating[data-side="bottom"] { transform-origin: top center; }
+.bland-floating[data-side="top"] { transform-origin: bottom center; }
+.bland-floating[data-side="left"] { transform-origin: center right; }
+.bland-floating[data-side="right"] { transform-origin: center left; }
+.bland-floating[data-placement="bottom-start"] { transform-origin: top left; }
+.bland-floating[data-placement="bottom-end"] { transform-origin: top right; }
+.bland-floating[data-placement="top-start"] { transform-origin: bottom left; }
+.bland-floating[data-placement="top-end"] { transform-origin: bottom right; }
+.bland-floating[data-placement="left-start"] { transform-origin: top right; }
+.bland-floating[data-placement="left-end"] { transform-origin: bottom right; }
+.bland-floating[data-placement="right-start"] { transform-origin: top left; }
+.bland-floating[data-placement="right-end"] { transform-origin: bottom left; }
 
 @media (prefers-reduced-motion: reduce) {
   /* Opacity only: no scale. */
-  .bland-popover,
-  .bland-popover:popover-open[data-closing] {
+  .bland-floating,
+  .bland-floating:popover-open[data-closing] {
     transform: none;
     transition-property: opacity;
   }
 
   @starting-style {
-    .bland-popover:popover-open {
+    .bland-floating:popover-open {
       transform: none;
     }
   }

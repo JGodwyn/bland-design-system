@@ -68,7 +68,9 @@ test('hover underlines a link label and fills the overflow crumb', async ({ page
   const nav = page.getByRole('navigation', { name: 'Collapsed breadcrumb' });
   const home = nav.getByRole('link', { name: 'Home' });
   await home.hover();
-  await expect(home.locator('.bland-breadcrumb__label')).toHaveCSS('text-decoration-line', 'underline');
+  // The underline is Link's, on the <a>: the label inside draws it (decorations propagate, not computed styles).
+  await expect(home).toHaveCSS('text-decoration-line', 'underline');
+  await expect(home).toHaveCSS('text-decoration-thickness', '1px');
   const overflow = nav.getByRole('button');
   await overflow.hover();
   await expect(overflow).toHaveCSS('background-color', 'rgb(226, 229, 234)');

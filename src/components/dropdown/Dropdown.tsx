@@ -18,9 +18,9 @@ import { CaretDownIcon, CheckCircleIcon, WarningCircleIcon, WarningOctagonIcon, 
 import { Chip } from '../chip/Chip';
 import { Icon } from '../icon/Icon';
 import { disabledKeysOf, MenuRow, renderItem, type MenuItemData, type MenuSize } from '../menu/items';
-import { Popover } from '../overlay/Popover';
+import { FloatingPanel } from '../overlay/FloatingPanel';
 import { ScrollArea } from '../scroll-area/ScrollArea';
-import '../overlay/popover.css';
+import '../overlay/floating-panel.css';
 import '../menu/menu.css';
 import './dropdown.css';
 
@@ -302,7 +302,7 @@ function SelectDropdown(props: DropdownProps) {
       chevron={<Chevron />}
       hidden={<HiddenSelect state={state} triggerRef={buttonRef} label={label} name={name} isDisabled={disabled} />}
       popover={
-        <Popover
+        <FloatingPanel
           open={state.isOpen}
           reference={field}
           placement="bottom-start"
@@ -314,7 +314,7 @@ function SelectDropdown(props: DropdownProps) {
           <div className="bland-menu bland-smooth" data-size={menuSize}>
             <ListBox listProps={menuProps} state={state} size={menuSize} mark={multiple ? 'checkbox' : 'check'} />
           </div>
-        </Popover>
+        </FloatingPanel>
       }
     >
       {multiple && filled ? (
@@ -450,7 +450,7 @@ function FilterableDropdown(props: DropdownSingleProps) {
         </button>
       }
       popover={
-        <Popover
+        <FloatingPanel
           ref={popoverRef}
           open={state.isOpen}
           reference={field}
@@ -463,7 +463,7 @@ function FilterableDropdown(props: DropdownSingleProps) {
           <div className="bland-menu bland-smooth" data-size={menuSize}>
             <ListBox listProps={listBoxProps} state={state} size={menuSize} mark="check" listRef={listBoxRef} />
           </div>
-        </Popover>
+        </FloatingPanel>
       }
     >
       <input

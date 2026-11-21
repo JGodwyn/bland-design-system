@@ -27,7 +27,7 @@ const uncap: Middleware = {
   },
 };
 
-export interface PopoverProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface FloatingPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   /** Whether the panel is shown. The content stays mounted after it closes until the exit has played. */
   open: boolean;
   /** The element Floating UI anchors to: a Menu's trigger, a Dropdown's field box. */
@@ -60,7 +60,7 @@ export interface PopoverProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
  * to the screen space left (no max-height token: Godwin 2026-10-19). Motion is CSS: `@starting-style` in, and
  * out while still shown (overlay/exit.ts, so every engine plays it); the children stay mounted until then.
  */
-export function Popover({
+export function FloatingPanel({
   open,
   reference,
   placement,
@@ -75,8 +75,8 @@ export function Popover({
   style,
   ref,
   ...rest
-}: PopoverProps) {
-  const popoverRef = useRef<HTMLDivElement>(null);
+}: FloatingPanelProps) {
+  const floatingRef = useRef<HTMLDivElement>(null);
 
   // Mounted while open and until the exit finishes; a new generation (key) on every open.
   const [mounted, setMounted] = useState(open);
@@ -119,7 +119,7 @@ export function Popover({
   useLayoutEffect(() => {
     // Our own ref, not Floating UI's element: that one arrives a render later, so a panel open from the start
     // would still be hidden when its content's autofocus runs (a defaultOpen date picker's calendar).
-    const floating = popoverRef.current;
+    const floating = floatingRef.current;
     if (!floating || !('showPopover' in floating)) return;
     if (!open) {
       // Focus goes back first, so hiding a panel that holds focus never drops it on the body.
@@ -152,7 +152,7 @@ export function Popover({
       // A press on the trigger counts as outside too: React Aria closes the panel and swallows that press, so
       // the trigger toggles it shut instead of reopening it.
     },
-    popoverRef,
+    floatingRef,
   );
 
   const zoom = elements.floating ? zoomOf(elements.floating) : 1;
@@ -161,9 +161,9 @@ export function Popover({
   return (
     <div
       {...mergeProps(rest, dismissable ? overlayProps : {})}
-      ref={mergeRefs<HTMLDivElement>(ref, popoverRef, refs.setFloating)}
+      ref={mergeRefs<HTMLDivElement>(ref, floatingRef, refs.setFloating)}
       popover="manual"
-      className={`bland-popover${className ? ` ${className}` : ''}`}
+      className={`bland-floating${className ? ` ${className}` : ''}`}
       data-side={sideOf(placed)}
       data-placement={placed}
       data-instant={instant || undefined}

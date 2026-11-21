@@ -2,6 +2,7 @@ import { useRef, type HTMLAttributes, type ReactNode } from 'react';
 import { CaretRightIcon } from '../../icons';
 import { Icon } from '../icon/Icon';
 import { Menu } from '../menu/Menu';
+import '../link/link.css';
 import './breadcrumb.css';
 
 /** One page in the trail. The last item is the current page. */
@@ -43,7 +44,9 @@ export interface BreadcrumbProps extends HTMLAttributes<HTMLElement> {
   overflowLabel?: string;
 }
 
-const linkClass = 'bland-breadcrumb__crumb bland-breadcrumb__link bland-focus-ring bland-smooth';
+// Link's look (color, underline, focus ring) through its class alone, so a router's link that keeps only
+// `className` still gets it; breadcrumb.css turns the underline to hover only.
+const linkClass = 'bland-link bland-breadcrumb__crumb bland-breadcrumb__link bland-focus-ring bland-smooth';
 const defaultLink = (props: BreadcrumbLinkProps) => <a {...props} />;
 
 /** Where the current page sits in the site hierarchy. Figma: Breadcrumbs page, set "Breadcrumb". */

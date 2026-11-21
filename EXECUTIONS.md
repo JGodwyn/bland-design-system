@@ -2631,3 +2631,77 @@ Godwin tried the landing page on his phone and sent a list of changes.
 - Godwin: publish what the side sessions finished and push the docs live. Ships the Sheet session (Sheet in code, Modal `top` deprecated, Logo `children` removed), the stroke-button session (xs 1px / sm 1.5px edges, neutral brand stroke hover) and the text-input session (softer `--border-input`, new `--control-border`), all already in the CHANGELOG's Unreleased (0.3.0) entry, now dated.
 - Popover stays Figma-only: its five new Figma variables were not synced, so the repo's raw export is five variables behind Figma until Popover is built (expected drift).
 - Checks: typecheck, lint, token/drift/lint/brand tests, audit, full Playwright suite, package smoke test; then version 0.3.0, commit, tag `v0.3.0`, push to main (Cloudflare deploys). npm publish is Godwin's step.
+- Godwin asked for it tighter and drew a frame (`7382:24855`, an instance with padding overrides on the Modal parts). Dumped its spacing: title 8/4, body 8/8, actions 4/4, sm Buttons. Asked replace vs Density variant and whether to even the 4 under the buttons; he chose replace and 8 under. Bound the paddings on both variants' parts (space-sm / space-xs), Buttons Size=sm, set description updated. Screenshots: set light and the dark example. His frame keeps its own overrides (4 under the buttons); left it for him.
+
+### Popover in code (2026-11-21)
+
+- Godwin: hide the title and action bar by default, then build it. Figma: `👀 Title` / `👀 Actions` defaults false (`editComponentProperty`), examples keep both on, set description updated.
+- Asked how the public component relates to the internal `overlay/Popover.tsx`; Godwin chose renaming the helper. First renamed it to `Floating.tsx`: typecheck failed, TS1149 (casing clash with `overlay/floating.ts` on macOS). Renamed again to `FloatingPanel.tsx` / `floating-panel.css`, class `.bland-floating`; imports in Menu, Dropdown, DatePicker, DateRangePicker, BrandPage, Showcase; menu.css selector, two specs, docs/components.md.
+- Token sync: drift check showed exactly the 5 Popover variables; `--apply`, `npm run tokens` (614 emitted), checksum 667 / `e5833034` in Figma and locally.
+- `src/components/popover/`: `Popover.tsx` (trigger, FloatingPanel, `PopoverPanel` with useDialog + ModalContent), `popover.css`, `popover.stories.tsx`; export from `src/index.ts`. A static export of the panel was dropped before use: useDialog would take focus on the docs page; the story draws the panel as Sheet's does.
+- Checked in Chrome at localhost:5180/#/components/popover: role dialog named Filters, described, no aria-modal, focus on the panel, 4px under the trigger, 320 wide; static rows in light. Added `aria-haspopup="dialog"` (was missing).
+- `tests/popover.spec.ts`: first run had 3 test mistakes (measured during the 0.96 scale, assumed bottom when it had flipped up, expected the first outside press to reach another trigger, which useOverlay takes as Menu does). Fixed the spec; 19 pass in Chromium and WebKit (Firefox doesn't launch on macOS 27). Baselines popover light/dark and popover-open light/dark, looked at.
+- Godwin: a centred body should centre the title when there's no close button, and the docs demo needs switches for the title and action bars. popover.css centres the header under a centred body without `.bland-modal__close`; demo args `titleBar` / `actionBar` (and `align` / `actionsAlign` defaults so their pickers don't read Select…); a static row of two centred panels (with and without the close button). Checked in Chrome: title middle equals the panel's (584/584) without the X; actionBar off drops the actions.
+
+## Link component: survey and proposal (2026-11-21, side session)
+
+- Figma: only `Text/text-link` (brand-600 / dark brand-300) and `Icon/icon-link`; underline text styles exist only at body-lg (`Body/body-lg-underline`, `-bold-underline`), described as link hover styles. No Link set, no visited, hover or pressed link colors.
+- Code: the only text link look is Breadcrumb (`text-link`, `icon-link`, body-lg, underline on hover via `body-lg-underline`). ChatBubble's document link underlines its filename on hover in its own color. TabBar, Sidebar, ListItem, ChatListItem, Pagination and Logo render links through `renderLink({ href, className, children })` but draw them as rows, tabs or a logo, not text links. Outside `src/`: docs `.pg-index a`, `.docs-brand-link`, site footer and hero links each restyle text-link and hover underline.
+- No external-link icon in `src/icons/` yet.
+- Proposal sent to Godwin; waiting on his decisions before any Figma or code work.
+- Godwin agreed to the proposal as written (2026-11-21).
+- Figma: created text styles `Body/body-md-underline` and `Body/body-sm-underline` (bound like body-md / body-sm, AUTO offset and thickness like body-lg-underline), placed after the lg underline styles, and cloned the body-lg-underline Typo card for each after body-md-bold / body-sm-bold.
+- Tested first: overriding `textDecorationThickness` / `textDecorationOffset` on a node keeps its text style, so hover thickness is an override, not more styles.
+- Created page `     •  Link` before Lists and set `Link` (24 variants: Size sm/md/lg in columns × Underline × Color × State in rows), properties ✏️ Label, 👀/🌟 Icon (L), 👀/🌟 Icon (R), 👀 External (ArrowUpRight), 👀 Focused (absolute focus-ring frame, as `_Breadcrumb Base`). First write failed (an alias Sizing value passed to `resize`) and rolled back whole; the retry worked. Page frame from Header / Footer like Popover's; light and dark example frames beside it. Screenshots checked in both themes.
+- Not done: code (on Godwin's word), the token sync for the two text styles (with the code, after checking the drift report for the Popover session's variables).
+
+## Link in code (2026-11-21, side session)
+
+- Figma first, at Godwin's word: sm focus ring → stroke-sm; all 144 stroked icon vectors in the set (icon-l, icon-r, external × 24 variants) bound to stroke-md and their Icon/* color. Hidden instances return no children until shown, so the script showed each, bound, and hid it again.
+- `src/components/link/` (Link.tsx, link.css, link.stories.tsx), `ArrowUpRightIcon` in `src/icons/` (Figma 24 grid scaled to the 32 grid), exports in `src/index.ts`, `tests/link.spec.ts`.
+- First test run: the external link's name had the word joiner in it ("GitHub⁠ (opens…)"), so the icon spans became aria-hidden; the running-text paragraph did not wrap at 40ch (now 28ch); Breadcrumb's hover test read `text-decoration-line` on the label span, which only the `<a>` computes (decorations propagate, computed styles don't), so it now checks the link.
+- Breadcrumb onto Link's classes; docs Brand sample and landing hero text links onto `<Link>`. Breadcrumb screenshots unchanged.
+
+## Skeleton: survey, proposal, Figma (2026-11-21, side session)
+
+- Figma survey: no skeleton/placeholder/shimmer variables or sets; no Motion token for a looping pulse (`spin` 800 and `typing` 1200 are the only loops). Fitting tokens: `Surface/surface-alpha` / `-alpha-hover`, `avatar/*`, rad scale, text styles bound to `_Typography` size and line-height.
+- Proposal to Godwin: shapes text/circle/rect, text by text style, surface-alpha, pulse, SkeletonGroup. He took every recommended option: pulse, new `duration/pulse` 1600, text sized by text style, SkeletonGroup wrapper.
+- Figma: added Motion `duration/pulse` = 1.6 (`VariableID:7400:364`, scopes as `duration/typing`). Page `     •  Skeleton` after Sidebar; `Skeleton-text` (9 Type variants, booleans `👀 Middle line` / `👀 Last line`; each line a frame bound to the style's line-height with a centred bar bound to its font size; last bar 60% with a SCALE constraint), `Skeleton-circle` (7 sizes on avatar/*), `Skeleton-rectangle`; all fills surface-alpha. Page frame from the Annotations Header / Footer as Link's; light and dark examples.
+- The first wrap call failed (the Link example's text style id was a remote key with a trailing comma) and rolled back whole; the retry used local `Body/body-lg`. Text variants first kept a fixed 3-line height, so hidden lines left a gap; set to hug.
+- Not done: code (on Godwin's word) and the token sync for `duration/pulse` (repo tokens now drift by that one variable).
+
+## Skeleton in code (2026-11-21, side session)
+
+- Token sync: drift check showed `duration/pulse` plus the Link session's two underline text styles (pending since Link); took both. The pulse came out `--duration-pulse: 1.6px`: I had created it as `FLOAT`, the other durations are `TIMING` (the build formats by type). Recreated it in Figma as `TIMING` (`VariableID:7403:365`; `TIMING` variables take no scopes), ran the drift check again (old id removed, new added), applied, `npm run tokens`: 1600ms. Checksum 668 / `e9f9fdb3` in both. Hand-patching the raw chunk was refused, rightly; the drift path did it.
+- Built `Skeleton.tsx`, `skeleton.css`, `skeleton.stories.tsx`, `tests/skeleton.spec.ts`, exports in `src/index.ts`. Lint and typecheck clean.
+- The shared docs server (another session's, started before my story existed) said "No story called skeleton" until `playground/docs/data.ts` was touched and the page reloaded.
+- Screenshots: the first group examples (surface-100, surface-sunken) were invisible in dark; switched to the page and a raised card with elevation-neutral-near. `--update-snapshots` then left the old baselines in place; deleted them and took them again, looked at both themes.
+- Applied the Link session's LEARNINGS entry: the group's hidden status gets `inset: 0` in a `position: relative` group.
+- Tests: skeleton spec 12/12 (Chromium, WebKit), visual and axe for skeleton pass, docs smoke 168/168. Checked in Chrome at http://localhost:5180/#/components/skeleton: pulse runs (alpha 0.06 to 0.10), light and dark, code snippet. Firefox not run (doesn't start on macOS 27).
+- Not done: commit (Godwin's call), the tracker doc.
+
+## Spinner: survey, proposal, Figma (2026-11-21, side session)
+
+- Read `_Spinner` (6065:1682, Buttons page): one 20 symbol, an ELLIPSE arc (inner radius 0.8, so 2 thick), fill `Icon/icon-bold`, description "static in Figma". Code: `SpinnerIcon`, `ButtonSpinner`, button.css spin and reduced motion.
+- Proposal (sizes, colors, label, status/decorative, reduced motion, Button switch) in the side-session notes; Godwin said yes and added a spokes variant from an image (eight spokes, like Phosphor's bold Spinner). Asked how the spokes move: fading trail.
+- Figma: Sizing `spinner/xl` 32 and `spinner/2xl` 48; page `     •  Spinner` after Slider (header, sets, footer); `_spinner-spokes` drawn as eight 2-wide round-cap lines outlined to vectors; `Spinner` set Type x Size x Color x Label position (96), `👀 Label` / `✏️ Label`, mark instances bound to the size tokens, recolored per Color; arranged sizes in columns, on-color rows over a `Surface/surface-brand-strong` backdrop in a `Spinner set` wrapper frame; light and dark example frames (beside a label, a section, a brand fill).
+- Snag: `outlineStroke()` put the new vectors on the page, not in the component; moved them in at the same x/y (LEARNINGS).
+- Not done: code (on Godwin's word), the token sync for `spinner/*` (the repo now drifts by those two variables), the tracker doc.
+
+## Spinner in code (2026-11-21, side session)
+
+- Drift check: only my `spinner/xl` and `spinner/2xl` differed; `--apply`, `npm run tokens`, checksum 670 / `9ce36001` equal in Figma and the repo.
+- Built Spinner (component, CSS, story, spec), exports; switched `ButtonSpinner` to `<Spinner decorative>` and moved the turn out of button.css; button.spec now expects `bland-spinner-turn`.
+- First spec run: three layout checks failed because a turning ring's bounding box is the rotated square (27 for 20); the layout tests emulate reduced motion first.
+- Lint and typecheck clean. Spinner spec 8/8 and button spec in Chromium and WebKit; spinner and button screenshots (new spinner baselines looked at, button unchanged); axe clean in Chromium and WebKit (Firefox does not launch on macOS 27, known).
+- Checked in Chrome at http://localhost:5180/#/components/spinner: ring turning, spokes' bright spoke moving clockwise (4 → 6 in 200 ms), status "Loading".
+- Not done: commit (Godwin's call), the tracker doc.
+- Godwin: more room between the spinner and its label, 8. Root gap space-sm for both placements (CSS, spec, Figma's 48 end variants and the set description); spinner screenshots re-baselined, Button unchanged; spinner, button, visual and axe pass in Chromium and WebKit.
+- Godwin: a label placement at the start. Code: `start` in the type, row-reverse in CSS, story row and control, spec (8 apart, centred). Figma: cloned the 48 end variants to start with the label first; the clones' labels had lost their `👀 Label` / `✏️ Label` links (relinked, LEARNINGS); options reordered end, start, bottom with the rename-one-read trick; grid and on-color backdrop re-laid. Screenshots re-baselined; spinner, axe and visual pass in Chromium and WebKit.
+
+### Release 0.3.1 (2026-11-21, top session)
+
+- Godwin, after checking them: push and publish Popover, Link, Skeleton and Spinner (the four side sessions' work, already in the CHANGELOG's Unreleased entry, now 0.3.1: every change is an addition; 0.4.0 would also have to remove Modal `top`).
+- Tokens: the side sessions had synced; checksum 670 variables, `9ce36001`, equal in Figma and the repo; 25 text styles (Link's two underline styles).
+- `test:brand` still counted 23 text styles; now 25.
+- Checks: typecheck, lint, token/drift/lint/brand tests, audit, full Playwright suite, package smoke test; then commit, tag `v0.3.1`, push to main (Cloudflare deploys). npm publish is Godwin's step.

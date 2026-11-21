@@ -81,21 +81,20 @@
   gap: var(--space-sm);
   margin: 0;
   padding: 0;
+  color: var(--text-bold);
   list-style: none;
 }
 
-/* Text links: Body/body-md text-bold, padding 0 space-xs, rad-md (Figma "Menu item"). */
-.hero__link {
+/* Text links: Body/body-lg text-bold, padding 0 space-xs, rad-md (Figma "Menu item"). The text links are Bland
+   Links (size lg, underline on hover, color inherit from the list); the icon links are plain <a>s. */
+.hero__link,
+.hero__link.bland-link {
   --bland-radius: var(--rad-md);
 
   display: flex;
   align-items: center;
   padding: 0 var(--space-xs);
   border-radius: var(--rad-md);
-  color: var(--text-bold);
-  font: var(--type-body-lg);
-  letter-spacing: var(--type-body-lg-letter-spacing);
-  text-decoration: none;
   white-space: nowrap;
 }
 
@@ -118,12 +117,6 @@
 .hero__links > li:not(:has(.hero__link--icon)):not(:first-child),
 .hero__links > li.hero__nav-figma {
   display: none;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .hero__link:not(.hero__link--icon):hover {
-    text-decoration: underline;
-  }
 }
 
 /* Headline block: 848 wide, centred; the button sits over its middle (Figma: 32 below centre). */

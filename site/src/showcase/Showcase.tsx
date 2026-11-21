@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEve
 import { flushSync } from 'react-dom';
 import { Icon, ScrollArea } from '../../../src';
 import { cards, lastCards, moreCards } from './Cards';
-import { Popover } from '../../../src/components/overlay/Popover';
+import { FloatingPanel } from '../../../src/components/overlay/FloatingPanel';
 import { ColorPicker } from '../../../playground/docs/ColorPicker';
 import { StackIcon } from '../../../playground/docs/icons';
 import { BLAND, BRANDS, FONTS, fontStyle, loadFont, paletteFor, paletteStyle, type Look } from './settings';
@@ -99,7 +99,7 @@ function Swatches({ hex, onPick, onDraggingChange }: { hex: string; onPick: (hex
         onClick={(e) => setPicking(picking ? null : { instant: e.detail === 0 })}
       />
       <span className="showcase__ring" data-edge={edge} aria-hidden="true" />
-      <Popover
+      <FloatingPanel
         open={!!picking}
         reference={any.current}
         placement="top"
@@ -110,7 +110,7 @@ function Swatches({ hex, onPick, onDraggingChange }: { hex: string; onPick: (hex
         aria-label="Pick a brand color"
       >
         <ColorPicker value={hex} onChange={onPick} onDraggingChange={onDraggingChange} />
-      </Popover>
+      </FloatingPanel>
     </div>
   );
 }

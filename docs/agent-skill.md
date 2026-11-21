@@ -49,12 +49,16 @@ Raw material for the skill we package at the end of the project: what an agent n
 - Copy buttons (CodeSnippet, CodeText) work on plain-http pages too (a fallback), so a phone on the LAN can copy.
 - Icons: Bland ships none for the project; pass any SVG (Phosphor React recommended). Icon-only controls need `aria-label`.
 - Variants are props (`size`, `emotion`, `type`), never class overrides. Defaults: most sizes default to sm or md; check the map.
-- Routers: links take `renderLink` (Breadcrumb, TabBar, Sidebar, Pagination, ListItem, Logo).
+- Routers: links take `renderLink` (Link, Breadcrumb, TabBar, Sidebar, Pagination, ListItem, Logo).
+- Text links: use `Link`, never a styled `<a>`. Inside running text leave `size` off (it takes the text's font) and keep `underline="always"`; links on their own get a `size` and may use `underline="hover"`; `color="inherit"` for footers, legal text and brand fills. `target="_blank"` adds the external mark by itself.
 - Sidebar peek: the minimized rail opens over the page, past its own box, so no ancestor may clip it (`overflow: hidden`) narrower than `--sidebar-width`.
 - `Logo` is the Bland logo (logomark and drawn wordmark), not a slot for a project's name: a project with its own name renders its own logo. `mono` for one color, `color="on-color" mono` on brand fills, `mark={false}` for the wordmark alone. `children` was removed in 0.3.0.
 - `Sheet` for a panel from a screen edge (details, editing, filters, phone navigation): `side="end"` (default) / `"start"` / `"bottom"`, logical, so they flip in right-to-left pages; `floating` detaches it. Same title, description, `children`, `actions` and open props as Modal. Use Modal for a decision that needs an answer.
+- `Popover` for a small panel beside the element that opened it (a profile, Share, a few filters): not modal, closes on a press outside or Escape. Pass the opener as `trigger`; title and actions are off until passed, use sm Buttons in `actions`. Use Menu for a list of actions, Modal for a decision.
 - Modal and Sheet bodies have one slot, `children`; Modal's `top` is deprecated (0.3.0, removed in 0.4.0).
 - Sidebar logo: pass `top` as `({ rail }) => rail ? <Mark /> : <Logo />` when the product has a logo mark; a plain `top` hides in the rail and the expand button takes its place.
+- Loading: `Skeleton` in place of the content (`type` = the text style the real text uses, `shape="circle" size` = the Avatar size, `shape="rect"` with the image's height), inside one `SkeletonGroup` per loading region (it carries `aria-busy` and the single "Loading" announcement; set `loading={false}` and render the content when it arrives). Never put `aria-busy` or a Loading text on each skeleton.
+- Loading with no known layout or length: `<Spinner>` (`type` ring or spokes, `size` xs to 2xl, `color`), with `label` saying what loads and `showLabel` to show it; `decorative` inside a loading Button or an `aria-busy` region. Known progress is a ProgressBar.
 - Disabled uses the disabled tokens, never opacity.
 - Left to right only: right-to-left (RTL) layouts are not supported yet (Godwin 2026-11-03). Don't promise an RTL page with Bland; Toggle and Slider are known not to mirror.
 - Deprecated names (`docs/release.md`, "Deprecation"): an old token name, prop or component keeps working for one minor version, with a console warning in development for props and components. When the CHANGELOG or a warning names a replacement, switch to it in the same upgrade; never add new uses of a deprecated name.

@@ -1,0 +1,65 @@
+/*
+ * Popover (Figma: Popover page, set "Popover"). Reuses Modal's parts and their CSS (modal.css), tighter.
+ *
+ *   <div class="bland-floating" popover="manual" data-side="bottom">      overlay/floating-panel.css: placement, motion
+ *     <div class="bland-popover bland-smooth" role="dialog" data-size="md">
+ *       <div class="bland-modal__content">
+ *         <div class="bland-modal__header">…                              _modal-title (👀 Title, off by default)
+ *         <div class="bland-scroll-area bland-modal__scroll">…            _modal-body, scrolls past the screen space left
+ *         <div class="bland-modal__actions" data-orientation="horizontal">…   _modal-action-bar (👀 Actions)
+ *       </div>
+ *     </div>
+ *   </div>
+ *
+ * Menu's panel look with its own tokens: Popover/surface, an inside stroke-sm Popover/border, rad-md,
+ * Elevation/neutral/mid. Width popover/width-sm (256) or -md (320), never wider than the screen less space-sm each
+ * side. Spacing is tighter than a Modal's (Godwin 2026-11-21): title space-sm above and space-xs under, body
+ * space-sm above and under, actions space-xs above and space-sm under; sides space-lg.
+ */
+
+.bland-popover {
+  --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
+  --bland-popover-width: var(--popover-width-md);
+
+  display: flex;
+  flex-direction: column;
+  width: min(var(--bland-popover-width), calc(100vw - var(--space-sm) * 2));
+  max-height: var(--_available-height, none);
+  overflow: hidden;
+  background: var(--popover-surface);
+  color: var(--text-bold);
+  box-shadow:
+    inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--popover-border),
+    var(--elevation-neutral-mid);
+  /* The panel takes focus on open so its name is read first; it is not a control, so no ring. */
+  outline: none;
+}
+
+.bland-popover[data-size="sm"] {
+  --bland-popover-width: var(--popover-width-sm);
+}
+
+.bland-popover .bland-modal__header {
+  padding: var(--space-sm) var(--space-lg) var(--space-xs);
+}
+
+.bland-popover .bland-modal__body {
+  padding: var(--space-sm) var(--space-lg);
+}
+
+.bland-popover .bland-modal__actions {
+  padding: var(--space-xs) var(--space-lg) var(--space-sm);
+}
+
+/* A centred body centres the title too, while there is no close button to balance it (Godwin 2026-11-21). */
+.bland-popover:has(> .bland-modal__content > .bland-modal__scroll .bland-modal__body[data-align="center"])
+  .bland-modal__header:not(:has(.bland-modal__close)) {
+  justify-content: center;
+  text-align: center;
+}
+
+.bland-popover:has(> .bland-modal__content > .bland-modal__scroll .bland-modal__body[data-align="center"])
+  .bland-modal__header:not(:has(.bland-modal__close))
+  .bland-modal__title {
+  flex: 0 1 auto;
+}

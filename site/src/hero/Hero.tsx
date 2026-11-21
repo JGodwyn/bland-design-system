@@ -8,7 +8,7 @@
 // theme (Godwin 2026-11-06). The button comes out while the pointer is over the headline and follows it,
 // magnetically (Figma annotation, after typesafe.ai's hero).
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
-import { Icon, Logo } from '../../../src';
+import { Icon, Link, Logo } from '../../../src';
 // Button's CSS for the link below, which uses its classes without the component.
 import '../../../src/components/button/button.css';
 import { FigmaLogoIcon, GitHubIcon } from '../icons';
@@ -380,9 +380,9 @@ export function Hero() {
             <ul className="hero__links" role="list">
               {links.map((link) => (
                 <li key={link.label}>
-                  <a className="hero__link bland-focus-ring bland-smooth" href={link.href}>
+                  <Link className="hero__link" href={link.href} size="lg" underline="hover" color="inherit">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
               <li className="hero__nav-figma">

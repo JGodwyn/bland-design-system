@@ -15,13 +15,14 @@ How Bland components move. The rules come from Emil Kowalski's animation skills 
 | `--duration-toast-visible` | 5000ms | Not an animation: how long a Toast stays on screen before it dismisses itself. The Toaster reads it. Added 2026-10-18 |
 | `--duration-tooltip-delay` | 500ms | Not an animation: how long the pointer rests on a trigger before its Tooltip opens. Keyboard focus and a warm tooltip skip it. Added 2026-10-19 |
 | `--duration-tooltip-close-delay` | 100ms | Not an animation: how long a Tooltip stays after the pointer leaves, so the pointer can cross onto it. Added 2026-10-19 |
-| `--duration-spin` | 800ms | One full turn of a loading spinner, repeated, with `--easing-linear`. Added 2026-10-17 for the Button's loading state |
+| `--duration-spin` | 800ms | One full turn of a loading spinner, repeated, with `--easing-linear`. Added 2026-10-17 for the Button's loading state. The Spinner's spokes use it too (2026-11-21): each spoke comes in at full strength and fades to 0.25 over one lap, an eighth of a lap after the one before, so the bright spoke goes round clockwise; opacity only, so it keeps going under reduced motion, while the ring stands still |
 | `--duration-typing` | 1200ms | One wave of a typing Chat bubble's dots, repeated, with `--easing-in-out`: each dot brightens and lifts by space-xs in turn, a sixth of the cycle apart. A loop, like the spinner, so it sits above the 250ms UI limit. Reduced motion keeps the color wave and drops the lift. Added 2026-10-20 |
+| `--duration-pulse` | 1600ms | One Skeleton pulse, repeated, with `--easing-in-out`: the fill eases from `--surface-alpha` to `--surface-alpha-hover` and back. A loop, so above the 250ms limit. Reduced motion stands it still. Added 2026-11-21 |
 | `--easing-out` | `cubic-bezier(0.23, 1, 0.32, 1)` | Default. Anything entering or exiting |
 | `--easing-in-out` | `cubic-bezier(0.77, 0, 0.175, 1)` | Moving or morphing while on screen |
 | `--easing-drawer` | `cubic-bezier(0.32, 0.72, 0, 1)` | Sidebar and sheets |
 | `--easing-ease` | `cubic-bezier(0.25, 0.1, 0.25, 1)` | Hover and color changes |
-| `--easing-linear` | `linear` | Progress fills, hold-to-confirm and spinner rotation only |
+| `--easing-linear` | `linear` | Progress fills, hold-to-confirm and spinners only (the ring's turn, the spokes' fade) |
 
 The lint rejects raw `ms`/`s` values, easing keywords, `cubic-bezier()`, `steps()` and `linear()` in component CSS, and names the token to use. `ease-in` is rejected outright.
 

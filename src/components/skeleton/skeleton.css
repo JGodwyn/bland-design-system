@@ -1,0 +1,119 @@
+/*
+ * Skeleton (Figma: Skeleton page, sets "Skeleton-text", "Skeleton-circle", "Skeleton-rectangle").
+ *
+ *   <span class="bland-skeleton" data-shape="text" data-type="body-md" aria-hidden="true" style="font: var(--type-body-md)">
+ *     <span class="bland-skeleton__line"><span class="bland-skeleton__bar bland-smooth"></span></span>
+ *   </span>
+ *   <span class="bland-skeleton" data-shape="circle" data-size="md" aria-hidden="true"></span>
+ *   <span class="bland-skeleton bland-smooth" data-shape="rect" data-radius="md" aria-hidden="true"></span>
+ *
+ * Fill: Surface/surface-alpha, the see-through tint, so it reads on the page, a card or a panel in both themes.
+ * It pulses to surface-alpha-hover and back over duration/pulse, easing/in-out, looping; static under reduced motion.
+ *
+ * Text: each line is a one-row grid holding a zero-width character (::before), so the row is exactly the text
+ * style's line height; the bar sits in the same cell, 1em (the style's font size) tall, centred.
+ */
+
+.bland-skeleton {
+  display: block;
+}
+
+.bland-skeleton[data-shape="circle"],
+.bland-skeleton[data-shape="rect"],
+.bland-skeleton__bar {
+  background-color: var(--surface-alpha);
+  animation: bland-skeleton-pulse var(--duration-pulse) var(--easing-in-out) infinite;
+}
+
+@keyframes bland-skeleton-pulse {
+  0%,
+  100% {
+    background-color: var(--surface-alpha);
+  }
+
+  50% {
+    background-color: var(--surface-alpha-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bland-skeleton[data-shape="circle"],
+  .bland-skeleton[data-shape="rect"],
+  .bland-skeleton__bar {
+    animation: none;
+  }
+}
+
+/* ---- Text: lines that take a text style's line height ---- */
+
+.bland-skeleton__line {
+  display: grid;
+  align-items: center;
+}
+
+.bland-skeleton__line::before {
+  content: "\200b";
+  grid-area: 1 / 1;
+}
+
+.bland-skeleton__bar {
+  --bland-radius: var(--rad-xs);
+
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 1em;
+}
+
+.bland-skeleton__line:last-child:not(:first-child) .bland-skeleton__bar {
+  width: 60%;
+}
+
+/* ---- Circle: Avatar's sizes ---- */
+
+.bland-skeleton[data-shape="circle"] {
+  --_size: var(--avatar-md);
+
+  display: inline-block;
+  flex: none;
+  width: var(--_size);
+  height: var(--_size);
+  border-radius: var(--rad-rd);
+  vertical-align: middle;
+}
+
+.bland-skeleton[data-shape="circle"][data-size="xs"] { --_size: var(--avatar-xs); }
+.bland-skeleton[data-shape="circle"][data-size="sm"] { --_size: var(--avatar-sm); }
+.bland-skeleton[data-shape="circle"][data-size="lg"] { --_size: var(--avatar-lg); }
+.bland-skeleton[data-shape="circle"][data-size="xl"] { --_size: var(--avatar-xl); }
+.bland-skeleton[data-shape="circle"][data-size="2xl"] { --_size: var(--avatar-2xl); }
+.bland-skeleton[data-shape="circle"][data-size="3xl"] { --_size: var(--avatar-3xl); }
+
+/* ---- Rect: fills its container, 16:9 until the project sets a height or aspect-ratio ---- */
+
+.bland-skeleton[data-shape="rect"] {
+  --bland-radius: var(--rad-md);
+
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.bland-skeleton[data-shape="rect"][data-radius="null"] { --bland-radius: var(--rad-null); }
+.bland-skeleton[data-shape="rect"][data-radius="xs"] { --bland-radius: var(--rad-xs); }
+.bland-skeleton[data-shape="rect"][data-radius="sm"] { --bland-radius: var(--rad-sm); }
+.bland-skeleton[data-shape="rect"][data-radius="lg"] { --bland-radius: var(--rad-lg); }
+.bland-skeleton[data-shape="rect"][data-radius="xl"] { --bland-radius: var(--rad-xl); }
+
+/* ---- Group: the loading region and its one announcement ---- */
+
+/* The hidden status stays inside the group (inset: 0 in a positioned box), so its text never widens the page. */
+.bland-skeleton-group {
+  position: relative;
+}
+
+.bland-skeleton-group__status {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

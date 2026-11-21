@@ -21,9 +21,9 @@ import {
 import { useMenuTriggerState, useTreeState, type Node, type TreeState } from 'react-stately';
 import type { Placement } from '@floating-ui/react-dom';
 import { ScrollArea } from '../scroll-area/ScrollArea';
-import { Popover } from '../overlay/Popover';
+import { FloatingPanel } from '../overlay/FloatingPanel';
 import { disabledKeysOf, MenuRow, renderItem, type MenuItemData, type MenuSize } from './items';
-import '../overlay/popover.css';
+import '../overlay/floating-panel.css';
 import './menu.css';
 
 export type { MenuItemData, MenuSize } from './items';
@@ -120,7 +120,7 @@ export function Menu({
         ...mergeProps(child.props, buttonProps),
         ref: mergeRefs<HTMLElement>(child.props.ref, triggerRef, (el: HTMLElement | null) => setTriggerEl(el)),
       })}
-      <Popover
+      <FloatingPanel
         open={state.isOpen}
         reference={triggerEl}
         placement={placement}
@@ -143,7 +143,7 @@ export function Menu({
           />
           <DismissButton onDismiss={state.close} />
         </div>
-      </Popover>
+      </FloatingPanel>
     </>
   );
 }

@@ -1,7 +1,7 @@
 /*
  * Menu (Figma: Dropdown page, sets "Menu" and "_menu-item"). Dropdown's options use the same panel and rows.
  *
- *   <div class="bland-popover" popover="manual">                         overlay/popover.css
+ *   <div class="bland-floating" popover="manual">                         overlay/floating-panel.css
  *     <div class="bland-menu bland-smooth" data-size="sm">              Figma Menu
  *       <div class="bland-scroll-area bland-menu__scroll">…             fade/sm and the thumb, once it overflows
  *         <ul class="bland-menu__list" role="menu">
@@ -30,7 +30,7 @@
 }
 
 /* Inside a Dropdown the panel takes the field's width (Figma: Fill container). */
-.bland-popover[data-match-width] .bland-menu {
+.bland-floating[data-match-width] .bland-menu {
   width: 100%;
 }
 

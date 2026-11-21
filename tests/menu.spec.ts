@@ -15,7 +15,7 @@ test('a press opens it with motion; choosing an item runs it, closes and returns
   await trigger.click();
   await expect(menu(page)).toBeVisible();
   await expect(trigger).toHaveAttribute('aria-expanded', 'true');
-  await expect(page.locator('.bland-popover:popover-open')).not.toHaveAttribute('data-instant');
+  await expect(page.locator('.bland-floating:popover-open')).not.toHaveAttribute('data-instant');
   await page.getByRole('menuitem', { name: 'Share' }).click();
   await expect(page.getByTestId('last-action')).toHaveText('share');
   await expect(menu(page)).toBeHidden();
@@ -27,7 +27,7 @@ test('the keyboard opens it at once, arrows skip disabled items, typeahead jumps
   await trigger.focus();
   await page.keyboard.press('ArrowDown');
   await expect(menu(page)).toBeVisible();
-  await expect(page.locator('.bland-popover:popover-open')).toHaveAttribute('data-instant', 'true');
+  await expect(page.locator('.bland-floating:popover-open')).toHaveAttribute('data-instant', 'true');
   const item = (name: string) => page.getByRole('menuitem', { name });
   await expect(item('New file')).toBeFocused();
   await expect(item('New file')).toHaveAttribute('data-focus-visible', 'true');
@@ -77,7 +77,7 @@ test('it sits space-xs under the trigger, menu/width wide, and flips above near 
   const trigger = page.getByTestId('more-trigger');
   await trigger.evaluate((el) => el.scrollIntoView({ block: 'start' }));
   await trigger.click();
-  const panel = page.locator('.bland-popover:popover-open .bland-menu');
+  const panel = page.locator('.bland-floating:popover-open .bland-menu');
   await expect(panel).toBeVisible();
   await expect.poll(() => panel.evaluate((e) => getComputedStyle(e.parentElement!).opacity)).toBe('1');
   const t = (await trigger.boundingBox())!;
@@ -88,10 +88,10 @@ test('it sits space-xs under the trigger, menu/width wide, and flips above near 
   expect(m.x).toBeCloseTo(t.x, 0);
   await page.keyboard.press('Escape');
   // Near the bottom edge it flips above instead of squeezing.
-  await expect(page.locator('.bland-popover:popover-open')).toHaveCount(0);
+  await expect(page.locator('.bland-floating:popover-open')).toHaveCount(0);
   await trigger.evaluate((el) => el.scrollIntoView({ block: 'end' }));
   await trigger.click();
-  await expect(page.locator('.bland-popover:popover-open')).toHaveAttribute('data-side', 'top');
+  await expect(page.locator('.bland-floating:popover-open')).toHaveAttribute('data-side', 'top');
 });
 
 test('a long menu is capped to the screen and scrolls with the fade and thumb; the focused item stays in view', async ({ page }) => {
@@ -100,7 +100,7 @@ test('a long menu is capped to the screen and scrolls with the fade and thumb; t
   await trigger.evaluate((el) => el.scrollIntoView({ block: 'center' }));
   await trigger.focus();
   await page.keyboard.press('ArrowDown');
-  const popover = page.locator('.bland-popover:popover-open');
+  const popover = page.locator('.bland-floating:popover-open');
   const box = (await popover.boundingBox())!;
   expect(box.y).toBeGreaterThanOrEqual(8);
   expect(box.y + box.height).toBeLessThanOrEqual(500 - 8 + 1);
@@ -123,7 +123,7 @@ test('reduced motion drops the scale', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.getByTestId('actions-trigger').click();
   await expect(menu(page)).toBeVisible();
-  const transform = await page.locator('.bland-popover:popover-open').evaluate((e) => getComputedStyle(e).transform);
+  const transform = await page.locator('.bland-floating:popover-open').evaluate((e) => getComputedStyle(e).transform);
   expect(transform).toBe('none');
 });
 
@@ -135,7 +135,7 @@ for (const theme of ['light', 'dark'] as const) {
     await trigger.evaluate((el) => el.scrollIntoView({ block: 'start' }));
     await trigger.focus();
     await page.keyboard.press('ArrowDown');
-    const popover = page.locator('.bland-popover:popover-open');
+    const popover = page.locator('.bland-floating:popover-open');
     await expect(popover).toBeVisible();
     const t = (await trigger.boundingBox())!;
     const b = (await popover.boundingBox())!;

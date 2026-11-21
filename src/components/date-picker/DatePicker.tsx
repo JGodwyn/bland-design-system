@@ -7,8 +7,8 @@ import { Button } from '../button/Button';
 import { SingleCalendar, type CalendarSize } from '../calendar/Calendar';
 import { fromDate, useDateOptProp, useDateProp } from '../calendar/dates';
 import { FieldButton, FieldShell, Segments, type DateFieldStatus } from '../date-field/DateField';
-import { Popover } from '../overlay/Popover';
-import '../overlay/popover.css';
+import { FloatingPanel } from '../overlay/FloatingPanel';
+import '../overlay/floating-panel.css';
 
 export type DatePickerSize = 'sm' | 'md' | 'lg';
 export type DatePickerStatus = DateFieldStatus;
@@ -259,7 +259,7 @@ function DatePickerInner({
       after={
         <>
           {name && <input type="hidden" name={name} value={fromDate(state.value) ?? ''} />}
-          <Popover
+          <FloatingPanel
             open={state.isOpen}
             reference={box}
             placement="bottom-start"
@@ -298,7 +298,7 @@ function DatePickerInner({
                 }
               />
             </div>
-          </Popover>
+          </FloatingPanel>
         </>
       }
     >

@@ -17,7 +17,7 @@ test('basic: a press opens the options under the field, as wide as it; choosing 
   await expect(trigger).toHaveAccessibleName('Banana Basic');
   await trigger.click();
   await expect(listbox(page)).toBeVisible();
-  const panel = page.locator('.bland-popover:popover-open .bland-menu');
+  const panel = page.locator('.bland-floating:popover-open .bland-menu');
   await expect.poll(() => panel.evaluate((e) => getComputedStyle(e.parentElement!).opacity)).toBe('1');
   const f = (await field(page, 'basic').boundingBox())!;
   const m = (await panel.boundingBox())!;
@@ -38,7 +38,7 @@ test('basic: the keyboard opens it at once on the chosen option; disabled option
   await trigger.focus();
   await page.keyboard.press('ArrowDown');
   await expect(listbox(page)).toBeVisible();
-  await expect(page.locator('.bland-popover:popover-open')).toHaveAttribute('data-instant', 'true');
+  await expect(page.locator('.bland-floating:popover-open')).toHaveAttribute('data-instant', 'true');
   await expect(page.getByRole('option', { name: 'Banana' })).toBeFocused();
   await page.keyboard.press('ArrowDown');
   await expect(page.getByRole('option', { name: 'Cherry' })).toBeFocused();
@@ -123,7 +123,7 @@ for (const theme of ['light', 'dark'] as const) {
     ] as const) {
       await page.getByTestId(id).evaluate((el) => el.scrollIntoView({ block: 'start' }));
       await open(page);
-      const popover = page.locator('.bland-popover:popover-open');
+      const popover = page.locator('.bland-floating:popover-open');
       await expect(popover).toBeVisible();
       const f = (await page.getByTestId(id).boundingBox())!;
       const b = (await popover.boundingBox())!;
