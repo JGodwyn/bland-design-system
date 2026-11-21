@@ -154,6 +154,7 @@ export {
   type ModalActionsOrientation,
   type ModalBackdrop,
 } from './components/modal/Modal';
+export { Sheet, type SheetProps, type SheetSide, type SheetSize } from './components/sheet/Sheet';
 export {
   SectionTabs,
   type SectionTabsProps,

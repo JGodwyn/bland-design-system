@@ -2,6 +2,16 @@
 
 Bland follows [semantic versioning](https://semver.org). Until 1.0, a minor version (0.2.0) may change an API or a token name; a patch (0.1.1) never does. Each entry says what a project has to change, if anything.
 
+## 0.3.0 (2026-11-21)
+
+- **New: Sheet.** `import { Sheet } from 'bland-ui'`: a panel that slides in from an edge of the screen over the page, for details, editing a record, filters, or a phone's navigation. `side` is `end` (default), `start` or `bottom`; `end` and `start` follow the reading direction, so in a right-to-left language the end sheet comes in from the left. `size` sm 384 / md 512 / lg 640 for side sheets; `floating` detaches it 8px from every screen edge with every corner rounded; the bottom sheet has a grab handle (`handle`) and stacked actions. It takes Modal's title, description, body, actions, `trigger`, `open` / `defaultOpen` / `onOpenChange` and `dismissable`. New tokens `--sheet-surface`, `--sheet-handle`, `--sheet-backdrop`, `--sheet-width-sm`, `-md`, `-lg`, `--sheet-height`, `--sheet-handle-width`, `--sheet-handle-height`.
+- **Deprecated: Modal `top`.** Figma's Modal body now has one slot. `top` still shows above the description, with a development warning, and goes in 0.4.0. What to change: put that content in `children`; for something above the text, leave `description` out and put both in `children`.
+- **Removed: Logo `children`** (deprecated in 0.2.0). What to change: a product with another name renders its own logo; Bland's `Logo` always draws "Bland".
+- **Stroke buttons: lighter edges on small sizes.** The edge of a `type="stroke"` Button or Icon Button is now 1.5px on `sm` and 1px on `xs` (it was 2px at every size); `md` and `lg` keep 2px. The edge also matches Figma in hover and pressed.
+- **Brand stroke hover is neutral.** A brand stroke button's hover and pressed fills are now gray (`--button-brand-stroke-hover`, `--button-brand-stroke-pressed` read `--neutral-50` / `--neutral-100`, and `--neutral-900` / `--neutral-800` in dark) instead of a light brand tint, matching its gray edge and label. Other emotions keep their tints.
+- **Softer text field borders; checkbox and radio keep theirs.** `--border-input` (Text Input, Text Area, Search Input, Numeric Input Field, Dropdown, the date and time pickers, the File Upload drop zone, the chat message bar, the next-step Progress wizard marker) is now `--neutral-200` in light and `--neutral-700` in dark (it was 500 / 400), so fields read quieter. New token `--control-border` (`--neutral-500` / `--neutral-400`, the old values) for the unchecked Checkbox, Radio and the Menu multi-select box, which keep 3:1 against the page.
+- Nothing to change in a project. If you used `--border-input` on your own checkbox-like control, switch it to `--control-border`.
+
 ## 0.2.1 (2026-11-20)
 
 - **Toggle `size="xs"`.** A 32 × 16 track with a 12 knob and a body-md label, for dense layouts such as table rows and toolbars. Its track is under the 24px touch target, so keep a label beside it (the label is part of the hit area). New tokens `--toggle-track-xs`, `--toggle-height-xs`, `--toggle-knob-xs`.

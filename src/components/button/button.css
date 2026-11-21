@@ -195,13 +195,25 @@
   --_bg-pressed: var(--_e-ghost-pressed);
 }
 
-/* Stroke: a stroke-lg edge drawn inside the box (Figma's inside stroke), so it adds no size. */
+/*
+ * Stroke: an edge drawn inside the box (Figma's inside stroke), so it adds no size, in every state.
+ * Its weight steps with the size: stroke-lg on lg and md, stroke-md on sm, stroke-sm on xs (Godwin 2026-11-21).
+ */
 .bland-button[data-type="stroke"] {
   --_bg-hover: var(--_e-stroke-hover);
   --_bg-pressed: var(--_e-stroke-pressed);
   --_border: var(--_e-border);
+  --_stroke: var(--stroke-lg);
 
-  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-lg) var(--_border);
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--_stroke) var(--_border);
+}
+
+.bland-button[data-type="stroke"][data-size="sm"] {
+  --_stroke: var(--stroke-md);
+}
+
+.bland-button[data-type="stroke"][data-size="xs"] {
+  --_stroke: var(--stroke-sm);
 }
 
 /* ---- Parts ---- */

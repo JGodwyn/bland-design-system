@@ -125,7 +125,7 @@
   width: var(--selection-box-sm);
   height: var(--selection-box-sm);
   background-color: var(--surface-field);
-  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-input);
+  box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--control-border);
 }
 
 .bland-menu__checkbox[data-checked] {

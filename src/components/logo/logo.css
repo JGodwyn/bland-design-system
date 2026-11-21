@@ -77,14 +77,3 @@
   width: auto;
   height: var(--_mark);
 }
-
-/* Deprecated `children`: live text in place of the wordmark, in the text style the logo had before 0.2.0. */
-.bland-logo__text {
-  font: var(--type-heading-md);
-  letter-spacing: var(--type-heading-md-letter-spacing);
-}
-
-.bland-logo[data-size="sm"] .bland-logo__text {
-  font: var(--type-title-md);
-  letter-spacing: var(--type-title-md-letter-spacing);
-}

@@ -34,11 +34,6 @@ export interface LogoProps extends Omit<HTMLAttributes<HTMLElement>, 'color' | '
    * replaces it, drawn in a square the height of the logo. Decorative: hidden from screen readers.
    */
   mark?: ReactNode;
-  /**
-   * @deprecated Since 0.2.0, removed in 0.3.0. The wordmark is a drawing of the word Bland, so a product with
-   * another name draws its own logo. Until then, text passed here is shown in place of the wordmark.
-   */
-  children?: ReactNode;
   /** Makes the logo a link, usually to the home page, with Bland's focus ring. */
   href?: string;
   /**
@@ -87,31 +82,21 @@ function Wordmark() {
   );
 }
 
-let warnedChildren = false;
-
 /**
  * The Bland logo: the logomark and the wordmark, both drawings. A static `<span>`, or the home link with `href`.
  * Figma: Brand elements page, sets "Logo" and "Logomark".
  */
-// The library builds without Node types; bundlers replace `process.env.NODE_ENV`.
-declare const process: { env: { NODE_ENV?: string } } | undefined;
-
 export function Logo({
   size = 'lg',
   color = 'default',
   mono = false,
   mark,
-  children,
   href,
   renderLink = defaultLink,
   className,
   onClick,
   ...rest
 }: LogoProps) {
-  if (children != null && !warnedChildren && typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-    warnedChildren = true;
-    console.warn('bland-ui: Logo `children` is deprecated and goes in 0.3.0. The wordmark is a drawing of "Bland"; draw your own logo for another name.');
-  }
   const content = (
     <>
       {mark !== false && mark !== null && (
@@ -119,7 +104,7 @@ export function Logo({
           {mark === undefined || mark === true ? <Logomark /> : mark}
         </span>
       )}
-      {children != null ? <span className="bland-logo__text">{children}</span> : <Wordmark />}
+      <Wordmark />
     </>
   );
   if (href !== undefined) {

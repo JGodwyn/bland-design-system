@@ -195,10 +195,9 @@ export default {
         <Panel title="One action" description={description} actions={<Button>Got it</Button>} />
       </Row>
 
-      <Row label={<><code>top</code> and <code>children</code>; no title, a close button only; no actions</>}>
+      <Row label={<><code>children</code>, the body's one slot; no title, a close button only; no actions</>}>
         <Panel
           title="Invite people"
-          top={<div className="pg-label">The top slot: an image or a summary</div>}
           description="They will get an email with a link to this file."
           actions={two}
           actionsAlign="right"

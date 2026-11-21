@@ -207,10 +207,8 @@ export function buildTokens({ meta, raw }: Pick<Export, 'meta' | 'raw'>) {
   // ---------- build tokens ----------
 
 
-  // Fade/*-clear: Figma-only drawing aids. sheet/* and Sheet/*: held back until the Sheet component
-  // ships in code, so their names aren't published while its design may still change (Godwin
-  // 2026-11-20). Drop the second pattern in the release that adds Sheet.
-  const skip = (name: string) => /^Fade\/.*-clear$/.test(name) || /^[Ss]heet\//.test(name);
+  // Fade/*-clear: Figma-only drawing aids.
+  const skip = (name: string) => /^Fade\/.*-clear$/.test(name);
   const tokens: Token[] = [];
   const skipped: string[] = [];
 

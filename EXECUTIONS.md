@@ -2573,3 +2573,61 @@ Godwin tried the landing page on his phone and sent a list of changes.
 - Code: Toggle xs, SegmentedBar sm, Alert size + neutral, `AlertSize` exported, stories and JSDoc. Checked in Chrome at localhost:5180 (xs track 16 at 2px down a 20 line, sm bar 24 / 20, rad 4; Alert sm and neutral in light and dark).
 - Specs: new checks for each; one old Alert test measured the first icon on the page, now an sm one, so it targets md. 44 pass in Chromium and WebKit (Firefox does not launch on macOS 27, as known). Re-baselined the six screenshots of the three stories.
 - Version 0.2.1, CHANGELOG entry (also fixed a missing line break in the 0.2.0 entry). npm publish is Godwin's step.
+
+### Stroke Buttons: neutral brand hover, weight per size, Figma fixes (2026-11-21)
+
+- Side session from the Sheet session's parent. Godwin's three points: brand stroke hover looked off, the sm border is too big, Figma's xs brand stroke hover and the stroke hovers in general don't match code.
+- Audit (read-only `use_figma` over the 128 stroke variants of Button `170:23095` and Icon Button `6068:3509`): colors matched code; Figma xs is `stroke-sm` (1) while code drew `stroke-lg` at every size; the two brand xs hover variants carried a `stroke-lg` stroke on the inner Base frame. Notes in the side-session folder.
+- Proposed neutral alpha for the brand hover; Godwin chose solid neutrals ("we've been using solid colors for the buttons"). Brand ghost left as is.
+- Figma: `Button/brand-stroke-hover` → Neutral50 / Neutral900, `-pressed` → Neutral100 / Neutral800, descriptions updated; `stroke-md` description widened. Every stroke variant's border on the root, weight bound per size (xs stroke-sm, sm stroke-md, md/lg stroke-lg); moved the eight brand hover borders off Base.
+- First review screenshot (temporary instances in a Light and a Dark frame, then removed): no hover or pressed variant showed a border, in any emotion. Base repeated the root's fill and covered the inside stroke (`LEARNINGS.md`). Cleared the 64 duplicate Base fills; the second screenshot shows the border in every state in both themes.
+- Drift check: exactly the three variables; `--apply`, `npm run tokens`, checksum 661 / `f107f066` in both.
+- `button.css`: `--_stroke` per size on stroke buttons. Checked in Chrome at localhost:5180 with a grid of every emotion, size and state in light and dark: 2 / 1.5 / 1px inset, neutral brand hover #f1f2f3 and pressed #e2e5ea.
+
+- Tests: lint, typecheck clean. `npm test` 1414 passed, 2 failed (an Accordion height spec and a Sidebar rail spec, both passed on rerun, timing). The button screenshots passed under the 0.2% tolerance, so re-baselined them with `--update-snapshots all` (button light and dark only); the new baseline shows 1 / 1.5 / 2px edges.
+
+### Text input border: where it is used, softer, a control border (2026-11-21)
+
+- Side session for Godwin's Text input work. Question: "Where's border-input used?" Read-only `use_figma` census over every page: 11 component sets bind it on a stroke (Text Input, Search Input, Text Area, `_Numeric Input Field Base`, `_dropdown-trigger`, Checkbox, Radio Button, `_uploader`, Chat-message-bar, `_progress-icon`, `_progress-wizard-item`), the rest reach it through nested instances. Code: the same ten components plus the Menu multi-select box, which Figma doesn't draw.
+- A first census script counted almost no nested-instance hits; a second, by instance and main component, found them all. A border lookup by layer name also caught `field` (no stroke) before `inner-border`; checked one instance by hand.
+- Godwin had already set light `border-input` to Neutral200 in Figma. Proposed Neutral700 for dark (the mirror) and a separate border for Checkbox and Radio, since 1.65:1 is too faint for a box that is the whole control. Godwin: yes, and give them their own token.
+- Figma: `border-input` dark → Neutral700, description rewritten; new `Control/border` (Neutral500 / Neutral400, STROKE_COLOR) bound on the eight unchecked box strokes of Checkbox and Radio Button; every nested instance follows (Checkbox Group, Radio Button Group, Table, Cover, Landing page). Pointer added to both set descriptions. Colors page lists primitives only, nothing to rebuild.
+- Drift check: exactly the two variables (the stroke-button session's changes were already in the raw export); `--apply`, `npm run tokens`, checksum 662 / `2d9fb272` in both.
+- CSS: Checkbox, Radio and Menu's box read `--control-border`. CLAUDE.md Checkbox row and CHANGELOG Unreleased updated.
+- Tests: lint and typecheck clean. Chromium screenshots: 18 field stories failed as expected (checkbox, radio, menu passed unchanged); viewed Text Input light and dark, then re-baselined 13 field stories (26 images) with `--update-snapshots all`, including file-upload, progress-wizard, pagination-table and slider, which changed under the 0.2% tolerance. Nothing committed: the stroke-button session's changes share the token files.
+
+### Sheet: sides explained, floating variant, one Modal body slot (2026-11-21)
+
+- Side session for the Sheet. Godwin asked whether left and right look the same: answered (placement mirror only, contents not mirrored) and proposed start / end in code with left / right kept in Figma; he agreed.
+- His two updates: one body slot, and a floating variant. Proposed a private `_sheet-body` first (the plugin API has no `createSlot`, so a new slot could only come from a copy); Godwin then asked why Modal has two slots at all. The only reason was content above the description, which one slot covers; he chose to remove it from `_modal-body` itself, so Sheet keeps reusing it.
+- Read-only check: `_modal-body` (`649:3797`) has 9 instances, none with the top slot on.
+- Figma: removed the top SLOT node from both Alignment variants, deleted `👀 Top slot` and `🧩 Top slot`, renamed the bottom pair to `👀 Slot` / `🧩 Slot`, new default description text and set description. Sheet's body text overrides now say "Turn on the slot for more."
+- Sheet (`7331:680`): every variant renamed with `Floating=false`, cloned to `Floating=true` (7 new: `7366:1175` … `7366:1199`), all four radii bound to rad-lg (side) or rad-xl (bottom), all four stroke weights to stroke-sm, smoothing 1. Set laid out in two columns (docked, floating), 1352 wide; the page frame hugs it. Set description rewritten (side meaning, start/end in code, floating).
+- Screenshots of the whole set in light and dark (explicit Theme mode on the page's frame, then cleared): corners, borders and handle right in both. No new color pairings, so no contrast change.
+- Nothing in code yet; Modal `top` deprecation and the Sheet build wait for Godwin's go (0.3.0).
+
+### Sheet in code, for 0.3.0 (2026-11-21)
+
+- Godwin: "build it", and he is changing other parts too, so this goes under CHANGELOG "Unreleased (0.3.0)" without a version bump or release.
+- Tokens: dropped the `/^[Ss]heet\//` skip in `scripts/tokens/core.ts` (and the "held Sheet tokens" log text); `npm run tokens` emits 610 (5 skipped, the Fade clears). Figma variables unchanged this session, so no drift step.
+- Read the Sheet variant bindings (right sm and bottom): side sheets title divider on, actions right / horizontal / divider; bottom off, fill / vertical; handle frame space-sm down, grip `sheet/handle-*`, rad-rd, Sheet/handle.
+- Modal refactor: its function became the internal `DialogShell`; Modal is now a thin wrapper (size, backdrop, the `top` deprecation warning). `ModalContent` takes `before`. Close button selector moved off `.bland-modal`.
+- `Sheet.tsx`, `sheet.css` (lint clean first try), `sheet.stories.tsx` (static panels of every side, size, floating, long content; live triggers end / start / bottom / floating long / controlled edit). Exported from `src/index.ts`. Modal story's top-slot example now uses `children`.
+- Logo: removed `children`, its warning and `.bland-logo__text` CSS.
+- Checked in Chrome at localhost:5180/#/components/sheet: end 384 x full height at the right edge, focus on the dialog; floating md 512 at 8 from the edges, radius and borders all round, body scrolls; bottom full width with handle; start on the left with the border on its right; `dir="rtl"` puts end at x 0 with the border on its right.
+- `tests/sheet.spec.ts` (10 tests): first run, the motion test opened from the keyboard, which has no transition (`data-instant`); opens by press now. Baselines: sheet light/dark, sheet-open light/dark; modal light/dark re-baselined (the top-slot row changed). Looked at all of them.
+- Godwin's review of the docs demo: keep only the description (dropped the filter form from the demo), the divider controls did nothing (they were undefined and side sheets already drew them), and no dividers by default. Sheet now defaults both to false; demo args set them; the static row shows them on the long-content panel. Figma: turned off `👀 Divider` on `_modal-title` and `_modal-action-bar` in the 12 side variants (24 switches), set description updated.
+
+### Popover design in Figma (2026-11-21)
+
+- Side session. Read CLAUDE.md, `overlay/Popover.tsx` and `popover.css`, docs/figma.md. Read-only `use_figma` over every page: no Popover set or tokens; nearest parts Menu's panel (Menu/surface-rest, Menu/border, rad-md, neutral/mid), Modal's three parts (reused by Sheet) and Tooltip's pointer.
+- Proposed four choices; Godwin took every recommendation: Menu's panel look with Popover's own tokens; Modal's parts with close off by default; sm 256 / md 320; no pointer, space-xs gap.
+- `unit/320` was missing (units near it: 280, 384); added it for md, as agreed.
+- Figma: variables `unit/320`, `popover/width-sm`, `popover/width-md` (Sizing, WIDTH_HEIGHT), `Popover/surface` (FRAME_FILL, SHAPE_FILL), `Popover/border` (STROKE_COLOR), with descriptions. Page `7373:391` after Pill tab with Header and Footer; set `7373:484` (Size=sm `7373:392`, md `7373:448`), booleans `👀 Title` / `👀 Actions` wired to the parts' visibility, set description written for code. Two example frames beside the page frame (Light `7373:522`, Dark `7373:647`): a brand secondary sm Button with a filter Popover sm space-xs under it. Screenshots in both modes: surface, border and shadow read in both.
+- Logged in INTERFACE.md and the CLAUDE.md component map. No token sync or code: other sessions hold uncommitted token files.
+
+### Release 0.3.0 (2026-11-21, top session)
+
+- Godwin: publish what the side sessions finished and push the docs live. Ships the Sheet session (Sheet in code, Modal `top` deprecated, Logo `children` removed), the stroke-button session (xs 1px / sm 1.5px edges, neutral brand stroke hover) and the text-input session (softer `--border-input`, new `--control-border`), all already in the CHANGELOG's Unreleased (0.3.0) entry, now dated.
+- Popover stays Figma-only: its five new Figma variables were not synced, so the repo's raw export is five variables behind Figma until Popover is built (expected drift).
+- Checks: typecheck, lint, token/drift/lint/brand tests, audit, full Playwright suite, package smoke test; then version 0.3.0, commit, tag `v0.3.0`, push to main (Cloudflare deploys). npm publish is Godwin's step.

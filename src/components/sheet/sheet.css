@@ -1,0 +1,200 @@
+/*
+ * Sheet (Figma: Sheet page, set "Sheet"; Side right/left/bottom, Size sm/md/lg, Floating). Reuses Modal's
+ * parts and their CSS (modal.css): _modal-title, _modal-body with its one slot, _modal-action-bar.
+ *
+ *   <dialog class="bland-sheet bland-smooth" data-side="end" data-size="sm" data-floating>   showModal()
+ *     <div class="bland-modal__content">
+ *       <span class="bland-sheet__handle">                       bottom only, 👀 Handle
+ *       <div class="bland-modal__header" data-divider>…          _modal-title
+ *       <div class="bland-scroll-area bland-modal__scroll">…     _modal-body, scrolls
+ *       <div class="bland-modal__actions" data-divider>…         _modal-action-bar, pinned
+ *     </div>
+ *   </dialog>
+ *
+ * Sides are logical (Godwin 2026-11-21): end is Figma's right in left-to-right languages, start its left, and
+ * both flip under dir="rtl". Docked side sheets are full height, flush, square, with a stroke-sm border-subtle on
+ * the inner edge; the bottom sheet is full width with rad-xl top corners and hugs its content up to the screen
+ * height less Layout/margin-mobile. Floating keeps space-sm from every edge, rounds every corner (rad-lg, the
+ * bottom sheet rad-xl) and draws the border all round. Sheet/surface, Elevation/neutral/far, Sheet/backdrop.
+ * Slides in from its edge over duration/2xl with easing/drawer, out along the same path in duration/lg.
+ */
+
+.bland-sheet {
+  --bland-radius: var(--rad-null);
+  --bland-sheet-width: var(--sheet-width-sm);
+  --_inset: var(--space-none);
+  /* Which way "end" is: +1 left-to-right, -1 right-to-left. */
+  --_dir: 1;
+  --_hidden: calc(var(--_dir) * (100% + var(--_inset))) 0;
+
+  /* Reset the dialog's UA box; each side places it below. */
+  position: fixed;
+  inset: auto;
+  margin: var(--space-none);
+  padding: var(--space-none);
+  border: none;
+  box-sizing: border-box;
+  max-width: none;
+  max-height: none;
+  overflow: hidden;
+  background: var(--sheet-surface);
+  color: var(--text-bold);
+  box-shadow: var(--elevation-neutral-far);
+  /* The dialog takes focus on open so the title is read first; it is not a control, so no ring. */
+  outline: none;
+
+  translate: var(--_hidden);
+  transition: translate var(--duration-2xl) var(--easing-drawer);
+}
+
+.bland-sheet:dir(rtl) {
+  --_dir: -1;
+}
+
+.bland-sheet[data-size="md"] {
+  --bland-sheet-width: var(--sheet-width-md);
+}
+
+.bland-sheet[data-size="lg"] {
+  --bland-sheet-width: var(--sheet-width-lg);
+}
+
+.bland-sheet[data-floating] {
+  --bland-radius: var(--rad-lg);
+  --_inset: var(--space-sm);
+
+  border: var(--stroke-sm) solid var(--border-subtle);
+}
+
+/* Side sheets: full height (less the floating inset), as wide as their size, never wider than the screen. */
+.bland-sheet[data-side="end"],
+.bland-sheet[data-side="start"] {
+  inset-block: var(--_inset);
+  width: min(var(--bland-sheet-width), calc(100vw - var(--_inset) * 2));
+  height: calc(100dvh - var(--_inset) * 2);
+}
+
+.bland-sheet[data-side="end"] {
+  inset-inline-end: var(--_inset);
+}
+
+.bland-sheet[data-side="start"] {
+  --_hidden: calc(var(--_dir) * -1 * (100% + var(--_inset))) 0;
+
+  inset-inline-start: var(--_inset);
+}
+
+.bland-sheet[data-side="end"]:not([data-floating]) {
+  border-inline-start: var(--stroke-sm) solid var(--border-subtle);
+}
+
+.bland-sheet[data-side="start"]:not([data-floating]) {
+  border-inline-end: var(--stroke-sm) solid var(--border-subtle);
+}
+
+/* Bottom sheet: full width (less the floating inset), hugs its content up to the screen less Layout/margin-mobile. */
+.bland-sheet[data-side="bottom"] {
+  --bland-radius: var(--rad-xl);
+  --_hidden: 0 calc(100% + var(--_inset));
+
+  inset-inline: var(--_inset);
+  inset-block-end: var(--_inset);
+  width: auto;
+  height: fit-content;
+  max-height: calc(100dvh - var(--layout-margin-mobile) - var(--_inset));
+}
+
+.bland-sheet[data-side="bottom"]:not([data-floating]) {
+  border-block-start: var(--stroke-sm) solid var(--border-subtle);
+  border-end-start-radius: var(--rad-null);
+  border-end-end-radius: var(--rad-null);
+}
+
+.bland-sheet[open] {
+  display: flex;
+  flex-direction: column;
+  translate: 0 0;
+}
+
+/* Closing: back along the same path, quicker; the exit plays while the dialog is still open (overlay/exit.ts). */
+.bland-sheet[open][data-closing] {
+  translate: var(--_hidden);
+  pointer-events: none;
+  transition-duration: var(--duration-lg);
+}
+
+@starting-style {
+  .bland-sheet[open] {
+    translate: var(--_hidden);
+  }
+}
+
+.bland-sheet::backdrop {
+  background: var(--sheet-backdrop);
+  opacity: 0;
+  transition: opacity var(--duration-2xl) var(--easing-drawer);
+}
+
+.bland-sheet[open]::backdrop {
+  opacity: 1;
+}
+
+.bland-sheet[open][data-closing]::backdrop {
+  opacity: 0;
+  transition-duration: var(--duration-lg);
+}
+
+@starting-style {
+  .bland-sheet[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+/* Opened from the keyboard or open from the start: no motion, in or out. */
+.bland-sheet[data-instant],
+.bland-sheet[data-instant]::backdrop {
+  transition: none;
+}
+
+/* Side sheets: the body takes the height left, so the action bar stays at the bottom. */
+.bland-sheet[data-side="end"] .bland-modal__scroll,
+.bland-sheet[data-side="start"] .bland-modal__scroll {
+  flex: 1 1 auto;
+}
+
+/* 👀 Handle: Figma's handle frame, space-sm down, a sheet/handle-width x -height pill in Sheet/handle. */
+.bland-sheet__handle {
+  display: block;
+  flex: none;
+  align-self: center;
+  width: var(--sheet-handle-width);
+  height: var(--sheet-handle-height);
+  margin-block-start: var(--space-sm);
+  border-radius: var(--rad-rd);
+  background: var(--sheet-handle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Opacity only: no slide. */
+  .bland-sheet,
+  .bland-sheet[open][data-closing] {
+    translate: none;
+    opacity: 0;
+    transition: opacity var(--duration-md) var(--easing-out);
+  }
+
+  .bland-sheet[open] {
+    opacity: 1;
+  }
+
+  .bland-sheet[open][data-closing] {
+    transition-duration: var(--duration-xs);
+  }
+
+  @starting-style {
+    .bland-sheet[open] {
+      translate: none;
+      opacity: 0;
+    }
+  }
+}

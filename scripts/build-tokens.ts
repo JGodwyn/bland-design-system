@@ -106,6 +106,6 @@ writeFileSync(join(root, 'src/tokens/tokens.css'), `${css}\n${chartCss(blandChar
 const count = (c: string) => tokens.filter((t) => t.collection === c).length;
 console.log(
   `tokens: ${tokens.length} emitted (${order.map((c) => `${c} ${count(c)}`).join(', ')}); ` +
-    `${skipped.length} skipped (Fade/*-clear, held Sheet tokens); ${raw.length} variables read` +
+    `${skipped.length} skipped (Fade/*-clear); ${raw.length} variables read` +
     (deprecated.length > 0 ? `; ${deprecated.length} deprecated alias${deprecated.length === 1 ? '' : 'es'}.` : '.'),
 );

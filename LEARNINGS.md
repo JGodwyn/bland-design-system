@@ -1024,3 +1024,10 @@ shell never produces. Also: don't point two Playwright runs at one log file.
 - Symptom: Toggle xs variants cloned from sm showed at sm size although width and height were bound to the new xs tokens.
 - Cause: the sm track carried raw `minWidth` 40 / `minHeight` 24, which the clone kept and which beat the bound size.
 - Rule: after cloning a variant to a smaller size, clear `minWidth` / `minHeight` on the root and its sized parts (as the Calendar roots needed on 2026-10-15).
+
+## A child fill hides an inside stroke (2026-11-21)
+
+- Symptom: in Figma every stroke Button's hover and pressed variants showed no border, though the root had a bound inside stroke; only brand hover showed one, because its stroke sat on the child instead.
+- Cause: an inside stroke is drawn on the frame itself, under its children. The variants' inner `Base` frame repeated the hover fill and covered it.
+- Rule: when auditing a stroke in Figma, look at a screenshot, not only the bindings; a child with a fill hides the parent's inside stroke. Keep the fill on one layer.
+

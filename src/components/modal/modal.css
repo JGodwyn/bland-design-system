@@ -155,7 +155,7 @@
 }
 
 /* Figma's close is a control/xs box holding an icon/md X in icon-subtle: an xs ghost Icon Button. */
-.bland-modal .bland-button.bland-modal__close {
+.bland-modal__header .bland-button.bland-modal__close {
   --bland-icon-size: var(--icon-md);
   --_icon: var(--icon-subtle);
 

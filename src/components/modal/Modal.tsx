@@ -58,7 +58,10 @@ export interface ModalProps extends Omit<DialogHTMLAttributes<HTMLDialogElement>
   titleDivider?: boolean;
   /** The body text, which also describes the dialog (`aria-describedby`). */
   description?: ReactNode;
-  /** Any content above the description, such as an image. */
+  /**
+   * @deprecated Since 0.3.0, removed in 0.4.0: Figma's body has one slot. Put the content in `children` (turn the
+   * description off and put both there for something above the text). Until then it still shows above the description.
+   */
   top?: ReactNode;
   /** Any content under the description, such as a form or a list. */
   children?: ReactNode;
@@ -87,14 +90,45 @@ export interface ModalProps extends Omit<DialogHTMLAttributes<HTMLDialogElement>
   ref?: Ref<HTMLDialogElement>;
 }
 
+let warnedTop = false;
+
+// The library builds without Node types; bundlers replace `process.env.NODE_ENV`.
+declare const process: { env: { NODE_ENV?: string } } | undefined;
+
 /**
  * A dialog over the page that asks for a decision or shows focused content. A native `<dialog>` opened as modal:
  * the top layer, the page behind inert, `::backdrop` as the scrim, rendered in place so it keeps the theme.
  * Focus moves to the dialog on open and back to the trigger on close; Escape closes it. Figma: Modals page,
  * set "Modal" with `_modal-title`, `_modal-body` and `_modal-action-bar`.
  */
-export function Modal({
-  size = 'sm',
+export function Modal({ size = 'sm', backdrop = 'subtle', top, className, ...rest }: ModalProps) {
+  if (top != null && !warnedTop && typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+    warnedTop = true;
+    console.warn('bland-ui: Modal `top` is deprecated and goes in 0.4.0. Put the content in `children`.');
+  }
+  return (
+    <DialogShell
+      {...rest}
+      top={top}
+      className={`bland-modal bland-smooth${className ? ` ${className}` : ''}`}
+      data-size={size}
+      data-backdrop={backdrop}
+    />
+  );
+}
+
+/** What Modal and Sheet share: everything but their size and look. Internal. */
+export interface DialogShellProps extends Omit<ModalProps, 'size' | 'backdrop'> {
+  /** Rendered first inside the dialog, before the title row (the Sheet's grab handle). */
+  before?: ReactNode;
+  [data: `data-${string}`]: string | boolean | undefined;
+}
+
+/**
+ * The native `<dialog>` behind Modal and Sheet (internal): open state, trigger, focus, Escape, backdrop press,
+ * scroll lock and the exit motion. The caller names the root class and data attributes; the CSS draws the rest.
+ */
+export function DialogShell({
   open,
   defaultOpen,
   onOpenChange,
@@ -114,11 +148,11 @@ export function Modal({
   actionsOrientation = 'auto',
   actionsDivider = false,
   dismissable = true,
-  backdrop = 'subtle',
+  before,
   className,
   ref,
   ...rest
-}: ModalProps) {
+}: DialogShellProps) {
   const state = useOverlayTriggerState({ isOpen: open, defaultOpen, onOpenChange });
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLElement>(null);
@@ -227,9 +261,7 @@ export function Modal({
         tabIndex={-1}
         aria-labelledby={rest['aria-labelledby'] ?? (title != null && !rest['aria-label'] ? titleId : undefined)}
         aria-describedby={rest['aria-describedby'] ?? (description != null ? descriptionId : undefined)}
-        className={`bland-modal bland-smooth${className ? ` ${className}` : ''}`}
-        data-size={size}
-        data-backdrop={backdrop}
+        className={className}
         data-instant={instant || undefined}
         onCancel={onCancel}
         onPointerDown={(e) => {
@@ -245,6 +277,7 @@ export function Modal({
         {mounted && (
           <ModalContent
             key={generation}
+            before={before}
             title={title}
             titleAs={Title}
             titleId={titleId}
@@ -286,6 +319,7 @@ type ModalContentProps = Pick<
   | 'actionsOrientation'
   | 'actionsDivider'
 > & {
+  before?: ReactNode;
   titleAs: ModalTitleAs;
   titleId?: string;
   descriptionId?: string;
@@ -294,6 +328,7 @@ type ModalContentProps = Pick<
 
 /** The dialog's inside: title row, scrolling body, action bar. Internal; the stories draw it statically too. */
 export function ModalContent({
+  before,
   title,
   titleAs: Title,
   titleId,
@@ -335,6 +370,7 @@ export function ModalContent({
 
   return (
     <div className="bland-modal__content">
+      {before}
       {(title != null || closeButton) && (
         <div className="bland-modal__header" data-divider={titleDivider || undefined}>
           {icon != null && icon !== false && <Icon className="bland-modal__icon">{icon}</Icon>}

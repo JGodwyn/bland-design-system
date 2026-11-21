@@ -25,6 +25,7 @@ Raw material for the skill we package at the end of the project: what an agent n
 - **Gray page with white cards:** the page is `--surface-sunken`, the cards `--surface-raised` (hover `--surface-raised-hover`). Not `--surface-200` under `--surface-100`: those mirror, so in dark the page would turn lighter than its cards. A white page keeps `--surface-100`; a recessed area on it (a well, a demo stage) is `--surface-sunken` with a border.
 - **Fields and small fills on your own parts:** use `--surface-field` (hover `--surface-field-hover`), not `--surface-200`. It is see-through (black 6% in light, white 6% in dark), so it reads on the page, a card or a modal. A white part of your own (a tag, a toolbar) on the page uses `--surface-raised`, so it lifts in dark instead of turning black.
 - **An area one step apart from what it sits on** (a panel inside a panel, a table stripe, inline code): `--surface-alpha`, hover `--surface-alpha-hover`. One token works on any neutral background because it is see-through (darker in light, lighter in dark). One layer only, never on brand or status fills. Since 0.2.1.
+- **Borders on your own form parts:** a text field of your own takes `--border-input` (soft: about 1.6:1 light, 2:1 dark; the label and fill mark it too). A checkbox-like box or anything whose outline is the whole control takes `--control-border`, which keeps 3:1. Since the release after 0.2.1.
 - To recolor a Bland component in one area, override that component's tokens on a wrapper: `.promo { --button-brand-primary-rest: var(--accent-surface-strong); }`.
 - After a hand change to the colors, re-check them: paste the brand color into the Brand theme page, or run `npm run brand -- check brand.css` in the Bland repo; it warns, never blocks.
 
@@ -50,7 +51,9 @@ Raw material for the skill we package at the end of the project: what an agent n
 - Variants are props (`size`, `emotion`, `type`), never class overrides. Defaults: most sizes default to sm or md; check the map.
 - Routers: links take `renderLink` (Breadcrumb, TabBar, Sidebar, Pagination, ListItem, Logo).
 - Sidebar peek: the minimized rail opens over the page, past its own box, so no ancestor may clip it (`overflow: hidden`) narrower than `--sidebar-width`.
-- `Logo` is the Bland logo (logomark and drawn wordmark), not a slot for a project's name: a project with its own name renders its own logo. `mono` for one color, `color="on-color" mono` on brand fills, `mark={false}` for the wordmark alone. `children` is deprecated (0.2.0, removed in 0.3.0).
+- `Logo` is the Bland logo (logomark and drawn wordmark), not a slot for a project's name: a project with its own name renders its own logo. `mono` for one color, `color="on-color" mono` on brand fills, `mark={false}` for the wordmark alone. `children` was removed in 0.3.0.
+- `Sheet` for a panel from a screen edge (details, editing, filters, phone navigation): `side="end"` (default) / `"start"` / `"bottom"`, logical, so they flip in right-to-left pages; `floating` detaches it. Same title, description, `children`, `actions` and open props as Modal. Use Modal for a decision that needs an answer.
+- Modal and Sheet bodies have one slot, `children`; Modal's `top` is deprecated (0.3.0, removed in 0.4.0).
 - Sidebar logo: pass `top` as `({ rail }) => rail ? <Mark /> : <Logo />` when the product has a logo mark; a plain `top` hides in the rail and the expand button takes its place.
 - Disabled uses the disabled tokens, never opacity.
 - Left to right only: right-to-left (RTL) layouts are not supported yet (Godwin 2026-11-03). Don't promise an RTL page with Bland; Toggle and Slider are known not to mirror.
