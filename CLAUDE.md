@@ -26,16 +26,19 @@ scripts/figma/            Plugin API scripts run through use_figma, plus the loc
 scripts/stylelint/        bland/use-tokens lint rule, fixtures and test
 scripts/release/          package smoke test (npm run test:package)
 docs/hosting/             inert host config examples for the docs site (docs/release.md)
+skill/                    the agent skill shipped in the package as dist/skill/ (SKILL.md and references/, by hand; references/components.md is generated at build)
 site/                     the public site's own files beside the docs (the landing page, its 404 page, and site/public/ host files for Cloudflare Pages)
 ```
 
 - `npm run tokens`: regenerate `tokens.json` and `tokens.css` from the raw export.
 - `npm run tokens:checksum`: hash of the raw export; must equal `scripts/figma/checksum.js` run in Figma.
+- `npx bland-ui brand "#hex" --out src/brand.css` in a project: the same brand tool, shipped in the package as its `bin` (`scripts/cli.ts` bundles `scripts/brand.ts` into `dist/cli.js` with esbuild, `npm run cli`, part of `npm run build`; Godwin 2026-11-21). `npm run test:package` runs it in the installed app.
 - `npm run brand`: the brand override tool: `generate "#hex"` makes 13 brand steps from one color and 13 neutral steps leaning toward it (`--neutrals full|subtle|none`), plus up to three `--extra name=#hex` colors and the project's fonts (`--font-body "…"`, `--font-heading "…"`, `--font-code "…"`), `check brand.css` tests the brand pairings (warns, never blocks), `--fix` applies suggested steps (`docs/brand.md`). `npm run test:brand` runs its tests.
 - Chart palette: `--chart-1` … `--chart-8`, the brand, then the extras, then generated hues, light and dark, 3:1 on the page and neighbours apart for color-blind readers; Bland's own is appended to `tokens.css`, a project's is in its override file; a project can pick its own color for any later series (`--chart N=#hex`, or tap it on the Brand theme page), which changes no other series. Components never use them (`docs/brand.md`, "Chart palette").
 - `npm run tokens:drift`: drift check against Figma, variable by variable, with the CSS tokens each change reaches; `-- --apply` takes the Figma version. Two steps around one `use_figma` call (`docs/tokens.md`, "Drift check"). `npm run test:drift` runs its tests.
 - `tokens/deprecated.json` (kept by hand): old token names that `npm run tokens` writes as aliases of their replacement for one minor version, after a rename in Figma (`docs/release.md`, "Deprecation"). `npm run test:tokens` runs its tests.
-- `npm run build`: tokens, Vite library build, `dist/tokens.css`, type declarations. `npm pack` runs it first (`prepack`).
+- `npm run build`: tokens, props, Vite library build, `dist/tokens.css` and `dist/tokens.json`, type declarations, and the agent skill in `dist/skill/` (`scripts/build-skill.ts`: `skill/` with the version filled in, plus `references/components.md` generated from the props). `npm pack` runs it first (`prepack`). `npm run skill` rebuilds the skill alone.
+- **Agent skill** (Godwin 2026-11-21): ships in the package; a project copies `node_modules/bland-ui/dist/skill` into its agent's skills folder (README, "For your AI agent"). Write `skill/` from `docs/agent-skill.md`: when a decision there changes how a project uses Bland, update the matching skill file in the same commit.
 - `npm run test:package`: packs Bland, installs the tarball into a throwaway Vite + React 19 app with a brand override, type-checks, builds and checks it in Chromium. Needs the network. Publishing: `docs/release.md` (`bland-ui` is on public npm since 2026-10-30).
 - `npm run docs:build`: the docs site as static files in `dist-docs/` (relative paths, hash routes: any host or subpath); `npm run docs:preview` serves it at http://localhost:5181. `npm run site:build`: the public site for Cloudflare Pages in `dist-site/`: the landing page at `/`, its `404.html`, and the docs under `/docs/`.
 - `npm run typecheck`.
@@ -239,7 +242,7 @@ In order; tokens come before components.
 - [x] Extra project colors beside the brand: built 2026-10-27 (up to three, steps + light/dark roles, `docs/brand.md`). Chart palette `--chart-1…8` generated from the brand and extras, 2026-10-27 (Godwin: generated, not designed in Figma first).
 - [ ] Before the docs site goes live: review its copy (Godwin 2026-10-27): plain words a project's designer understands, no jargon messages (the chart check's ΔE and color-vision terms were the trigger).
 - [x] Publish the package: `bland-ui` 0.1.0 on public npm, 2026-10-30 (MIT; npm account `gdwn`, 2FA; publishing confirms in the browser, so run `npm publish` in an interactive terminal, `docs/release.md`).
-- [ ] At the end: package agent skills, how a project's agent uses Bland (install, tokens and the no-hardcoded-values rule, components and props, brand override, extra colors) (Godwin 2026-10-27).
+- [x] Agent skill: how a project's agent uses Bland (install, tokens and the no-hardcoded-values rule, components and props, brand override, extra colors) (Godwin 2026-10-27). Shipped in the package as `dist/skill/` with `dist/tokens.json` (2026-11-21). Not yet: the token lint rule for projects.
 
 ## Open questions (ask Godwin, don't assume)
 

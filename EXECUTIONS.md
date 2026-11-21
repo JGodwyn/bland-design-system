@@ -2705,3 +2705,22 @@ Godwin tried the landing page on his phone and sent a list of changes.
 - Tokens: the side sessions had synced; checksum 670 variables, `9ce36001`, equal in Figma and the repo; 25 text styles (Link's two underline styles).
 - `test:brand` still counted 23 text styles; now 25.
 - Checks: typecheck, lint, token/drift/lint/brand tests, audit, full Playwright suite, package smoke test; then commit, tag `v0.3.1`, push to main (Cloudflare deploys). npm publish is Godwin's step.
+
+### Agent skill and tokens.json (2026-11-21, top session)
+
+- Godwin: the agent skill is critical; ship `tokens.json` too. Asked three things: delivery (in the npm package), the component reference (generated at build), the lint rule (not now).
+- Wrote `skill/SKILL.md` and `skill/references/{setup,css,using-components}.md` from `docs/agent-skill.md` and the README, for a project's agent (not Bland's own): Bland-repo-only tools (the brand command) point to the Brand theme page instead.
+- `scripts/build-skill.ts`: copies `skill/` to `dist/skill/` with the version, and generates `references/components.md` from `playground/.generated/props.json`, limited to names exported from `src/index.ts`. `npm run build` now runs `props` first and copies `tokens/tokens.json` to `dist/`; `./tokens.json` export added.
+- Checked every `--token` named in the skill against `dist/tokens.css` (all exist; the only misses were prefixes like `--brand-*`) and every component name against the generated reference.
+- Package smoke test now requires `dist/tokens.json` and the skill files, and checks the skill's frontmatter, version and component sections.
+- Fixed the README's stale "docs not hosted yet" line (blandui.com/docs since 2026-11-17).
+
+### Agent skill tested on real tasks (2026-11-21, top session)
+
+- Throwaway Vite + React app ("Acme": a sign-up form and a user list) with the packed 0.3.1 tarball; four tasks phrased as a client would (settings page with notification switches and dark mode, pricing cards in brand orange #ff5a1f, a loading state for the user list, a terms line with links), each run by a fresh `claude -p` with and without the skill copied into `.claude/skills/bland-ui`. Scored by build, Bland's own Stylelint rule on the agent's CSS, and a search for hex values, raw units, inline styles, opacity, raw `<a>`, brand/neutral steps and dark classes. First attempt: the CLI's login had expired; Godwin signed in again.
+- All eight built with zero lint errors and no forbidden patterns. The "without skill" runs were not skill-free: they read the README, which points to `node_modules/bland-ui/dist/skill`, and read it there. So the skill works even before a project copies it.
+- Judgement calls were right: ListItem rows with trailing Toggles and `data-theme` on `<html>` (settings), SkeletonGroup + Skeleton rows (loading), Link with `color="inherit"` in a legal line (terms), raised cards with `.bland-smooth`, tokens and a reduced-motion fallback (pricing).
+- Gaps: (1) the brand override: with no way to use the Brand theme page, both agents hand-made the 13 steps (`--brand-600` #c93c0a against the generator's #c13a00; neutrals guessed, no contrast check). (2) Both centred feature rows whose text wraps (first-line rule missing from the skill). Fixed (2) in `css.md` and `SKILL.md`; a rerun aligned the rows to the first line with the exact offset. (1) is Godwin's call: ship the brand generator as a command in the package, or tell agents to ask for the Brand page's CSS.
+- Docs fix on the way: Toast's variant stacks centred (`alignItems: 'center'`), screenshots re-baselined.
+- Godwin: ship the brand command so the agent can run it, keep pasting the Brand theme page's CSS working, and make the agent use the command when told a brand color. `scripts/cli.ts` → `dist/cli.js` (esbuild, pinned devDependency), `bin` `bland-ui`; skill `SKILL.md` and `setup.md` rewritten for the two routes; README, `docs/brand.md`, the Brand theme page's intro and `docs/agent-skill.md` updated. The package test now installs the tarball and runs `npx bland-ui brand` in the app.
+- Retest with fresh `claude -p` agents and the skill: the pricing task (orange) and "Our brand color is teal, #0f766e" both ran `npx bland-ui brand "#hex" --fix --out src/brand.css`; a prompt with pasted Brand page CSS wrote it as is and ran `brand check`. All three `brand.css` step sets identical to the generator's; all build.

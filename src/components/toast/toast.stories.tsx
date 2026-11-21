@@ -59,7 +59,7 @@ export default {
   },
   render: () => (
     <>
-      <div className="pg-stack">
+      <div className="pg-stack" style={{ alignItems: 'center' }}>
         <span className="pg-label"><code>status</code>: <code>info</code>, <code>danger</code>, <code>success</code>, <code>warning</code></span>
         {statuses.map((status) => (
           <Toast key={status} status={status}>
@@ -68,7 +68,7 @@ export default {
         ))}
       </div>
 
-      <div className="pg-stack">
+      <div className="pg-stack" style={{ alignItems: 'center' }}>
         <span className="pg-label"><code>icon={false}</code>, another icon, and long text wrapping</span>
         <Toast status="success" icon={false}>
           Copied

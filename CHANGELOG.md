@@ -2,6 +2,14 @@
 
 Bland follows [semantic versioning](https://semver.org). Until 1.0, a minor version (0.2.0) may change an API or a token name; a patch (0.1.1) never does. Each entry says what a project has to change, if anything.
 
+## 0.3.2 (2026-11-21)
+
+- **Toast docs:** the variant toasts are centred.
+- **Agent skill in the package.** `dist/skill/` holds a skill for AI agents (Claude Code, Codex, Cursor, …) building UI with Bland: `SKILL.md` with the rules (stylesheet order, tokens instead of values, light and dark, brand override, the tokens used most), and `references/` with setup, CSS, choosing components, and every component's props, generated from the code so it matches the version you install. Copy it into your project: `cp -R node_modules/bland-ui/dist/skill .claude/skills/bland-ui` (README, "For your AI agent").
+- **New command: `npx bland-ui brand`.** The Brand theme page's generator now ships with the package: `npx bland-ui brand "#ff5a1f" --fix --out src/brand.css` writes the project's brand override (13 brand and 13 neutral steps, the chart palette, optional `--extra` colors and `--font-*` fonts) and checks its contrast, the same CSS the page gives. `npx bland-ui brand check src/brand.css` re-checks a file after a hand edit; `npx bland-ui` lists every option. The agent skill runs it when you tell your agent your brand color, and puts CSS you paste from the Brand theme page into `brand.css` as is.
+- **`tokens.json` in the package.** Every token with its CSS name, light and dark values and its description, at `bland-ui/tokens.json`, for agents and tools to search.
+- Nothing to change in a project.
+
 ## 0.3.1 (2026-11-21)
 
 - **New: Popover.** `import { Popover } from 'bland-ui'`: a small panel that opens beside the element that was pressed and holds any content (a profile, a Share panel with a link and Copy, a few filters and Apply). The page stays usable: a press outside, Escape or focus leaving it closes it, and focus returns to the trigger. Pass the opener as `trigger`; `size` sm 256 / md 320 (default); `placement` in Floating UI's names (default `bottom-start`). It takes Modal's `title`, `description`, `children` and `actions` (use sm Buttons), with the title and actions off until you pass them and `closeButton` off by default. New tokens `--popover-surface`, `--popover-border`, `--popover-width-sm`, `--popover-width-md`.

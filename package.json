@@ -1,6 +1,6 @@
 {
   "name": "bland-ui",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Bland design system: tokens and React components",
   "license": "MIT",
   "repository": {
@@ -16,10 +16,14 @@
       "import": "./dist/index.js"
     },
     "./tokens.css": "./dist/tokens.css",
+    "./tokens.json": "./dist/tokens.json",
     "./fonts.css": "./dist/fonts.css",
     "./base.css": "./dist/base.css",
     "./styles.css": "./dist/index.css",
     "./package.json": "./package.json"
+  },
+  "bin": {
+    "bland-ui": "dist/cli.js"
   },
   "files": [
     "dist",
@@ -32,7 +36,7 @@
   "scripts": {
     "tokens": "tsx scripts/build-tokens.ts",
     "tokens:checksum": "tsx scripts/figma/checksum.ts",
-    "build": "npm run tokens && vite build && cp src/tokens/tokens.css src/styles/fonts.css src/styles/base.css dist/ && tsc -p tsconfig.build.json",
+    "build": "npm run tokens && npm run props && vite build && cp src/tokens/tokens.css src/styles/fonts.css src/styles/base.css tokens/tokens.json dist/ && tsc -p tsconfig.build.json && npm run cli && tsx scripts/build-skill.ts",
     "prepack": "npm run build",
     "test:package": "tsx scripts/release/package-smoke.ts",
     "typecheck": "tsc --noEmit",
@@ -55,7 +59,9 @@
     "brand": "tsx scripts/brand.ts",
     "test:brand": "tsx --test scripts/brand/brand.test.ts",
     "site": "vite --config site/vite.config.ts",
-    "site:preview": "vite preview --config site/vite.config.ts"
+    "site:preview": "vite preview --config site/vite.config.ts",
+    "skill": "npm run props && tsx scripts/build-skill.ts",
+    "cli": "esbuild scripts/cli.ts --bundle --platform=node --format=esm --target=node20 --outfile=dist/cli.js --log-level=warning \"--banner:js=#!/usr/bin/env node\""
   },
   "peerDependencies": {
     "react": "^19.0.0",
@@ -77,6 +83,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "dialkit": "2.1.0",
+    "esbuild": "0.28.2",
     "motion": "14.10.1",
     "postcss-value-parser": "4.2.0",
     "react": "^19.3.1",

@@ -150,8 +150,8 @@ export function BrandPage() {
         <p>
           Make Bland your project’s own. Pick a brand color and Bland makes the 13 shades its components use and checks that text on them stays readable; add extra
           colors for your own UI and charts; choose the fonts for body text, headings and code. Preview it all in both themes, try it across this whole site, then copy one
-          small CSS file your project loads after Bland’s tokens. Nothing to install: the CSS is all a project needs. In a clone of the Bland repo, the same tool runs as{' '}
-          <code>npm run brand</code>.
+          small CSS file your project loads after Bland’s tokens. Nothing to install: the CSS is all a project needs. The same tool comes with the package as{' '}
+          <code>npx bland-ui brand "#hex"</code>, so your agent can write the file when you tell it your brand color.
         </p>
       </PageHeader>
 

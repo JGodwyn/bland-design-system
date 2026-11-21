@@ -32,11 +32,24 @@ const packed = spawnSync('npm', ['pack', '--json', '--pack-destination', app], {
 if (packed.status !== 0) throw new Error('npm pack failed');
 const [info] = JSON.parse(packed.stdout.slice(packed.stdout.indexOf('['))) as { filename: string; size: number; unpackedSize: number; files: { path: string }[] }[];
 const files = info!.files.map((f) => f.path);
-const required = ['package.json', 'LICENSE', 'README.md', 'CHANGELOG.md', 'dist/index.js', 'dist/index.d.ts', 'dist/index.css', 'dist/tokens.css', 'dist/fonts.css', 'dist/base.css'];
+const required = ['package.json', 'LICENSE', 'README.md', 'CHANGELOG.md', 'dist/index.js', 'dist/index.d.ts', 'dist/index.css', 'dist/tokens.css', 'dist/tokens.json', 'dist/cli.js', 'dist/fonts.css', 'dist/base.css',
+  'dist/skill/SKILL.md', 'dist/skill/references/components.md', 'dist/skill/references/setup.md', 'dist/skill/references/css.md', 'dist/skill/references/using-components.md'];
 const missing = required.filter((f) => !files.includes(f));
-const stray = files.filter((f) => !/^(package\.json|README\.md|CHANGELOG\.md|LICENSE|dist\/.*\.(js|d\.ts|css))$/.test(f) || /stories|\.test\./.test(f));
+const stray = files.filter((f) => !/^(package\.json|README\.md|CHANGELOG\.md|LICENSE|dist\/.*\.(js|d\.ts|css)|dist\/tokens\.json|dist\/skill\/.*\.md)$/.test(f) || /stories|\.test\./.test(f));
 console.log(`${info!.filename}: ${files.length} files, ${(info!.size / 1024).toFixed(0)} kB packed, ${(info!.unpackedSize / 1024).toFixed(0)} kB unpacked`);
 if (missing.length || stray.length) throw new Error(`tarball: missing ${missing.join(', ') || 'none'}; unexpected ${stray.join(', ') || 'none'}`);
+// The agent skill and tokens.json (2026-11-21): the skill names this version, and every component a project can import has a section.
+{
+  const dist = join(root, 'dist');
+  const skill = readFileSync(join(dist, 'skill/SKILL.md'), 'utf8');
+  const version = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version;
+  if (!skill.startsWith('---\nname: bland-ui\n') || !skill.includes(`bland-ui ${version}`) || skill.includes('{{version}}')) throw new Error('dist/skill/SKILL.md: frontmatter or version missing');
+  const reference = readFileSync(join(dist, 'skill/references/components.md'), 'utf8');
+  for (const name of ['Button', 'Link', 'Popover', 'Sheet', 'Skeleton', 'Spinner', 'TextInput']) if (!reference.includes(`\n## ${name}\n`)) throw new Error(`components.md has no ${name}`);
+  const tokens = JSON.parse(readFileSync(join(dist, 'tokens.json'), 'utf8')).tokens as { css: string; description: string }[];
+  if (tokens.length < 600 || !tokens.some((t) => t.css === '--surface-alpha' && t.description)) throw new Error('dist/tokens.json looks wrong');
+  console.log(`skill: SKILL.md for ${version}, components.md; tokens.json: ${tokens.length} tokens`);
+}
 
 // 2. The throwaway app.
 mkdirSync(join(app, 'src'), { recursive: true });
@@ -92,14 +105,16 @@ writeFileSync(join(app, 'src/app.css'), `.section { display: flex; flex-wrap: wr
 .title { margin: 0; font: var(--type-title-md); letter-spacing: var(--type-title-md-letter-spacing); }
 `);
 
-// 3. The brand override, made by the tool as a project would (it exits 1 on a contrast warning; that's fine here).
-run('npx', ['tsx', 'scripts/brand.ts', 'generate', '#ff5a1f', '--extra', 'accent', '--font-heading', 'Smoke Serif, serif', '--font-code', 'Smoke Mono', '--out', join(app, 'src/brand.css')], root, true);
-if (!existsSync(join(app, 'src/brand.css'))) throw new Error('npm run brand wrote no brand.css');
-
-// 4. Install, type-check, build. A reused app dir would keep the old tarball's copy (same version), so drop it.
+// 3. Install. A reused app dir would keep the old tarball's copy (same version), so drop it.
 rmSync(join(app, 'node_modules/bland-ui'), { recursive: true, force: true });
 rmSync(join(app, 'package-lock.json'), { force: true });
+rmSync(join(app, 'src/brand.css'), { force: true });
 run('npm', ['install', '--no-audit', '--no-fund', '--loglevel=error'], app);
+
+// 4. The brand override, made by the package's own command, as a project (or its agent) would (it exits 1 on a
+// contrast warning; that's fine here). Then type-check and build.
+run('npx', ['bland-ui', 'brand', '#ff5a1f', '--extra', 'accent', '--font-heading', 'Smoke Serif, serif', '--font-code', 'Smoke Mono', '--out', 'src/brand.css'], app, true);
+if (!existsSync(join(app, 'src/brand.css'))) throw new Error('npx bland-ui brand wrote no brand.css');
 run('npm', ['run', 'build'], app);
 
 // 5. Serve the build and check it in Chromium.

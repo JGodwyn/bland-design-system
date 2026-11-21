@@ -162,6 +162,8 @@ The page imports `scripts/brand/core.ts`, so it never disagrees with the command
 
 ## The tool: `npm run brand`
 
+In a project, the same tool ships with the package (Godwin 2026-11-21): `npx bland-ui brand "#ff5a1f" --fix --out src/brand.css` (generate is implied; `npx bland-ui brand check src/brand.css`; `npx bland-ui` lists the options). It is `scripts/brand.ts` bundled with `scripts/cli.ts` into `dist/cli.js` (`npm run cli`, part of `npm run build`), the package's `bin`. The agent skill tells a project's agent to run it whenever the user gives a brand color, and to paste the Brand theme page's CSS as is when the user gives that.
+
 ```bash
 npm run brand -- generate "#ff5a1f"                 # 13 brand + 13 neutral steps from one color, then the check
 npm run brand -- generate "#ff5a1f" --neutrals none # pure gray neutrals (or subtle; full is the default)

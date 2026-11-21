@@ -48,31 +48,42 @@ export function Form() {
 
 Icons are any SVG passed as a React node (Phosphor, Lucide, your own); Bland sizes and colors them. Every component, its props and its variants are on the docs site.
 
+## For your AI agent
+
+Bland ships an agent skill with the package: what an agent (Claude Code, Codex, Cursor or any agent that reads skills) needs to build UI with Bland: the stylesheet order, the no-hardcoded-values rule, which token to use for what, the brand override, and every component's props, generated from the code at each release so it matches the installed version. Copy it to where your agent reads skills, and again after you upgrade Bland:
+
+```bash
+mkdir -p .claude/skills && cp -R node_modules/bland-ui/dist/skill .claude/skills/bland-ui
+```
+
+Every token also ships as data, with its light and dark value and a description of where to use it: `node_modules/bland-ui/dist/tokens.json` (`import tokens from 'bland-ui/tokens.json' with { type: 'json' }`). The same descriptions are comments in `tokens.css`.
+
 ## Your brand
 
 Bland ships blue. A project brings its own color by overriding the 13 `--brand-*` steps (and the 13 `--neutral-*` steps, tinted toward the brand) at `:root`; every brand-colored token follows in light and dark.
 
-The 13 steps are worked out from one color, so make them with a tool rather than by hand. Nothing extra to install in your project:
+The 13 steps are worked out from one color, so make them with a tool rather than by hand. Both give the same CSS:
 
-- **The Brand theme page on the docs site:** pick the color, check contrast, try fonts, then copy the CSS into your `brand.css`.
-- **Or the `brand` command, in a clone of the Bland repo** (it isn't part of the npm package), which writes the same file:
+- **The Brand theme page on the docs site** (https://blandui.com/docs/#/brand): pick the color, check contrast, try fonts, then copy the CSS into your `brand.css`.
+- **Or the `bland-ui` command that comes with the package**, which writes the file (your agent can run it too: tell it your brand color):
 
 ```bash
-npm run brand -- generate "#ff5a1f" --out brand.css
+npx bland-ui brand "#ff5a1f" --fix --out src/brand.css
 ```
 
 - `--neutrals full|subtle|none`: grays tinted toward the brand (default), half as much, or pure gray.
 - `--fix`: moves other steps until the brand's contrast pairings pass. The color you entered never moves.
-- `npm run brand -- check brand.css`: re-checks an override after a hand edit. It warns, never blocks.
+- `npx bland-ui brand check src/brand.css`: re-checks an override after a hand edit. It warns, never blocks.
+- `npx bland-ui` alone lists every option. In a clone of the Bland repo, `npm run brand -- generate …` is the same tool.
 
 Load `brand.css` after Bland's CSS and keep it on `:root`, not on a nested element.
 
 ### Extra colors
 
-Up to three more colors for the project's own UI (charts, illustrations, a section, a tag). Bland's components never use them. Add them on the Brand theme page (Extra colors), or with the command in the Bland repo:
+Up to three more colors for the project's own UI (charts, illustrations, a section, a tag). Bland's components never use them. Add them on the Brand theme page (Extra colors), or with the command:
 
 ```bash
-npm run brand -- generate "#ff5a1f" --extra accent=#7c3aed --extra chart --out brand.css
+npx bland-ui brand "#ff5a1f" --extra accent=#7c3aed --extra chart --out src/brand.css
 ```
 
 Each gets 13 steps (`--accent-0` … `--accent-1000`) and six roles that switch in dark mode: `--accent-surface`, `-surface-strong` (the one that carries white text), `-surface-light`, `-text`, `-icon`, `-border`. Use the roles; the raw steps look the same in both modes. An extra with no color takes the next one in harmony with the brand.
@@ -99,7 +110,7 @@ Write them yourself in `brand.css`, on `:root`; no tool needed. Every component 
 }
 ```
 
-End each list with a generic family (`sans-serif`, `serif`, `monospace`) so text shows while the font loads. To try fonts first, use the Fonts tab on the docs site's Brand theme page; it copies these lines for you, with the install lines for the fonts it offers. The `brand` command in the Bland repo writes them too (`--font-body "Söhne" --font-heading "Lora" --font-code "Berkeley Mono"`).
+End each list with a generic family (`sans-serif`, `serif`, `monospace`) so text shows while the font loads. To try fonts first, use the Fonts tab on the docs site's Brand theme page; it copies these lines for you, with the install lines for the fonts it offers. The brand command writes them too (`--font-body "Söhne" --font-heading "Lora" --font-code "Berkeley Mono"`).
 
 The tokens only name the family; load the font files yourself, under the same family name, with the weights the text styles use (body 400 and 500, heading 600, code 400 and 600):
 
@@ -131,7 +142,7 @@ Build on the same tokens, never raw values: `color: var(--text-bold)`, `padding:
 
 ## Docs
 
-The docs site shows every token and component with live controls, in both themes. It is not hosted yet: run it from a checkout with `npm run docs` (http://localhost:5180). To try it on a phone on the same Wi-Fi, run `npm run docs:phone` instead and open the `Network:` address it prints.
+The docs site shows every token and component with live controls, in both themes: https://blandui.com/docs/. From a checkout, `npm run docs` runs it at http://localhost:5180 (`npm run docs:phone` for a phone on the same Wi-Fi).
 
 ## Developing Bland
 
