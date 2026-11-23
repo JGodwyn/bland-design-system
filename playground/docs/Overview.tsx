@@ -37,8 +37,10 @@ export function Overview() {
         <ul className="docs-stats docs-dots bland-smooth">
           {stats.map((s) => (
             <li key={s.label} className="docs-stat bland-smooth">
-              <span className="docs-stat-n">{s.n}</span>
-              <span className="docs-stat-l">{s.label}</span>
+              <span className="docs-stat-card bland-smooth">
+                <span className="docs-stat-n">{s.n}</span>
+                <span className="docs-stat-l">{s.label}</span>
+              </span>
             </li>
           ))}
         </ul>

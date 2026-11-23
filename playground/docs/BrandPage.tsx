@@ -155,7 +155,7 @@ export function BrandPage() {
         </p>
       </PageHeader>
 
-      {/* Figma 6806:6170: the tools sit in three tabs; the preview stays under them, whichever is open. */}
+      {/* Figma 6806:6170: the tools sit in tabs; the preview shows under How to use only. */}
       <section className="docs-section docs-brand-tabs" id="colors" data-toc="Colors" aria-label="Colors">
         <SectionTabs
           aria-label="Brand theme"
@@ -314,8 +314,8 @@ export function BrandPage() {
         />
       </section>
 
-      {/* Nothing of an extra's to preview until one is added (Figma 6806:7199 has no preview). */}
-      {!(tab === 'extras' && validExtras.length === 0) && (
+      {/* The preview shows under How to use only (Godwin 2026-11-23): the result of everything picked, next to its CSS. */}
+      {tab === 'use' && (
       <Section title="Preview" className="docs-brand-section">
         <p className="docs-note">This brand on components, before it is applied. Apply to site to see it on every page.</p>
         <div className="docs-brand-previews">

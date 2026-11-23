@@ -7,7 +7,8 @@
  */
 
 .docs {
-  /* The page colour: surface-100, except the Overview, a surface-sunken page under raised cards (Godwin 2026-11-02). */
+  /* The page colour: surface-100 on every page, the Overview included (Godwin 2026-11-23; it was a surface-sunken
+     page under raised cards from 2026-11-02). */
   --docs-page: var(--surface-100);
 
   min-height: 100vh;
@@ -594,9 +595,9 @@ code,
   corner-shape: superellipse(2);
 }
 
-/* Dots behind demos, every space-sm. */
+/* Dots behind demos, every space-sm, in border-bold (border-subtle until 2026-11-23: Godwin wanted them a little stronger). */
 .docs-dots {
-  background-image: radial-gradient(circle, var(--border-subtle) calc(var(--stroke-sm) / 2), transparent calc(var(--stroke-sm) / 2 + var(--stroke-xs)));
+  background-image: radial-gradient(circle, var(--border-bold) calc(var(--stroke-sm) / 2), transparent calc(var(--stroke-sm) / 2 + var(--stroke-xs)));
   background-size: var(--space-sm) var(--space-sm);
 }
 
@@ -902,9 +903,6 @@ code,
 }
 
 /* ---- Overview ---- */
-.docs:has(.docs-hero) {
-  --docs-page: var(--surface-sunken);
-}
 .docs-hero {
   display: flex;
   flex-direction: column;
@@ -917,7 +915,7 @@ code,
   margin: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr); /* phone: one card a line, filling it (Godwin 2026-10-29) */
-  gap: var(--space-sm);
+  gap: var(--space-md);
   padding: var(--space-xl) var(--space-lg);
 }
 @media (min-width: 768px) {
@@ -925,15 +923,25 @@ code,
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   }
 }
-/* Figma 2026-11-02: the stat cards sit straight on the dotted page, no frame or border. */
+/* Each stat (Godwin 2026-11-23): a raised card with a stroke-lg brand border, inset space-lg in a brand-light
+   tray with the next radius up, on the dotted page. */
 .docs-stat {
+  --bland-radius: var(--rad-xl);
+
+  display: flex;
+  padding: var(--space-lg);
+  background: var(--surface-brand-light);
+}
+.docs-stat-card {
   --bland-radius: var(--rad-lg);
 
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: var(--space-xs);
   padding: var(--space-xl) var(--space-lg);
   background: var(--surface-raised);
+  box-shadow: inset 0 0 0 var(--stroke-lg) var(--border-brand);
 }
 .docs-stat-n {
   font: var(--type-heading-lg);
@@ -995,7 +1003,7 @@ code,
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 }
 .docs-style-card {
-  box-shadow: inset 0 0 0 var(--stroke-xs) var(--border-subtle);
+  /* The component cards' border (docs-tile: stroke-xs border-bold), Godwin 2026-11-23. */
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
@@ -1927,7 +1935,13 @@ code,
   flex-direction: column;
   gap: var(--space-sm);
   padding: var(--space-sm);
-  background: var(--surface-200);
+  /* surface-alpha (Godwin 2026-11-23): a step off the page in both themes, so the card shows in dark, where
+     surface-200 hid the List rows (both Neutral900) and surface-sunken matched the page. */
+  background: var(--surface-alpha);
+}
+/* Your own font sits further from the three role cards above it (Godwin 2026-11-23). */
+.docs-font-own {
+  margin-block-start: var(--space-xl);
 }
 .docs-font-head {
   display: flex;
@@ -1946,9 +1960,8 @@ code,
 .docs-font-about {
   padding-inline: var(--space-md);
 }
-/* The sample: surface-inverse with text-inverse (Figma binds text-on-color, white in both themes, which vanishes on
-   the white inverse surface in dark), the TextAa marker and, when it opens the list, a caret. Icons and caret line
-   up with the sample's first line (first-line rule). */
+/* The sample: surface-alpha with text-bold (Figma, Godwin 2026-11-23; it was surface-inverse), the TextAa marker and,
+   when it opens the list, a caret. Icons and caret line up with the sample's first line (first-line rule). */
 .docs-font-sample {
   --bland-radius: var(--rad-lg);
   --docs-font-line: var(--type-body-lg-line-height);
@@ -1961,8 +1974,8 @@ code,
   margin: var(--space-none);
   padding: var(--space-xl) var(--space-lg);
   border: none;
-  background: var(--surface-inverse);
-  color: var(--text-inverse);
+  background: var(--surface-alpha);
+  color: var(--text-bold);
   text-align: start;
   overflow-wrap: anywhere;
 }
@@ -1997,7 +2010,7 @@ button.docs-font-sample {
 .docs-font-caret {
   flex: none;
   margin-block-start: calc((var(--docs-font-line) - var(--icon-lg)) / 2);
-  color: var(--icon-inverse);
+  color: var(--icon-subtle);
   transition: transform var(--duration-md) var(--easing-out);
 }
 .docs-font-sample[aria-expanded="true"] .docs-font-caret {
@@ -2042,4 +2055,30 @@ button.docs-font-sample {
 }
 .docs-font-row .bland-list-item__row:active {
   --_bg: var(--list-surface-pressed);
+}
+/* In dark the List rows (Neutral900) match the surface-alpha card, so they step up one surface there; light keeps
+   the white rows (Godwin 2026-11-23). */
+:root[data-theme="dark"] .docs-font-row .bland-list-item__row {
+  --_bg: var(--surface-300);
+}
+:root[data-theme="dark"] .docs-font-row .bland-list-item__row:active {
+  --_bg: var(--surface-400);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .docs-font-row .bland-list-item__row {
+    --_bg: var(--surface-300);
+  }
+  :root:not([data-theme="light"]) .docs-font-row .bland-list-item__row:active {
+    --_bg: var(--surface-400);
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  :root[data-theme="dark"] .docs-font-row .bland-list-item__row:hover {
+    --_bg: var(--surface-400);
+  }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .docs-font-row .bland-list-item__row:hover {
+    --_bg: var(--surface-400);
+  }
 }

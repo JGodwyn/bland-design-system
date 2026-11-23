@@ -112,7 +112,7 @@ Write them yourself in `brand.css`, on `:root`; no tool needed. Every component 
 
 End each list with a generic family (`sans-serif`, `serif`, `monospace`) so text shows while the font loads. To try fonts first, use the Fonts tab on the docs site's Brand theme page; it copies these lines for you, with the install lines for the fonts it offers. The brand command writes them too (`--font-body "Söhne" --font-heading "Lora" --font-code "Berkeley Mono"`).
 
-The tokens only name the family; load the font files yourself, under the same family name, with the weights the text styles use (body 400 and 500, heading 600, code 400 and 600):
+The tokens only name the family; load the font files yourself, under the same family name, with the weights the text styles use (body 400 and 500, heading 600, code 400, 500 and 600):
 
 ```css
 /* fonts.css of your project, loaded instead of bland-ui/fonts.css */

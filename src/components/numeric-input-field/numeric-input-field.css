@@ -16,6 +16,9 @@
   --_border: var(--border-input);
   --_helper: var(--text-subtle);
   --_box: var(--digit-sm);
+  --_radius: var(--rad-md);
+  --_digit: var(--type-code-title-lg);
+  --_digit-letter-spacing: var(--type-code-title-lg-letter-spacing);
   --_label: var(--text-bold);
 
   display: inline-flex;
@@ -37,7 +40,7 @@
 }
 
 .bland-numeric-input-field__box {
-  --bland-radius: var(--rad-sm); /* drawn by .bland-smooth */
+  --bland-radius: var(--_radius); /* drawn by .bland-smooth */
 
   flex: none;
   width: var(--_box);
@@ -49,7 +52,8 @@
   /* Figma's inside stroke, drawn inside the box so it adds no size. */
   box-shadow: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--_border);
   color: var(--text-bold);
-  font: var(--type-body-md);
+  font: var(--_digit);
+  letter-spacing: var(--_digit-letter-spacing);
   text-align: center;
   transition: background-color var(--duration-xs) var(--easing-ease);
 }
@@ -65,18 +69,26 @@
   overflow-wrap: break-word;
 }
 
-/* ---- Sizes: sm body-md, md and lg title-lg (Figma) ---- */
+/* ---- Sizes: digits in the code font, about half the box (Figma 2026-11-23) ---- */
+
+.bland-numeric-input-field[data-size="xs"] {
+  --_box: var(--digit-xs);
+  --_digit: var(--type-code-body-lg);
+  --_digit-letter-spacing: var(--type-code-body-lg-letter-spacing);
+}
 
 .bland-numeric-input-field[data-size="md"] {
   --_box: var(--digit-md);
+  --_radius: var(--rad-lg);
+  --_digit: var(--type-code-heading-sm);
+  --_digit-letter-spacing: var(--type-code-heading-sm-letter-spacing);
 }
 
 .bland-numeric-input-field[data-size="lg"] {
   --_box: var(--digit-lg);
-}
-
-.bland-numeric-input-field:is([data-size="md"], [data-size="lg"]) .bland-numeric-input-field__box {
-  font: var(--type-title-lg);
+  --_radius: var(--rad-lg);
+  --_digit: var(--type-code-heading-md);
+  --_digit-letter-spacing: var(--type-code-heading-md-letter-spacing);
 }
 
 /* ---- Status ---- */

@@ -1050,3 +1050,14 @@ shell never produces. Also: don't point two Playwright runs at one log file.
 
 - Symptom: a 20px spinner measured 27px wide in Playwright. Cause: `boundingBox()` returns the rotated square's box mid-turn. Rule: emulate `reducedMotion: 'reduce'` (or stop the animation) before measuring anything that rotates.
 - **A variant cloned into its set loses its layers' property links**: `variant.clone()` appended to the set kept the label's text and visibility but `componentPropertyReferences` came back `{}`, so `👀 Label` did nothing on the new variants. → After cloning variants, set `componentPropertyReferences` again on every linked layer (2026-11-21, Spinner).
+
+## A text style at a new weight needs its font file (2026-11-23)
+- **Symptom:** the new `Code/title-lg` and Code heading styles (Geist Mono Medium, 500) drew at another weight in the browser while Figma showed Medium.
+- **Cause:** `src/styles/fonts.css` imports only the Fontsource weights the styles used so far (Geist Mono 400/600); the browser fell back to the nearest weight.
+- **Rule:** when a text style uses a weight a family didn't have, add its `@fontsource/<family>/<weight>.css` to `fonts.css`, the docs font picker's loaders and `fontInstalls` (`playground/docs/fontStore.ts`), and every "load these weights" line (README, `docs/brand.md`, `docs/agent-skill.md`, `skill/references/setup.md`).
+
+## Primitives stay out of pickers through empty scopes (2026-11-23)
+
+- Symptom: the four new `Brand/Alpha/AlphaDeep*`/`AlphaPale*` primitives showed in a library search, while every other primitive stayed hidden.
+- Cause: a hidden collection alone doesn't hide its variables from pickers; every older primitive has `scopes = []`, and the new ones were created with `['FRAME_FILL', 'SHAPE_FILL']`.
+- Rule: a new primitive gets `scopes = []`; only Theme and scale tokens get real scopes. (Scopes are not in the drift records, so the repo can't catch this.)

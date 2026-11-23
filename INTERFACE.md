@@ -557,6 +557,25 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
 - Disabled matches Text Input (Godwin, 2026-10-18): label `text-subtle`,
   every box `border-subtle` whatever the status, helper `text-minimal`.
   Figma's twelve disabled variants were rebound from a `text-bold` label.
+- **Redesign, 2026-11-23 (Godwin; Figma, then code the same day):** after the Ahia
+  Design System's copy of this component. A fourth size **xs**, `digit/xs`
+  32 (aliases `unit/32`; below the touch target, for dense layouts).
+  Corners **rad-md on xs and sm, rad-lg on md and lg** (was rad-sm on all).
+  **Digits in the code font**, larger: `Code/body-lg` 16/24 on xs,
+  `Code/title-lg` 22/28 on sm, `Code/heading-sm` 27/32 on md,
+  `Code/heading-md` 34/40 on lg, about half the box height each. The three
+  new Code styles are Geist Mono **Medium** (`weight/medium`; Regular reads
+  thin at these sizes, SemiBold heavy), on the existing `size/*` and
+  `line-height/*` variables and `family/code`, named after the sizes they
+  share so other code can use them; the build emits them as
+  `--type-code-title-lg`, `--type-code-heading-sm`, `--type-code-heading-md`
+  with no script change. Rejected: `font-family: var(--font-code)` over
+  `title-lg` in CSS (Figma would need family overrides on a style). States,
+  status borders, label, helper, gap space-xs and disabled tokens unchanged.
+  In code: `size="xs"`; the CSS sets `--_box`, `--_radius` and `--_digit`
+  (with its letter spacing) per size.
+  `fonts.css` now loads Geist Mono 500 for these styles, so a replacement
+  code font needs 400, 500 and 600.
 
 ### Search Input (2026-10-18)
 - `import { SearchInput } from 'bland-ui'`, folder `search-input/`. It is Text
@@ -2761,3 +2780,29 @@ Reverses "Code has no picker" (Font tester: six presets) and "Code keeps Geist M
 - **Why:** in the skill test an agent asked to use a brand color had no way to run the Brand theme page, so it made the 13 steps by hand (close, not Bland's: `--brand-600` #c93c0a against #c13a00; grays guessed; no contrast check). Reverses the 2026-10-31 call that the command stays in the repo.
 - **What:** `npx bland-ui brand "#hex" [--fix] [--out file] [--neutrals …] [--extra …] [--chart …] [--font-* …] [--at …]` and `npx bland-ui brand check file`; `brand generate` works too. `scripts/cli.ts` sets `process.argv` and imports `scripts/brand.ts`, bundled by esbuild (a pinned devDependency) into `dist/cli.js` with a node shebang; `package.json` `bin` `bland-ui`. Same core as the page, so the CSS is identical.
 - **Agent rule (skill):** a brand color from the user runs the command with `--fix` into the project's `brand.css`; CSS pasted from the Brand theme page goes into `brand.css` as is; never write or adjust `--brand-*`, `--neutral-*` or `--chart-*` steps by hand. A color name without a hex: ask, or find it in the project and say which.
+
+### Field tints from Brand 900 / 100 (Godwin 2026-11-23)
+- **Why:** the see-through fills were Neutral1000 / Neutral0 at 6% and 10%, and the generator keeps those two ends pure black and white for every brand, so fields were the one hue-less part of a tinted UI (Ahia's login, purple #4800ff: field `#f0f0f0` beside a `#c7c9d4` border and `#5c6175` text). Neutral950 can't fix it (at 6% it gives `#f0f0f1`: the dark neutrals hold almost no hue). A brand step can: Brand900 at 6% gives `#f2f0f8`.
+- **Checked on 22 brands, tinted and pure-gray grays** (`EXECUTIONS.md`): light rest at most Ahia's `#f2f0f8` (OKLCH C 0.011), light hover `#e9e6f4` (0.019), the strongest anywhere a vivid green's dark hover `#263025` (0.024); every one below that brand's own `surface-brand-light`.
+- **What:** new primitives `Brand/Alpha/900-a6`, `900-a10`, `100-a6`, `100-a10`; the nine fill tokens point at them (light / dark): `Surface/surface-field`, `-field-hover`, `surface-alpha`, `-alpha-hover`, `TextInput/surface-rest`, `-hover`, `Dropdown/surface-rest`, `-hover`, `Messaging/surface-messagebar`. Shadows (`Shadow/neutral-*`) and `Modal/backdrop-minimal` stay on `Neutral/Alpha/a6`/`a10`. `white-a6`/`white-a10` are now unused (kept, "Reserved"). Colors page: four cards added to Brand alpha.
+- **Trade-off accepted:** fields follow the brand, not the neutrals setting, so a colorful brand with pure gray grays still gets tinted fields.
+- **Undo:** in Figma point the nine tokens back (light `Neutral/Alpha/a6` for the rests, `a10` for the hovers; dark `Neutral/Alpha/white-a6` / `white-a10`), restore the a6/a10/white descriptions, delete the four `Brand/Alpha/*00-a*` primitives and their Colors page cards, then sync (`docs/tokens.md`). Or restore Figma's version history from before 2026-11-23 10:25 UTC and revert the repo commit.
+
+### Field tints moved to Brand 950 / 50; alpha primitives renamed (Godwin 2026-11-23)
+- **Brand 900 looked too saturated** on the Button playground's fields (Godwin), so the tints moved one step deeper and paler: `AlphaDeep6`/`10` from Brand950, `AlphaPale6`/`10` from Brand50 (Ahia: `#f1f0f6` rest). Skeleton keeps the tint (Godwin).
+- **Alpha naming** (Godwin): every alpha primitive starts with "Alpha" written in full, and primitive names carry no dash, like `Brand100` (Theme names keep theirs, `surface-100`). `Neutral/Alpha/a6` became `Neutral/Alpha/Alpha6` (also 10, 24, 40, 60), `white-a6`/`-a10` became `AlphaWhite6`/`10`, `Brand`/`Red`/`Green`/`Amber` `a12`/`24`/`40` became `Alpha12`/`24`/`40`, the field tints `900-a6` etc. became `AlphaDeep6`, `AlphaDeep10`, `AlphaPale6`, `AlphaPale10`: named for what they are (Godwin chose Deep/Pale over Bold/Minimal, which read as emphasis levels), so the source step can move without a rename. Plain `AlphaN` keeps its scale's usual source (black for Neutral, the 600 step for Brand and status colors).
+- Hidden primitives never reach CSS, so the rename changes no CSS name. The emitted steps stay `--brand-100` (the build adds the dash); renaming them would break every brand.css.
+- Colors page: every alpha primitive has a card now (Alpha60, AlphaWhite6, AlphaWhite10 were missing), rows ordered by strength, exceptions last.
+- **Undo** as in the entry above, with the new names: point the nine tokens back to `Neutral/Alpha/Alpha6`/`Alpha10` (light) and `AlphaWhite6`/`AlphaWhite10` (dark).
+
+### Docs Overview back on surface-100 (Godwin 2026-11-23)
+- The Overview page uses `surface-100` like every other docs page; the `surface-sunken` page under raised cards (2026-11-02) is gone (`docs.css`, the `.docs:has(.docs-hero)` override removed). The stat and page cards keep `surface-raised` with their border, so they still read on the white page; in dark they sit a step above it.
+- **Stats restyled** (Godwin 2026-11-23, from his mock): each stat is a `surface-raised` card with a `stroke-lg` `border-brand` edge, rad-lg, inset space-lg in a `surface-brand-light` tray with the next radius up (rad-xl), the trays space-md apart on the dotted band (`.docs-stat` tray, `.docs-stat-card`). The docs dots are `border-bold` now (were `border-subtle`, a little stronger as asked), everywhere they show. The style cards take the component cards' border (stroke-xs `border-bold`).
+
+### Brand theme page: font rows, sample, preview (Godwin 2026-11-23)
+- **Font card on `surface-sunken`** (was `surface-200`; Figma's Doc site card `6909:12709` rebound too): its rows are List rows (`List/surface-rest`, Neutral900 in dark) and surface-200 mirrors to Neutral900, so the rows vanished in dark. Sunken stays the deepest layer, the "gray behind white rows" pattern. In dark the card is the page's color; its rows and sample still show.
+- **The font sample** is `surface-alpha` with `text-bold` and an `icon-subtle` caret, as Godwin set in Figma (`6909:12712`, from `surface-inverse`).
+- **The Preview** (components in light and dark) shows under How to use only, beside the CSS it previews; the Brand colors, Extra colors, Chart colors and Fonts tabs no longer show it. The chart spec opens How to use to check it.
+- Follow-up (Godwin 2026-11-23): in dark the sunken card matched the page, so the card gets a stroke-sm `border-subtle` edge in both themes (Figma's card too). "Your own font" sits space-xl further from the role cards (`.docs-font-own`). The four Deep/Pale primitives had picker scopes by mistake; now `[]` like every primitive.
+- Then (Godwin 2026-11-23): no border; the font card is `surface-alpha` instead (Figma's card too). It is a step off the page in both themes, so it shows in dark; the white List rows sit on it in light and read as a step deeper than it in dark, and the sample bar (also `surface-alpha`) shows as a second tint on top.
+- And (Godwin 2026-11-23): on the surface-alpha card the dark List rows (Neutral900) blurred into it, so in dark only the font rows step up to `surface-300` (hover and pressed `surface-400`), as the docs already do for the extra-color cards (a `:root[data-theme="dark"]` rule plus the system-dark media query). Light keeps the white List rows.

@@ -417,7 +417,9 @@ test('the brand page shows the chart palette in both themes, takes your own pick
   await reset.click();
   await expect(reset).toBeDisabled();
 
-  // Each preview sets the palette for its own theme, and its sample chart draws every series.
+  // Each preview sets the palette for its own theme, and its sample chart draws every series. The preview shows
+  // under How to use only (Godwin 2026-11-23).
+  await page.getByRole('tab', { name: 'How to use' }).click();
   const previews = page.locator('.docs-brand-preview');
   const series = (i: number, n: number) => previews.nth(i).evaluate((el, k) => getComputedStyle(el).getPropertyValue(`--chart-${k}`).trim(), n);
   expect(await series(0, 1)).toBe('#0062ff');
@@ -425,6 +427,7 @@ test('the brand page shows the chart palette in both themes, takes your own pick
   expect(await series(0, 8)).toBe(await root('--chart-8'));
   await expect(previews.first().locator('.docs-brand-chart-track').first().locator('span')).toHaveCount(8);
   await expect(previews.first().getByText('Series 8')).toBeVisible();
+  await page.getByRole('tab', { name: 'Chart colors' }).click();
 
   // An extra color goes to series 2, but your pick there stays, over it, until Use Bland's pick; changing the
   // extra's color leaves it alone. Every color but the brand's can be picked, an extra's too.
@@ -689,7 +692,7 @@ test('the Fonts tab: How to use gives the code font line, its install and its im
   await expect(css).toContainText('--font-code: "Fira Code", ui-monospace, monospace;');
   await expect(css).not.toContainText('--font-body');
   await expect(page.locator('.docs-font-install pre')).toHaveText('npm install @fontsource/fira-code');
-  await expect(page.locator('.docs-font-imports pre')).toHaveText(['@import "@fontsource/fira-code/400.css";', '@import "@fontsource/fira-code/600.css";'].join('\n'));
+  await expect(page.locator('.docs-font-imports pre')).toHaveText(['@import "@fontsource/fira-code/400.css";', '@import "@fontsource/fira-code/500.css";', '@import "@fontsource/fira-code/600.css";'].join('\n'));
   await expect(page.locator('#use-in-a-project')).toContainText('it loads Inter and Geist Mono');
 });
 

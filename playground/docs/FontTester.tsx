@@ -21,7 +21,7 @@ const ROLES: Record<Role, { title: string; about: string; sample: string }> = {
   body: { title: 'Body', about: 'Every Body text style, in weights 400 and 500.', sample: 'Pack my box with five dozen liquor jugs, then read the small print twice.' },
   heading: { title: 'Heading', about: 'Display, Heading and Title, in weight 600.', sample: 'Headings set the tone' },
   // => !== and <= turn into single marks in a font with ligatures (Fira Code, JetBrains Mono).
-  code: { title: 'Code', about: 'Every Code text style, in weights 400 and 600.', sample: 'const ok = (a, b) => a !== b && a <= b;' },
+  code: { title: 'Code', about: 'Every Code text style, in weights 400, 500 and 600.', sample: 'const ok = (a, b) => a !== b && a <= b;' },
 };
 
 const SAME = 'same';
@@ -57,7 +57,7 @@ export function FontTester() {
 
 // The fonts above are for trying things out; a project can use any font (Godwin 2026-11-01).
 const OWN_FONT_CSS = `/* 1. Load the font's files in your project, one @font-face per weight
-   (400 and 500 for body, 600 for headings, 400 and 600 for code). */
+   (400 and 500 for body, 600 for headings, 400, 500 and 600 for code). */
 @font-face {
   font-family: "Acme Sans";
   src: url("/fonts/acme-sans-400.woff2") format("woff2");
@@ -74,7 +74,7 @@ const OWN_FONT_CSS = `/* 1. Load the font's files in your project, one @font-fac
 /** Any font works in a project, not only the ones above: how to load your own and point the tokens at it. */
 function OwnFont() {
   return (
-    <section className="docs-font" aria-labelledby="font-own">
+    <section className="docs-font docs-font-own" aria-labelledby="font-own">
       <h3 id="font-own" className="docs-brand-chart-title">
         Your own font
       </h3>

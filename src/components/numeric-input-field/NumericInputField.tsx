@@ -13,11 +13,11 @@ import {
 import type { TextInputStatus } from '../text-input/TextInput';
 import './numeric-input-field.css';
 
-export type NumericInputFieldSize = 'sm' | 'md' | 'lg';
+export type NumericInputFieldSize = 'xs' | 'sm' | 'md' | 'lg';
 export type NumericInputFieldStatus = TextInputStatus;
 
 export interface NumericInputFieldProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
-  /** Square boxes of sm 40 (default), md 56, lg 72. On mobile, use sm for 6 digits. */
+  /** Square boxes of xs 32 (below the touch target, for dense layouts), sm 40 (default), md 56, lg 72. On mobile, use xs or sm for 6 digits. */
   size?: NumericInputFieldSize;
   /** Every box's border and the helper text color. danger also sets `aria-invalid`. */
   status?: NumericInputFieldStatus;

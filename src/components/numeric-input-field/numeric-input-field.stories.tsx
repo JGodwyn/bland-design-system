@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { Story } from '../../../playground/story';
 import { NumericInputField, type NumericInputFieldSize, type NumericInputFieldStatus } from './NumericInputField';
 
-const sizes: NumericInputFieldSize[] = ['sm', 'md', 'lg'];
+const sizes: NumericInputFieldSize[] = ['xs', 'sm', 'md', 'lg'];
 const statuses: NumericInputFieldStatus[] = ['default', 'danger', 'success', 'warning'];
 const helper: Record<NumericInputFieldStatus, string> = {
   default: 'We sent a code to your phone',
@@ -30,7 +30,7 @@ export default {
   description:
     'A row of boxes for a one-time code or PIN, one digit per box.',
   usage: [
-    '`length`: 4 or 6 digits. On mobile, use `size="sm"` for 6: the larger rows are wider than a phone screen\'s column.',
+    '`length`: 4 or 6 digits. On mobile, use `size="xs"` or `"sm"` for 6: the larger rows are wider than a phone screen\'s column. `xs` is below the touch target, for dense layouts.',
     '`onComplete` runs once every box is filled.',
     'Pasting a code, or the phone offering one from a text message, fills every box.',
     'Give it a `label`, or an `aria-label`.',
@@ -66,7 +66,7 @@ export default {
       ))}
 
       <div className="pg-stack">
-        <span className="pg-label"><code>length={6}</code> (<code>sm</code> fits a phone screen)</span>
+        <span className="pg-label"><code>length={6}</code> (<code>xs</code> and <code>sm</code> fit a phone screen)</span>
         <NumericInputField length={6} label="Six digits" defaultValue="274" />
       </div>
 

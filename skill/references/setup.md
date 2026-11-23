@@ -73,7 +73,7 @@ Pass them to the brand command (`--font-body`, `--font-heading`, `--font-code`),
 }
 ```
 
-One font for all text: set `--font-body` alone. Load the font files yourself, under the same family name, with the weights Bland's styles use: body 400 and 500, heading 600, code 400 and 600 (`@font-face`, a Fontsource package, or a font host). Skip `bland-ui/fonts.css` only if every font is replaced. Sizes, line heights and letter spacing stay Bland's. Never set `font-family` in project CSS beside a text style.
+One font for all text: set `--font-body` alone. Load the font files yourself, under the same family name, with the weights Bland's styles use: body 400 and 500, heading 600, code 400, 500 and 600 (`@font-face`, a Fontsource package, or a font host). Skip `bland-ui/fonts.css` only if every font is replaced. Sizes, line heights and letter spacing stay Bland's. Never set `font-family` in project CSS beside a text style.
 
 To change fonts in one area only, set `--font-body` / `--font-heading` on an element that also has `data-theme="light"`, and put `data-theme="dark"` on an element inside it if the area is dark.
 

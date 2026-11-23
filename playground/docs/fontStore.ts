@@ -39,7 +39,7 @@ export const PICK_ROLES: PickRole[] = ['body', 'heading', 'code'];
 export type FontPicks = Partial<Record<PickRole, string>>;
 
 /**
- * Each preset's stylesheets, one per weight Bland's text styles use (400, 500, 600; code 400 and 600). Written out so Vite sees
+ * Each preset's stylesheets, one per weight Bland's text styles use (400, 500, 600, code too). Written out so Vite sees
  * every import and splits each into its own file; the font files download only when text uses them.
  */
 const LOADERS: Record<string, () => Promise<unknown>[]> = {
@@ -48,9 +48,9 @@ const LOADERS: Record<string, () => Promise<unknown>[]> = {
   'source-serif-4': () => [import('@fontsource/source-serif-4/400.css'), import('@fontsource/source-serif-4/500.css'), import('@fontsource/source-serif-4/600.css')],
   lora: () => [import('@fontsource/lora/400.css'), import('@fontsource/lora/500.css'), import('@fontsource/lora/600.css')],
   'playfair-display': () => [import('@fontsource/playfair-display/400.css'), import('@fontsource/playfair-display/500.css'), import('@fontsource/playfair-display/600.css')],
-  'jetbrains-mono': () => [import('@fontsource/jetbrains-mono/400.css'), import('@fontsource/jetbrains-mono/600.css')],
-  'fira-code': () => [import('@fontsource/fira-code/400.css'), import('@fontsource/fira-code/600.css')],
-  'ibm-plex-mono': () => [import('@fontsource/ibm-plex-mono/400.css'), import('@fontsource/ibm-plex-mono/600.css')],
+  'jetbrains-mono': () => [import('@fontsource/jetbrains-mono/400.css'), import('@fontsource/jetbrains-mono/500.css'), import('@fontsource/jetbrains-mono/600.css')],
+  'fira-code': () => [import('@fontsource/fira-code/400.css'), import('@fontsource/fira-code/500.css'), import('@fontsource/fira-code/600.css')],
+  'ibm-plex-mono': () => [import('@fontsource/ibm-plex-mono/400.css'), import('@fontsource/ibm-plex-mono/500.css'), import('@fontsource/ibm-plex-mono/600.css')],
 };
 const loaded = new Map<string, Promise<unknown>>();
 /** Loads a preset's stylesheets once. Inter and Geist Mono are in the docs site's fonts.css already. */
@@ -87,7 +87,7 @@ export function pickedFonts(all: FontPicks = picks): Fonts {
 
 /**
  * The Fontsource packages a project installs for the picks, each with the weights its roles use: body 400 and 500
- * (and 600 while headings follow it), heading 600, code 400 and 600. Inter and Geist Mono are left out:
+ * (and 600 while headings follow it), heading 600, code 400, 500 and 600. Inter and Geist Mono are left out:
  * bland-ui/fonts.css loads them.
  */
 export function fontInstalls(all: FontPicks = picks): { pkg: string; weights: number[] }[] {
@@ -101,7 +101,7 @@ export function fontInstalls(all: FontPicks = picks): { pkg: string; weights: nu
   };
   add(all.body, all.heading ? [400, 500] : [400, 500, 600]);
   add(all.heading, [600]);
-  add(all.code, [400, 600]);
+  add(all.code, [400, 500, 600]);
   return [...out].map(([pkg, w]) => ({ pkg, weights: [...w].sort((a, b) => a - b) }));
 }
 

@@ -2,6 +2,14 @@
 
 Bland follows [semantic versioning](https://semver.org). Until 1.0, a minor version (0.2.0) may change an API or a token name; a patch (0.1.1) never does. Each entry says what a project has to change, if anything.
 
+## 0.3.3 (2026-11-23)
+
+- **Numeric Input Field: new look and an xs size.** The digits are in the code font (`--font-code`, Geist Mono) and larger: 22px on `sm`, 27px on `md`, 34px on `lg`. Corners are rounder: 8px on `xs` and `sm`, 16px on `md` and `lg`. New `size="xs"`, 32px boxes with 16px digits, below the touch target, for dense layouts. New tokens `--digit-xs` and the text styles `--type-code-title-lg`, `--type-code-heading-sm`, `--type-code-heading-md` (Geist Mono Medium, with their line-height and letter-spacing).
+- **Fonts:** `bland-ui/fonts.css` now loads Geist Mono 500 too, for the new Code styles. If you replace the code font (`--font-code`), load its 500 weight beside 400 and 600.
+- **Fields carry the brand's hue.** The see-through fills (`--surface-field`, `--surface-alpha`, the Text Input, Dropdown and message bar fills, and their hovers) are now the brand's 950 step at 6% / 10% in light and its 50 step in dark, instead of black and white. On a brand with tinted grays a field no longer looks flat gray beside its tinted border and text (a violet brand's field goes from `#f0f0f0` to `#f1f0f6`). Checked on 22 brand colors: never stronger than the brand's own light surface. Shadows and modal backdrops stay neutral. A brand.css made before this needs nothing: the fills follow its `--brand-950` and `--brand-50`.
+- **Docs:** the Overview page is white (`--surface-100`) again, like every other page, with restyled stats. On the Brand theme page the font lists show in dark mode, and the preview sits under How to use only.
+- Nothing to change in a project; a field you have keeps its size and changes look.
+
 ## 0.3.2 (2026-11-21)
 
 - **Toast docs:** the variant toasts are centred.
