@@ -2751,3 +2751,7 @@ Godwin tried the landing page on his phone and sent a list of changes.
 ### Release 0.3.3 (2026-11-23, top session)
 
 - Ships the Numeric Input Field update (its side session), the field tints on Brand 950 / 50, the alpha primitive renames, the Overview and Brand theme page changes. `test:brand` counted 25 text styles; now 28 (three Code digit styles). Typecheck, lint, script tests, audit, checksum 675 / `c8ad7f0f`, full suite (1,539 passed), package test passed. Commit, tag `v0.3.3`, push; npm publish is Godwin's step.
+
+### Release 0.3.4 (2026-11-23, top session)
+
+- Godwin asked whether 0.3.3 reached the skill, tokens.json and the guides. Checked: tokens.json, tokens.css comments, the generated component reference, the setup guide, README, docs/brand.md and the docs token pages were all current; no old alpha names left. One gap: SKILL.md didn't say the see-through fills carry the brand hue, so an agent might swap them for gray. Added the line, released as 0.3.4 (package test passed, skill names 0.3.4).

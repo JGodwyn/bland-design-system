@@ -2,6 +2,10 @@
 
 Bland follows [semantic versioning](https://semver.org). Until 1.0, a minor version (0.2.0) may change an API or a token name; a patch (0.1.1) never does. Each entry says what a project has to change, if anything.
 
+## 0.3.4 (2026-11-23)
+
+- **Agent skill:** says the see-through fills carry a faint brand hue on purpose (Brand 950 / 50), so an agent doesn't swap them for a gray.
+
 ## 0.3.3 (2026-11-23)
 
 - **Numeric Input Field: new look and an xs size.** The digits are in the code font (`--font-code`, Geist Mono) and larger: 22px on `sm`, 27px on `md`, 34px on `lg`. Corners are rounder: 8px on `xs` and `sm`, 16px on `md` and `lg`. New `size="xs"`, 32px boxes with 16px digits, below the touch target, for dense layouts. New tokens `--digit-xs` and the text styles `--type-code-title-lg`, `--type-code-heading-sm`, `--type-code-heading-md` (Geist Mono Medium, with their line-height and letter-spacing).
