@@ -50,7 +50,8 @@ test('Figma copy, landmark and links; dark whatever the system theme', async ({ 
   await expect(nav.getByRole('link', { name: 'MIT license' })).toHaveAttribute('href', 'https://github.com/JGodwyn/bland-design-system/blob/main/LICENSE');
   await expect(nav.getByRole('link', { name: 'Bland on GitHub' })).toHaveAttribute('href', 'https://github.com/JGodwyn/bland-design-system');
   await expect(nav.getByRole('link', { name: 'bland-ui on npm' })).toHaveAttribute('href', 'https://www.npmjs.com/package/bland-ui');
-  await expect(ft(page).getByText('© 2026 Godwin John. Released under the MIT license.')).toBeVisible();
+  await expect(ft(page).locator('.ft__copyright')).toHaveText('© 2026 Godwin John. Released under the MIT license.');
+  await expect(ft(page).getByRole('link', { name: 'Godwin John' })).toHaveAttribute('href', 'https://www.godwinjohn.com/');
   // The page's colors are the dark theme's whatever the system says.
   const bg = await ft(page).evaluate((el) => getComputedStyle(el).backgroundColor);
   await page.emulateMedia({ colorScheme: 'dark' });

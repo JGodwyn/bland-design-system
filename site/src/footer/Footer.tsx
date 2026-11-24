@@ -8,7 +8,7 @@
 // each word fills from outline to bold with its glow, so the page ends on the glow. Reduced motion: the headline
 // turns bold in one step once the footer is shown, everything only fades.
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react';
-import { CodeSnippet, CodeText, Icon, Logo } from '../../../src';
+import { CodeSnippet, CodeText, Icon, Link, Logo } from '../../../src';
 import { clamp01, wave } from '../hero/story';
 import { footerStyle, useFooterTuning, type FooterTuning } from './tuning';
 import { GitHubIcon } from '../icons';
@@ -45,6 +45,8 @@ export const FOOTER_LINKS = {
   license: 'https://github.com/JGodwyn/bland-design-system/blob/main/LICENSE',
   github: 'https://github.com/JGodwyn/bland-design-system',
   npm: 'https://www.npmjs.com/package/bland-ui',
+  // The name in the copyright links to Godwin's portfolio (2026-11-24).
+  portfolio: 'https://www.godwinjohn.com/',
 };
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -269,7 +271,11 @@ export function Footer() {
         </nav>
 
         <p className="ft__block ft__copyright" style={block(3)}>
-          © 2026 Godwin John. Released under the MIT license.
+          © 2026{' '}
+          <Link href={FOOTER_LINKS.portfolio} color="inherit">
+            Godwin John
+          </Link>
+          . Released under the MIT license.
         </p>
       </div>
     </footer>

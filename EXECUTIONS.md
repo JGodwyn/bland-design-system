@@ -2755,3 +2755,8 @@ Godwin tried the landing page on his phone and sent a list of changes.
 ### Release 0.3.4 (2026-11-23, top session)
 
 - Godwin asked whether 0.3.3 reached the skill, tokens.json and the guides. Checked: tokens.json, tokens.css comments, the generated component reference, the setup guide, README, docs/brand.md and the docs token pages were all current; no old alpha names left. One gap: SKILL.md didn't say the see-through fills carry the brand hue, so an agent might swap them for gray. Added the line, released as 0.3.4 (package test passed, skill names 0.3.4).
+
+### Footer: name links to the portfolio (2026-11-24, top session)
+
+- Godwin: the name in the footer's copyright, underlined, links to https://www.godwinjohn.com/. `FOOTER_LINKS.portfolio`; Bland's `Link` with `color="inherit"` (the copyright's text-subtle) and the default always-on underline; opens in the same tab, so no external arrow.
+- Footer spec checks the link and the full line; 14 passed in Chromium and WebKit; typecheck passes; checked in Chrome at 1440.
