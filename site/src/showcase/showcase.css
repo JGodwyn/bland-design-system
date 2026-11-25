@@ -554,3 +554,36 @@
     --bland-grid-margin: var(--space-xl);
   }
 }
+
+/* ---------- The row (the embed: Showcase layout="row", site/embed/showcase/) ---------- */
+
+/* No section padding of its own: the page that frames it gives the room around it. */
+.showcase[data-layout='row'] {
+  padding-block: 0;
+  background: transparent;
+}
+
+/* Every card of the three sets in one row that scrolls sideways; each as wide as a card of the landing panel's three a row. */
+.showcase[data-layout='row'] .showcase__cards {
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+}
+
+.showcase[data-layout='row'] .showcase__card-slot {
+  flex: 0 0 var(--landing-showcase-row-card-width);
+  scroll-snap-align: start;
+}
+
+/* A card grows with its part (an open Accordion, an uploaded file) instead of scrolling inside it: the frame's
+   height follows, so nothing in the embed scrolls up and down. The row's cards stretch to the tallest. */
+.showcase[data-layout='row'] .showcase__card {
+  height: auto;
+  min-height: var(--landing-showcase-card-height);
+}
+
+.showcase[data-layout='row'] .showcase__card-body {
+  flex: 1 0 auto;
+}

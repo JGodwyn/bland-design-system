@@ -310,6 +310,9 @@
   /* Every card's one height (Godwin 2026-11-09: nothing a card does moves the panel). Figma's 200, raised to fit the
      calendar's five weeks with its room; taller content scrolls inside. */
   --landing-showcase-card-height: 256px;
+  /* The embed's row (Showcase layout="row"): a card as wide as Figma's three a row at 1440 (267px), so the row reads as
+     the landing panel laid sideways. */
+  --landing-showcase-row-card-width: 272px;
   /* The "Any color" swatch: every hue at one lightness and chroma, in OKLCH (a picture, not a theme color). */
   --landing-showcase-any-color: conic-gradient(in oklch longer hue, oklch(0.7 0.18 0), oklch(0.7 0.18 360));
 }

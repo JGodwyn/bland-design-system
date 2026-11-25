@@ -12,7 +12,7 @@ import { cards, lastCards, moreCards } from './Cards';
 import { FloatingPanel } from '../../../src/components/overlay/FloatingPanel';
 import { ColorPicker } from '../../../playground/docs/ColorPicker';
 import { StackIcon } from '../../../playground/docs/icons';
-import { BLAND, BRANDS, FONTS, fontStyle, loadFont, paletteFor, paletteStyle, type Look } from './settings';
+import { BLAND, BRANDS, FONTS, fontStyle, loadFont, paletteFor, paletteStyle, type Look, type Theme } from './settings';
 import { showcaseStyle, useShowcaseTuning } from './tuning';
 import { CaretUpDownIcon, MoonIcon, SunIcon, TextTIcon } from './vectors';
 import './showcase.css';
@@ -115,19 +115,30 @@ function Swatches({ hex, onPick, onDraggingChange }: { hex: string; onPick: (hex
   );
 }
 
-export function Showcase() {
+/**
+ * `panel` is the landing page's section. `row` is the embed the Bland case study on godwinjohn.com frames
+ * (site/embed/showcase/): the same panel and toolbar with no title, no link and no set switcher, so every card of the
+ * three sets sits in one row that scrolls sideways, and a card grows with its part instead of scrolling inside it
+ * (the frame takes the page's height, so nothing in it may scroll up and down; Godwin 2026-11-25).
+ */
+export type ShowcaseLayout = 'panel' | 'row';
+
+export function Showcase({ layout = 'panel', initialTheme = 'light' }: { layout?: ShowcaseLayout; initialTheme?: Theme } = {}) {
+  const row = layout === 'row';
   const t = useShowcaseTuning();
   const reduced = useReducedMotion();
   const [target, setTarget] = useState<Look>({
     hex: BLAND.hex,
-    theme: 'light',
+    theme: initialTheme,
     font: FONTS[0]!,
   });
   // Which set of nine the panel shows: Figma's, then two more (the switcher before the font button cycles them).
   const [set, setSet] = useState(0);
   const items = useMemo(
     () =>
-      set === 0
+      row
+        ? [...cards({ buttonLoadingMs: t.parts.buttonLoadingMs, uploadStepMs: t.parts.uploadStepMs }), ...moreCards(), ...lastCards()]
+        : set === 0
         ? cards({
             buttonLoadingMs: t.parts.buttonLoadingMs,
             uploadStepMs: t.parts.uploadStepMs,
@@ -135,7 +146,7 @@ export function Showcase() {
         : set === 1
           ? moreCards()
           : lastCards(),
-    [set, t.parts.buttonLoadingMs, t.parts.uploadStepMs],
+    [row, set, t.parts.buttonLoadingMs, t.parts.uploadStepMs],
   );
   // While the picker is dragged, a color reaches every card at once (a wave per pointer move would never finish).
   const dragging = useRef(false);
@@ -255,14 +266,20 @@ export function Showcase() {
   const dark = target.theme === 'dark';
 
   return (
-    <section className="showcase" aria-labelledby="showcase-title" style={showcaseStyle(t)} data-shown={shown || undefined} data-instant={instant || undefined}>
+    <section
+      className="showcase"
+      data-layout={layout}
+      {...(row ? { 'aria-label': 'Bland components' } : { 'aria-labelledby': 'showcase-title' })}
+      style={showcaseStyle(t)} data-shown={shown || undefined} data-instant={instant || undefined}>
       <div className="showcase__grid bland-grid">
-        <div className="showcase__head">
+        {row ? null : (
+          <div className="showcase__head">
           <h2 id="showcase-title" className="showcase__title">
             See it in your brand
           </h2>
           <p className="showcase__lede">One set of components, any brand. Change the color, font or theme and watch every component update.</p>
-        </div>
+          </div>
+        )}
 
         <div ref={panelRef} className="showcase__panel-slot">
           <Themed look={looks[0]!} outerClassName="showcase__panel-font" className="showcase__panel bland-smooth">
@@ -278,17 +295,24 @@ export function Showcase() {
                 >
                   {/* Every card keeps one height (Godwin 2026-11-09): what grows (an open Accordion, an
                       uploaded file, a six-week month) scrolls inside it, with Bland's fade and scrollbar. */}
-                  <ScrollArea className="showcase__card-scroll" fadeSize="sm">
+                  {row ? (
                     <div className="showcase__card-body" data-card={card.id} data-top={card.top || undefined}>
                       {card.node}
                     </div>
-                  </ScrollArea>
+                  ) : (
+                    <ScrollArea className="showcase__card-scroll" fadeSize="sm">
+                      <div className="showcase__card-body" data-card={card.id} data-top={card.top || undefined}>
+                        {card.node}
+                      </div>
+                    </ScrollArea>
+                  )}
                 </Themed>
               ))}
             </div>
 
             <div className="showcase__toolbar">
               <div className="showcase__looks">
+                {row ? null : (
                 <button
                   type="button"
                   className="showcase__round"
@@ -299,6 +323,7 @@ export function Showcase() {
                     <StackIcon />
                   </Icon>
                 </button>
+                )}
                 <button
                   type="button"
                   className="showcase__font bland-smooth"
@@ -334,12 +359,14 @@ export function Showcase() {
           </Themed>
         </div>
 
+        {row ? null : (
         <div className="showcase__more">
           {/* A real link drawn as Bland's md brand primary Button (the Button's own markup and classes). */}
           <a className="bland-button bland-focus-ring bland-smooth" data-size="md" data-emotion="brand" data-type="primary" href="/docs/#/components/button">
             <span className="bland-button__label">Browse all components</span>
           </a>
         </div>
+        )}
       </div>
     </section>
   );
