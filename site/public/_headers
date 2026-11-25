@@ -19,3 +19,11 @@
 /.well-known/ard.json
   Content-Type: application/json
   Access-Control-Allow-Origin: *
+
+# The showcase embed (site/embed/showcase/), framed by the Bland case study on godwinjohn.com. Cloudflare joins
+# same-named headers from overlapping rules, so the site-wide ones above are removed first, not just overridden:
+# joined, the two CSPs would both apply and 'self' alone would still refuse godwinjohn.com.
+/embed/*
+  ! X-Frame-Options
+  ! Content-Security-Policy
+  Content-Security-Policy: frame-ancestors 'self' https://www.godwinjohn.com https://godwinjohn.com http://localhost:3000
