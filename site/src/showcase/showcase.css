@@ -563,6 +563,12 @@
   background: transparent;
 }
 
+/* The framing page sets the width (its own column), so Bland's page grid steps aside: the panel fills the frame. */
+.showcase[data-layout='row'] .showcase__grid {
+  display: block;
+  padding-inline: 0;
+}
+
 /* Every card of the three sets in one row that scrolls sideways; each as wide as a card of the landing panel's three a row. */
 .showcase[data-layout='row'] .showcase__cards {
   display: flex;

@@ -44,6 +44,15 @@ test('cards scroll sideways, never inside', async ({ page }) => {
   expect(pageWide).toBe(false);
 });
 
+test('the panel fills the frame, edge to edge', async ({ page }) => {
+  // The page that frames it sets the width (its own column); Bland's page grid would leave margins inside that.
+  await page.setViewportSize({ width: 680, height: 600 });
+  await page.goto(embed);
+  const box = await page.locator('.showcase__panel').boundingBox();
+  expect(box!.x).toBe(0);
+  expect(Math.round(box!.width)).toBe(680);
+});
+
 test('starts light under a dark system', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto(embed);
