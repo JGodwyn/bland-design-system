@@ -6,6 +6,7 @@ import './progress-wizard.css';
 export type ProgressWizardLayout = 'inline' | 'centered' | 'stacked';
 export type ProgressWizardStyle = 'bar' | 'connector';
 export type ProgressWizardProgress = 'done' | 'current' | 'next';
+export type ProgressWizardOrientation = 'horizontal' | 'vertical' | 'auto';
 
 export interface ProgressWizardStep {
   /** The step's name. */
@@ -24,7 +25,12 @@ export interface ProgressWizardProps extends Omit<OlHTMLAttributes<HTMLOListElem
    * Pass `steps.length` when every step is done.
    */
   current: number;
-  /** inline (marker beside the text, default), centered (marker above, centered) or stacked (marker above, left aligned). */
+  /**
+   * horizontal (steps in a row, default), vertical (steps stacked top to bottom, marker beside the text) or auto
+   * (vertical below `breakpoint/md`, 768px, horizontal from there).
+   */
+  orientation?: ProgressWizardOrientation;
+  /** inline (marker beside the text, default), centered (marker above, centered) or stacked (marker above, left aligned). Horizontal only: a vertical wizard is always inline. */
   layout?: ProgressWizardLayout;
   /** bar (a 2px bar on top of each step, default) or connector (a line between markers). The native style attribute is `htmlStyle`. */
   style?: ProgressWizardStyle;
@@ -34,6 +40,7 @@ export interface ProgressWizardProps extends Omit<OlHTMLAttributes<HTMLOListElem
   disabled?: boolean;
   /**
    * Stretch the wizard across its container, the steps sharing the width equally. Off, each step is 152px wide and the wizard hugs them.
+   * Horizontal only: a vertical wizard always fills its container's width.
    */
   fill?: boolean;
   /** What a screen reader hears for each step's marker. Defaults to "Completed", "Current" and "Not started". */
@@ -54,7 +61,8 @@ function progressOf(index: number, current: number): ProgressWizardProgress {
 export function ProgressWizard({
   steps,
   current,
-  layout = 'inline',
+  orientation = 'horizontal',
+  layout: layoutProp = 'inline',
   style = 'bar',
   htmlStyle,
   disabled = false,
@@ -64,23 +72,28 @@ export function ProgressWizard({
   ...rest
 }: ProgressWizardProps) {
   const last = steps.length - 1;
+  const layout = orientation === 'vertical' ? 'inline' : layoutProp;
+  // Vertical and auto draw a line down from each inline connector marker (auto hides it from breakpoint/md).
+  const railLine = orientation !== 'horizontal';
 
   return (
     <ol
       {...rest}
       style={htmlStyle}
       className={`bland-progress-wizard${className ? ` ${className}` : ''}`}
+      data-orientation={orientation}
       data-layout={layout}
       data-style={style}
-      data-fill={fill || undefined}
+      data-fill={(fill && orientation !== 'vertical') || undefined}
     >
       {steps.map((step, index) => {
         const progress = progressOf(index, current);
         // A line is brand once the step it leads into is reached (Figma's _progress-wizard-item).
-        const line = (side: 'start' | 'end', shown: boolean) => (
+        const line = (side: 'start' | 'end', shown: boolean, axis?: 'y') => (
           <span
             className="bland-progress-wizard__line"
             data-side={side}
+            data-axis={axis}
             data-reached={(side === 'start' ? index <= current : index < current) || undefined}
             data-hidden={!shown || undefined}
           />
@@ -112,7 +125,10 @@ export function ProgressWizard({
                 {line('end', index < last)}
               </span>
             ) : (
-              <span className="bland-progress-wizard__marker-wrap">{marker}</span>
+              <span className="bland-progress-wizard__marker-wrap">
+                {marker}
+                {connector && railLine && index < last && line('end', true, 'y')}
+              </span>
             )}
             <span className="bland-progress-wizard__text">
               {connector && layout === 'inline' ? (

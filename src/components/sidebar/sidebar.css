@@ -2,8 +2,8 @@
  * Sidebar (Figma: Sidebar page, sets "Sidebar", "_sidebar-item-group" and "_sidebar-item").
  *
  *   <div class="bland-sidebar" data-size data-minimized data-layout="full|rail" data-compact
- *        data-peek="open|closing" data-top data-collapsible>
- *     <div class="bland-sidebar__panel">
+ *        data-peek="open|closing" data-top data-collapsible data-selected-style data-floating data-border>
+ *     <div class="bland-sidebar__panel bland-smooth">
  *       <div class="bland-sidebar__header">
  *         <div class="bland-sidebar__slot bland-sidebar__top">…</div>
  *         <button class="bland-sidebar__toggle">SidebarSimple</button>
@@ -15,9 +15,10 @@
  *       …
  *       <div class="bland-sidebar__slot bland-sidebar__bottom">…</div>
  *
- * The root is the box the page lays out (sidebar/width, or the rail: an item plus space-sm each side); the
- * panel draws everything: surface-200 (Figma, 2026-10-20), a stroke-sm border-subtle edge on the right,
- * space-sm above. It fills its container's height (sidebar/height is Figma's frame).
+ * The root is the box the page lays out (sidebar/width, or the rail: an item plus space-sm each side; floating
+ * adds space-sm); the panel draws everything: surface-200 (Figma, 2026-10-20), a stroke-sm border-subtle edge on
+ * the right (all round floating, none with data-border="none"), space-sm above. It fills its container's height
+ * (sidebar/height is Figma's frame).
  *
  * Collapse, expand and the hover peek all move the same way (duration/2xl, easing/drawer): the panel is
  * clipped from or to the rail's edge while the root's width follows, so the page slides in step. While
@@ -39,6 +40,18 @@
   --_list-pad: var(--space-sm);
   --_icon-x: var(--_pad);
   --bland-icon-size: var(--icon-sm);
+  /* The selected row's look (selectedStyle): brand, the brand tint, by default. */
+  --_sel-bg: var(--sidebar-surface-selected);
+  --_sel-bg-hover: var(--sidebar-surface-selected-hover);
+  --_sel-text: var(--sidebar-text-selected);
+  --_sel-icon: var(--sidebar-icon-selected);
+  --_sel-count: var(--sidebar-count-selected);
+  --_sel-count-text: var(--sidebar-count-selected-content);
+  --_sel-shadow: none;
+  /* Floating: the space around the panel. Docked: none. */
+  --_inset: var(--space-none);
+  /* The panel's edge (border): the right side docked, all round floating. */
+  --_edge: inset calc(var(--stroke-sm) * -1) var(--space-none) var(--space-none) var(--space-none) var(--border-subtle);
 
   position: relative;
   display: flex;
@@ -80,6 +93,38 @@
   width: var(--_rail);
 }
 
+/*
+ * Raised selected row (Godwin 2026-11-25): a white row lifted by Elevation/neutral/near on the gray panel. In dark
+ * it is Neutral800, one step above the panel (surface-raised is the panel's Neutral900 there, so it would vanish).
+ * No hover change.
+ */
+.bland-sidebar[data-selected-style="raised"] {
+  --_sel-bg: var(--sidebar-surface-selected-raised);
+  --_sel-bg-hover: var(--sidebar-surface-selected-raised);
+  --_sel-text: var(--text-bold);
+  --_sel-icon: var(--icon-bold);
+  --_sel-count: var(--sidebar-count-selected-raised);
+  --_sel-count-text: var(--text-subtle);
+  --_sel-shadow: var(--elevation-neutral-near);
+}
+
+/*
+ * Floating (Godwin 2026-11-25, as Sheet's floating): the panel sits space-sm from the top, bottom and start
+ * edges, rounded rad-lg, with its border all round. The root keeps that space, so the page starts right after
+ * the panel and the rail's icons stay where they are.
+ */
+.bland-sidebar[data-floating] {
+  --_inset: var(--space-sm);
+  --_edge: inset var(--space-none) var(--space-none) var(--space-none) var(--stroke-sm) var(--border-subtle);
+
+  width: calc(var(--sidebar-width) + var(--_inset));
+  padding: var(--_inset) var(--space-none) var(--_inset) var(--_inset);
+}
+
+.bland-sidebar[data-floating][data-minimized] {
+  width: calc(var(--_rail) + var(--_inset));
+}
+
 /* The rail's places: each icon centred in a square row. */
 .bland-sidebar[data-compact] {
   --_icon-x: calc((var(--_item) - var(--bland-icon-size)) / 2);
@@ -97,9 +142,18 @@
   height: 100%;
   padding-top: var(--space-sm);
   background-color: var(--surface-200);
-  box-shadow: inset calc(var(--stroke-sm) * -1) var(--space-none) var(--space-none) var(--space-none) var(--border-subtle);
-  clip-path: inset(var(--space-none));
+  box-shadow: var(--_edge);
+  clip-path: inset(var(--space-none) round var(--bland-radius));
   transition: clip-path var(--duration-2xl) var(--easing-drawer);
+}
+
+.bland-sidebar[data-floating] > .bland-sidebar__panel {
+  --bland-radius: var(--rad-lg); /* drawn by .bland-smooth; the clip rounds at the same radius */
+}
+
+/* border={false}: no edge (a gray page, or a raised selected row, needs none). */
+.bland-sidebar[data-border="none"] > .bland-sidebar__panel {
+  box-shadow: none;
 }
 
 /* The rail: the panel is as wide as the root. Its clip names the rail's edge, so an opening starts there. */
@@ -109,14 +163,26 @@
 
 .bland-sidebar[data-layout="rail"] > .bland-sidebar__panel,
 .bland-sidebar[data-peek="closing"] > .bland-sidebar__panel {
-  clip-path: inset(var(--space-none) calc(100% - var(--_rail)) var(--space-none) var(--space-none));
+  clip-path: inset(var(--space-none) calc(100% - var(--_rail)) var(--space-none) var(--space-none) round var(--bland-radius));
 }
 
 /* Open over the page, or sliding back to the rail: from the rail's top left corner. */
 .bland-sidebar[data-peek] > .bland-sidebar__panel {
   position: absolute;
-  inset-block: var(--space-none);
-  inset-inline-start: var(--space-none);
+  inset-block: var(--_inset);
+  inset-inline-start: var(--_inset);
+  height: auto;
+  /* Over the page it lifts, docked or floating (Godwin 2026-11-25). */
+  box-shadow: var(--_edge), var(--elevation-neutral-mid);
+}
+
+.bland-sidebar[data-border="none"][data-peek] > .bland-sidebar__panel {
+  box-shadow: var(--elevation-neutral-mid);
+}
+
+/* Open, the clip stands off the panel far enough for its shadow (Elevation/neutral/mid reaches about 10px). */
+.bland-sidebar[data-peek="open"] > .bland-sidebar__panel {
+  clip-path: inset(calc(var(--space-lg) * -1) round var(--bland-radius));
 }
 
 /* ---- Header: the top slot and the collapse button, in flow ---- */
@@ -261,7 +327,8 @@
   --_icon: var(--icon-subtle);
   --_count-bg: var(--surface-300);
   --_count-text: var(--text-subtle);
-  --bland-radius: var(--rad-sm);
+  --_shadow: none;
+  --bland-radius: var(--rad-md); /* rad-sm until 2026-11-25 */
 
   display: flex;
   align-items: center;
@@ -272,6 +339,7 @@
   padding: var(--space-none) var(--_pad) var(--space-none) var(--_icon-x);
   border: none;
   background-color: var(--_bg);
+  box-shadow: var(--_shadow);
   color: var(--_text);
   font: var(--type-body-lg);
   letter-spacing: var(--type-body-lg-letter-spacing);
@@ -280,6 +348,7 @@
   cursor: pointer;
   transition:
     background-color var(--duration-xs) var(--easing-out),
+    box-shadow var(--duration-xs) var(--easing-out),
     color var(--duration-xs) var(--easing-out),
     padding-inline-start var(--duration-2xl) var(--easing-drawer),
     width var(--duration-2xl) var(--easing-drawer);
@@ -301,17 +370,18 @@
   }
 
   .bland-sidebar__item[aria-current="page"]:hover:not([aria-disabled="true"]) {
-    --_bg: var(--sidebar-surface-selected-hover);
-    --_count-bg: var(--sidebar-count-selected);
+    --_bg: var(--_sel-bg-hover);
+    --_count-bg: var(--_sel-count);
   }
 }
 
 .bland-sidebar__item[aria-current="page"] {
-  --_bg: var(--sidebar-surface-selected);
-  --_text: var(--sidebar-text-selected);
-  --_icon: var(--sidebar-icon-selected);
-  --_count-bg: var(--sidebar-count-selected);
-  --_count-text: var(--sidebar-count-selected-content);
+  --_bg: var(--_sel-bg);
+  --_text: var(--_sel-text);
+  --_icon: var(--_sel-icon);
+  --_count-bg: var(--_sel-count);
+  --_count-text: var(--_sel-count-text);
+  --_shadow: var(--_sel-shadow);
 
   font: var(--type-body-lg-bold);
 }
@@ -329,6 +399,7 @@
 .bland-sidebar__item[aria-current="page"][aria-disabled="true"] {
   --_bg: var(--surface-300);
   --_count-bg: var(--surface-400);
+  --_shadow: none;
 }
 
 .bland-sidebar__icon,
@@ -354,7 +425,7 @@
 }
 
 .bland-sidebar__count {
-  --bland-radius: var(--rad-xs);
+  --bland-radius: var(--rad-sm); /* rad-xs until 2026-11-25 */
 
   display: inline-flex;
   flex: none;
@@ -414,7 +485,7 @@
 /* ---- Collapse and expand: a row-sized button, its icon lined up with the rows'; expand mirrors it ---- */
 
 .bland-sidebar__toggle {
-  --bland-radius: var(--rad-sm);
+  --bland-radius: var(--rad-md);
 
   display: flex;
   flex: none;
@@ -502,7 +573,7 @@
 }
 
 .bland-sidebar[data-instant] :is(.bland-sidebar__item, .bland-sidebar__toggle) {
-  transition-property: background-color, color;
+  transition-property: background-color, box-shadow, color;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -517,7 +588,7 @@
 
   .bland-sidebar__item,
   .bland-sidebar__toggle {
-    transition-property: background-color, color;
+    transition-property: background-color, box-shadow, color;
   }
 
   /* Opacity only: no blur, no height easing. */

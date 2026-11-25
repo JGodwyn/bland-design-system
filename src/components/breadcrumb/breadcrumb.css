@@ -20,38 +20,75 @@
  * The separator sits outside the link, in the item, and is decorative (Icon is aria-hidden).
  */
 
+/*
+ * Size (Godwin 2026-11-25), Link's steps: lg (default) body-lg, icons icon/md, control/xs high; md body-md, icon/sm;
+ * sm body-sm, icon/xs. md and sm put space-xs between crumbs and hug their line height. The separator stays icon/xs.
+ */
+.bland-breadcrumb {
+  --_type: var(--type-body-lg);
+  --_type-spacing: var(--type-body-lg-letter-spacing);
+  --_type-bold: var(--type-body-lg-bold);
+  --_icon: var(--icon-md);
+  --_gap: var(--space-sm);
+  --_crumb-gap: var(--space-xs);
+  --_overflow-pad: var(--space-xs);
+  --_height: var(--control-xs);
+}
+
+.bland-breadcrumb[data-size="md"] {
+  --_type: var(--type-body-md);
+  --_type-spacing: var(--type-body-md-letter-spacing);
+  --_type-bold: var(--type-body-md-bold);
+  --_icon: var(--icon-sm);
+  --_gap: var(--space-xs);
+  --_crumb-gap: var(--space-2xs);
+  --_overflow-pad: var(--space-2xs);
+  --_height: auto;
+}
+
+.bland-breadcrumb[data-size="sm"] {
+  --_type: var(--type-body-sm);
+  --_type-spacing: var(--type-body-sm-letter-spacing);
+  --_type-bold: var(--type-body-sm-bold);
+  --_icon: var(--icon-xs);
+  --_gap: var(--space-xs);
+  --_crumb-gap: var(--space-2xs);
+  --_overflow-pad: var(--space-2xs);
+  --_height: auto;
+}
+
 .bland-breadcrumb__list {
   display: flex;
   flex-wrap: wrap; /* Figma does not wrap; in code a long trail wraps rather than overflow the page */
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--_gap);
   margin: var(--space-none);
   padding: var(--space-none);
   list-style: none;
 }
 
-/* One _Breadcrumb Base: the crumb, then the separator, space-sm apart, control/xs high. */
+/* One _Breadcrumb Base: the crumb, then the separator, space-sm apart (md, sm space-xs), control/xs high on lg. */
 .bland-breadcrumb__item {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-sm);
-  height: var(--control-xs);
+  gap: var(--_gap);
+  height: var(--_height);
 }
 
 .bland-breadcrumb__crumb {
-  --bland-icon-size: var(--icon-md);
+  --bland-icon-size: var(--_icon);
   --bland-radius: var(--rad-sm); /* drawn by .bland-smooth */
 
   display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
-  height: var(--control-xs);
+  gap: var(--_crumb-gap);
+  height: var(--_height);
   margin: var(--space-none);
   padding: var(--space-none) var(--space-2xs);
   border: none;
   background-color: transparent;
-  font: var(--type-body-lg);
-  letter-spacing: var(--type-body-lg-letter-spacing);
+  font: var(--_type);
+  letter-spacing: var(--_type-spacing);
   white-space: nowrap;
 }
 
@@ -81,7 +118,7 @@
 
 .bland-breadcrumb__current {
   color: var(--text-bold);
-  font: var(--type-body-lg-bold);
+  font: var(--_type-bold);
 }
 
 .bland-breadcrumb__current .bland-breadcrumb__icon {
@@ -91,7 +128,7 @@
 /* ---- Overflow: stands in for the collapsed middle ---- */
 
 .bland-breadcrumb__overflow {
-  padding-inline: var(--space-xs);
+  padding-inline: var(--_overflow-pad);
   color: var(--text-link);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -101,6 +138,11 @@
   .bland-breadcrumb__overflow:hover {
     background-color: var(--breadcrumb-surface-hover);
   }
+}
+
+/* The sm ring is stroke-sm, as Link's sm (Godwin 2026-11-21). */
+.bland-breadcrumb[data-size="sm"] .bland-breadcrumb__crumb.bland-focus-ring:focus-visible {
+  outline-width: var(--stroke-sm);
 }
 
 /* ---- Separator: CaretRight, icon/xs, decorative ---- */

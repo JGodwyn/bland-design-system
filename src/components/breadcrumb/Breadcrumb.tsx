@@ -42,6 +42,8 @@ export interface BreadcrumbProps extends HTMLAttributes<HTMLElement> {
   renderLink?: (props: BreadcrumbLinkProps, item: BreadcrumbItem) => ReactNode;
   /** Accessible name of the overflow crumb. */
   overflowLabel?: string;
+  /** Crumb size, as Link's: lg (default) body-lg with icon/md icons, md body-md, sm body-sm. */
+  size?: 'sm' | 'md' | 'lg';
 }
 
 // Link's look (color, underline, focus ring) through its class alone, so a router's link that keeps only
@@ -55,6 +57,7 @@ export function Breadcrumb({
   maxItems,
   renderLink = defaultLink,
   overflowLabel = 'Show hidden pages',
+  size = 'lg',
   className,
   'aria-label': ariaLabel = 'Breadcrumb',
   ...rest
@@ -107,7 +110,7 @@ export function Breadcrumb({
   };
 
   return (
-    <nav {...rest} aria-label={ariaLabel} className={`bland-breadcrumb${className ? ` ${className}` : ''}`}>
+    <nav {...rest} aria-label={ariaLabel} data-size={size} className={`bland-breadcrumb${className ? ` ${className}` : ''}`}>
       <ol className="bland-breadcrumb__list">
         {collapsed ? (
           <>

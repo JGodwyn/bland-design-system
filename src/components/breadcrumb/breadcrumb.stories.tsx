@@ -23,12 +23,13 @@ export default {
     'List `items` from the top level down. The last one is the current page and isn\'t a link.',
     'Set `maxItems` for deep trails: Bland keeps the first item and the last two, and folds the rest into a menu.',
     'Pass `renderLink` to render your router\'s link component.',
+    'Pick a `size` to match the text around it: `lg` (default) beside a page title, `md` or `sm` in denser layouts.',
     'Don\'t use it on flat sites, or as a page\'s only navigation.',
   ],
   components: ['Breadcrumb'],
   demo: {
     component: 'Breadcrumb',
-    args: { crumbs: '4', maxItems: 'none' },
+    args: { size: 'lg', crumbs: '4', maxItems: 'none' },
     controls: {
       crumbs: { kind: 'select', options: ['2', '3', '4', '5', '6', '7'] },
       maxItems: { kind: 'select', options: ['none', '4', '5', '6'] },
@@ -36,10 +37,10 @@ export default {
       renderLink: false,
       overflowLabel: false,
     },
-    render: ({ crumbs, maxItems }) => (
-      <Breadcrumb key={`${crumbs}-${maxItems}`} {...prevent} items={trail(Number(crumbs))} maxItems={maxItems === 'none' ? undefined : Number(maxItems)} />
+    render: ({ size, crumbs, maxItems }) => (
+      <Breadcrumb key={`${crumbs}-${maxItems}`} {...prevent} size={size as 'sm' | 'md' | 'lg'} items={trail(Number(crumbs))} maxItems={maxItems === 'none' ? undefined : Number(maxItems)} />
     ),
-    code: ({ crumbs, maxItems }) => ({ items: trail(Number(crumbs)), maxItems: maxItems === 'none' ? undefined : Number(maxItems) }),
+    code: ({ size, crumbs, maxItems }) => ({ size, items: trail(Number(crumbs)), maxItems: maxItems === 'none' ? undefined : Number(maxItems) }),
   },
   render: () => (
     <>
@@ -47,6 +48,20 @@ export default {
         <span className="pg-label">2 to 7 <code>items</code>; the last is the current page</span>
         {[2, 3, 4, 5, 6, 7].map((n) => (
           <Breadcrumb key={n} {...prevent} aria-label={`Breadcrumb ${n}`} items={trail(n)} />
+        ))}
+      </div>
+      <div className="pg-stack">
+        <span className="pg-label"><code>size</code>: <code>lg</code> (default), <code>md</code>, <code>sm</code></span>
+        {(['lg', 'md', 'sm'] as const).map((size) => (
+          <Breadcrumb
+            key={size}
+            {...prevent}
+            size={size}
+            data-testid={`size-${size}`}
+            aria-label={`Breadcrumb ${size}`}
+            maxItems={4}
+            items={[{ label: 'Home', href: '#/', icon: <HouseIcon /> }, ...trail(7).slice(1)]}
+          />
         ))}
       </div>
       <div className="pg-stack">

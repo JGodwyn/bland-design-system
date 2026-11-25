@@ -30,12 +30,13 @@ export default {
   usage: [
     'Pass `steps` and the `current` step\'s index; the steps before it show as done. Set `current` to `steps.length` when every step is done.',
     '`layout` and `style` set how the steps are drawn. `fill` stretches them across the container.',
+    '`orientation="vertical"` stacks the steps top to bottom (a checkout or onboarding list down the side of a page); `auto` is vertical on phones and horizontal from 768px.',
     'Keep step titles to a word or two.',
   ],
   components: ['ProgressWizard'],
   demo: {
     component: 'ProgressWizard',
-    args: { steps: 4, current: 1, description: true, layout: 'inline', style: 'bar', disabled: false },
+    args: { steps: 4, current: 1, description: true, orientation: 'horizontal', layout: 'inline', style: 'bar', disabled: false },
     controls: {
       steps: { kind: 'select', options: ['2', '3', '4', '5'] },
       current: { kind: 'select', options: ['0', '1', '2', '3', '4', '5'] },
@@ -114,6 +115,47 @@ export default {
           current={0}
           aria-label="Long title"
         />
+      </div>
+
+      <div className="pg-stack">
+        <span className="pg-label"><code>orientation="vertical"</code>: <code>bar</code> and <code>connector</code>, then disabled and every step done</span>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3xl)', alignItems: 'flex-start' }}>
+          {styles.map((style) => (
+            <div key={style} style={{ width: 256 }}>
+              <ProgressWizard orientation="vertical" style={style} steps={fiveSteps} current={1} aria-label={`Vertical ${style}`} />
+            </div>
+          ))}
+          <div style={{ width: 256 }}>
+            <ProgressWizard orientation="vertical" style="connector" steps={stepsOf(3)} current={1} disabled aria-label="Vertical disabled" />
+          </div>
+          <div style={{ width: 256 }}>
+            <ProgressWizard orientation="vertical" style="connector" steps={stepsOf(3)} current={3} aria-label="Vertical complete" />
+          </div>
+        </div>
+      </div>
+
+      <div className="pg-stack">
+        <span className="pg-label">Vertical titles and descriptions wrap; the marker stays on the title's first line</span>
+        <div style={{ width: 200 }}>
+          <ProgressWizard
+            orientation="vertical"
+            style="connector"
+            steps={[
+              { title: 'Billing and shipping address', description: 'Where we send the invoice and the parcel' },
+              { title: 'Payment' },
+              { title: 'Review' },
+            ]}
+            current={0}
+            aria-label="Vertical long title"
+          />
+        </div>
+      </div>
+
+      <div className="pg-stack">
+        <span className="pg-label"><code>orientation="auto"</code>: vertical below 768px, horizontal from there (resize the window)</span>
+        <ProgressWizard orientation="auto" style="connector" layout="centered" steps={stepsOf(4)} current={1} aria-label="Auto wizard (centered)" />
+        <ProgressWizard orientation="auto" style="connector" steps={stepsOf(4)} current={1} aria-label="Auto wizard (inline)" />
+        <ProgressWizard orientation="auto" style="bar" layout="stacked" steps={stepsOf(4)} current={1} aria-label="Auto wizard (stacked, bar)" />
       </div>
 
       <div className="pg-stack">

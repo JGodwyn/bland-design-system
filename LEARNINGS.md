@@ -1061,3 +1061,11 @@ shell never produces. Also: don't point two Playwright runs at one log file.
 - Symptom: the four new `Brand/Alpha/AlphaDeep*`/`AlphaPale*` primitives showed in a library search, while every other primitive stayed hidden.
 - Cause: a hidden collection alone doesn't hide its variables from pickers; every older primitive has `scopes = []`, and the new ones were created with `['FRAME_FILL', 'SHAPE_FILL']`.
 - Rule: a new primitive gets `scopes = []`; only Theme and scale tokens get real scopes. (Scopes are not in the drift records, so the repo can't catch this.)
+
+## Cloned variants lose their property links (2026-11-25)
+
+- **Symptom:** variants made with `variant.clone()` + `set.appendChild()` looked right, but toggling `👀 Icon` on an instance of a clone did nothing (Breadcrumb md/sm).
+- **Cause:** the clone's layers came without `componentPropertyReferences` (visible, characters, mainComponent links to the set's properties).
+- **Rule:** after cloning variants inside a set, copy `componentPropertyReferences` from each original to its clone by walking both trees in step, and test one boolean on an instance before calling it done.
+
+- **Figma: `setBoundVariable(field, null)` unbinds but keeps the value** (2026-11-25, Progress wizard). Unbinding `minWidth` left a 24px minimum that made a column wider than its marker. Cause: unbinding only drops the variable. Rule: to clear a min/max size, set the property itself to `null` (`node.minWidth = null`). Also: moving a node into another parent inside a variant drops its `componentPropertyReferences`; check and set them again.

@@ -81,7 +81,7 @@ const prevent = { onClick: (e: { preventDefault(): void }) => e.preventDefault()
 /** A page-wide box: one sidebar per row, so collapsing one never moves another. Never narrower than the sidebar, so on a phone the demo scrolls instead of clipping it. */
 function Frame({ children, height = 'var(--sidebar-height)', width = '100%' }: { children: ReactNode; height?: string; width?: string }) {
   // At least as wide as the full sidebar beside the page's padding, so a rail's peek fits inside the frame.
-  const style: CSSProperties = { display: 'flex', height, width, minWidth: 'calc(var(--sidebar-width) + var(--space-xl) * 2)', boxShadow: 'inset 0 0 0 var(--stroke-sm) var(--border-subtle)', overflow: 'hidden' };
+  const style: CSSProperties = { display: 'flex', height, width, background: 'var(--surface-100)', minWidth: 'calc(var(--sidebar-width) + var(--space-xl) * 2)', boxShadow: 'inset 0 0 0 var(--stroke-sm) var(--border-subtle)', overflow: 'hidden' };
   return (
     <div style={style} {...prevent}>
       {children}
@@ -123,6 +123,7 @@ export default {
     'The open rail draws past its own box, over the page: keep the space beside the rail free of `overflow: hidden` up to the full sidebar width, or the peek is cut off.',
     'Put the logo or workspace switcher in `top`, and the account or settings in `bottom`.',
     'For the rail, pass `top` as a function of `{ rail }` and return a logo mark when `rail` is true. A plain logo has no rail version, so the rail shows the expand button instead.',
+    'Set `selectedStyle="raised"` for a white current row instead of the brand tint, `floating` to float the panel off the screen edges, and `border={false}` on a gray page.',
     'On mobile, hide it and use TabBar.',
   ],
   components: ['Sidebar'],
@@ -130,7 +131,7 @@ export default {
     component: 'Sidebar',
     // Room for the whole sidebar (sidebar/height) and the stage's padding.
     height: 736,
-    args: { size: 'sm', defaultCurrent: 'home', defaultMinimized: false, collapsible: true, slots: true },
+    args: { size: 'sm', selectedStyle: 'brand', floating: false, border: true, defaultCurrent: 'home', defaultMinimized: false, collapsible: true, slots: true },
     controls: {
       defaultCurrent: { kind: 'select', options: ['home', 'inbox', 'search', 'website', 'mobile', 'brand', 'calendar', 'team', 'settings'] },
       slots: { kind: 'boolean' },
@@ -217,6 +218,28 @@ export default {
               items={items.slice(0, 6)}
               current="reports"
             />
+          </Frame>
+        </div>
+      </div>
+      <div className="pg-stack">
+        <span className="pg-label"><code>selectedStyle="raised"</code>: a white current row with a small shadow (one step above the panel in dark); with <code>border={'{false}'}</code> on the right</span>
+        <div className="pg-stack">
+          <Frame height="var(--sidebar-height)">
+            <Sidebar aria-label="Raised" data-testid="raised" size="md" items={items} selectedStyle="raised" defaultCurrent="inbox" collapsible />
+          </Frame>
+          <Frame height="var(--sidebar-height)">
+            <Sidebar aria-label="Raised, no border" size="md" items={items} selectedStyle="raised" border={false} defaultCurrent="mobile" />
+          </Frame>
+        </div>
+      </div>
+      <div className="pg-stack">
+        <span className="pg-label"><code>floating</code>: space-sm from the edges, rounded, bordered all round; minimized, the rail floats too and its peek lifts over the page</span>
+        <div className="pg-stack">
+          <Frame height="var(--sidebar-height)">
+            <Sidebar aria-label="Floating" data-testid="floating" size="md" items={items} floating selectedStyle="raised" collapsible top={({ rail }) => <Logo rail={rail} />} />
+          </Frame>
+          <Frame height="var(--sidebar-height)">
+            <Sidebar aria-label="Floating rail" data-testid="floating-rail" size="md" items={items} floating defaultMinimized collapsible />
           </Frame>
         </div>
       </div>

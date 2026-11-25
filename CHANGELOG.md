@@ -2,6 +2,18 @@
 
 Bland follows [semantic versioning](https://semver.org). Until 1.0, a minor version (0.2.0) may change an API or a token name; a patch (0.1.1) never does. Each entry says what a project has to change, if anything.
 
+## 0.4.0 (2026-11-25)
+
+- **Removed: Modal `top`** (deprecated in 0.3.0). What to change: put that content in `children`; for something above the text, leave `description` out and put both in `children`.
+
+- **Buttons: tighter on the icon side.** A Button's side that holds an icon or the loading spinner now has one step less padding than a bare side: 24px on `lg` (32 bare), 12px on `md` (16), 8px on `sm` (12), 4px on `xs` (8). Buttons with icons get a little narrower. Icon Button is unchanged.
+- **xs buttons: rounder, lighter icons.** `size="xs"` Buttons and Icon Buttons use `--rad-md` corners like the other sizes (they used `--rad-sm`), and stroked icons in them draw at 1px (`--stroke-sm`). This includes the close buttons of Banner, Notification and Modal.
+- **Progress Wizard: vertical.** New `orientation` prop: `vertical` stacks the steps top to bottom (a checkout or onboarding list down the side of a page), the marker beside the text on the title's first line, a line (connector) or bar running down between steps; it fills its container's width and its titles wrap. `auto` is vertical below 768px and horizontal from there, in CSS only. The default stays `horizontal`, so existing wizards don't change.
+- **Sidebar: raised selected style, floating, border.** New `selectedStyle="raised"`: the current row is white with a small shadow instead of the brand tint (in dark, one step above the panel). New `floating`: the panel sits 8px from the top, bottom and start edges, rounded (`--rad-lg`) with its border all round; the sidebar's own box grows by those 8px. New `border` (default `true`): `border={false}` drops the panel's edge, for a gray page. Rows and the collapse button are rounder (`--rad-md`, was `--rad-sm`), count boxes `--rad-sm` (was `--rad-xs`). The minimized rail's hover peek now casts `--elevation-neutral-mid` over the page. New tokens `--sidebar-surface-selected-raised` and `--sidebar-count-selected-raised`.
+- **Breadcrumb: sizes.** New `size`: `lg` (default, unchanged), `md` (14px text, 16px icons) and `sm` (12px text, 12px icons), the same steps as Link.
+- **File Upload: regular-weight title.** The title above the drop zone is `--type-body-lg` (was `--type-body-lg-bold`).
+- Nothing else to change in a project.
+
 ## 0.3.4 (2026-11-23)
 
 - **Agent skill:** says the see-through fills carry a faint brand hue on purpose (Brand 950 / 50), so an agent doesn't swap them for a gray.

@@ -13,16 +13,87 @@
  *         <span class="bland-progress-wizard__title">…</span>           (inline connector: in a title-row with the line)
  *         <span class="bland-progress-wizard__description">…</span>
  *
+ * Orientation (data-orientation): vertical stacks the steps top to bottom, the marker beside the text; the
+ * inline connector marker-wrap then also holds a line running down (data-axis="y"). auto is vertical below
+ * breakpoint/md and horizontal from there. Vertical values are the --_v-* properties below; each rule reads
+ * its horizontal value as the var() fallback, and auto resets them to initial from md, so the rules are
+ * written once.
+ *
  * Colors: each step names its reached color (--_reached, brand or checked-disabled) and its marker
  * colors from data-progress and data-disabled; bars and lines read --_reached or the track.
  */
 
 .bland-progress-wizard {
   display: flex;
+  flex-direction: var(--_v-direction, row);
   margin: var(--space-none);
   padding: var(--space-none);
   list-style: none;
   letter-spacing: var(--type-body-lg-letter-spacing);
+}
+
+/* ---- Orientation: vertical values; auto is vertical below breakpoint/md (mobile first) ---- */
+
+.bland-progress-wizard:is([data-orientation="vertical"], [data-orientation="auto"]) {
+  --_v-direction: column;
+  --_v-step-direction: row;
+  --_v-step-align: stretch;
+  --_v-text-align: start;
+  --_v-text-flex: 1;
+  --_v-text-inline: var(--space-none);
+  --_v-step-width: auto;
+  --_v-connector-pad: var(--space-none);
+  --_v-bar-x: var(--stroke-lg);
+  --_v-bar-y: var(--space-none);
+  --_v-rail-direction: column;
+  --_v-rail-align: center;
+  --_v-rail-gap: var(--space-xs);
+  --_v-rail-self: stretch;
+  --_v-rail-pad: var(--space-2xs);
+  --_v-start-line: none;
+  --_v-hidden-line: none;
+  --_v-line-width: var(--stroke-lg);
+  --_v-line-height: auto;
+  --_v-line-end: var(--space-2xs);
+  --_v-y-line: block;
+  --_v-title-connector: none;
+  --_v-title-wrap: normal;
+  --_v-text-pad: var(--space-xl);
+}
+
+/* The bar runs down the start edge, so it sits on the right in a right-to-left page. */
+.bland-progress-wizard:is([data-orientation="vertical"], [data-orientation="auto"]):dir(rtl) {
+  --_v-bar-x: calc(var(--stroke-lg) * -1);
+}
+
+@media (min-width: 768px) {
+  .bland-progress-wizard[data-orientation="auto"],
+  .bland-progress-wizard[data-orientation="auto"]:dir(rtl) {
+    --_v-direction: initial;
+    --_v-step-direction: initial;
+    --_v-step-align: initial;
+    --_v-text-align: initial;
+    --_v-text-flex: initial;
+    --_v-text-inline: initial;
+    --_v-step-width: initial;
+    --_v-connector-pad: initial;
+    --_v-bar-x: initial;
+    --_v-bar-y: initial;
+    --_v-rail-direction: initial;
+    --_v-rail-align: initial;
+    --_v-rail-gap: initial;
+    --_v-rail-self: initial;
+    --_v-rail-pad: initial;
+    --_v-start-line: initial;
+    --_v-hidden-line: initial;
+    --_v-line-width: initial;
+    --_v-line-height: initial;
+    --_v-line-end: initial;
+    --_v-y-line: initial;
+    --_v-title-connector: initial;
+    --_v-title-wrap: initial;
+    --_v-text-pad: initial;
+  }
 }
 
 /* ---- Step: one per progress/step-width, shrinking to share a narrow row ---- */
@@ -40,7 +111,7 @@
   flex: 0 1 auto;
   gap: var(--space-sm);
   /* A width, not a flex-basis, so a wizard in a shrink-to-fit container still measures 152 a step. */
-  width: var(--progress-step-width);
+  width: var(--_v-step-width, var(--progress-step-width));
   min-width: var(--space-none);
   padding: var(--space-sm);
 }
@@ -83,29 +154,40 @@
 /* ---- Style: bar is a stroke-lg inside stroke on top; connector moves the padding to the markers ---- */
 
 .bland-progress-wizard[data-style="bar"] .bland-progress-wizard__step {
-  box-shadow: inset var(--space-none) var(--stroke-lg) var(--space-none) var(--space-none) var(--_bar);
+  box-shadow: inset var(--_v-bar-x, var(--space-none)) var(--_v-bar-y, var(--stroke-lg)) var(--space-none) var(--space-none) var(--_bar);
 }
 
 .bland-progress-wizard[data-style="connector"] .bland-progress-wizard__step {
+  padding-block: var(--_v-connector-pad, var(--space-sm));
   padding-inline: var(--space-none);
+}
+
+/* Vertical connector: space-xl under each step's text but the last, which the line runs beside. */
+.bland-progress-wizard[data-style="connector"] .bland-progress-wizard__step:not(:last-child) .bland-progress-wizard__text {
+  padding-bottom: var(--_v-text-pad, var(--space-none));
 }
 
 /* ---- Layout ---- */
 
 .bland-progress-wizard[data-layout="centered"] .bland-progress-wizard__step {
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+  flex-direction: var(--_v-step-direction, column);
+  align-items: var(--_v-step-align, center);
+  text-align: var(--_v-text-align, center);
 }
 
 .bland-progress-wizard[data-layout="stacked"] .bland-progress-wizard__step {
-  flex-direction: column;
+  flex-direction: var(--_v-step-direction, column);
 }
 
-/* Inline: the marker centres on the title's first line. */
+/* Inline: the marker centres on the title's first line. Vertical: a column, the marker over its line. */
 .bland-progress-wizard__marker-wrap {
   display: flex;
   flex: none;
+  flex-direction: var(--_v-rail-direction, row);
+  gap: var(--_v-rail-gap, var(--space-none));
+  align-items: var(--_v-rail-align, normal);
+  align-self: var(--_v-rail-self, auto);
+  padding-top: var(--_v-rail-pad, var(--space-none));
 }
 
 .bland-progress-wizard[data-layout="inline"] .bland-progress-wizard__marker-wrap {
@@ -114,12 +196,16 @@
 
 .bland-progress-wizard__marker-row {
   display: flex;
+  flex-direction: var(--_v-rail-direction, row);
+  gap: var(--_v-rail-gap, var(--space-none));
   align-items: center;
   align-self: stretch;
+  padding-top: var(--_v-rail-pad, var(--space-none));
 }
 
 .bland-progress-wizard__text {
   display: flex;
+  flex: var(--_v-text-flex, 0 1 auto);
   flex-direction: column;
   min-width: var(--space-none);
 }
@@ -133,11 +219,11 @@
 }
 
 .bland-progress-wizard[data-style="connector"][data-layout="centered"] .bland-progress-wizard__text {
-  padding-inline: var(--space-sm);
+  padding-inline: var(--_v-text-inline, var(--space-sm));
 }
 
 .bland-progress-wizard[data-style="connector"][data-layout="stacked"] .bland-progress-wizard__text {
-  padding-inline-end: var(--space-sm);
+  padding-inline-end: var(--_v-text-inline, var(--space-sm));
 }
 
 /* ---- Marker: progress/marker circle; done holds a check, current a dot ---- */
@@ -172,16 +258,32 @@
 
 .bland-progress-wizard__line {
   flex: 1;
-  height: var(--stroke-lg);
+  width: var(--_v-line-width, auto);
+  height: var(--_v-line-height, var(--stroke-lg));
   background-color: var(--progress-track);
+}
+
+/* Vertical: the line stops space-xs above the next marker (with that marker's space-2xs offset). */
+.bland-progress-wizard__line[data-side="end"] {
+  margin-bottom: var(--_v-line-end, var(--space-none));
+}
+
+.bland-progress-wizard__line[data-side="start"] {
+  display: var(--_v-start-line, block);
+}
+
+/* The inline connector's line down, drawn only while vertical. */
+.bland-progress-wizard__line[data-axis="y"] {
+  display: var(--_v-y-line, none);
 }
 
 .bland-progress-wizard__line[data-reached] {
   background-color: var(--_reached);
 }
 
-/* A first step keeps an invisible start line so its marker stays centred. */
+/* A first step keeps an invisible start line so its marker stays centred (horizontal only). */
 .bland-progress-wizard__line[data-hidden] {
+  display: var(--_v-hidden-line, block);
   visibility: hidden;
 }
 
@@ -196,11 +298,11 @@
   min-width: var(--space-none);
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: var(--_v-title-wrap, nowrap);
 }
 
 .bland-progress-wizard__connector {
-  display: flex;
+  display: var(--_v-title-connector, flex);
   flex: 1;
   min-width: var(--space-xl);
   padding-inline-end: var(--space-sm);

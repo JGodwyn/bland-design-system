@@ -110,6 +110,18 @@ export interface SidebarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
   peekDelay?: number;
   /** How long, in ms, the open rail waits after the pointer leaves before it closes. Defaults to 300. */
   peekCloseDelay?: number;
+  /**
+   * The current row's look: `brand` (default) tints it with the brand color; `raised` is a white row lifted by a
+   * small shadow (one step above the panel in dark), for a calmer sidebar.
+   */
+  selectedStyle?: 'brand' | 'raised';
+  /**
+   * Floats the panel space-sm from the top, bottom and start edges, rounded, with its border all round. The
+   * sidebar takes that space too, so the page starts right after the panel.
+   */
+  floating?: boolean;
+  /** The panel's edge: the right side, or all round when `floating`. Defaults to true; turn it off on a gray page. */
+  border?: boolean;
   /** Accessible name of the collapse button. */
   collapseLabel?: string;
   /** Accessible name of the expand button. */
@@ -167,6 +179,9 @@ export function Sidebar({
   collapsible = false,
   peekDelay,
   peekCloseDelay,
+  selectedStyle = 'brand',
+  floating = false,
+  border = true,
   collapseLabel = 'Collapse sidebar',
   expandLabel = 'Expand sidebar',
   top,
@@ -360,6 +375,9 @@ export function Sidebar({
       {...rest}
       className={`bland-sidebar${className ? ` ${className}` : ''}`}
       data-size={size}
+      data-selected-style={selectedStyle}
+      data-floating={floating || undefined}
+      data-border={border ? undefined : 'none'}
       data-minimized={isMinimized || undefined}
       data-layout={rail ? 'rail' : 'full'}
       data-compact={compact || undefined}
@@ -394,7 +412,7 @@ export function Sidebar({
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
     >
-      <div className="bland-sidebar__panel">
+      <div className="bland-sidebar__panel bland-smooth">
         {(top !== undefined || collapsible) && (
           <div className="bland-sidebar__header">
             {topSlot !== undefined && <SlotFade className="bland-sidebar__top" slot={topSlot} rail={compact} instant={instant} />}

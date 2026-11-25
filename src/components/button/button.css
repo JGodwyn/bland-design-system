@@ -34,7 +34,10 @@
   max-width: 100%;
   height: var(--control-md);
   margin: var(--space-none);
-  padding: var(--space-none) var(--space-lg);
+  /* Side padding, and the tighter one on a side that holds an icon or spinner (set per size below). */
+  --_pad: var(--space-lg);
+  --_pad-icon: var(--space-md);
+  padding: var(--space-none) var(--_pad);
   border: none;
   --bland-radius: var(--rad-md); /* drawn by .bland-smooth */
   background-color: var(--_bg);
@@ -59,8 +62,10 @@
 .bland-button[data-size="lg"] {
   --bland-icon-size: var(--icon-lg);
 
+  --_pad: var(--space-2xl);
+  --_pad-icon: var(--space-xl);
+
   height: var(--control-lg);
-  padding-inline: var(--space-2xl);
 }
 
 .bland-button[data-size="md"] {
@@ -70,17 +75,39 @@
 .bland-button[data-size="sm"] {
   --bland-icon-size: var(--icon-md);
 
+  --_pad: var(--space-md);
+  --_pad-icon: var(--space-sm);
+
   height: var(--control-sm);
-  padding-inline: var(--space-md);
 }
 
+/* xs: rad-md corners like the other sizes (Godwin 2026-11-25; it was rad-sm). */
 .bland-button[data-size="xs"] {
   --bland-icon-size: var(--icon-xs);
+  --_pad: var(--space-sm);
+  --_pad-icon: var(--space-xs);
 
   height: var(--control-xs);
-  padding-inline: var(--space-sm);
-  --bland-radius: var(--rad-sm);
   font: var(--type-body-md-bold);
+}
+
+/* xs icons: stroked icons draw at stroke-sm (1) instead of stroke-md, so the 12px glyph stays light (Godwin 2026-11-25). */
+.bland-button[data-size="xs"] .bland-icon > svg[stroke]:not([stroke="none"]),
+.bland-button[data-size="xs"] .bland-icon > svg [stroke]:not([stroke="none"]) {
+  stroke-width: var(--stroke-sm);
+}
+
+/*
+ * Optical padding (Godwin 2026-11-25, code only: Figma cannot tie padding to a visible icon).
+ * The side that holds an icon or the loading spinner is one space step tighter than a bare side,
+ * because the glyph carries its own air: lg 24, md 12, sm 8, xs 4.
+ */
+.bland-button:not(.bland-icon-button):has(> :is(.bland-button__icon, .bland-button__spinner):first-child) {
+  padding-inline-start: var(--_pad-icon);
+}
+
+.bland-button:not(.bland-icon-button):has(> :is(.bland-button__icon, .bland-button__spinner):last-child) {
+  padding-inline-end: var(--_pad-icon);
 }
 
 /* Icon Button: a square, the icon centered. */

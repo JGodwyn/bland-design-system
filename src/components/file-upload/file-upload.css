@@ -47,7 +47,7 @@
 }
 
 .bland-file-upload__title {
-  font: var(--type-body-lg-bold);
+  font: var(--type-body-lg);
   color: var(--text-bold);
 }
 

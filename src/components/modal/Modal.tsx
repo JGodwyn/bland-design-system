@@ -58,11 +58,6 @@ export interface ModalProps extends Omit<DialogHTMLAttributes<HTMLDialogElement>
   titleDivider?: boolean;
   /** The body text, which also describes the dialog (`aria-describedby`). */
   description?: ReactNode;
-  /**
-   * @deprecated Since 0.3.0, removed in 0.4.0: Figma's body has one slot. Put the content in `children` (turn the
-   * description off and put both there for something above the text). Until then it still shows above the description.
-   */
-  top?: ReactNode;
   /** Any content under the description, such as a form or a list. */
   children?: ReactNode;
   /** `Alignment`: left, or center for short confirmations. */
@@ -90,8 +85,6 @@ export interface ModalProps extends Omit<DialogHTMLAttributes<HTMLDialogElement>
   ref?: Ref<HTMLDialogElement>;
 }
 
-let warnedTop = false;
-
 // The library builds without Node types; bundlers replace `process.env.NODE_ENV`.
 declare const process: { env: { NODE_ENV?: string } } | undefined;
 
@@ -101,15 +94,10 @@ declare const process: { env: { NODE_ENV?: string } } | undefined;
  * Focus moves to the dialog on open and back to the trigger on close; Escape closes it. Figma: Modals page,
  * set "Modal" with `_modal-title`, `_modal-body` and `_modal-action-bar`.
  */
-export function Modal({ size = 'sm', backdrop = 'subtle', top, className, ...rest }: ModalProps) {
-  if (top != null && !warnedTop && typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-    warnedTop = true;
-    console.warn('bland-ui: Modal `top` is deprecated and goes in 0.4.0. Put the content in `children`.');
-  }
+export function Modal({ size = 'sm', backdrop = 'subtle', className, ...rest }: ModalProps) {
   return (
     <DialogShell
       {...rest}
-      top={top}
       className={`bland-modal bland-smooth${className ? ` ${className}` : ''}`}
       data-size={size}
       data-backdrop={backdrop}
@@ -140,7 +128,6 @@ export function DialogShell({
   closeLabel = 'Close',
   titleDivider = false,
   description,
-  top,
   children,
   align = 'left',
   actions,
@@ -288,8 +275,7 @@ export function DialogShell({
             titleDivider={titleDivider}
             description={description}
             descriptionId={descriptionId}
-            top={top}
-            align={align}
+                  align={align}
             actions={actions}
             actionsAlign={actionsAlign}
             actionsOrientation={actionsOrientation}
@@ -311,7 +297,6 @@ type ModalContentProps = Pick<
   | 'closeLabel'
   | 'titleDivider'
   | 'description'
-  | 'top'
   | 'children'
   | 'align'
   | 'actions'
@@ -339,7 +324,6 @@ export function ModalContent({
   titleDivider,
   description,
   descriptionId,
-  top,
   children,
   align = 'left',
   actions,
@@ -391,10 +375,9 @@ export function ModalContent({
           )}
         </div>
       )}
-      {(description != null || top != null || children != null) && (
+      {(description != null || children != null) && (
         <ScrollArea className="bland-modal__scroll">
           <div ref={bodyRef} className="bland-modal__body" data-align={align}>
-            {top != null && <div className="bland-modal__slot">{top}</div>}
             {description != null && (
               <div id={descriptionId} className="bland-modal__description">
                 {description}

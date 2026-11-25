@@ -10,7 +10,6 @@
  *       </div>
  *       <div class="bland-scroll-area bland-modal__scroll">           scrolls past the screen height
  *         <div class="bland-modal__body" data-align="left">          _modal-body
- *           <div class="bland-modal__slot">…top</div>
  *           <div class="bland-modal__description">…</div>
  *           <div class="bland-modal__slot">…children</div>
  *         </div>

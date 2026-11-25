@@ -2760,3 +2760,44 @@ Godwin tried the landing page on his phone and sent a list of changes.
 
 - Godwin: the name in the footer's copyright, underlined, links to https://www.godwinjohn.com/. `FOOTER_LINKS.portfolio`; Bland's `Link` with `color="inherit"` (the copyright's text-subtle) and the default always-on underline; opens in the same tab, so no external arrow.
 - Footer spec checks the link and the full line; 14 passed in Chromium and WebKit; typecheck passes; checked in Chrome at 1440.
+
+### Sidebar and Breadcrumb update, Figma (2026-11-25, side session)
+
+- Read `_sidebar-item` (1077:3151), `_sidebar-item-group` (1078:9910), Sidebar (1084:13817), Breadcrumb (190:19992), `_Breadcrumb Base` (189:19389), their code and tokens. Found: rows rad-sm at every size; in dark `surface-raised` = `surface-200` = Neutral900, so a white-style selected row needs its own token. Proposal sent; Godwin: "go on with what you recommend" (Neutral800 + shadow in dark).
+- Variables: `Sidebar/surface-selected-raised` (VariableID:7467:364, Neutral0 / Neutral800) and `Sidebar/count-selected-raised` (7467:365, Neutral100 / Neutral700), scopes frame and shape fill, descriptions.
+- `_sidebar-item`: rad-md on rows and focus rings, rad-sm on counts; `Selected style=brand` added to every name; 24 raised clones of the Selected=true variants, placed below (set 1144 x 1536). First pass left the icon vectors on Sidebar/icon-selected (the paint swap missed them); rebound 32 vectors to Icon/icon-bold in a second pass.
+- Sidebar: frame stroke moved to an absolute `border` overlay (stretch constraints, inside stroke, right side stroke-sm), `👀 Border` boolean; collapse/expand rad-md; `Floating=false` prefixed, 12 Floating=true clones below (rad-lg, border all sides, hover variants Elevation/neutral/mid). Set 1144 x 4032.
+- `_Breadcrumb Base`: `Size=lg` prefixed; md and sm clones (heights unbound and hugging, text styles body-md/sm, icon icon/sm/xs, gaps, overflow padding, ring stroke-sm on sm). Breadcrumb: `Size=lg` prefixed, md and sm clones with space-xs gaps and nested `Size` set.
+- **Surprise:** variants cloned inside a set lost their `componentPropertyReferences` (the breadcrumb icon toggle did nothing on md/sm). Copied the references from each original to its clone by walking both trees: 112 links in `_sidebar-item`, 72 in Sidebar, 24 in `_Breadcrumb Base`. Logged in LEARNINGS.
+- Screenshots checked, light and dark: items on surface-200, Sidebars (docked, no border, floating, floating rail, floating peek), breadcrumbs at three sizes with icons, overflow and hover. Temp frames removed. Sidebar page content frame restacked (gap 72, 6340 high) and the Breadcrumbs one (1564); descriptions updated on all four sets.
+- Not done: the token sync and the component code (when Godwin asks).
+
+### Buttons: xs corners, xs icon stroke, optical padding (2026-11-25)
+
+- Godwin: xs rad-md, stroke-sm icons, less padding on the icon side, and "reduce the gap to 4? in code it looks good". Measured first: Figma and code agree on everything asked (gap space-sm 8, xs rad-sm, icons stroke-md, padding 8/12/16/32). The gap looks different only because Figma's default Placeholder glyph fills its 20 box while Bland's icons sit on a 32 grid with ~3px of air.
+- Godwin's answers (question card): rad-md for xs in Figma and code; stroke-sm on xs icons only; one step less padding on the icon side (code only); gap unchanged.
+- Figma: 128 xs variants, root, Base and focus-ring corners bound to rad-md (384 nodes); 130 icon vectors in xs variants bound to stroke-sm (Spinner left). Set descriptions got the xs stroke note and the code-only padding rule. Screenshot of xs and sm in all types checked.
+- Code: `--_pad` / `--_pad-icon` per size, `:has(> :is(.bland-button__icon, .bland-button__spinner):first-child | :last-child)` sets the inline start or end, `:not(.bland-icon-button)`; xs radius from the base rad-md; xs icon stroke rule. Chrome at localhost:5180: md icon side 12 / bare 16, lg 24/32, sm 8/12, xs 4/8, loading start and end follow the spinner, Icon Buttons 0, xs icons 1px.
+- Screenshots: only button light and dark moved past tolerance; re-baselined those.
+
+- Tests: lint and typecheck clean; `npm test` 1537 passed, 2 WebKit timing specs (Sidebar hover intent, What you get glide) failed and passed on rerun.
+
+### Progress wizard: vertical (2026-11-25, side session)
+
+- Read the Progress-wizard (813:46129) and `_progress-wizard-item` (812:45358) sets and descriptions, the code, INTERFACE.md's Progress section. Proposed `orientation` horizontal/vertical/auto, connector down / bar on the start edge, first-line marker, no content slot, auto opt-in. Godwin: "Yes, go ahead".
+- Figma: 12 vertical item variants cloned from the inline ones (bar: stroke moved top to left; connector: icon-wrap a column with the line FILL down, title out of title-row and wrapping, text space-xl bottom padding, width progress/width), `Orientation=horizontal` added to the rest. 8 wizard variants (inline, Style x Steps) cloned, set vertical, instances swapped, last connector step's text padding space-none.
+- Surprises: the moved line lost its `👀 Connector ( R )` reference (put it on the connector frame instead) and switching the instances reset the boolean (set again); `setBoundVariable('minWidth', null)` unbinds but keeps 24, so the marker column was 24 wide and the last marker jumped 2px (set `minWidth = null`). Screenshots checked; descriptions updated.
+- Code: `orientation` prop (vertical forces inline, drops fill), a `line[data-axis="y"]` in the inline connector marker-wrap; CSS vertical values as `--_v-*` properties read as var() fallbacks, reset to `initial` for auto from 768. Stories for vertical, wrapping titles, auto.
+- Tests: three new behaviour specs (stacking and first-line marker, bar edge and lines down, auto at 1024 and 390); new story names first clashed with old `getByRole` names (substring match: "All done", "centered connector"), renamed. Progress-wizard spec 20 passed in Chromium and WebKit (Firefox doesn't start on macOS 27), axe passed, progress-wizard screenshots re-baselined (old sections unchanged), lint and typecheck clean.
+- Follow-up: as the Sidebar session found, the 12 cloned item variants had also lost their title and description property links. Restored them (24 text layers) and checked on an instance: Title, Description and Connector ( R ) toggles work.
+- Godwin: both peeks get the shadow, then build the code. Figma: Elevation/neutral/mid on the four docked hover variants, Sidebar description updated.
+- Token sync by targeted records (the two new variables; Figma count 677 = 675 + 2): `result-0.json` written from them, the drift report showed exactly two added, `--apply`, `npm run tokens` (635 emitted), checksum 677 / `250b7a18`, equal in Figma and the repo.
+- Code: Sidebar `selectedStyle`, `floating`, `border`; rows and toggle rad-md, count rad-sm; peek shadow with the clip standing off by space-lg. Breadcrumb `size`. Stories: raised, raised without border, floating, floating rail; breadcrumb sizes. Typecheck and lint clean. Checked in Chrome (localhost:5180): raised light and dark, floating, floating rail and its peek (rounded, lifted), breadcrumb sizes.
+- CHANGELOG Unreleased, skill `using-components.md`, `docs/agent-skill.md`, CLAUDE.md rows.
+
+## 0.4.0 release: Modal `top` removed (2026-11-25)
+
+1. Removed `top` from `Modal.tsx` (prop, warning, `DialogShell` and `ModalContent` pass-through, the slot) and from Sheet's `Omit`; dropped the line from the `modal.css` structure comment.
+2. CHANGELOG: Unreleased became 0.4.0 with the removal on top. CLAUDE.md map row, `docs/agent-skill.md` and the skill's `using-components.md` updated. Version 0.4.0.
+3. Typecheck, lint, full Playwright suite and the package smoke test, then the Build Tracker, commit, tag `v0.4.0`, push.
+4. Godwin, mid-release: File Upload title to body-lg. Figma `_uploader` titles 607:201, 6208:901, 6208:916, 608:222 set to Body/body-lg; `.bland-file-upload__title` font changed; CHANGELOG line under 0.4.0; file-upload screenshots re-baselined.

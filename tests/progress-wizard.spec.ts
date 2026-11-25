@@ -78,3 +78,68 @@ test('a long inline connector title truncates with an ellipsis and leaves the li
   expect(line.width).toBeGreaterThanOrEqual(24);
   expect(line.x + line.width).toBeLessThanOrEqual((await step.boundingBox())!.x + 152 + 0.5);
 });
+
+test('vertical stacks the steps down its container, markers on the title\'s first line', async ({ page }) => {
+  for (const name of ['Vertical bar', 'Vertical connector']) {
+    const wizard = page.getByRole('list', { name });
+    const steps = await wizard.getByRole('listitem').evaluateAll((els) =>
+      els.map((e) => {
+        const step = e.getBoundingClientRect();
+        const marker = e.querySelector('.bland-progress-wizard__marker')!.getBoundingClientRect();
+        const title = e.querySelector('.bland-progress-wizard__title')!.getBoundingClientRect();
+        return { x: step.x, top: step.top, bottom: step.bottom, width: step.width, markerMid: marker.top + marker.height / 2, titleTop: title.top };
+      }),
+    );
+    expect(steps).toHaveLength(5);
+    for (const [i, s] of steps.entries()) {
+      expect(s.width).toBe(256); // fills its 256 wide container
+      expect(s.x).toBe(steps[0]!.x);
+      if (i > 0) expect(s.top).toBeGreaterThanOrEqual(steps[i - 1]!.bottom - 0.5);
+      // body-lg's 24 line: the 20 marker centres 12 below the title's top.
+      expect(Math.abs(s.markerMid - (s.titleTop + 12))).toBeLessThanOrEqual(0.5);
+    }
+  }
+});
+
+test('vertical bar runs down the start edge; vertical connector lines run down to the next marker', async ({ page }) => {
+  const bar = page.getByRole('list', { name: 'Vertical bar' }).getByRole('listitem').first();
+  expect(await bar.evaluate((e) => getComputedStyle(e).boxShadow)).toMatch(/2px 0px 0px 0px inset$/);
+
+  const wizard = page.getByRole('list', { name: 'Vertical connector' });
+  const lines = await wizard.locator('.bland-progress-wizard__line[data-axis="y"]').evaluateAll((els) =>
+    els.map((e) => {
+      const r = e.getBoundingClientRect();
+      return { width: r.width, height: r.height, color: getComputedStyle(e).backgroundColor };
+    }),
+  );
+  // One line under every step but the last, the horizontal title-row lines hidden.
+  expect(lines).toHaveLength(4);
+  expect(await wizard.locator('.bland-progress-wizard__connector').first().isVisible()).toBe(false);
+  for (const l of lines) {
+    expect(l.width).toBe(2);
+    expect(l.height).toBeGreaterThanOrEqual(24);
+  }
+  // Brand into the current step (step 2), track after it.
+  expect(lines[0]!.color).not.toBe(lines[1]!.color);
+  expect(lines.slice(1).every((l) => l.color === lines[1]!.color)).toBe(true);
+});
+
+test('auto is horizontal from breakpoint/md and vertical below it', async ({ page }) => {
+  const xs = async (name: string) =>
+    page.getByRole('list', { name }).getByRole('listitem').evaluateAll((els) => els.map((e) => e.getBoundingClientRect().x));
+  await page.setViewportSize({ width: 1024, height: 900 });
+  for (const name of ['Auto wizard (centered)', 'Auto wizard (inline)', 'Auto wizard (stacked, bar)']) {
+    const x = await xs(name);
+    expect(x[1]! - x[0]!).toBe(152);
+  }
+  await page.setViewportSize({ width: 390, height: 900 });
+  for (const name of ['Auto wizard (centered)', 'Auto wizard (inline)', 'Auto wizard (stacked, bar)']) {
+    const x = await xs(name);
+    expect(new Set(x).size).toBe(1);
+  }
+  // Below md the centered connector reads as vertical: no start lines, lines run down.
+  const centered = page.getByRole('list', { name: 'Auto wizard (centered)' });
+  expect(await centered.locator('.bland-progress-wizard__line[data-side="start"]').first().isVisible()).toBe(false);
+  const line = (await centered.locator('.bland-progress-wizard__line[data-side="end"]').first().boundingBox())!;
+  expect(line.width).toBe(2);
+});

@@ -257,6 +257,7 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   Brand800, Green900, Red900, Amber900. Light mode is unchanged.
 - Retuned in Figma 2026-10-25 (Godwin): every `Button/*-disabled` fill is lighter in light (#c4cad4, was #a8b0be) and darker in dark (#2b313b, was #576275), so disabled reads as receded in both themes; brand secondary rest, hover and pressed each moved one step brighter in dark only (#001b55, #002873, #003a9e). Token-only change, no CSS.
 - **Stroke buttons** (Godwin 2026-11-21): the edge weight steps with the size, `stroke-lg` (2) on lg and md, `stroke-md` (1.5) on sm (it was 2, "too big"), `stroke-sm` (1) on xs (Figma already drew xs at 1; code drew 2). `stroke-md`'s description now names sm stroke buttons beside the icons. The brand stroke hover and pressed fills are solid neutrals, Neutral50 / Neutral100 in light and Neutral900 / Neutral800 in dark (one step up from the darkest, as the 2026-10-20 rule): the brand stroke button is neutral at rest (border-bold, text-bold), so a blue tint on hover looked off. Solid, not the see-through `surface-field` values, because every Button fill is solid. Success, danger and warning keep their tints (their border and label are colored). Brand ghost is unchanged. In Figma the border now sits on each variant's root in every state, and the inner Base frame no longer repeats the hover or pressed fill, which had painted over the inside stroke so hover and pressed showed no border.
+- **xs corners, xs icon stroke, optical padding** (Godwin 2026-11-25): xs Buttons and Icon Buttons take rad-md like the other sizes (it was rad-sm; in Chromium the smoothed corner on a 24 tall box is near a pill, accepted). Stroked icons in xs buttons draw at stroke-sm (1); sm, md and lg keep stroke-md (Godwin chose xs only). In Figma the xs icon vectors are bound to stroke-sm; a swapped icon keeps its own stroke (the set description says to set it). The side of a Button holding an icon or the spinner is one space step tighter than a bare side (lg space-xl vs space-2xl, md space-md vs space-lg, sm space-sm vs space-md, xs space-xs vs space-sm), code only via `:has()` on the first or last child, since Figma cannot tie padding to a visible icon; Icon Button is excluded. The icon to label gap stays space-sm in both: code looked better than Figma only because real icons carry about 3px of air in their box, while Figma's Placeholder glyph fills it. The xs close buttons in Banner, Notification and Modal pick up the rounder hover and the 1px X.
 
 ### Indicator (2026-10-18)
 - `import { Indicator } from 'bland-ui'`. Props: `size` sm/md/lg/xl/2xl (default
@@ -818,6 +819,28 @@ Rules in `CLAUDE.md` and `docs/motion.md`. Decisions on top of them:
   `tests/a11y.spec.ts`, as it does for disabled fields.
 - Not interactive: nothing takes focus, so no Focused row. Circles skip
   `.bland-smooth`.
+
+### Progress-wizard vertical (2026-11-25)
+- Godwin asked for a vertical wizard (checkout or onboarding steps down the side of a page). Agreed proposal: **`orientation`**
+  horizontal (default) / vertical / auto, the name Banner, the groups and Modal's actions use, rather than a fourth `layout`.
+- **Vertical is always the inline layout** (marker beside the text, centred on the title's first line); `layout` and `fill`
+  are horizontal only and ignored when vertical. It fills its container's width (Figma's frame is `progress/width`),
+  titles wrap (the inline connector's ellipsis is horizontal only).
+- **Connector:** a `stroke-lg` line runs down from each marker to the next, `space-xs` clear of both (`space-xs` gap under the
+  marker; `space-2xs` at the line's end plus the next marker's `space-2xs` first-line offset). Each step's text but the
+  last has `space-xl` under it, so a line is at least that long. Brand once the step it leads into is reached, as horizontal.
+  Steps have no block padding. **Bar:** the 2px bar moves to the step's start edge (`:dir(rtl)` puts it on the right).
+- **`auto`** is vertical below `breakpoint/md` (768) and horizontal from there, CSS only (mobile first, as Modal's actions);
+  every layout and style switches, centered and stacked read as inline below md. Opt in: horizontal stays the default
+  so existing wizards don't change (Godwin).
+- **No content slot under the current step** (Godwin): the wizard stays a progress indicator; the page holds the form.
+- CSS: the vertical values are `--_v-*` custom properties set on the wizard for vertical and auto; every rule reads its
+  horizontal value as the `var()` fallback, and auto resets them to `initial` from md, so no rule is written twice.
+  The inline connector marker-wrap holds an extra `line[data-axis="y"]`, rendered for vertical and auto, shown only
+  while vertical; the title-row connector hides.
+- Figma: `Orientation` on `_progress-wizard-item` (12 vertical variants, Layout=inline only) and Progress-wizard
+  (8 vertical variants, Layout=inline, Style x Steps); `👀 Connector ( R )` is the line down (it hides the whole
+  connector frame); descriptions say so.
 
 ### Accordion (2026-10-19)
 - `import { Accordion } from 'bland-ui'`, folder `accordion/`. A native
@@ -2806,3 +2829,18 @@ Reverses "Code has no picker" (Font tester: six presets) and "Code keeps Geist M
 - Follow-up (Godwin 2026-11-23): in dark the sunken card matched the page, so the card gets a stroke-sm `border-subtle` edge in both themes (Figma's card too). "Your own font" sits space-xl further from the role cards (`.docs-font-own`). The four Deep/Pale primitives had picker scopes by mistake; now `[]` like every primitive.
 - Then (Godwin 2026-11-23): no border; the font card is `surface-alpha` instead (Figma's card too). It is a step off the page in both themes, so it shows in dark; the white List rows sit on it in light and read as a step deeper than it in dark, and the sample bar (also `surface-alpha`) shows as a second tint on top.
 - And (Godwin 2026-11-23): on the surface-alpha card the dark List rows (Neutral900) blurred into it, so in dark only the font rows step up to `surface-300` (hover and pressed `surface-400`), as the docs already do for the extra-color cards (a `:root[data-theme="dark"]` rule plus the system-dark media query). Light keeps the white List rows.
+
+### Sidebar and Breadcrumb update (2026-11-25)
+- **Godwin asked** for a white selected row, rounder rows, a floating Sidebar, a border switch and Breadcrumb sizes; he took Claude's proposal as is ("go on with what you recommend").
+- **Selected style** → `selectedStyle` `brand` (default, today's tint) / `raised`. Raised: `Sidebar/surface-selected-raised` (Neutral0 light, Neutral800 dark) with Elevation/neutral/near, label `text-bold` bold, icon `icon-bold`, count `Sidebar/count-selected-raised` (Neutral100 / Neutral700) with `text-subtle`; no hover change; selected disabled as brand's (surface-300). Not `surface-raised`: in dark it is Neutral900 like the surface-200 panel, so the row would vanish. Known trade-off (Godwin's pick): in dark the raised row has the hover row's fill (surface-300, Neutral800), told apart by the bold label and the shadow. Figma: `_sidebar-item` gains `Selected style` (brand on all 48, raised on the 24 Selected=true variants; 72).
+- **Radius:** rows, the collapse/expand button and their focus rings rad-sm → **rad-md** at every size; count box rad-xs → rad-sm. Reason: concentric with the floating panel (rad-lg less the space-sm list padding = 8). Watch sm (24 high): the smoothed curve is drawn at twice the radius, 16 against a half-height of 12, so it reads close to a pill in Chromium; check in code.
+- **Floating** → `floating`: placed space-sm from the screen's top, bottom and start edges (as Sheet's `floating`), corners rad-lg smoothed, stroke-sm `border-subtle` all round, no elevation in the layout; the hover peek adds Elevation/neutral/mid. The rail keeps item + space-sm each side, so icons don't move; the root's width grows by the inset. The peek's clip-path reveal needs `inset(… round rad-lg)` (plain rounding while it slides; corner-shape doesn't apply to clip-path). Figma: Sidebar `Floating` false/true (24 variants); the variant frame is still sidebar/width x sidebar/height, the inset is the designer's placement.
+- **Border** → `border`, default true: the right edge docked, all round floating; off for a gray page. Figma: the frame stroke moved to an absolute `border` overlay frame shown by `👀 Border` (a boolean can only toggle a layer).
+- **Breadcrumb sizes** → `size` lg (default, today's) / md / sm, Link's steps: text body-lg / body-md / body-sm (bold and underline alike), crumb icon icon/md / icon/sm / icon/xs, crumb-to-separator space-sm / space-xs / space-xs, icon-to-label space-xs / space-2xs / space-2xs, overflow padding space-xs / space-2xs / space-2xs, focus ring stroke-lg (stroke-sm on sm, as Link). lg keeps control/xs (24); md and sm hug their line height (20, 16). Separator icon/xs at every size; the overflow Menu stays sm. In code the crumbs can pass `data-size` to `.bland-link` and let link.css size text and icons. Figma: `Size` on `_Breadcrumb Base` (15) and Breadcrumb (18).
+- **Peek shadow, both kinds (Godwin 2026-11-25):** whenever the rail's peek covers the page it casts Elevation/neutral/mid, docked or floating (Figma's docked hover variants got it too). The panel's clip-path cuts shadows, so the open peek's clip stands off the panel by space-lg (`inset(-space-lg round r)`); the clip interpolates from the rail's as before.
+- **Code (2026-11-25):** the border is the panel's inset box-shadow (`--_edge`: the right side, or all round floating), so it never moves the content; `border={false}` is `data-border="none"`. The selected row's look is a set of `--_sel-*` properties on the root that `selectedStyle="raised"` swaps, so the hover and disabled rules stay one set. The panel carries `.bland-smooth` (radius 0 docked, rad-lg floating) and its clip rounds at the same radius (the smoothed curve sits inside it). Floating pads the root space-sm on the top, bottom and start and widens it by space-sm; the peek's absolute panel is placed at that inset. Breadcrumb sizes are local `--_type`, `--_icon`, `--_gap`, `--_crumb-gap`, `--_overflow-pad`, `--_height` on the nav; the sm focus ring is stroke-sm.
+
+## Modal `top` removed (0.4.0, 2026-11-25)
+
+- **Modal `top` removed** as planned (deprecated in 0.3.0): the prop, its development warning and the slot it rendered above the description are gone from `Modal`, `DialogShell` and `ModalContent`; Sheet's props no longer omit it. Content goes in `children`. Released as 0.4.0 together with the Sidebar, Breadcrumb, Progress Wizard and Button changes.
+- **File Upload title regular weight** (Godwin 2026-11-25): the `_uploader` title is Body/body-lg (was body-lg-bold), in Figma (the four `_uploader` variants; File-upload follows) and `file-upload.css`.

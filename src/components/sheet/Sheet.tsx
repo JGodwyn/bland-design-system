@@ -10,7 +10,7 @@ import './sheet.css';
 export type SheetSide = 'end' | 'start' | 'bottom';
 export type SheetSize = 'sm' | 'md' | 'lg';
 
-export interface SheetProps extends Omit<ModalProps, 'size' | 'backdrop' | 'top' | 'align'> {
+export interface SheetProps extends Omit<ModalProps, 'size' | 'backdrop' | 'align'> {
   /** The edge it is attached to: end (default, Figma's right), start (Figma's left, for navigation) or bottom (a phone sheet). */
   side?: SheetSide;
   /** A side sheet's width: sm 384 (default), md 512, lg 640. A bottom sheet fills the screen width. */

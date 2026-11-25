@@ -21,7 +21,7 @@ Props for every component are in `components.md`, generated from the package. Th
 | Feedback after an action | `Toast` (through `useToaster`) or `Notification` |
 | Loading with a known layout | `Skeleton` inside a `SkeletonGroup` |
 | Loading with no known layout or length | `Spinner` |
-| Known progress | `ProgressBar`; steps of a flow, `ProgressWizard` |
+| Known progress | `ProgressBar`; steps of a flow, `ProgressWizard` (`orientation="vertical"` for steps down the side of a page, `"auto"` to go vertical on phones) |
 | Navigation | `Sidebar` (desktop), `TabBar` (phone), `Breadcrumb`, `SectionTabs`, `Pagination` |
 | Content switching | `SectionTabs`, `PillTabs`, `FileTabs`, `SegmentedBar`, `Accordion` |
 | Data | `Table` and its parts, `ListItem`, `PaginationTable` |
@@ -40,7 +40,7 @@ Props for every component are in `components.md`, generated from the package. Th
 - **Icons**: pass any SVG node to `icon`, `iconStart`, `iconEnd`, `leading` and the like; Bland sizes and colors it. Icons beside a label are decorative. Icon-only controls (`IconButton`, a Badge with only an icon) need `aria-label`.
 - **Link**: inside running text leave `size` off (it takes the text's font) and keep `underline="always"`. A link on its own gets a `size` and may use `underline="hover"`. `color="inherit"` for footers, legal text and brand fills. `target="_blank"` adds the external mark and a screen reader hint by itself.
 - **Routers**: Link, Breadcrumb, TabBar, Sidebar, Pagination, ListItem and Logo take `renderLink` to render the project's router link (keep the `className` it passes).
-- **Modal, Sheet, Popover** share their parts: `title`, `description`, `children` (the one body slot) and `actions` (primary first; a function gets `close`). Pass the opener as `trigger`, or control them with `open` / `defaultOpen` / `onOpenChange`. Modal's `top` is deprecated: put that content in `children`. Popover's title and actions are off until passed; use sm Buttons in its `actions`.
+- **Modal, Sheet, Popover** share their parts: `title`, `description`, `children` (the one body slot) and `actions` (primary first; a function gets `close`). Pass the opener as `trigger`, or control them with `open` / `defaultOpen` / `onOpenChange`. Popover's title and actions are off until passed; use sm Buttons in its `actions`.
 - **Sheet**: `side="end"` (default), `"start"` or `"bottom"`; `end` and `start` follow the reading direction. `floating` detaches it from the screen edges. Use Modal instead for a decision.
 - **Forms**: every field takes `label` and `helperText`, and `status` (danger sets `aria-invalid`). Without a visible label, give an `aria-label`. Link an Alert to its field with `aria-describedby`.
 - **Toggle**: name the setting, not the action ("Notifications"). `size="xs"` is under the touch target: dense layouts only, with a label beside it.
@@ -48,7 +48,7 @@ Props for every component are in `components.md`, generated from the package. Th
 - **Spinner**: give `label` saying what is loading (`showLabel` to show it). `decorative` inside a loading Button or an `aria-busy` region.
 - **Tooltip**: wraps one focusable element that forwards `ref` (every Bland control does). Keep its content non-interactive.
 - **Table**: give it `aria-label` or `aria-labelledby`. It scrolls sideways inside itself when its columns don't fit.
-- **Sidebar**: the minimized rail opens over the page, past its own box, so no ancestor may clip it (`overflow: hidden`) narrower than `--sidebar-width`. For a product logo in the rail, pass `top` as `({ rail }) => (rail ? <Mark /> : <Logo />)`. No phone layout: hide it there and use `TabBar`.
+- **Sidebar**: the minimized rail opens over the page, past its own box, so no ancestor may clip it (`overflow: hidden`) narrower than `--sidebar-width`. For a product logo in the rail, pass `top` as `({ rail }) => (rail ? <Mark /> : <Logo />)`. No phone layout: hide it there and use `TabBar`. `selectedStyle="raised"` for a white current row instead of the brand tint, `floating` to float it off the screen edges (it takes 8px more width), `border={false}` on a gray page.
 - **ChatBubble audio**: the project owns the `<audio>` element and its playback; the bubble only draws it (`playing`, `onPlayingChange`, `progress`, `duration`).
 - **Copy buttons** (CodeSnippet, CodeText) work on plain-http pages too.
 - **Disabled** is the native `disabled` prop, drawn with the disabled tokens.
