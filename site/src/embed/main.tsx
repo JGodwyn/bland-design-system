@@ -19,13 +19,24 @@ function post(message: { type: 'bland:height'; height: number } | { type: 'bland
   if (window.parent !== window) window.parent.postMessage(message, '*');
 }
 
-/** The document's height, posted on first layout and on every change, at most once a frame. */
+/**
+ * The content's height: the lowest edge of anything in the body, the showcase and any floating layer portalled
+ * beside it (the color picker, menus). Not scrollHeight: a document is never shorter than its viewport, so a frame
+ * sized from it could grow but never shrink back.
+ */
+function contentHeight() {
+  let bottom = 0;
+  for (const el of document.body.children) bottom = Math.max(bottom, el.getBoundingClientRect().bottom + window.scrollY);
+  return Math.ceil(bottom);
+}
+
+/** The content's height, posted on first layout and on every change, at most once a frame. */
 function reportHeight() {
   let frame = 0;
   let last = -1;
   const send = () => {
     frame = 0;
-    const height = Math.ceil(document.documentElement.scrollHeight);
+    const height = contentHeight();
     if (height === last) return;
     last = height;
     post({ type: 'bland:height', height });

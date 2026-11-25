@@ -70,6 +70,23 @@ test('posts its height and ready to the parent', async ({ page }) => {
     .toBeGreaterThan(200);
 });
 
+test('the height is the content\'s, not the frame\'s', async ({ page }) => {
+  // A frame far taller than the showcase: the reported height must still be the showcase's, or a frame could only
+  // ever grow (a document is never shorter than its viewport).
+  await page.goto('http://localhost:5182/');
+  await page.setContent(
+    `<!doctype html><body style="margin:0"><iframe id="f" src="${embed}" style="width:1024px;height:1200px;border:0"></iframe>
+     <script>window.msgs = []; addEventListener('message', (e) => window.msgs.push(e.data));</script></body>`,
+  );
+  const content = await page
+    .frameLocator('#f')
+    .locator('.showcase__panel')
+    .evaluate((el) => el.getBoundingClientRect().bottom);
+  await expect
+    .poll(async () => (await msgs(page)).filter((m) => m.type === 'bland:height').at(-1)?.height ?? 0, { timeout: 10_000 })
+    .toBeLessThan(content + 64);
+});
+
 test('the height follows an open colour picker', async ({ page }) => {
   const frame = await framed(page);
   await expect.poll(async () => (await msgs(page)).some((m) => m.type === 'bland:ready'), { timeout: 10_000 }).toBe(true);
