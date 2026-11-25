@@ -1,0 +1,15 @@
+/* The showcase embed's page: nothing around the panel, and a transparent ground so the framing page shows through. */
+html,
+body {
+  background: transparent;
+}
+
+body {
+  margin: 0;
+}
+
+/* The page's height is what the frame takes (main.tsx posts scrollHeight), so it must include the color picker,
+   which opens above the swatches and can reach past the panel. */
+.embed {
+  display: flow-root;
+}

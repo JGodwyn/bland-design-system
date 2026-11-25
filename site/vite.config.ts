@@ -22,7 +22,7 @@ function preloadHeroFonts(): Plugin {
       order: 'post',
       handler(_html, ctx) {
         // The landing page only; the 404 page has no hero.
-        if (!ctx.path.endsWith('/index.html')) return [];
+        if (ctx.path !== '/index.html') return [];
         const files = Object.keys(ctx.bundle ?? {});
         return wanted.map((pattern) => {
           const file = files.find((name) => pattern.test(name));
@@ -76,7 +76,7 @@ function siteAddress(): Plugin {
     transformIndexHtml: {
       order: 'post',
       handler(html, ctx) {
-        if (!site || !ctx.path.endsWith('/index.html')) return html;
+        if (!site || ctx.path !== '/index.html') return html;
         return html
           .replace('content="/og.png"', `content="${site}/og.png"`)
           .replace('</head>', `    <link rel="canonical" href="${site}/" />\n    <meta property="og:url" content="${site}/" />\n  </head>`);
@@ -128,7 +128,14 @@ export default defineConfig(({ command }) => ({
   build: {
     outDir: resolve(import.meta.dirname, '../dist-site'),
     emptyOutDir: true,
-    // Two pages: the landing page and the 404 page Cloudflare Pages serves for unknown paths.
-    rollupOptions: { input: { main: resolve(import.meta.dirname, 'index.html'), notFound: resolve(import.meta.dirname, '404.html') } },
+    // Three pages: the landing page, the 404 page Cloudflare Pages serves for unknown paths, and the showcase embed
+    // the Bland case study on godwinjohn.com frames (site/src/embed/).
+    rollupOptions: {
+      input: {
+        main: resolve(import.meta.dirname, 'index.html'),
+        notFound: resolve(import.meta.dirname, '404.html'),
+        embed: resolve(import.meta.dirname, 'embed/showcase/index.html'),
+      },
+    },
   },
 }));
