@@ -79,6 +79,26 @@ test('posts its height and ready to the parent', async ({ page }) => {
     .toBeGreaterThan(200);
 });
 
+test('never posts a height before it has rendered', async ({ page }) => {
+  // A first message of 0 (measured before React's first commit) would collapse the frame's reserved height.
+  await framed(page);
+  await expect.poll(async () => (await msgs(page)).some((m) => m.type === 'bland:ready'), { timeout: 10_000 }).toBe(true);
+  const heights = (await msgs(page)).filter((m) => m.type === 'bland:height').map((m) => m.height!);
+  expect(heights.length).toBeGreaterThan(0);
+  expect(Math.min(...heights)).toBeGreaterThan(200);
+});
+
+test('answers a hello with its height and ready, for a page that was listening late', async ({ page }) => {
+  // The framing page may hydrate after the embed has said everything once: it asks, and the embed repeats itself.
+  await framed(page);
+  await expect.poll(async () => (await msgs(page)).some((m) => m.type === 'bland:ready'), { timeout: 10_000 }).toBe(true);
+  await page.evaluate(() => {
+    (window as unknown as { msgs: unknown[] }).msgs = [];
+    (document.getElementById('f') as HTMLIFrameElement).contentWindow!.postMessage({ type: 'bland:hello' }, '*');
+  });
+  await expect.poll(async () => (await msgs(page)).map((m) => m.type).sort().join(','), { timeout: 5_000 }).toBe('bland:height,bland:ready');
+});
+
 test('the height is the content\'s, not the frame\'s', async ({ page }) => {
   // A frame far taller than the showcase: the reported height must still be the showcase's, or a frame could only
   // ever grow (a document is never shorter than its viewport).

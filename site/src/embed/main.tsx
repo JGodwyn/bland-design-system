@@ -30,14 +30,20 @@ function contentHeight() {
   return Math.ceil(bottom);
 }
 
-/** The content's height, posted on first layout and on every change, at most once a frame. */
+let ready = false;
+let last = 0;
+
+/**
+ * The content's height, posted on every change, at most once a frame. Nothing is posted until there is something to
+ * measure: before React's first commit the body is empty, and a height of 0 would collapse the framing page's
+ * reserved space.
+ */
 function reportHeight() {
   let frame = 0;
-  let last = -1;
   const send = () => {
     frame = 0;
     const height = contentHeight();
-    if (height === last) return;
+    if (height <= 0 || height === last) return;
     last = height;
     post({ type: 'bland:height', height });
   };
@@ -59,4 +65,18 @@ createRoot(document.getElementById('root')!).render(
 );
 
 reportHeight();
-void document.fonts.ready.then(() => requestAnimationFrame(() => requestAnimationFrame(() => post({ type: 'bland:ready' }))));
+void document.fonts.ready.then(() =>
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      ready = true;
+      post({ type: 'bland:ready' });
+    }),
+  ),
+);
+
+// A framing page that started listening after we spoke (it hydrated late) asks again, and we repeat what we know.
+window.addEventListener('message', (event) => {
+  if (event.source !== window.parent || (event.data as { type?: unknown } | null)?.type !== 'bland:hello') return;
+  if (last > 0) post({ type: 'bland:height', height: last });
+  if (ready) post({ type: 'bland:ready' });
+});
