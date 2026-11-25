@@ -26,4 +26,4 @@
 /embed/*
   ! X-Frame-Options
   ! Content-Security-Policy
-  Content-Security-Policy: frame-ancestors 'self' https://www.godwinjohn.com https://godwinjohn.com http://localhost:3000
+  Content-Security-Policy: frame-ancestors 'self' https://www.godwinjohn.com https://godwinjohn.com http://localhost:*
